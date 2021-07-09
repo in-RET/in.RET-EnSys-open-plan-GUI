@@ -70,3 +70,14 @@ You can either use the existing `mvs_eland_api` folder or clone the latest stabl
 ## Installation Notes
 1. Docker engine should be started to run the application
 2. An error might occur on `setup.sh` execution. This is because of the underlying OS and the way it handles EOL. Try to execute the commands in the file sequentially instead.
+
+### Manage translations
+to generate the translations .po files
+```bash
+ python manage.py makemessages -l de --ignore="src" --ignore="static" --ignore="cdn_static_root" --ignore="requirements.txt"
+```
+These will be located in the folder `app/locale`, perform the translations (or send the .po file for translation) and then compile the translations:
+
+```bash
+python manage.py compilemessages
+```

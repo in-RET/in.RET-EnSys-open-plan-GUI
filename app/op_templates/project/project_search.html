@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
-
+{% load custom_filters %}
 {% load static %}
+{% load i18n %}
+
 {% block head_block %}
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" crossorigin=""
           integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="/>
@@ -16,184 +18,183 @@
 {% block title %}Projects{% endblock title %}
 
 {% block content %}
-    <!-- <div class="container5"> -->
-    <style>
-        .container {
-            max-width: 73% !important;
-        }
-        .container5{
-            border-radius: 0%;
-            width: 95%;
-            margin:5% auto;
-        }
+    <main>
+        <section class="header">
+            <div>
+                <div class="header__left"></div>
+                <h1 class="header__title">{% translate "My Projects" %}</h1>
+                <div class="header__back"></div>
+            </div>
+        </section>
+
+        {% for project in project_list %}
+
+            <section class="project">
+                <div>
+                    <div class="project__top">
+                        <h2 class="name">
+                            {{ project.name }}
+                        </h2>
+                        <a href="#" class="location">
+                            <span class="icon-pin" aria-hidden="true"></span>
+                            {{ project.country }}
+                        </a>
+                    </div>
+                    <div class="project__details">
+                        <div class="details">
+                            <div class="detail">
+                                <span class="detail__property">{% translate "Created" %}</span>
+                                <span class="detail__value">{{ project.date_created }}</span>
+                            </div>
+                            <!--<div class="detail">
+                                <span class="detail__property">Interest rate</span>
+                                <span class="detail__value">{{ project.economic_data.currency }}</span>
+                            </div>-->
+                            <div class="detail">
+                                <span class="detail__property">{% translate "Lifetime" %}</span>
+                                <span class="detail__value">{{ project.economic_data.duration }} {% translate "years" %}</span>
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <a class="btn btn--action btn--hollow action" href="results.html">
+                                <span class="icon icon-results" aria-hidden="true"></span>
+                                {% translate "Results" %}
+                            </a>
+                            <a class="btn btn--action action" href="{% url 'project_update' project.pk %}">
+                                <span class="icon icon-edit" aria-hidden="true"></span>
+                                {% translate "Edit" %}
+                            </a>
+                            <button class="btn btn--action action" type="button">
+                                <span class="icon icon-duplicate" aria-hidden="true"></span>
+                                {% translate "Duplicate" %}
+                            </button>
+                            <form action="{% url 'project_delete' project.pk %}"
+                                  method="POST">
+                                {% csrf_token %}
+                                <!-- TODO change the ugly inline style-->
+                                <button style="margin-top:0.25rem;" class="btn btn--action action" type="submit" value="Delete" onclick="return confirm('Are you sure you want to delete?' + '\n' +'This will also delete all related project data.')">
+                                    <span class="icon icon-delete" aria-hidden="true"></span>
+                                    {% translate "Delete" %}
+                                </button>
+
+                            </form>
+
+                        </div>
+                    </div>
+
+                    <!--
+                    return render(request, 'scenario/scenario_search.html',
+                    {'comment_list': project.comment_set.all(),
+                    'scenarios_list': project.scenario_set.all(),
+                    'project': project,
+                    'show_comments':show_comments
+                    })-->
 
 
-        td#colname {
-            max-width: 100px;
-        }
+                    <div class="project__scenarios">
+                        <div class="toggle" class="js-toggle-scenario">
+                            <button class="btn btn--action" type="button" data-bs-toggle="collapse" data-bs-target="#collapseScenarios" aria-expanded="false" aria-controls="collapseScenarios">
+                                <span class="icon-i_arrow_down icon icon--small js-toggle-scenario-icon" aria-hidden="true"></span>
+                                <span class="js-toggle-scenario-name">{% translate "Show scenarios" %}</span>
+                            </button>
+                        </div>
+                        <div class="collapse" id="collapseScenarios">
+                            <form>
+                                <div class="card card-body">
+                                    <ul class="list-group">
 
-        @media screen and (max-width: 1900px) {
-            .btn-success {
-                margin-top: 4rem;
-                margin-left: -35rem;
+                                        {% for scenario in project|scenario_list %}
+                                        <li class="list-group-item">
+                                            <div class="details">
+                                                <input class="form-check-input me-1" id="scenario-01" type="checkbox" value="scenario-01" aria-label="">
+                                                <label class="form-check-label" for="scenario-01">
+                                                    {{ scenario }}
+                                                </label>
+                                                <div class="detail">
+                                                    <span class="detail__property">{% translate "Created" %}</span>
+                                                    <span class="detail__value">{{ project.date_created }}</span>
+                                                </div>
+                                            </div>
+                                            <div class="actions">
+                                                <a class="btn btn--action results" href="results.html">
+                                                    <span class="icon icon-results" aria-hidden="true"></span>
+                                                    {% translate "Results" %}
+                                                </a>
+                                                <a class="btn btn--action action" href="scenario-creation-1.html">
+                                                    <span class="icon icon-edit" aria-hidden="true"></span>
+                                                </a>
+                                                <button class="btn btn--action action" type="button">
+                                                    <span class="icon icon-duplicate" aria-hidden="true"></span>
+                                                </button>
+                                                <button class="btn btn--action action" type="button">
+                                                    <span class="icon icon-delete" aria-hidden="true"></span>
+                                                </button>
+                                            </div>
+                                        </li>
+                                        {% empty %}
+                                            {% translate "There are no scenarios" %}
+                                        {% endfor %}
 
-            }
 
-            .btn-danger {
-                margin-top: 4rem;
-                margin-left: -25rem;
-            }
+                                    </ul>
+                                </div>
+                                <button class="btn btn--action action export" type="button">
+                                    <span class="icon icon-export" aria-hidden="true"></span>
+                                    {% translate "Export selected" %}
+                                </button>
+                            </form>
+                        </div>
+                        <div class="add-scenario">
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle" type="button" id="dropdownCreateScenario" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="icon icon-add" aria-hidden="true"></span>
+                                    {% translate "Create scenario" %}
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownCreateScenario">
 
-            .btn-info {
-                margin-top: 4rem;
-                margin-left: -15rem;
+                                    {% if project.user == request.user %}
+                                        <li><a class="dropdown-item" href="{% url 'scenario_create' project.id %}">{% translate "New scenario" %}</a></li>
+                                    {% endif %}
+                                    <li><a class="dropdown-item" href="#">{% translate "From file" %}</a></li>
+                                </ul>
+                            </div>
 
-            }
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-            .btn-default {
-                margin-top: 4rem;
-                margin-left: -5rem;
 
-            }
+        {% empty %}
+            <section class="projects-empty">
+                <div>
+                    <div class="projects-empty__img">
+                        <img src="{% static '/assets/illustrations/empty_folder.svg' %}" alt="Empty folder">
+                    </div>
+                    <div class="projects-empty__text">
+                        {% translate "There are no projects yet" %}
+                    </div>
+                    <div class="projects-empty__btn">
+                        <div class="dropdown">
+                            <button class="btn btn--medium btn--transparent btn--icon dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                {% translate "Create project" %}
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                <li><a class="dropdown-item" href="{% url 'project_create' %}">{% translate "Empty project" %}</a></li>
+                                <li><a class="dropdown-item" href="#">{% translate "From use case" %}</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-            .btn-warning {
-                margin-top: 4rem;
-                margin-left: 3rem;
+        {% endfor %}
 
-            }
+    </main>
 
-            #listtitle {
-                margin: 5% auto;
-            }
 
-        }
 
-        /* @media screen and (max-width: 991px) {
-               td#colname, td#colname2, td#colname3 {
-                   max-width: 130px !important;
-                   overflow: hidden;
-                   white-space: nowrap;
-                   text-overflow: ellipsis;
-                   font-size: 90%;
-               }
-           }*/
-
-        @media screen and (max-width: 1199px) and (min-width: 768px) {
-            #list6 {
-                font-size: 10px;
-            }
-
-            #list5 {
-                left: -5%;
-            }
-
-            #box2, #box1 {
-                min-width: 95% !important;
-                right: -4%;
-            }
-        }
-
-        @media screen and (max-width: 904px) {
-            #box2 {
-                min-width: 100% !important;
-            }
-
-            #listtitle {
-                font-size: 85% !important;
-            }
-
-            .mapp {
-                height: 300px !important;
-                border-right: none;
-                border-bottom: 6px solid #967b65;;
-            }
-
-            td#colname, td#colname2, td#colname3{
-                font-size: 80%;
-                max-width: 130px !important;
-                overflow: hidden;
-                white-space: nowrap;
-                text-overflow: ellipsis;
-            }
-
-            td#colname4{
-                font-size: 80%;
-                max-width: 380px !important;
-                overflow: hidden;
-                white-space: nowrap;
-                text-overflow: ellipsis;
-            }
-        }
-
-      
-        div.dropdown-menu{
-            overflow: visible;
-          
-            z-index: 999!important;
-           min-width: 100px;
-           
-        }
-
-        .dropdown-menu a{
-            color: black;
-            padding: 6px 8px;
-            text-decoration: none;
-             display: block;
-             font-size:12px;
-             text-transform:none!important;
-        }
-
-        .table-responsive{
-            overflow: visible !important;
-            border: none;
-        }
-
-        .container5{
-            overflow: auto;
-        }
-
-        @media screen and (min-width:886px){
-            .container5{
-            overflow: hidden;
-            }
-        }
-        #buttonn input{
-            padding:8px 16px;
-            background-color: #1c1c1c;
-            color:#f4d9a4;
-            border:none;
-            border-radius: 2px;
-            font-weight: 600;
-            box-shadow: 1px 1px 5px #1c1c1c57;
-        }
-
-        .btn{
-            background-color: rgb(255, 255, 255);
-            color:#414141;
-            font-size: 10px;
-        }
-      .btn:hover{
-        box-shadow:3px 3px 5px #1c1c1c2d
-      }
-      a.dropdown-item:hover,  input:hover{
-         /* background-color: rgba(139, 138, 139, 0.164);*/
-         cursor:pointer;
-         color:rgba(139, 138, 139, 0.699);
-      }
-
-      .btn-group.open .dropdown-toggle{
-          box-shadow: none;
-      }
-      #buttonn input:hover{
-          box-shadow: 3px 3px 5px #1c1c1c94;
-      }
-
-      input{
-          padding:6px 8px;
-      }
-
-    </style>
-    <div class="backg">
+    <!--<div class="backg">
         <div id="project_map" class="mapback"></div>
         <br>
         <div class="row">
@@ -263,7 +264,7 @@
                                                 <div class="dropdown">
                                             <div class="btn-group" dropdown>
                                                 <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                    <!--<span class="glyphicon glyphicon-cog"></span>&nbsp;--><!--<span class="caret" style=" transform: rotate(-90deg);"></span>-->
+                                                    <span class="glyphicon glyphicon-cog"></span>&nbsp;--><!--<span class="caret" style=" transform: rotate(-90deg);"></span>
                                                     <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
 
                                                 </button>
@@ -292,44 +293,7 @@
                                             </div>
                                         </div>
                                             </td>
-                                          <!-- <td>
 
-                                                <div class="buttons">
-                                                    <form style="float: left;" class="form"
-                                                          action="{% url 'scenario_search' project.pk %}"
-                                                          method="GET">
-                                                        <input class="btn btn-sm btn-success" type="submit"
-                                                               value="Open"/>&emsp;
-                                                    </form>
-                                                    <form style="float: left;" class="form"
-                                                          action="{% url 'project_detail' project.pk %}"
-                                                          method="GET">
-                                                        <input class="btn btn-sm btn-info" type="submit" value="Show"/>&emsp;
-                                                    </form>
-                                                    {% if project.user == request.user %}
-                                                    <form style="float: left;" class="form"
-                                                          action="{% url 'project_update' project.pk %}"
-                                                          method="GET">
-                                                        <input class="btn btn-sm btn-default" type="submit"
-                                                               value="Edit"/>&emsp;
-                                                    </form>
-                                                    <form style="float: left;" class="form"
-                                                          action="{% url 'project_delete' project.pk %}"
-                                                          method="POST">
-                                                        {% csrf_token %}
-                                                        <input class="btn btn-sm btn-danger" type="submit"
-                                                               value="Delete"
-                                                               onclick="return confirm('Are you sure you want to delete?' + '\n' +
-                             'This will also delete all related project data.')"/>
-                                                    </form>
-                                                    <form style="float: left;" class="form"
-                                                          onSubmit="shareProject(event, `{% url 'project_share' project.pk %}`)">
-                                                        <input class="btn btn-sm btn-warning" id="shaare" type="submit"
-                                                               value="Share"/>&emsp;
-                                                    </form>
-                                                    {% endif %}
-                                                </div>
-                                            </td>-->
                                         </tr>
                                     {% endfor %}
                                     </tbody>
@@ -349,11 +313,16 @@
 
     <br>
     <br>
+-->
+
 
 {% endblock content %}
 
 
 {% block end_body_scripts %}
+
+
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
 <script>

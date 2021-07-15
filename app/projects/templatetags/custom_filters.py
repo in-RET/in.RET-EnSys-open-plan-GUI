@@ -18,3 +18,7 @@ def convert_seconds_to_intuitive_string(value):
 
     except Exception as e:
         return str(e)
+
+@register.filter(name='scenario_list')
+def get_scenario_list_from_project(project):
+    return project.scenario_set.all()

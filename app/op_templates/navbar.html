@@ -21,13 +21,16 @@
             <ul class="navbar-nav mb-2 mb-lg-0">
                 {% if user.is_authenticated %}
                     <li class="nav-item">
+                        <!--results.html-->
                         <a class="nav-link" href="results.html">{% translate "Simulation results" %}</a>
                     </li>
                     <li class="nav-item">
+                        <!--scenario-empty.html-->
                         <a class="nav-link" href="scenario-empty.html">{% translate "New scenario" %}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="projects-view.html">{% translate "My projects" %}</a>
+                        <!--project-view.html-->
+                        <a class="nav-link" href="{% url 'project_search' %}">{% translate "My projects" %}</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">{% translate "Documentation" %}</a>

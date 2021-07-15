@@ -1,101 +1,131 @@
 {% load static %}
-<style>
-    @media screen and (max-width: 767px) {
-
-        .nav > li > a, .dropdown-menu {
-            font-size: 13px !important;
-        }
-
-        .navbar-nav {
-            text-align: center;
-        }
-
-        .navbar-header {
-            border-bottom: 1px solid #EFB03D;
-            width: 95%;
-        }
-
-        .navbar-nav {
-            width: 95%;
-        }
-    }
-
-</style>
+{% load i18n %}
+{% load custom_template_tags %}
 
 
-<nav class="navbar navbar-inverse">
+{% if signup %}
+    {% setvar "navbar--signup" as signup_class %}
+{% else %}
+    {% setvar "" as signup_class %}
+{% endif %}
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light {{ signup_class }}">
     <div class="container-fluid">
-        <div class="navbar-header">
-            <img src="{% static 'images/eland.png' %}" class="logoo"/>
-            <a class="navbar-brand" href="https://elandh2020.eu/" target="_blank">E-LAND</a>
-        </div>
+        <a class="navbar-brand" href="#">
+            <img src="{% static 'assets/logos/open_plan_logo_horizontal.svg' %}" alt="open_plan Logo">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mb-2 mb-lg-0">
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="results.html">{% translate "Simulation results" %}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="scenario-empty.html">{% translate "New scenario" %}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="projects-view.html">{% translate "My projects" %}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">{% translate "Documentation" %}</a>
+                    </li>
+                {% elif signup %}
 
-        <ul class="nav navbar-nav">
-            <li>
-                <a href="{% url 'home' %}" >EPA</a>
-            </li>
-        </ul>
-        <ul class="nav navbar-nav">
-            <li>
-                <a href="https://github.com/rl-institut/multi-vector-simulator" target="_blank" id="MVS">
-                    <i class="fab fa-github fa-lg"></i> MVS
-                </a>
-            </li>
-        </ul>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">{% translate "Contact" %}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">{% translate "Documentation" %}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">{% translate "Use cases" %}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">{% translate "License" %}</a>
+                    </li>
+                {% endif %}
 
-        {% if user.is_authenticated %}
-           
-        <ul class="nav navbar-nav navbar-right">
-                <li>
-                    <a href="{% url 'logout' %}">Logout <span class="glyphicon glyphicon-log-out" style="font-size:13px;"></span></a>
+                <li class="nav-item dropdown locale" id="language-switcher">
+                    <form action="{% url 'set_language' %}" method="post">
+                        {% csrf_token %}
+                        <input name="next" type="hidden" value="/" />
+
+                        <select class="selectpicker" name="language" style="width: auto;" onchange="this.form.submit()">
+                            {% get_current_language as LANGUAGE_CODE %}
+                            {% get_available_languages as LANGUAGES %}
+                            {% get_language_info_list for LANGUAGES as languages %}
+                            {% for language in languages %}
+
+                            <option
+                                    class="nav-link"
+                                    value="{{ language.code }}"
+                                    {% if language.code == LANGUAGE_CODE %} selected="selected"{% endif %}
+                                    data-content='<img src="/static/images/flags/{{ language.code }}.png">
+                        <span style="display:inline-block; width:100px; padding-left: 10px; text-shadow:none">
+                          {{ language.name_local }}
+                          <!-- span style="color:#999;">&nbsp;[{{ language.code }}]</span -->
+                        </span>'>
+                                {{ language.code }}
+                            </option>
+
+                            {% endfor %}
+                        </select>
+                    </form>
                 </li>
-            </ul>
-            <ul class="nav navbar-nav navbar-right" style="line-height:0.99;">
-                <li class="dropdown" >
-                    <a data-toggle="dropdown" href="#" id="userr">
-                        <span class="glyphicon glyphicon-user dropdown-toggle" style="font-size:13px;"></span>
-                        {{ user.username }}
-                        <span class="caret"></span>
+
+                {% if user.is_authenticated %}
+
+                    <!--<li class="nav-item">
+                        <a href="{% url 'logout' %}">Logout <span class="glyphicon glyphicon-log-out" style="font-size:13px;"></span></a>
+                    </li>
+
+                    <li class="nav-item dropdown" >
+                        <a data-toggle="dropdown" href="#" id="userr">
+                            <span class="glyphicon glyphicon-user dropdown-toggle" style="font-size:13px;"></span>
+                            {{ user.username }}
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="{% url 'user_info' %}">{% translate "User Info" %}</a></li>
+                            <li><a href="{% url 'change_password' %}">{% translate "Change Password" %}</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="{% url 'project_search' %}">{% translate "Project List" %}</a></li>-->
+
+
+                <li class="nav-item dropdown profile">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="{% static 'assets/icons/i_profile.svg' %}" alt="Profile icon">
                     </a>
-                    <ul class="dropdown-menu">
-                        <li><a href="{% url 'user_info' %}">User Info</a></li>
-                        <li><a href="{% url 'change_password' %}">Change Password</a></li>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="#">{% translate "Use cases" %}</a></li>
+                        <li><a class="dropdown-item" href="#">{% translate "License" %}</a></li>
+                        <li><a class="dropdown-item" href="about.html">{% translate "Contact" %}</a></li>
+                        <li><a class="dropdown-item" href="{% url 'user_feedback' %}">{% translate "Feedback" %}</a></li>
+                        <li><a class="dropdown-item" href="account.html">{% translate "Account" %}</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'logout' %}">{% translate "Log out" %}</a></li>
                     </ul>
                 </li>
-            </ul>
-            <ul class="nav navbar-nav navbar-right">
-                <li><a href="{% url 'project_search' %}">Project List</a></li>
-            </ul>
-            <ul class="nav navbar-nav navbar-right">
-                <li>
-                    <a href="{% url 'user_feedback' %}">Feedback</a>
-                </li>
-            </ul> 
-        {% else %}
-            <ul class="nav navbar-nav navbar-right">
-                <li>
-                    <a href="{% url 'login' %}"><span class="glyphicon glyphicon-log-in" style="font-size:13px;"></span> Login</a>
-                </li>
-            </ul>
-
-            <ul class="nav navbar-nav navbar-right">
-                <li>
-                    <a href="{% url 'signup' %}"> Sign up</a>
-                </li>
-            </ul>
-
-        {% endif %}
 
 
+                {% else %}
+                    <li class="nav-item">
+                        <!-- pages/projects-view-empty.html -->
+                        <a class="nav-link" href="{% url 'login' %}">{% translate "Log in" %}</a>
+                    </li>
+                    <li class="nav-item">
+                        <!-- pages/signup.html -->
+                        <a class="btn btn--small" href="{% url 'signup' %}" role="button">{% translate "Sign up" %}</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
     </div>
 </nav>
-
-<script type="text/javascript">
-    $(document).ready(function () {
-        const url = window.location;
-        $('ul.nav a[href="' + url + '"]').parent().addClass('active');
-        $('ul.nav a').filter(function () {
-            return this.href == url;
-        }).parent().addClass('active');
-    });
-</script>

@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
-
 {% load crispy_forms_tags %}
-
 {% load static %}
+{% load i18n %}
+
 {% block head_block %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" crossorigin=""
         integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" />
@@ -16,186 +16,142 @@
 {% endblock %}
 
 {% block content %}
-    <style>
-        @media screen and (max-width: 800px) {
-            .panel-default {
-                background: transparent;
-                box-shadow: none;
-            }
 
-            .btn btn-success, .submit-btn btn btn-primary { {
-                font-size: 80%;
-            }
-        }
-
-        @media screen and (max-width: 767px) {
-            .requiredField {
-                width: 50%;
-                margin-left: 5rem;
-            }
-
-            .numberinput {
-                width: 80%;
-                margin-left: 5rem;
-            }
-
-            .select {
-                width: 80%;
-                margin-left: 5rem;
-            }
-
-
-            #mapid {
-    height: 300px!important;
-  }
-
-  .btn.btn-primary.btn-lg{
-      margin-left:40% ;
-  }
-
-        #listtitle2 {
-            font-size: 60%;
-            width: 100%;
-            margin-left: 1rem;
-            text-align: center !important;
-
-        }
-    
-        }
-
-        @media screen and (max-width: 767px) {
-            .btn btn-success, .submit-btn btn btn-primary { {
-                width: 30%;
-                margin-left: 12rem;
-                font-size: 80%;
-            }
-        }
-         @media screen and (max-width: 991px) {
-             #mapid{
-                 height:2300px;
-             }
-         }
-    </style>
-    <br>
-    <button onclick="window.open(`{% url 'project_search' %}`, `_self`)" id="backbutton"><span class="glyphicon glyphicon-chevron-left"></span> Back</button>
-
-    <br>
-    <br>
-    <div class="row">
-
-        <div class="col-sm-12">
-
-
-            <div class="panel panel-default ">
-
-                <div class="container6">
-
-                    <div class="row">
-                        <!--   <div class="col-sm-7"> -->
-
-                        <!-- <div id="project_map"> -->
-                        <div class="col-sm-5">
-                            <div id="mapid" style="filter:sepia(10%); height:900px;">
-
-                            </div>
-                        </div>
-                        <div class="col-sm-7">
-                            <br>
-                            <br>
-
-                            <div class="panel-heading"><h3 class="panel-title" id="titleproj" style="color: #1b1e21;">
-                                <strong>Edit
-                                    Project </strong></h3></div>
-                            <br>
-                            <br>
-                            <div class="row">
-                                <div class="col-sm-1"></div>
-                                <div class="col-sm-10">
-
-                                    <div class="panel-body">
-                                        <form method="post">
-                                            {% csrf_token %}
-                                            <div class="form-group">
-                                                {{ project_form.name| as_crispy_field }}
-                                                {{ project_form.description| as_crispy_field }}
-                                                {{ project_form.country| as_crispy_field }}
-                                                <!-- <div style="height:350px" id="mapid"></div> -->
-                                                <br/>
-                                                <div class="row">
-                                                    <div class="form-row">
-                                                        <div class="form-group col-md-4 mb-0">
-                                                            {{ project_form.latitude|as_crispy_field }}
-                                                        </div>
-                                                        <div class="form-group col-md-4 mb-0">
-                                                            {{ project_form.longitude|as_crispy_field }}
-                                                        </div>
-                                                        <div class="form-group col-md-4 mb-0">
-                                                            {{ economic_data_form.duration|as_crispy_field }}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="form-row">
-                                                        <div class="form-group col-md-4 mb-0">
-                                                            {{ economic_data_form.currency|as_crispy_field }}
-                                                        </div>
-                                                        <div class="form-group col-md-4 mb-0">
-                                                            {{ economic_data_form.discount|as_crispy_field }}
-                                                        </div>
-                                                        <div class="form-group col-md-4 mb-0">
-                                                            {{ economic_data_form.tax|as_crispy_field }}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <br>
-                                            <div class="row">
-                                                <div class="col-sm-4"></div>
-                                                <div class="col-sm-5">
-                                                    <button class="btn btn-primary btn-lg"type="submit"  type="submit">Submit
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                                <div class="col-sm-1"></div>
-                            </div>
-                        </div>
-                    </div>
-
+    <div>
+        <section class="header">
+            <div>
+                <div class="header__left"></div>
+                <h1 class="header__title">{% translate "Project Setup" %}</h1>
+                <div class="header__back">
+                    <a href="{% url 'project_search' %}">{% translate "My projects" %}</a>
                 </div>
-                <div class="col-sm-2"></div>
-                <script>
-                    /* Map Show and Latitude-Longitude data autofill */
-                    var lat = document.getElementById("id_latitude").value;
-                    var lon = document.getElementById("id_longitude").value;
-                    var mymap = L.map('mapid').setView([lat, lon], 4);
-
-                    L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
-                        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-                        maxZoom: 18,
-                        id: 'mapbox/streets-v11',
-                        tileSize: 512,
-                        zoomOffset: -1,
-                        accessToken: 'pk.eyJ1IjoidmFsa2FsYWlzIiwiYSI6ImNrZGhpZ29peTFnMjIycG5ybWR3aG4yeHIifQ.L4y4PQjkIdO1c7pvzOr2kw'
-                    }).addTo(mymap);
-
-                    var popup = L.popup();
-
-                    function onMapClick(e) {
-                        popup.setLatLng(e.latlng)
-                            .setContent(`Location Coordinates: <br> (${e.latlng.lat.toFixed(4)}. ${e.latlng.lng.toFixed(4)})`)
-                            .openOn(mymap);
-                        $('#id_latitude').val(e.latlng.lat.toFixed(4));
-                        $('#id_longitude').val(e.latlng.lng.toFixed(4));
-                    }
-
-                    mymap.on('click', onMapClick);
-                </script>
             </div>
-        </div>
+        </section>
+        <section class="project-setup two-columns">
+            <div class="left">
+                <div>
+                    <div class="text">
+                      <span>
+                        {% translate "Fill in the following parameters:" %}
+                      </span>
+                        <span>
+                        <button class="btn btn--load" type="button">
+                        {% translate "Load parameters from file" %}
+                        </button>
+                        <span class="icon icon-question" aria-hidden="false" title="{% translate 'For more details about the parameters, please check the documentation' %}"></span>
+                      </span>
+                    </div>
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <div class="input-item">
+                            {{ project_form.name| as_crispy_field }}
+                        </div>
+                        <div class="input-item optional">
+                            {{ project_form.description| as_crispy_field }}
+                        </div>
+                        <div class="input-item optional">
+                            {{ project_form.country| as_crispy_field }}
+                        </div>
+                        <div class="input-item">
+                            {{ project_form.latitude|as_crispy_field }}
+                        </div>
+                        <div class="input-item">
+                            {{ project_form.longitude|as_crispy_field }}
+                        </div>
+                        <div class="input-item">
+                            {{ economic_data_form.duration|as_crispy_field }}
+                        </div>
+                        <div class="input-item">
+                            {{ economic_data_form.currency|as_crispy_field }}
+                        </div>
+                        <div class="input-item">
+                            {{ economic_data_form.discount|as_crispy_field }}
+                        </div>
+                        <div class="input-item">
+                            {{ economic_data_form.tax|as_crispy_field }}
+                        </div>
+                        <button class="btn btn--medium" type="submit">{% translate "Save project" %}</button>
+
+                        <!--<div class="input-item">
+                            <label for="projectName" class="form-label">Project name</label>
+                            <input type="text" class="form-control" id="projectName" placeholder="Name" aria-describedby="projectNameHelp" required>
+                            <div id="projectNameHelp" class="form-text">Maximum of 50 characters</div>
+                        </div>
+                        <div class="input-item optional">
+                            <label for="projectDescription" class="form-label">Project description</label>
+                            <textarea class="form-control" id="projectDescription" rows="3" placeholder="Description" aria-describedby="projectDescriptionHelp"></textarea>
+                            <div id="projectDescriptionHelp" class="form-text">Maximum of 300 characters</div>
+                        </div>
+                        <div class="input-item">
+                            <label for="gpsCoordinates" class="form-label">
+                                GPS coordinates
+                                <span class="icon icon-question" data-bs-toggle="tooltip" title="Point or shape"></span>
+                            </label>
+                            <textarea type="text" class="form-control" id="gpsCoordinates" placeholder="53.26485151, 12. 48415124" required></textarea>
+                        </div>
+                        <div class="input-item">
+                            <label for="interestRate" class="form-label">
+                                Interest rate
+                                <span class="icon icon-question" data-bs-toggle="tooltip" title="A guess of what the interest rate will be in during the project lifetime. Could be provided as constant or timeseries"></span>
+                            </label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="interestRate" placeholder="00.000" required>
+                                <span class="input-group-text">EUR</span>
+                            </div>
+                        </div>
+                        <div class="input-item">
+                            <label for="projectLifetime" class="form-label">
+                                Project lifetime
+                                <span class="icon icon-question" data-bs-toggle="tooltip" title="Simulation time"></span>
+                            </label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="projectLifetime" placeholder="2025-2050" required>
+                                <span class="input-group-text">Year</span>
+                            </div>
+                        </div>-->
+
+                    </form>
+                </div>
+            </div>
+            <div class="right">
+                <div>
+                    <!-- Insert map -->
+                    <div class="map" id="mapid">
+                        Here comes a map (maybe)
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
-    <br>
-    <br>
+
+
+    <script>
+        /* Map Show and Latitude-Longitude data autofill */
+        var lat = document.getElementById("id_latitude").value;
+        var lon = document.getElementById("id_longitude").value;
+        var mymap = L.map('mapid').setView([lat, lon], 4);
+
+        L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+            maxZoom: 18,
+            id: 'mapbox/streets-v11',
+            tileSize: 512,
+            zoomOffset: -1,
+            accessToken: 'pk.eyJ1IjoidmFsa2FsYWlzIiwiYSI6ImNrZGhpZ29peTFnMjIycG5ybWR3aG4yeHIifQ.L4y4PQjkIdO1c7pvzOr2kw'
+        }).addTo(mymap);
+
+        var popup = L.popup();
+
+        function onMapClick(e) {
+            popup.setLatLng(e.latlng)
+                .setContent(`Location Coordinates: <br> (${e.latlng.lat.toFixed(4)}. ${e.latlng.lng.toFixed(4)})`)
+                .openOn(mymap);
+            $('#id_latitude').val(e.latlng.lat.toFixed(4));
+            $('#id_longitude').val(e.latlng.lng.toFixed(4));
+        }
+
+        mymap.on('click', onMapClick);
+    </script>
+
 {% endblock content %}

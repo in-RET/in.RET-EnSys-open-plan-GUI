@@ -174,7 +174,7 @@ integrity="sha256-b88RdwbRJEzRx95nCuuva+hO5ExvXXnpX+78h8DjyOE=" crossorigin="ano
                     <div class="col-sm-4">
                         {% if project.user == request.user %}
                         <a class="glyphicon glyphicon-plus open-comments-modal" style="color: transparent;"
-                           data-modal="CreateScenarioModal" data-url="{% url 'scenario_create' project.id %}">
+                           data-modal="CreateScenarioModal" href="{% url 'scenario_steps' project.id %}">
                            <span id="createnewscen">Create New Scenario</span>
                         </a>
                         {% endif %}
@@ -321,7 +321,7 @@ integrity="sha256-b88RdwbRJEzRx95nCuuva+hO5ExvXXnpX+78h8DjyOE=" crossorigin="ano
 
     $(".open-modal").on("click", function () {
         $.ajax({
-            url: "{% url 'scenario_create' project.id %}",
+            url: "{% url 'scenario_steps' project.id %}",
             success: function (data) {
                 modalDiv.html(data);
                 console.log(modalDiv);

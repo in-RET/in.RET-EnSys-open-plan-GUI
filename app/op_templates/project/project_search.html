@@ -153,7 +153,7 @@
                                 <ul class="dropdown-menu" aria-labelledby="dropdownCreateScenario">
 
                                     {% if project.user == request.user %}
-                                        <li><a class="dropdown-item" href="{% url 'scenario_create' project.id %}">{% translate "New scenario" %}</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'scenario_steps' project.id %}">{% translate "New scenario" %}</a></li>
                                     {% endif %}
                                     <li><a class="dropdown-item" href="#">{% translate "From file" %}</a></li>
                                 </ul>

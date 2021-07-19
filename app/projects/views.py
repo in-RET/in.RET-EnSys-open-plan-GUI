@@ -291,11 +291,53 @@ def scenario_search(request, proj_id, show_comments=0):
                    })
 
 
+
 @login_required
-@require_http_methods(["GET"])
-def scenario_create(request, proj_id):
+@require_http_methods(["GET", "POST"])
+def scenario_create_parameters(request, proj_id, step_id):
     form = ScenarioCreateForm()
-    return render(request, 'scenario/scenario_create.html', {'form': form, 'proj_id':proj_id})
+    return render(
+        request,
+        f'scenario/scenario_step{step_id}.html',
+        {'form': form, 'proj_id': proj_id, 'step_id': step_id}
+    )
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def scenario_create_topology(request, proj_id, step_id):
+    return render(
+        request,
+        f'scenario/scenario_step{step_id}.html',
+        {'proj_id': proj_id, 'step_id': step_id}
+    )
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def scenario_create_constraints(request, proj_id, step_id):
+    return render(
+        request,
+        f'scenario/scenario_step{step_id}.html',
+        {'proj_id': proj_id, 'step_id': step_id}
+    )
+
+
+SCENARIOS_STEPS = [
+    scenario_create_parameters,
+    scenario_create_topology,
+    scenario_create_constraints
+]
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def scenario_steps(request, proj_id, step_id=None):
+    #form = ScenarioCreateForm()
+
+    if step_id is None:
+        return HttpResponseRedirect(reverse('scenario_steps', args=[proj_id, 1]))
+
+    return SCENARIOS_STEPS[step_id](request, proj_id, step_id)
+
+# return render(request, f'scenario/scenario_step{step_id}.html', {'form': form, 'proj_id':proj_id, 'step_id': step_id})
 
 
 @json_view

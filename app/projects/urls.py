@@ -6,6 +6,7 @@ urlpatterns = [
     # Project
     path('project/create/', project_create, name='project_create'),
     path('project/search/', project_search, name='project_search'),
+    path('project/search/<int:proj_id>', project_search, name='project_search'),
     path('project/update/<int:proj_id>', project_update, name='project_update'),
     path('project/detail/<int:proj_id>', project_detail, name='project_detail'),
     path('project/delete/<int:proj_id>', project_delete, name='project_delete'),

@@ -148,7 +148,7 @@ def project_create(request):
                 user = request.user,
                 economic_data = economic_data
             )
-            return HttpResponseRedirect(reverse('scenario_search', args=[project.id]))
+            return HttpResponseRedirect(reverse('project_search', args=[project.id]))
     else:
         form = ProjectCreateForm()
     return render(request, 'project/project_create.html', {'form': form})

@@ -141,7 +141,7 @@ class ScenarioCreateForm(ModelForm):
     #                          'data-toggle': 'tooltip', 'title': 'Provide a factor of 1.0 for the minimum degree of autonomy.'}))
     class Meta:
         model = Scenario
-        exclude = ['id', 'project']
+        exclude = ['id']
         widgets = scenario_widgets
         labels = scenario_labels
 
@@ -149,7 +149,7 @@ class ScenarioCreateForm(ModelForm):
 class ScenarioUpdateForm(ModelForm):
     class Meta:
         model = Scenario
-        exclude = ['id', 'project']
+        exclude = ['id']
         widgets = scenario_widgets
         labels = scenario_labels
 

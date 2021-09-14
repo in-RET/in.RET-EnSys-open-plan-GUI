@@ -423,7 +423,7 @@ def scenario_update(request, scen_id):
         if form.is_valid():
             [setattr(scenario, name, value) for name, value in form.cleaned_data.items()]
             scenario.save(update_fields=form.cleaned_data.keys())
-            return HttpResponseRedirect(reverse('scenario_search', args=[scenario.project.id]))
+            return HttpResponseRedirect(reverse('project_search', args=[scenario.project.id]))
     else:
         raise Http404("An error occurred while updating the Scenario.")
 
@@ -453,7 +453,7 @@ def scenario_duplicate(request, scen_id):
     duplicate_scenario_connections(connections_list, scenario, old2new_asset_ids_map, old2new_bus_ids_map)
     # duplicate_scenario_objects(simulation_list, scenario)
 
-    return HttpResponseRedirect(reverse('scenario_search', args=[scenario.project.id]))
+    return HttpResponseRedirect(reverse('project_search', args=[scenario.project.id]))
 
 
 @login_required
@@ -466,7 +466,7 @@ def scenario_delete(request, scen_id):
     if request.POST:
         scenario.delete()
         messages.success(request, 'scenario successfully deleted!')
-        return HttpResponseRedirect(reverse('scenario_search', args=[scenario.project.id]))
+        return HttpResponseRedirect(reverse('project_search', args=[scenario.project.id]))
 
 
 # class LoadScenarioFromFileView(BSModalCreateView):

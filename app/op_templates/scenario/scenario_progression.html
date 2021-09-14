@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
 {% block navbar %}
     {% include "navbar.html" with user=user scenario_create=True %}
@@ -10,36 +11,39 @@
 <!-- WRITE HTML CODE WITHIN THESE block content TAGS -->
 {% block content %}
 
-
-<div class="grid-x">
-
-    <div class="cell small-9 grid-x view-component">
-        <h4 class="cell"><a href="https://open-plan.readthedocs.io/en/latest/tool_interface.html#progression-bar" target="_blank">Progression bar VC</a></h4>
-        {% comment %}        {% import "progression_bar.html" as progression_bar %}
-        {{ progression_bar.input(step_idx=step_id, step_map=step_map) }}{% endcomment %}
+<section class="wizard">
+    <div class="wizard__name">
+        <span class="project">{{ proj_id }} {{ proj_name }}</span>
     </div>
-
-
+    <div class="wizard__steps">
+        <ul>
+            {% for step in step_list %}
+            {% if step_id == forloop.counter %}
+            <li class="active">{% translate step %}</li>
+            {% else %}
+            <li class>{% translate step %}</li>
+            {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+    <div></div>
+</section>
 
     {% block progression_content %}
 
-
     {% endblock progression_content %}
 
-</div>
-<div class="grid-x progression-buttons">
-    {% comment %}
-        {% if step_id > 1 %}
-    <a class="cell small-1 button warning nextprevbut" href="{{ url_for('progression', step_id=step_id-1) }}">Previous</a>
-    {% endif %}
-
-    {% if step_id < step_map|length %}
-    <a class="cell small-1 button success nextprevbut" href="{{ url_for('progression', step_id=step_id+1) }}">Next</a>
-    {% endif %}
-    {% endcomment %}
-</div>
-{% comment %}
-<a href="{{ url_for('project_overview') }}" class="button warning">Back to project overview</a>
-{% endcomment %}
 {% endblock content %}
 
+{% block footer %}
+<div class="step-footer">
+    <div>
+        {% if step_id > 1 %}
+            <a class="btn btn--medium btn--hollow btn--previous" href="{% url 'scenario_steps' proj_id step_id|add:'-1' %}" aria-disabled="true">{% translate "Previous" %}</a>
+        {% endif %}
+        {% if step_id < step_list|length %}
+            <a class="btn btn--medium" href="{% url 'scenario_steps' proj_id step_id|add:1 %}">{% translate "Next" %}</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock footer %}

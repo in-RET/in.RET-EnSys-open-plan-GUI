@@ -70,6 +70,8 @@
 {% endif %}
 
 <footer class="footer">
+    {% block footer %}
+
     <div>
         <div class="footer__logo">
             <img src="{% static 'assets/logos/open_plan_logo_horizontal.svg' %}" alt="open_plan logo">
@@ -85,6 +87,7 @@
             </ul>
         </div>
     </div>
+    {% endblock footer %}
 </footer>
 
 {% block end_body_scripts %}{% endblock %}

@@ -291,24 +291,39 @@ def scenario_search(request, proj_id, show_comments=0):
                    })
 
 
+STEP_LIST = [
+    "Scenario Setup",
+    "Energy system design",
+    "Constraints",
+    "Simulation"
+]
 
 @login_required
 @require_http_methods(["GET", "POST"])
 def scenario_create_parameters(request, proj_id, step_id):
     form = ScenarioCreateForm()
+    project = get_object_or_404(Project, pk=proj_id)
+
+    # TODO: if the scenario exists, load it, otherwise default form
+
+    # TODO: manage form errors and indicate where is wrong
+
     return render(
         request,
         f'scenario/scenario_step{step_id}.html',
-        {'form': form, 'proj_id': proj_id, 'step_id': step_id}
+        {'form': form, 'proj_id': proj_id, 'project': project, 'step_id': step_id, "step_list": STEP_LIST}
     )
 
 @login_required
 @require_http_methods(["GET", "POST"])
 def scenario_create_topology(request, proj_id, step_id):
+
+    # TODO: if the scenario exists, load it, otherwise default form
+
     return render(
         request,
         f'scenario/scenario_step{step_id}.html',
-        {'proj_id': proj_id, 'step_id': step_id}
+        {'proj_id': proj_id, 'step_id': step_id, "step_list": STEP_LIST}
     )
 
 @login_required
@@ -317,25 +332,46 @@ def scenario_create_constraints(request, proj_id, step_id):
     return render(
         request,
         f'scenario/scenario_step{step_id}.html',
-        {'proj_id': proj_id, 'step_id': step_id}
+        {'proj_id': proj_id, 'step_id': step_id, "step_list": STEP_LIST}
     )
 
+@login_required
+@require_http_methods(["GET", "POST"])
+def scenario_create_simulate(request, proj_id, step_id):
+    return render(
+        request,
+        f'scenario/scenario_step{step_id}.html',
+        {'proj_id': proj_id, 'step_id': step_id, "step_list": STEP_LIST}
+    )
 
 SCENARIOS_STEPS = [
     scenario_create_parameters,
     scenario_create_topology,
-    scenario_create_constraints
+    scenario_create_constraints,
+    scenario_create_simulate
 ]
 
 @login_required
 @require_http_methods(["GET", "POST"])
 def scenario_steps(request, proj_id, step_id=None):
     #form = ScenarioCreateForm()
+    #import pdb; pdb.set_trace()
+    if request.method == "GET":
+        if step_id is None:
+            return HttpResponseRedirect(reverse('scenario_steps', args=[proj_id, 1]))
+        print(step_id, SCENARIOS_STEPS[step_id])
+        return SCENARIOS_STEPS[step_id-1](request, proj_id, step_id)
+    elif request.method == "POST":
+        print("requestpost", step_id)
 
-    if step_id is None:
-        return HttpResponseRedirect(reverse('scenario_steps', args=[proj_id, 1]))
+        # do the db things here
+        scenario_create_post(request, proj_id)
 
-    return SCENARIOS_STEPS[step_id](request, proj_id, step_id)
+        return HttpResponseRedirect(reverse('scenario_steps', args=[proj_id, step_id]))
+        #return HttpResponseRedirect(reverse(SCENARIOS_STEPS[step_id], args=[proj_id, step_id]))
+    else:
+        print(request.method )
+        return HttpResponse("the request is")
 
 # return render(request, f'scenario/scenario_step{step_id}.html', {'form': form, 'proj_id':proj_id, 'step_id': step_id})
 

@@ -4,39 +4,45 @@
 
 
 {% if signup %}
-    {% setvar "navbar--signup" as signup_class %}
+    {% setvar "navbar--signup" as navbar_class %}
+{% elif scenario_create %}
+    {% setvar "navbar--scenario" as navbar_class %}
 {% else %}
-    {% setvar "" as signup_class %}
+    {% setvar "" as navbar_class %}
 {% endif %}
 
-<nav class="navbar navbar-expand-lg navbar-light bg-light {{ signup_class }}">
+<nav class="navbar navbar-expand-lg navbar-light bg-light {{ navbar_class }}">
     <div class="container-fluid">
         <a class="navbar-brand" href="#">
             <img src="{% static 'assets/logos/open_plan_logo_horizontal.svg' %}" alt="open_plan Logo">
         </a>
+        {{scenario_create}} {{signup}}
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mb-2 mb-lg-0">
                 {% if user.is_authenticated %}
-                    <li class="nav-item">
-                        <!--results.html-->
-                        <a class="nav-link" href="results.html">{% translate "Simulation results" %}</a>
-                    </li>
-                    <li class="nav-item">
-                        <!--scenario-empty.html-->
-                        <a class="nav-link" href="scenario-empty.html">{% translate "New scenario" %}</a>
-                    </li>
-                    <li class="nav-item">
-                        <!--project-view.html-->
-                        <a class="nav-link" href="{% url 'project_search' %}">{% translate "My projects" %}</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">{% translate "Documentation" %}</a>
-                    </li>
+                    <!--During scenario creation the nav bar does not display all options-->
+                    {% if not scenario_create %}
+                        <li class="nav-item">
+                            <!--results.html-->
+                            <a class="nav-link" href="results.html">{% translate "Simulation results" %}</a>
+                        </li>
+                        <li class="nav-item">
+                            <!--scenario-empty.html-->
+                            <a class="nav-link" href="scenario-empty.html">{% translate "New scenario" %}</a>
+                        </li>
+                        <li class="nav-item">
+                            <!--project-view.html-->
+                            <a class="nav-link" href="{% url 'project_search' %}">{% translate "My projects" %}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">{% translate "Documentation" %}</a>
+                        </li>
+                    {% endif %}
                 {% elif signup %}
-
+                    <!--For user signup the nav bar does not display all options-->
                 {% else %}
                     <li class="nav-item">
                         <a class="nav-link" href="#">{% translate "Contact" %}</a>

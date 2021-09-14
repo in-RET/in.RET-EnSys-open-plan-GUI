@@ -29,7 +29,7 @@
 
         {% for project in project_list %}
 
-            <section class="project">
+            <section class="project" id="project-{{ project.id }}">
                 <div>
                     <div class="project__top">
                         <h2 class="name">
@@ -93,21 +93,23 @@
 
                     <div class="project__scenarios">
                         <div class="toggle" class="js-toggle-scenario">
-                            <button class="btn btn--action" type="button" data-bs-toggle="collapse" data-bs-target="#collapseScenarios" aria-expanded="false" aria-controls="collapseScenarios">
+                            <button class="btn btn--action" type="button" data-bs-toggle="collapse" data-bs-target="#collapseScenarios{{ project.id }}" aria-expanded="false" aria-controls="collapseScenarios{{ project.id }}">
                                 <span class="icon-i_arrow_down icon icon--small js-toggle-scenario-icon" aria-hidden="true"></span>
                                 <span class="js-toggle-scenario-name">{% translate "Show scenarios" %}</span>
                             </button>
                         </div>
-                        <div class="collapse" id="collapseScenarios">
-                            <form>
+                        <div class="collapse" id="collapseScenarios{{ project.id }}">
+
                                 <div class="card card-body">
                                     <ul class="list-group">
 
                                         {% for scenario in project|scenario_list %}
+                                        <form>
+                                            {% csrf_token %}
                                         <li class="list-group-item">
                                             <div class="details">
-                                                <input class="form-check-input me-1" id="scenario-01" type="checkbox" value="scenario-01" aria-label="">
-                                                <label class="form-check-label" for="scenario-01">
+                                                <input class="form-check-input me-1" id="project{{ project.id }}scenario-{{ scenario.id }}" type="checkbox" value="project{{ project.id }}scenario-{{ scenario.id }}" aria-label="">
+                                                <label class="form-check-label" for="project{{ project.id }}scenario-{{ scenario.id }}">
                                                     {{ scenario }}
                                                 </label>
                                                 <div class="detail">
@@ -120,17 +122,18 @@
                                                     <span class="icon icon-results" aria-hidden="true"></span>
                                                     {% translate "Results" %}
                                                 </a>
-                                                <a class="btn btn--action action" href="scenario-creation-1.html">
+                                                <a class="btn btn--action action" href="{% url 'scenario_steps' scenario.pk %}"> <!-- "scenario-creation-1.html" in B design -->
                                                     <span class="icon icon-edit" aria-hidden="true"></span>
                                                 </a>
-                                                <button class="btn btn--action action" type="button">
+                                                <a class="btn btn--action action" href="{% url 'scenario_duplicate' scenario.pk %}">
                                                     <span class="icon icon-duplicate" aria-hidden="true"></span>
-                                                </button>
-                                                <button class="btn btn--action action" type="button">
+                                                </a>
+                                                <button class="btn btn--action action" type="submit" formaction="{% url 'scenario_delete' scenario.pk %}" formmethod="post">
                                                     <span class="icon icon-delete" aria-hidden="true"></span>
                                                 </button>
                                             </div>
                                         </li>
+                                        </form>
                                         {% empty %}
                                             {% translate "There are no scenarios" %}
                                         {% endfor %}
@@ -142,15 +145,15 @@
                                     <span class="icon icon-export" aria-hidden="true"></span>
                                     {% translate "Export selected" %}
                                 </button>
-                            </form>
+
                         </div>
                         <div class="add-scenario">
                             <div class="dropdown">
-                                <button class="btn dropdown-toggle" type="button" id="dropdownCreateScenario" data-bs-toggle="dropdown" aria-expanded="false">
+                                <button class="btn dropdown-toggle" type="button" id="dropdownCreateScenario{{ project.id }}" data-bs-toggle="dropdown" aria-expanded="false">
                                     <span class="icon icon-add" aria-hidden="true"></span>
                                     {% translate "Create scenario" %}
                                 </button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownCreateScenario">
+                                <ul class="dropdown-menu" aria-labelledby="dropdownCreateScenario{{ project.id }}">
 
                                     {% if project.user == request.user %}
                                         <li><a class="dropdown-item" href="{% url 'scenario_steps' project.id %}">{% translate "New scenario" %}</a></li>
@@ -165,6 +168,8 @@
             </section>
 
 
+
+
         {% empty %}
             <section class="projects-empty">
                 <div>
@@ -174,21 +179,23 @@
                     <div class="projects-empty__text">
                         {% translate "There are no projects yet" %}
                     </div>
-                    <div class="projects-empty__btn">
-                        <div class="dropdown">
-                            <button class="btn btn--medium btn--transparent btn--icon dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                                {% translate "Create project" %}
-                            </button>
-                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                <li><a class="dropdown-item" href="{% url 'project_create' %}">{% translate "Empty project" %}</a></li>
-                                <li><a class="dropdown-item" href="#">{% translate "From use case" %}</a></li>
-                            </ul>
-                        </div>
-                    </div>
                 </div>
             </section>
 
         {% endfor %}
+
+        <section class="projects-new">
+            <div class="dropdown">
+                <button class="btn btn--medium btn--transparent btn--icon dropdown-toggle" type="button" id="newProjectButton" data-bs-toggle="dropdown" aria-expanded="false">
+                    {% translate "Create project" %}
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="newProjectButton">
+                    <li><a class="dropdown-item" href="{% url 'project_create' %}">{% translate "Empty project" %}</a></li>
+                    <li><a class="dropdown-item" href="#">{% translate "From use case" %}</a></li>
+                </ul>
+            </div>
+        </section>
+
 
     </main>
 

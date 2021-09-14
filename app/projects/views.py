@@ -196,12 +196,12 @@ def project_delete(request, proj_id):
 
 @login_required
 @require_http_methods(["GET"])
-def project_search(request):
+def project_search(request, proj_id=None):
     # project_list = Project.objects.filter(user=request.user)
     # shared_project_list = Project.objects.filter(viewers=request.user)
     combined_projects_list = Project.objects.filter(Q(user=request.user) | Q(viewers=request.user)).distinct()
     return render(request, 'project/project_search.html',
-                  {'project_list': combined_projects_list})
+                  {'project_list': combined_projects_list, "proj_id": proj_id })
 
 # endregion Project
 

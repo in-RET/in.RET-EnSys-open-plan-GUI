@@ -23,6 +23,15 @@ from .services import create_or_delete_simulation_scheduler, send_feedback_email
 from .constants import DONE, ERROR
 logger = logging.getLogger(__name__)
 
+
+@require_http_methods(["GET"])
+def home(request):
+    if request.user.is_authenticated:
+        return HttpResponseRedirect(reverse('project_search'))
+    else:
+        return render(request, "index.html")
+
+
 # region Project
 
 @login_required

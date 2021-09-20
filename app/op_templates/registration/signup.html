@@ -9,12 +9,12 @@
     {% include "navbar.html" with user=user signup=True %}
 {% endblock navbar %}
 
-{% block content %}
+{% block index %}
 
-<div class="signup">
+<main class="signup">
     <div class="signup-frame">
         <div class="signup-frame__img">
-            <img src="../assets/illustrations/open_plan_hero_hexagon.svg" alt="open_plan cells">
+            <img src="{% static 'assets/illustrations/open_plan_hero_hexagon.svg' %}" alt="open_plan cells">
         </div>
         <div class="signup-frame__heading">
             {% translate "Welcome to the open_plan tool" %}
@@ -24,14 +24,15 @@
         </div>
         <form method="post" class="signup-frame__form">
             {% csrf_token %}
-            <div class="mb-3">
+            {{ form|crispy }}
+            <!--<div class="mb-3">
                 <label for="id_email" class="form-label">{% translate "Email address" %}</label>
                 <input type="text" class="form-control form-control-lg" id="id_email" placeholder="name@example.com" required>
             </div>
             <div class="mb-3">
                 <label for="id_password1" class="form-label">{% translate "Password" %}</label>
                 <input type="password" class="form-control form-control-lg" id="id_password1" placeholder="Password with at least 8 characters" required>
-            </div>
+            </div>-->
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
                 <label class="form-check-label" for="flexCheckDefault">
@@ -41,5 +42,5 @@
             <button class="btn btn--large" type="submit" id="submitbutton">{% translate "Sign up" %}</button>
         </form>
     </div>
-</div>
-{% endblock content %}
+</main>
+{% endblock index %}

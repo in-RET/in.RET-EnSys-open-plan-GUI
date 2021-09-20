@@ -41,33 +41,20 @@
 
 {% block topology %}{% endblock %}
 
+
+
+{% block index %}
+
+{% endblock index %}
+
+
 <div class="container">
     {% include 'messages.html' %}
-    {% block content %}{% endblock %}
+    {% block content %}
+    {% endblock %}
 </div>
 
-{% if not user.is_authenticated %}
-    <main>
-        <section class="hero section" id="hero" data-aos="fade-up">
-            <div>
-                <div class="hero__text">
-                    <h1>
-                        {% translate "Model your local energy system" %}
-                    </h1>
-                    <span>
-                  {% translate "Use the GUI to include sector-coupling and optimize the energy system model subject to equality constraints" %}
-                </span>
-                    <a href="pages/signup.html" class="btn btn--medium">
-                        {% translate "Try out" %}
-                    </a>
-                </div>
-                <div class="hero__image">
-                    <img src="{% static 'assets/illustrations/energy_system_gui.svg' %}" alt="Energy system GUI">
-                </div>
-            </div>
-        </section>
-    </main>
-{% endif %}
+
 
 <footer class="footer">
     {% block footer %}

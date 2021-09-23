@@ -1,9 +1,40 @@
 {% extends 'scenario/scenario_progression.html' %}
 
+{% load i18n %}
 
 <!-- WRITE HTML CODE WITHIN THESE block content TAGS -->
 {% block progression_content %}
 
 parameters
 
+
 {% endblock progression_content %}
+
+
+
+
+{% block footer %}
+
+<script>
+    var next_btn = $("#next_btn");
+
+    var form_id = $("#sumbit_scenario_btn");
+
+    function next_btn_clicked(){
+        console.log("clicked");
+        form_id.click();
+    };
+
+
+
+<div class="step-footer">
+    <a onclick="javascript:next_btn_clicked()" id=next_btn" class="btn btn--medium" >{% translate "Next" %} </a>
+    <!--<form action="{% url 'scenario_create_parameters' proj_id %}" method="post">
+        {% csrf_token %}
+        <button class="btn btn--medium" type="submit">
+            {% translate "Next" %}
+        </button>
+
+    </form>-->
+</div>
+{% endblock footer %}

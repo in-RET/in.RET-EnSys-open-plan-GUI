@@ -122,7 +122,7 @@
                                                     <span class="icon icon-results" aria-hidden="true"></span>
                                                     {% translate "Results" %}
                                                 </a>
-                                                <a class="btn btn--action action" href="{% url 'scenario_steps' scenario.pk %}"> <!-- "scenario-creation-1.html" in B design -->
+                                                <a class="btn btn--action action" href="{% url 'scenario_steps' project.id scenario.pk %}"> <!-- "scenario-creation-1.html" in B design -->
                                                     <span class="icon icon-edit" aria-hidden="true"></span>
                                                 </a>
                                                 <a class="btn btn--action action" href="{% url 'scenario_duplicate' scenario.pk %}">

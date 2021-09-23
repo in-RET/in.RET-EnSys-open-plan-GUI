@@ -1,5 +1,5 @@
 {% extends 'scenario/scenario_progression.html' %}
-
+{% load i18n %}
 
 <!-- WRITE HTML CODE WITHIN THESE block content TAGS -->
 {% block progression_content %}
@@ -7,3 +7,17 @@
 topology
 
 {% endblock progression_content %}
+
+{% block footer %}
+<div class="step-footer">
+
+    <form action="{% url 'scenario_create_topology' proj_id %}" method="post">
+        {% csrf_token %}
+        <a class="btn btn--medium btn--hollow btn--previous" href="{% url 'scenario_steps_edit' proj_id scen_id step_id|add:'-1' %}" aria-disabled="true">{% translate "Previous" %}</a>
+
+        <button class="btn btn--medium" type="submit">
+            {% translate "Next" %}
+        </button>
+    </form>
+</div>
+{% endblock footer %}

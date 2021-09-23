@@ -309,26 +309,66 @@ STEP_LIST = [
 
 @login_required
 @require_http_methods(["GET", "POST"])
-def scenario_create_parameters(request, proj_id, step_id):
+def scenario_create_parameters(request, proj_id, scen_id=None, step_id=1):
     form = ScenarioCreateForm()
     project = get_object_or_404(Project, pk=proj_id)
 
-    # TODO: if the scenario exists, load it, otherwise default form
+    if scen_id == "None":
+        scen_id = None
 
     # TODO: manage form errors and indicate where is wrong
 
-    return render(
-        request,
-        f'scenario/scenario_step{step_id}.html',
-        {'form': form, 'proj_id': proj_id, 'project': project, 'step_id': step_id, "step_list": STEP_LIST}
-    )
+    if request.method == "GET":
+        if scen_id is not None:
+            scenario = get_object_or_404(Scenario, pk=scen_id)
+
+            if (scenario.project.user != request.user) and (request.user not in scenario.project.viewers.all()):
+                raise PermissionDenied
+
+            form = ScenarioUpdateForm(None, instance=scenario)
+
+        answer = render(
+            request,
+            f'scenario/scenario_step{step_id}.html',
+            {'form': form, 'proj_id': proj_id, 'project': project, 'scen_id': scen_id, 'step_id': step_id, "step_list": STEP_LIST}
+        )
+
+    elif request.method == "POST":
+
+            # TODO make a new scenario entry if the project changed and warn the user upon changing project that it is going to change its settings
+            # proj_id = request.POST.get("project")
+            form = ScenarioCreateForm(request.POST)
+
+            if form.is_valid():
+                if scen_id is None:
+                    scenario = Scenario()
+                else:
+                    scenario = Scenario.objects.get(id=scen_id)
+                [setattr(scenario, name, value) for name, value in form.cleaned_data.items()]
+                scenario.project = project
+                scenario.save()
+                answer = HttpResponseRedirect(reverse('scenario_create_topology', args=[proj_id, scenario.id]))
+
+    return answer
 
 @login_required
 @require_http_methods(["GET", "POST"])
-def scenario_create_topology(request, proj_id, step_id):
+def scenario_create_topology(request, proj_id, scen_id, step_id=2):
 
     # TODO: if the scenario exists, load it, otherwise default form
 
+    if request.method == "POST":
+        return HttpResponseRedirect(reverse('scenario_create_constraints', args=[proj_id, scen_id]))
+    else:
+        return render(
+            request,
+            f'scenario/scenario_step{step_id}.html',
+            {'proj_id': proj_id, 'scen_id': scen_id, 'step_id': step_id, "step_list": STEP_LIST}
+        )
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def scenario_create_constraints(request, proj_id, scen_id, step_id=3):
     return render(
         request,
         f'scenario/scenario_step{step_id}.html',
@@ -337,16 +377,7 @@ def scenario_create_topology(request, proj_id, step_id):
 
 @login_required
 @require_http_methods(["GET", "POST"])
-def scenario_create_constraints(request, proj_id, step_id):
-    return render(
-        request,
-        f'scenario/scenario_step{step_id}.html',
-        {'proj_id': proj_id, 'step_id': step_id, "step_list": STEP_LIST}
-    )
-
-@login_required
-@require_http_methods(["GET", "POST"])
-def scenario_create_simulate(request, proj_id, step_id):
+def scenario_create_simulate(request, proj_id, scen_id, step_id=4):
     return render(
         request,
         f'scenario/scenario_step{step_id}.html',
@@ -361,26 +392,14 @@ SCENARIOS_STEPS = [
 ]
 
 @login_required
-@require_http_methods(["GET", "POST"])
-def scenario_steps(request, proj_id, step_id=None):
-    #form = ScenarioCreateForm()
-    #import pdb; pdb.set_trace()
+@require_http_methods(["GET"])
+def scenario_steps(request, proj_id, step_id=None, scen_id=None):
     if request.method == "GET":
         if step_id is None:
             return HttpResponseRedirect(reverse('scenario_steps', args=[proj_id, 1]))
-        print(step_id, SCENARIOS_STEPS[step_id])
-        return SCENARIOS_STEPS[step_id-1](request, proj_id, step_id)
-    elif request.method == "POST":
-        print("requestpost", step_id)
 
-        # do the db things here
-        scenario_create_post(request, proj_id)
+        return SCENARIOS_STEPS[step_id-1](request, proj_id, scen_id, step_id)
 
-        return HttpResponseRedirect(reverse('scenario_steps', args=[proj_id, step_id]))
-        #return HttpResponseRedirect(reverse(SCENARIOS_STEPS[step_id], args=[proj_id, step_id]))
-    else:
-        print(request.method )
-        return HttpResponse("the request is")
 
 # return render(request, f'scenario/scenario_step{step_id}.html', {'form': form, 'proj_id':proj_id, 'step_id': step_id})
 

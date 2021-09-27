@@ -212,6 +212,28 @@ def project_search(request, proj_id=None):
     return render(request, 'project/project_search.html',
                   {'project_list': combined_projects_list, "proj_id": proj_id })
 
+
+@login_required
+@require_http_methods(["POST", "GET"])
+def project_duplicate(request, proj_id):
+    """ duplicates the selected project but none of its associated scenarios """
+    project = get_object_or_404(Project, pk=proj_id)
+
+    # duplicate the project
+    project.pk = None
+    print(project.economic_data.pk)
+    economic_data = project.economic_data
+    economic_data.pk = None
+    economic_data.save()
+    #economic_data = project.economic_data.save()
+    project.economic_data = economic_data
+    project.save()
+
+
+    return HttpResponseRedirect(reverse('project_search', args=[project.id]))
+
+
+
 # endregion Project
 
 

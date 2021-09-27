@@ -11,23 +11,23 @@
 <!-- WRITE HTML CODE WITHIN THESE block content TAGS -->
 {% block content %}
 
-<section class="wizard">
-    <div class="wizard__name">
-        <span class="project">{{ proj_id }} {{ proj_name }}</span>
-    </div>
-    <div class="wizard__steps">
-        <ul>
-            {% for step in step_list %}
-            {% if step_id == forloop.counter %}
-            <li class="active">{% translate step %}</li>
-            {% else %}
-            <li class>{% translate step %}</li>
-            {% endif %}
-            {% endfor %}
-        </ul>
-    </div>
-    <div></div>
-</section>
+    <section class="wizard">
+        <div class="wizard__name">
+            <span class="project">{{ proj_id }} {{ proj_name }}</span>
+        </div>
+        <div class="wizard__steps">
+            <ul>
+                {% for step in step_list %}
+                {% if step_id == forloop.counter %}
+                <li class="active">{% translate step %}</li>
+                {% else %}
+                <li class>{% translate step %}</li>
+                {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+        <div></div>
+    </section>
 
     {% block progression_content %}
 

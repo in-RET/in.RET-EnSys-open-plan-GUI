@@ -64,10 +64,15 @@
                                 <span class="icon icon-edit" aria-hidden="true"></span>
                                 {% translate "Edit" %}
                             </a>
-                            <button class="btn btn--action action" type="button">
-                                <span class="icon icon-duplicate" aria-hidden="true"></span>
-                                {% translate "Duplicate" %}
-                            </button>
+                            <form action="{% url 'project_duplicate' project.pk %}"
+                                  method="POST">
+                                {% csrf_token %}
+                                <!-- TODO change the ugly inline style-->
+                                <button style="margin-top:0.25rem;" class="btn btn--action action" type="submit" value="Duplicate">
+                                    <span class="icon icon-duplicate" aria-hidden="true"></span>
+                                    {% translate "Duplicate" %}
+                                </button>
+                            </form>
                             <form action="{% url 'project_delete' project.pk %}"
                                   method="POST">
                                 {% csrf_token %}
@@ -122,7 +127,7 @@
                                                     <span class="icon icon-results" aria-hidden="true"></span>
                                                     {% translate "Results" %}
                                                 </a>
-                                                <a class="btn btn--action action" href="{% url 'scenario_steps' project.id scenario.pk %}"> <!-- "scenario-creation-1.html" in B design -->
+                                                <a class="btn btn--action action" href="{% url 'scenario_steps_edit' proj_id=project.id scen_id=scenario.pk step_id=1 %}"> <!-- "scenario-creation-1.html" in B design -->
                                                     <span class="icon icon-edit" aria-hidden="true"></span>
                                                 </a>
                                                 <a class="btn btn--action action" href="{% url 'scenario_duplicate' scenario.pk %}">

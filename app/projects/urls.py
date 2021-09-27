@@ -28,11 +28,11 @@ urlpatterns = [
     path('project/<int:proj_id>/scenario/create_topology', scenario_create_topology, name='scenario_create_topology'),
     path('project/<int:proj_id>/scenario/create_constraints>', scenario_create_constraints, name='scenario_create_constraints'),
     path('project/<int:proj_id>/scenario/create_parameters/<int:scen_id>', scenario_create_parameters, name='scenario_create_parameters'),
+    path('project/<int:proj_id>/scenario/create_parameters/<scen_id>', scenario_create_parameters, name='scenario_create_parameters'),
     path('project/<int:proj_id>/scenario/create_topology/<int:scen_id>', scenario_create_topology, name='scenario_create_topology'),
     path('project/<int:proj_id>/scenario/create_constraints/<int:scen_id>/', scenario_create_constraints, name='scenario_create_constraints'),
     path('scenario/update/<int:scen_id>', scenario_update, name='scenario_update'),
     path('scenario/delete/<int:scen_id>', scenario_delete, name='scenario_delete'),
-    path('scenario/view/<int:scen_id>', scenario_view, name='scenario_view'),
     path('scenario/duplicate/<int:scen_id>', scenario_duplicate, name='scenario_duplicate'),
     # path('scenario/upload/<int:proj_id>', LoadScenarioFromFileView.as_view(), name='scenario_upload'),
     # Grid Model (Assets Creation)

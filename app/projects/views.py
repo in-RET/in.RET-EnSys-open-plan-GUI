@@ -459,27 +459,23 @@ def scenario_steps(request, proj_id, step_id=None, scen_id=None):
         return SCENARIOS_STEPS[step_id-1](request, proj_id, scen_id, step_id)
 
 
-
+# TODO delete this useless code here
 @login_required
 @require_http_methods(["GET"])
-def scenario_view(request, scen_id):
-    """ Scenario Update View. GET request only. """
+def scenario_view(request, scen_id, step_id):
+    """Scenario View. GET request only. """
     scenario = get_object_or_404(Scenario, pk=scen_id)
 
     if (scenario.project.user != request.user) and (request.user not in scenario.project.viewers.all()):
         raise PermissionDenied
 
-    scenario_form = ScenarioUpdateForm(None, instance=scenario)
-    return render(request, 'scenario/scenario_info.html', 
-        {
-            'scenario_form': scenario_form, 
-            'scenario': scenario
-        })
+    return HttpResponseRedirect(reverse('project_search', args=[scenario.project.id]))
 
 
+# TODO delete this useless code here
 @login_required
-@require_http_methods(["POST"])
-def scenario_update(request, scen_id):
+@require_http_methods(["GET"])
+def scenario_update(request, scen_id, step_id):
     """Scenario Update View. POST request only. """
     scenario = get_object_or_404(Scenario, pk=scen_id)
     if scenario.project.user != request.user:

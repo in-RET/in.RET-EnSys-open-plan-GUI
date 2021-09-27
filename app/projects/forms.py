@@ -100,8 +100,8 @@ class CommentForm(ModelForm):
 
 
 
-# region Scenarion
-
+# region Scenario
+# TODO build this from the documentation with a for loop over the keys
 scenario_widgets = {
     'name': forms.TextInput(attrs={'placeholder': 'Scenario name'}),
     'start_date': forms.DateInput(format='%m/%d/%Y',

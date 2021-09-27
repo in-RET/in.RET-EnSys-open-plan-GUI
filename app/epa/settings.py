@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     # 3rd Party
     'crispy_forms',
     'django_q',
+    'widget_tweaks'
 ]
 
 MIDDLEWARE = [
@@ -71,7 +72,7 @@ FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'op_templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -189,6 +190,8 @@ MVS_GET_URL = f"{MVS_API_HOST}/check/"
 # Allow iframes to show in page
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
+import sys
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -211,11 +214,16 @@ LOGGING = {
             'filename': 'django_epa_warning.log',
             'formatter': 'dtlnm'
         },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'stream': sys.stdout,
+        }
     },
     'loggers': {
         '': {
-            'handlers': ['info_file', 'warnings_file'],
-            'level': 'INFO',
+            'handlers': ['info_file', 'warnings_file', 'console'],
+            'level': 'DEBUG',
             'propagate': True,
         },
     },

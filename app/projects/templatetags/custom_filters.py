@@ -22,3 +22,9 @@ def convert_seconds_to_intuitive_string(value):
 @register.filter(name='scenario_list')
 def get_scenario_list_from_project(project):
     return project.scenario_set.all()
+
+@register.filter
+def pdb(element):
+    import pdb; pdb.set_trace()
+    return element
+

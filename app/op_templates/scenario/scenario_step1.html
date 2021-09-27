@@ -1,11 +1,37 @@
 {% extends 'scenario/scenario_progression.html' %}
-
+{% load crispy_forms_tags %}
 {% load i18n %}
 
 <!-- WRITE HTML CODE WITHIN THESE block content TAGS -->
 {% block progression_content %}
 
-parameters
+<section class="scenario-create">
+
+    <form id="CreateScenarioForm" method="POST" action="{% url 'scenario_create_parameters' proj_id scen_id %}">
+        {% csrf_token %}
+        <div id="FormGroup" class="form-group">
+
+
+            {% for field in form.visible_fields %}
+                <div class="form-group">
+                    {{ field|as_crispy_field }}
+                    {% if field.help_text %}
+                        <small class="form-text text-muted">{{ field.help_text }}</small>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+        </div>
+        <div class="row">
+            <div class="col-sm-4"></div>
+            <div class="col-sm-4">
+                <button style=display:none;" type="submit" id="sumbit_scenario_btn">Send form</button>
+
+            </div>
+        </div>
+    </form>
+
+</section>
 
 
 {% endblock progression_content %}
@@ -16,7 +42,6 @@ parameters
 {% block footer %}
 
 <script>
-    var next_btn = $("#next_btn");
 
     var form_id = $("#sumbit_scenario_btn");
 
@@ -27,14 +52,13 @@ parameters
 
 
 
-<div class="step-footer">
-    <a onclick="javascript:next_btn_clicked()" id=next_btn" class="btn btn--medium" >{% translate "Next" %} </a>
-    <!--<form action="{% url 'scenario_create_parameters' proj_id %}" method="post">
-        {% csrf_token %}
-        <button class="btn btn--medium" type="submit">
-            {% translate "Next" %}
-        </button>
 
-    </form>-->
+</script>
+
+
+<div class="step-footer">
+    <a onclick="javascript:next_btn_clicked()" class="btn btn--medium" >{% translate "Next" %} </a>
 </div>
 {% endblock footer %}
+
+

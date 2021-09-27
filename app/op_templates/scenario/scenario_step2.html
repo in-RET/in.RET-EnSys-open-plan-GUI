@@ -1,23 +1,301 @@
 {% extends 'scenario/scenario_progression.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
 {% load i18n %}
+
+
+{% block start_body_scripts %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jerosoler/Drawflow/dist/drawflow.min.css">
+
+<link rel="stylesheet" type="text/css" href="{% static 'css/beautiful1.css' %}"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css"
+      integrity="sha256-h20CPZ0QyXlBuAw7A+KluUYx/3pK+c7lYEpqLTlxjYQ=" crossorigin="anonymous"/>
+{% endblock start_body_scripts %}
+
 
 <!-- WRITE HTML CODE WITHIN THESE block content TAGS -->
 {% block progression_content %}
 
-topology
+<main>
+    <section class="system-design">
+        <div class="components">
+            <div class="components__title">
+                <div>
+                    <h2>{% translate "Energy components" %}</h2>
+                    <span class="icon icon-question" data-bs-toggle="tooltip" title="Lorem ipsum"></span>
+                </div>
+            </div>
+            <div class="components__content">
+                <div class="section section--providers">
+                    <div class="section__title">
+                        <h3>{% translate "Providers" %}</h3>
+                    </div>
+                    {% include 'scenario/topology_drag_items.html' with name="Electricity DSO" alt="Electric grid icon" image="electric_grid.svg" data_node="dso" %}
+                    {% include 'scenario/topology_drag_items.html' with name="Gas DSOt" alt="Electric grid icon" image="electric_grid.svg" data_node="gas_dso" %}
+                    {% include 'scenario/topology_drag_items.html' with name="H2 DSO" alt="Electric grid icon" image="electric_grid.svg" data_node="h2_dso" %}
+                    {% include 'scenario/topology_drag_items.html' with name="Heat DSO" alt="Electric grid icon" image="electric_grid.svg" data_node="heat_dso" %}
+                </div>
+
+                <div class="section section--production">
+                    <div class="section__title">
+                        <h3>{% translate "Production" %}</h3>
+                    </div>
+                    {% include 'scenario/topology_drag_items.html' with name="PV Plant" alt="" image="pv_plant.svg" data_node="pv_plant" %}
+                    {% include 'scenario/topology_drag_items.html' with name="Wind Plant" alt="" image="wind_plant.svg" data_node="wind_plant" %}
+                    {% include 'scenario/topology_drag_items.html' with name="Biogas Plant" alt="" image=".svg" data_node="biogas_plant" %}
+                    {% include 'scenario/topology_drag_items.html' with name="Geothermal Conversion" alt="" image=".svg" data_node="geothermal_conversion" %}
+                    {% include 'scenario/topology_drag_items.html' with name="Solar Thermal Plant" alt="" image=".svg" data_node="solar_thermal_plant" %}
+
+                </div>
+                <div class="section section--conversion">
+                    <div class="section__title">
+                        <h3>{% translate "Conversion" %}</h3>
+                    </div>
+                    {% include 'scenario/topology_drag_items.html' with name="Transformer Station (in)" alt="" image="transformer_in.svg" data_node="transformer_station_in" %}
+                    {% include 'scenario/topology_drag_items.html' with name="Transformer Station (out)" alt="" image="transformer_out.svg" data_node="transformer_station_out" %}
+                    {% include 'scenario/topology_drag_items.html' with name="Storage Charge Controller (in)" alt="" image="storage_in.svg" data_node="storage_charge_controller_in" %}
+                    {% include 'scenario/topology_drag_items.html' with name="Storage Charge Controller (out)" alt="" image="storage_out.svg" data_node="storage_charge_controller_out" %}
+                    {% include 'scenario/topology_drag_items.html' with name="Solar Inverter" alt="" image="solar_inverter.svg" data_node="solar_inverter" %}
+                    {% include 'scenario/topology_drag_items.html' with name="Diesel Generator" alt="" image=".svg" data_node="diesel_generator" %}
+                    {% include 'scenario/topology_drag_items.html' with name=" Fuel Cell" alt="" image=".svg" data_node="fuel_cell" %}
+                    {% include 'scenario/topology_drag_items.html' with name="Gas Boiler" alt="" image=".svg" data_node="gas_boiler" %}
+                    {% include 'scenario/topology_drag_items.html' with name="Electrolyzer" alt="" image=".svg" data_node="electrolyze" %}
+                    {% include 'scenario/topology_drag_items.html' with name="Heat Pump" alt="" image=".svg" data_node="heat_pump" %}
+
+                </div>
+                <div class="section section--storage">
+                    <div class="section__title">
+                        <h3>{% translate "Storage" %}</h3>
+                    </div>
+
+                    {% include 'scenario/topology_drag_items.html' with name="Electricity Storage" alt="" image="battery.svg" data_node="bess" %}
+                    {% include 'scenario/topology_drag_items.html' with name="Gas Storage" alt="" image=".svg" data_node="gess" %}
+                    {% include 'scenario/topology_drag_items.html' with name="H2 Storage" alt="" image=".svg" data_node="h2ess" %}
+                    {% include 'scenario/topology_drag_items.html' with name="Heat Storage" alt="" image=".svg" data_node="hess" %}
+
+
+                </div>
+                <div class="section section--demand">
+                    <div class="section__title">
+                        <h3>{% translate "Consumption" %}</h3>
+                    </div>
+
+
+                    {% include 'scenario/topology_drag_items.html' with name="Electricity Demand" alt="House with electricity and person icon" image="demand.svg" data_node="demand" %}
+                    {% include 'scenario/topology_drag_items.html' with name="Gas Demand" alt="" image=".svg" data_node="gas_demand" %}
+                    {% include 'scenario/topology_drag_items.html' with name="H2 Demand" alt="" image=".svg" data_node="h2_demand" %}
+                    {% include 'scenario/topology_drag_items.html' with name="Heat Demand" alt="" image=".svg" data_node="heat_demand" %}
+
+                </div>
+                <div class="section section--bus">
+                    <div class="section__title">
+                        <h3>{% translate "Bus" %}</h3>
+                    </div>
+
+
+                    {% include 'scenario/topology_drag_items.html' with name="Bus" alt="" image="power_antenna.svg" data_node="bus" %}
+
+                </div>
+            </div>
+        </div>
+        <div id="drawflow" class="gui" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <div class="gui__clear">
+                <div id="area-selection-div" hidden style="border: 1px dotted #000; position: absolute;"></div>
+                <div class="load-scenario">
+                    <select class="form-select">
+                        <option selected>{% translate "Load system design from existing scenario" %}</option>
+                        <option value="1">PV Potsdam 2025</option>
+                        <option value="2">open_plan test</option>
+                    </select>
+                </div>
+                <a class="btn btn--small btn--hollow" onclick="clearGridModel()">{% translate "Clear design" %}</a>
+            </div>
+            <div class="gui__empty-text">
+                <span>{% translate "Drag and drop components to build your energy system" %}</span>
+            </div>
+            <div class="gui-component gui-component--production gui-component--pv" style="position: absolute; left: 25%; top: 25%" data-bs-toggle="modal" data-bs-target="#pvModal">
+                <div class="gui-component__name">
+              <span>
+                pv_plant_name_XYZ_
+              </span>
+                </div>
+                <div class="gui-component__bottom">
+                    <div class="input">
+                        <div class="node"></div>
+                    </div>
+                    <div class="img"></div>
+                    <div class="output">
+                        <div class="node node--empty"></div>
+                        <div class="node"></div>
+                        <div class="node"></div>
+                        <div class="node"></div>
+                        <div class="node"></div>
+                        <div class="node"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
 
 {% endblock progression_content %}
+
+
+{% block end_body_scripts %}
+
+<script src="https://cdn.jsdelivr.net/gh/jerosoler/Drawflow/dist/drawflow.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.serializeJSON/3.1.0/jquery.serializejson.min.js"
+        integrity="sha512-4y8bsEzrXJqRyl2dqjdKk/DetH59JcFTtYNMsy5DUpvVV8CXiSrQ1gSCL3+dFgj1Xco0ONPizsYd6wX2eAXL2g=="
+        crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+<script>
+        const csrfToken = '{{ csrf_token }}';
+        const formGetUrl = `{% url 'get_asset_create_form' %}`;
+        const formPostUrl = `{% url 'asset_create_or_update' scenario.id %}`;
+        const retrieveExisitngNodesUrl = `{% url 'new_assets_topology' scenario.id %}`;
+        const scenarioBelongsToUser = {% if scenario.project.user == request.user %}true{% else %}false{% endif %};
+    </script>
+<script src="{% static 'js/grid_model_topology.js' %}"></script>
+
+<script>
+        /* Script to retrieve nodes (assets and busses) and links data from the backend. */
+        /* Html of asset modification is provided in grid_model_topology.js:createNodeObject function */
+        const addBusses = async (data) =>
+            await Promise.all(data.map(async nodeData => {
+                const result = await createNodeObject(nodeData.name, nodeData.input_ports, nodeData.output_ports, nodeData.data, nodeData.pos_x, nodeData.pos_y);
+                nodesToDB.set(`node-${result.editorNodeId}`, {uid:nodeData.data.databaseId, assetTypeName: "bus" });
+            }));
+
+        const addAssets = async (data) =>
+            await Promise.all(data.map(async nodeData => {
+                const result = await createNodeObject(nodeData.name, 1, 1, nodeData.data, nodeData.pos_x, nodeData.pos_y);
+                nodesToDB.set(`node-${result.editorNodeId}`, {uid:nodeData.data.unique_id, assetTypeName: nodeData.name });
+            }));
+
+        /* 'editor' is the variable name of the DrawFlow instance used here as a global variable */
+        const addLinks = async (data) => data.map(async linkData => {
+            const busNodeId = [...nodesToDB.entries()].filter(([key,val])=>val.uid===linkData.bus_id).map(([k,v])=>k)[0].split("-").pop();
+            const assetNodeId = [...nodesToDB.entries()].filter(([key,val])=>val.uid===linkData.asset_id).map(([k,v])=>k)[0].split("-").pop();
+            (linkData.flow_direction === "B2A") ?
+                editor.addConnection(busNodeId, assetNodeId, linkData.bus_connection_port, 'input_1')
+                : editor.addConnection(assetNodeId, busNodeId, 'output_1', linkData.bus_connection_port);
+        });
+
+        /* First retrieve the busses and assets, then draw the links */
+
+        $(window).on('load', async function () {
+            const data = JSON.parse(`{{topology_data_list| escapejs }}`);
+            Promise.all([addBusses(data['busses']), addAssets(data['assets'])])
+                .then(async () => addLinks(data['links']))
+                .catch(err=>Swal.fire('Grid Model Error', 'Could not retrieve grid nodes.', 'error'));
+        });
+    </script>
+
+<script defer>
+        function clearGridModel() {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "This will clear the whole grid model! This will not actually delete any asset from the scenario. You will need to save after clearing for the changes to actually take effect.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Yes, clear everything!",
+                cancelButtonText: "Cancel",
+            }).then((result) => result.value && editor.clearModuleSelected());
+        }
+
+        /*
+         * Export Topology to JSON and send to back-end.
+         * Used by the Save and Next buttons at page footer
+        */
+        function save_topology(move_step=false) {
+            // Data Pre-check
+            /*
+            /* Check if there are duplicate node names in the model
+            /* and prevent user from saving the model if there are.
+            */
+            let editorData = editor.export().drawflow.Home.data;
+            const node_list = Object.values(editorData)
+            const node_names = node_list.map(obj => obj.data.name);
+            const duplicate_names = node_names.filter((name, i, a) => a.indexOf(name) !== i);
+
+            if (duplicate_names.length != 0)
+                return Swal.fire('Grid Model Error',
+                    `There are nodes with duplicate names. \n Rename nodes with names: ${duplicate_names.toString()}`, 'error');
+            // End Data Pre-check
+            else {
+                const transformIOs = (obj, entry) => {
+                    const [key, io] = entry;
+                    obj[key] = io.connections.map(conn =>
+                        ("output" in conn) ?
+                        ({ node: nodesToDB.get('node-' + conn.node).uid, output: conn.output }) :
+                        ({ node: nodesToDB.get('node-' + conn.node).uid, input: conn.input }));
+                    return obj;
+                }
+
+                const drawflowData = Object.values(editorData)
+                    .map(obj=>({
+                        db_id: nodesToDB.get('node-'+obj.id).uid,
+                        name: obj.name,
+                        inputs: Object.entries(obj.inputs).reduce(transformIOs, {}),
+                        outputs: Object.entries(obj.outputs).reduce(transformIOs, {}),
+                        data: obj.data
+                    }));
+
+                 $.ajax({
+                    headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                    type: "POST",
+                    url: "{% url 'scenario_create_topology' proj_id scenario.id %}",
+                    data: JSON.stringify(drawflowData),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                     success: function (resp) {
+                        // var node = resp.data;
+                        // $.each(node, function (key, val) {
+                        //     // add database id to the node data dictionary, in order to discriminate among existing and new nodes.
+                        //     editor.drawflow.drawflow.Home.data[`${key}`].data['databaseId'] = val;
+                        // });
+                        // TODO change this to perfom these action within views.py
+                        if(move_step == true){
+                            window.location.href = "{% url 'scenario_create_constraints' proj_id scen_id %}";
+                        }
+                    },
+
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        const jsonData = XMLHttpRequest.responseJSON;
+                        if (jsonData.specific_obj_type) {
+                            Swal.fire('Grid Model Error', `Please fill in all ${jsonData.specific_obj_type.bold()} fields. \n
+                       Asset ${jsonData.obj_name.bold()} has empty fields or fields with wrong values.`, 'error');
+                       console.log(jsonData.full_error);
+                       //console.log(Object.keys(JSON.parse(a.full_error.replaceAll('\'','"'))));
+                        } else {
+                            Swal.fire('Grid Model Error', `Asset ${jsonData.obj_name.bold()} has empty fields or fields with wrong values.`, 'error');
+                        }
+                    }
+                });
+            }
+        };
+    </script>
+
+
+{% endblock end_body_scripts %}
+
 
 {% block footer %}
 <div class="step-footer">
 
-    <form action="{% url 'scenario_create_topology' proj_id %}" method="post">
-        {% csrf_token %}
+    <div>
         <a class="btn btn--medium btn--hollow btn--previous" href="{% url 'scenario_steps_edit' proj_id scen_id step_id|add:'-1' %}" aria-disabled="true">{% translate "Previous" %}</a>
+        {% if scenario.project.user == request.user %}
+        <button onclick="javascript:save_topology()">{% translate "Save" %}</button>
+        {% endif %}
+        <a onclick="javascript:save_topology(move_step=true)" id=next_btn" class="btn btn--medium" >{% translate "Next" %} </a>
 
-        <button class="btn btn--medium" type="submit">
-            {% translate "Next" %}
-        </button>
-    </form>
+    </div>
 </div>
 {% endblock footer %}
+
+
+
+

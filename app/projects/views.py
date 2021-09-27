@@ -380,23 +380,43 @@ def scenario_create_topology(request, proj_id, scen_id, step_id=2):
     # TODO: if the scenario exists, load it, otherwise default form
 
     if request.method == "POST":
-        return HttpResponseRedirect(reverse('scenario_create_constraints', args=[proj_id, scen_id]))
+
+        scenario = get_object_or_404(Scenario, pk=scen_id)
+        if request.user != scenario.project.user:
+            raise PermissionDenied
+
+        topology = json.loads(request.body)
+        node_list = list()
+        [node_list.append(NodeObject(topology[idx])) for idx in range(len(topology))]
+
+        # delete objects from database which were deleted by the user
+        update_deleted_objects_from_database(scen_id, node_list)
+
+        # Make sure there are no connections in the Database to prevent inserting the same connections upon updating.
+        ConnectionLink.objects.filter(scenario_id=scen_id).delete()
+        for node_obj in node_list:
+            create_node_interconnection_links(node_obj, scen_id)
+            # node_obj.assign_asset_to_proper_group(node_to_db_mapping_dict)
+        return JsonResponse({"success": True}, status=200)
+        # return HttpResponseRedirect(reverse('scenario_create_constraints', args=[proj_id, scen_id]))
     else:
-        return render(
-            request,
-            f'scenario/scenario_step{step_id}.html',
-            {'proj_id': proj_id, 'scen_id': scen_id, 'step_id': step_id, "step_list": STEP_LIST}
-        )
+
+        scenario = get_object_or_404(Scenario, pk=scen_id)
+        topology_data_list = load_scenario_topology_from_db(scen_id)
+        return render(request, f'scenario/scenario_step{step_id}.html',
+                      {
+                          'scenario': scenario,
+                          'scen_id': scen_id,
+                          'proj_id': scenario.project.id,
+                          'topology_data_list': json.dumps(topology_data_list),
+                          'step_id': step_id,
+                          "step_list": STEP_LIST
+                      })
+
 
 @login_required
 @require_http_methods(["GET", "POST"])
 def scenario_create_constraints(request, proj_id, scen_id, step_id=3):
-    return render(
-        request,
-        f'scenario/scenario_step{step_id}.html',
-        {'proj_id': proj_id, 'step_id': step_id, "step_list": STEP_LIST}
-    )
-
 @login_required
 @require_http_methods(["GET", "POST"])
 def scenario_create_simulate(request, proj_id, scen_id, step_id=4):

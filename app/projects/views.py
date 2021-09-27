@@ -199,8 +199,8 @@ def project_delete(request, proj_id):
         project.delete()
         messages.success(request, 'Project successfully deleted!')
 
-    project_list = Project.objects.filter(user=request.user)
-    return render(request, 'project/project_search.html', {'project_list': project_list})
+    return HttpResponseRedirect(reverse('project_search', args=[project.id]))
+
 
 
 @login_required

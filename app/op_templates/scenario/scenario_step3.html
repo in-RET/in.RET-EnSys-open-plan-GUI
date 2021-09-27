@@ -1,9 +1,105 @@
 {% extends 'scenario/scenario_progression.html' %}
-
+{% load static %}
+{% load i18n %}
 
 <!-- WRITE HTML CODE WITHIN THESE block content TAGS -->
 {% block progression_content %}
 
-constraints
+<main>
+    <section class="scenario-create">
+        <form method="POST" action="{% url 'scenario_create_constraints' proj_id scen_id %}">
+            <div class="input-item">
+                <div class="scenario-create__form">
+                    <div>
+                        <label for="sourcePowerMix" class="form-label">Source power mix (%)</label>
+                        <input type="text" class="form-control" id="sourcePowerMix" placeholder="[25.7, 12.78, 3.78, 17.20, 23.26]" aria-describedby="sourcePowerMixHelp" required>
+                    </div>
+                </div>
+                <div class="scenario-create__description">
+                    <div>
+                        <div id="sourcePowerMixHelp" class="form-text">Percentage of each source of power (inclusive % from grid). You can upload a file or enter the values manually in the following form: [99.99, 99.99, ..., 99.99].</div>
+                    </div>
+                </div>
+            </div>
+            <div class="input-item">
+                <div class="scenario-create__form">
+                    <div>
+                        <label for="lowerEnergyShare" class="form-label">Lower bound renewable energy share (%)</label>
+                        <input type="number" class="form-control" id="lowerEnergyShare" placeholder="12.412" aria-describedby="lowerEnergyShareHelp" required>
+                    </div>
+                </div>
+                <div class="scenario-create__description">
+                    <div>
+                        <div id="lowerEnergyShareHelp" class="form-text">A constraint that specifies the lower bound on the share of renewable energies in the optimized output energy mix.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="input-item">
+                <div class="scenario-create__form">
+                    <div>
+                        <label for="co2UpperLimit" class="form-label">CO2 upper limit (T CO2)</label>
+                        <input type="number" class="form-control" id="co2UpperLimit" placeholder="12.412" aria-describedby="co2UpperLimitHelp" required>
+                    </div>
+                </div>
+                <div class="scenario-create__description">
+                    <div>
+                        <div id="co2UpperLimitHelp" class="form-text">A constraint that specifies an upper bound on the CO2 emissions.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="input-item">
+                <div class="scenario-create__form">
+                    <div>
+                        <label for="degreeAutomomy" class="form-label">Degree of Autonomy</label>
+                        <input type="number" class="form-control" id="degreeAutomomy" placeholder="0.14" aria-describedby="degreeAutomomyHelp" required>
+                    </div>
+                </div>
+                <div class="scenario-create__description">
+                    <div>
+                        <div id="degreeAutomomyHelp" class="form-text">Value between 0 and 1. Degree of Autonomy or self sufficiency wished (capability of the system to sustain a certain part of the load).</div>
+                    </div>
+                </div>
+            </div>
+            <div class="input-item">
+                <div class="scenario-create__form">
+                    <div>
+                        <label for="maxInvestBudget" class="form-label">Maximum investment budget (EUR)</label>
+                        <input type="number" class="form-control" id="maxInvestBudget" placeholder="3000000" aria-describedby="maxInvestBudgetHelp" required>
+                    </div>
+                </div>
+                <div class="scenario-create__description">
+                    <div>
+                        <div id="maxInvestBudgetHelp" class="form-text">Upper bound on the investment budget.</div>
+                    </div>
+                </div>
+            </div>
+            <button style="display:none" type="submit" id="submit_constraints_btn">submit</button>
+        </form>
+    </section>
+</main>
 
 {% endblock progression_content %}
+
+
+{% block end_body_scripts %}
+<script>
+    var form_id = $("#submit_constraints_btn");
+
+    function next_btn_clicked(){
+        console.log("clicked");
+        form_id.click();
+    };
+</script>
+
+{% endblock end_body_scripts %}
+
+{% block footer %}
+<div class="step-footer">
+
+    <div>
+        <a class="btn btn--medium btn--hollow btn--previous" href="{% url 'scenario_steps_edit' proj_id scen_id step_id|add:'-1' %}" aria-disabled="true">{% translate "Previous" %}</a>
+        <a onclick="next_btn_clicked()" id=next_btn" class="btn btn--medium" >{% translate "Simulation" %} </a>
+
+    </div>
+</div>
+{% endblock footer %}

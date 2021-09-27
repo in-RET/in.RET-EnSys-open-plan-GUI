@@ -417,20 +417,36 @@ def scenario_create_topology(request, proj_id, scen_id, step_id=2):
 @login_required
 @require_http_methods(["GET", "POST"])
 def scenario_create_constraints(request, proj_id, scen_id, step_id=3):
-@login_required
-@require_http_methods(["GET", "POST"])
-def scenario_create_simulate(request, proj_id, scen_id, step_id=4):
-    return render(
-        request,
-        f'scenario/scenario_step{step_id}.html',
-        {'proj_id': proj_id, 'step_id': step_id, "step_list": STEP_LIST}
-    )
+    scenario = get_object_or_404(Scenario, pk=scen_id)
+
+    if request.method == "GET":
+
+        return render(request, f'scenario/scenario_step{step_id}.html',
+                      {
+                          'scenario': scenario,
+                          'scen_id': scen_id,
+                          'proj_id': scenario.project.id,
+                          'step_id': step_id,
+                          "step_list": STEP_LIST
+                      })
+    elif request.method == "POST":
+
+        #set the constraints and send the scenario to be simulated
+        return render(request, f'scenario/scenario_step{step_id}.html',
+              {
+                  'scenario': scenario,
+                  'scen_id': scen_id,
+                  'proj_id': scenario.project.id,
+                  'step_id': step_id,
+                  "step_list": STEP_LIST
+              })
+
+
 
 SCENARIOS_STEPS = [
     scenario_create_parameters,
     scenario_create_topology,
     scenario_create_constraints,
-    scenario_create_simulate
 ]
 
 @login_required

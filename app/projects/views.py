@@ -459,26 +459,6 @@ def scenario_steps(request, proj_id, step_id=None, scen_id=None):
         return SCENARIOS_STEPS[step_id-1](request, proj_id, scen_id, step_id)
 
 
-# return render(request, f'scenario/scenario_step{step_id}.html', {'form': form, 'proj_id':proj_id, 'step_id': step_id})
-
-
-@json_view
-@login_required
-@require_http_methods(["POST"])
-def scenario_create_post(request, proj_id):
-    project = get_object_or_404(Project, pk=proj_id)
-    form = ScenarioCreateForm(request.POST)
-
-    if form.is_valid():
-        scenario = Scenario()
-        [setattr(scenario, name, value) for name, value in form.cleaned_data.items()]
-        scenario.project = project
-        scenario.save()
-        return JsonResponse({'success': True}, status=200)
-    logger.warning(f"The submitted scenarion has erroneous field values.")
-    form_html = crispy_forms_filters.as_crispy_form(form)
-    return JsonResponse({'success': False, 'form_html': form_html}, status=422)
-
 
 @login_required
 @require_http_methods(["GET"])

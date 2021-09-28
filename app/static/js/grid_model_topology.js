@@ -29,11 +29,13 @@ function allowDrop(ev) {
 }
 
 function drag(ev) {
+    // corresponds to data-node defined in templates/scenario/topology_drag_items.html
     ev.dataTransfer.setData("node", ev.target.getAttribute('data-node'));
 }
 
 function drop(ev) {
     ev.preventDefault();
+    // corresponds to data-node defined in templates/scenario/topology_drag_items.html
     const nodeName = ev.dataTransfer.getData("node");
     (nodeName === BUS) ? IOBusOptions(nodeName, ev.clientX, ev.clientY)
         : addNodeToDrawFlow(nodeName, ev.clientX, ev.clientY);
@@ -173,6 +175,7 @@ function closeModalSteps(modal) {
 
 const closemodal = (e) => closeModalSteps(e.target.closest(".modal"));
 
+/* onclick method associated to each Node created by the createNodeObject() function */
 const submitForm = (e) => {
     const assetForm = e.target.closest('.modal-content').querySelector('form');
     const assetTypeName = assetForm.closest('.box').getAttribute(ASSET_TYPE_NAME);
@@ -236,7 +239,7 @@ window.onclick = function (e) {
 }
 // endregion set
 
-
+/* Create node on the gui */
 async function createNodeObject(nodeName, connectionInputs = 1, connectionOutputs = 1, nodeData = {}, pos_x, pos_y) {
     const shownName = (typeof nodeData.name === 'undefined') ? nodeName : nodeData.name;
 

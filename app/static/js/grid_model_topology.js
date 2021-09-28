@@ -146,7 +146,6 @@ document.addEventListener("dblclick", function (e) {
         .catch(err => console.log("Modal get form JS Error: " + err));
     }
 });
->>>>>>> 85f7ba7... First translation draft of topology
 // endregion
 }),editor.on("nodeRemoved",function(a){// remove nodeID from nodesToDB
 nodesToDB.delete("node-"+a)});async function addNodeToDrawFlow(a,b,c,d=1,e=1,f={}){return"fixed"!==editor.editor_mode&&(b=b*(editor.precanvas.clientWidth/(editor.precanvas.clientWidth*editor.zoom))-editor.precanvas.getBoundingClientRect().x*(editor.precanvas.clientWidth/(editor.precanvas.clientWidth*editor.zoom)),c=c*(editor.precanvas.clientHeight/(editor.precanvas.clientHeight*editor.zoom))-editor.precanvas.getBoundingClientRect().y*(editor.precanvas.clientHeight/(editor.precanvas.clientHeight*editor.zoom)),createNodeObject(a,d,e,{},b,c));// the following translation/transformation is required to correctly drop the nodes in the current clientScreen
@@ -154,14 +153,94 @@ nodesToDB.delete("node-"+a)});async function addNodeToDrawFlow(a,b,c,d=1,e=1,f={
 var transform="";document.addEventListener("dblclick",function(a){var b=this;const c=function(a){a.closest(".drawflow-node").style.zIndex="9999",a.querySelector(".modal").style.display="block",transform=editor.precanvas.style.transform,editor.precanvas.style.transform="",editor.precanvas.style.left=editor.canvas_x+"px",editor.precanvas.style.top=editor.canvas_y+"px",editor.editor_mode="fixed"},d=a.target.closest(".drawflow-node"),e=d.querySelector(".box").getAttribute(ASSET_TYPE_NAME);if(d&&"block"!==d.querySelector(".modal").style.display){const a=d.id,f=formGetUrl+e+(nodesToDB.has(a)?"/"+nodesToDB.get(a).uid:"");fetch(f).then(function(a){return _newArrowCheck(this,b),a.text()}.bind(this)).then(function(a){_newArrowCheck(this,b);const e=d.querySelector("form").parentNode;// console.log(formParentDiv);
 e.innerHTML=a;const f=e.closest(".box");c(f)}.bind(this)).catch(function(a){return _newArrowCheck(this,b),console.log("Modal get form JS Error: "+a)}.bind(this))}});// endregion
 // region close Modal on: 1. click 'x', 2. press 'esc' and 3. click outside the modal.
-function closeModalSteps(a){// // Change the name of the node based on input
-const b=a.closest(".drawflow_content_node").querySelector(".nodeName");// End name change
-// hide the modal
-// bring node to default z-index
-// delete modal form
-b.textContent=`${a.querySelector("input[df-name]").value}`,a.style.display="none",a.closest(".drawflow-node").style.zIndex=a.closest(".drawflow-node").classList.contains("ess")?"1":"2",editor.precanvas.style.transform=transform,editor.precanvas.style.left="0px",editor.precanvas.style.top="0px",editor.editor_mode="edit",a.querySelector("form").parentNode.innerHTML="<form></form>"}const closemodal=function(a){return _newArrowCheck(this,_this3),closeModalSteps(a.target.closest(".modal"))}.bind(void 0),submitForm=function(a){var b=this;_newArrowCheck(this,_this3);const c=a.target.closest(".modal-content").querySelector("form"),d=c.closest(".box").getAttribute(ASSET_TYPE_NAME),e=c.closest(".drawflow-node").id,f=e.split("-").pop(),g=formPostUrl+d+(nodesToDB.has(e)?"/"+nodesToDB.get(e).uid:""),h=new FormData(c),i=editor.drawflow.drawflow.Home.data[f].pos_x,j=editor.drawflow.drawflow.Home.data[f].pos_y;if(h.set("pos_x",i),h.set("pos_y",j),d===BUS){const a=Object.keys(editor.drawflow.drawflow.Home.data[f].inputs).length,b=Object.keys(editor.drawflow.drawflow.Home.data[f].outputs).length;h.set("input_ports",a),h.set("output_ports",b)}fetch(g,{method:"POST",headers:{// 'Content-Type': 'multipart/form-data', //'application/json', // if enabled then read json.loads(request.body) in the backend
-"X-CSRFToken":csrfToken},body:h}).then(function(a){return _newArrowCheck(this,b),a.json()}.bind(this)).then(function(f){_newArrowCheck(this,b),f.success?(!1===nodesToDB.has(e)&&nodesToDB.set(e,{uid:f.asset_id,assetTypeName:d}),closeModalSteps(a.target.closest(".modal"))):c.innerHTML=f.form_html}.bind(this)).catch(function(a){return _newArrowCheck(this,b),console.log("Modal form JS Error: "+a)}.bind(this))}.bind(void 0);document.addEventListener("keydown",function(a){const b=document.getElementsByClassName("modal");if(27===a.keyCode){var c,d=_createForOfIteratorHelper(b);try{for(d.s();!(c=d.n()).done;){let a=c.value;"block"===a.style.display&&closeModalSteps(a)}}catch(a){d.e(a)}finally{d.f()}}}),window.onclick=function(a){const b=document.getElementsByClassName("modal");var c,d=_createForOfIteratorHelper(b);try{for(d.s();!(c=d.n()).done;){const b=c.value;a.target===b&&"block"===b.style.display&&closeModalSteps(b)}}catch(a){d.e(a)}finally{d.f()}};// endregion set
-async function createNodeObject(a,b=1,c=1,d={},e,f){const g="undefined"==typeof d.name?a:d.name,h=`<div class="box" ${ASSET_TYPE_NAME}="${a}">
+function closeModalSteps(modal) {
+    // // Change the name of the node based on input
+    const nodeNameElem = modal.closest('.drawflow_content_node').querySelector('.nodeName');
+    nodeNameElem.textContent = `${modal.querySelector('input[df-name]').value}`;
+    // End name change
+
+    modal.style.display = "none"; // hide the modal
+    modal.closest(".drawflow-node").style.zIndex =
+        (modal.closest(".drawflow-node").classList.contains("ess")) ? "1" : "2"; // bring node to default z-index
+    editor.precanvas.style.transform = transform;
+    editor.precanvas.style.left = '0px';
+    editor.precanvas.style.top = '0px';
+    editor.editor_mode = "edit";
+
+    // delete modal form
+    modal.querySelector('form').parentNode.innerHTML = "<form></form>";
+}
+
+const closemodal = (e) => closeModalSteps(e.target.closest(".modal"));
+
+const submitForm = (e) => {
+    const assetForm = e.target.closest('.modal-content').querySelector('form');
+    const assetTypeName = assetForm.closest('.box').getAttribute(ASSET_TYPE_NAME);
+    const topologyNodeId = assetForm.closest('.drawflow-node').id; // e.g. 'node-2'
+    const drawflowNodeId = topologyNodeId.split("-").pop();
+    const postUrl = formPostUrl + assetTypeName
+        + (nodesToDB.has(topologyNodeId) ? "/" + nodesToDB.get(topologyNodeId).uid : "");
+    
+    const formData = new FormData(assetForm);
+    
+    const nodePosX = editor.drawflow.drawflow.Home.data[drawflowNodeId].pos_x
+    const nodePosY = editor.drawflow.drawflow.Home.data[drawflowNodeId].pos_y
+    formData.set('pos_x', nodePosX);
+    formData.set('pos_y', nodePosY);
+    if (assetTypeName === BUS) {
+        const nodeInputs = Object.keys(editor.drawflow.drawflow.Home.data[drawflowNodeId].inputs).length
+        const nodeOutputs = Object.keys(editor.drawflow.drawflow.Home.data[drawflowNodeId].outputs).length
+        formData.set('input_ports', nodeInputs);
+        formData.set('output_ports', nodeOutputs);
+    }
+
+    fetch(postUrl, {
+        method: "POST",
+        headers: {
+            // 'Content-Type': 'multipart/form-data', //'application/json', // if enabled then read json.loads(request.body) in the backend
+            "X-CSRFToken": csrfToken 
+        },
+        body: formData,
+    })
+    .then(res=>res.json())
+    .then(jsonRes=>{
+        if (jsonRes.success) {
+            if (nodesToDB.has(topologyNodeId) === false)
+                nodesToDB.set(topologyNodeId, {uid:jsonRes.asset_id, assetTypeName: assetTypeName });
+            closeModalSteps(e.target.closest(".modal"));
+        } else {
+            assetForm.innerHTML = jsonRes.form_html;
+        }
+    })
+    .catch(err => console.log("Modal form JS Error: " + err));
+} 
+
+// On Esc button press, close modal
+document.addEventListener('keydown', function (e) {
+    const modalList = document.getElementsByClassName("modal");
+    if (e.keyCode === 27) {
+        for (let modalDiv of modalList) {
+            if (modalDiv.style.display === "block")
+                closeModalSteps(modalDiv);
+        }
+    }
+})
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function (e) {
+    const modalList = document.getElementsByClassName("modal");
+    for (const modalDiv of modalList) {
+        if (e.target === modalDiv && modalDiv.style.display === "block")
+            closeModalSteps(modalDiv);
+    }
+}
+// endregion set
+
+
+async function createNodeObject(nodeName, connectionInputs = 1, connectionOutputs = 1, nodeData = {}, pos_x, pos_y) {
+    const shownName = (typeof nodeData.name === 'undefined') ? nodeName : nodeData.name;
+
+    /*const source_html = `<div class="box" ${ASSET_TYPE_NAME}="${nodeName}">
         <div class="modal" style="display:none">
           <div class="modal-content">
             <span class="close" onclick="closemodal(event)">&times;</span>
@@ -184,4 +263,29 @@ async function createNodeObject(a,b=1,c=1,d={},e,f){const g="undefined"==typeof 
           </div>
         </div>
     </div>
-    <div class="nodeName" >${g}</div>`;return{editorNodeId:editor.addNode(a,b,c,e,f,a,d,h),specificNodeType:a}}
+    <div class="nodeName" >${shownName}</div>`;*/
+
+
+    const source_html = `<div class="box" ${ASSET_TYPE_NAME}="${nodeName}">
+        <div class="modal modal--gui"  style="display:none">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h4 class="modal-title">${nodeName.replaceAll("_", " ")} Plant Properties</h4>
+                <button type="button" class="btn-close" onclick="closemodal(event)"></button>
+              </div>
+              <div class="modal-body">
+                <form></form>
+              </div>
+              <div class="modal-footer">
+                ${scenarioBelongsToUser ? '<button class="btn btn--medium" data-bs-dismiss="modal" onclick="submitForm(event)">Ok</button>': ''}
+              </div>
+            </div>
+          </div>
+    </div>
+    <div class="nodeName" >${shownName}</div>`;
+
+    return {
+        "editorNodeId": editor.addNode(nodeName, connectionInputs, connectionOutputs, pos_x, pos_y, nodeName, nodeData, source_html),
+        "specificNodeType": nodeName
+    };
+}

@@ -154,7 +154,6 @@
         const csrfToken = '{{ csrf_token }}';
         const formGetUrl = `{% url 'get_asset_create_form' %}`;
         const formPostUrl = `{% url 'asset_create_or_update' scenario.id %}`;
-        const retrieveExisitngNodesUrl = `{% url 'new_assets_topology' scenario.id %}`;
         const scenarioBelongsToUser = {% if scenario.project.user == request.user %}true{% else %}false{% endif %};
     </script>
 <script src="{% static 'js/grid_model_topology.js' %}"></script>

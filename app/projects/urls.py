@@ -36,7 +36,6 @@ urlpatterns = [
     path('scenario/duplicate/<int:scen_id>', scenario_duplicate, name='scenario_duplicate'),
     # path('scenario/upload/<int:proj_id>', LoadScenarioFromFileView.as_view(), name='scenario_upload'),
     # Grid Model (Assets Creation)
-    path('asset/assets_topology/<int:scen_id>', scenario_topology_view, name='new_assets_topology'),
     re_path(r'^asset/get_form/(?P<asset_type_name>\w+)?(/(?P<asset_uuid>[0-9a-f-]+))?$', get_asset_create_form, name='get_asset_create_form'),
     re_path(r'^asset/create_or_update_post/(?P<scen_id>\d+)/(?P<asset_type_name>\w+)?(/(?P<asset_uuid>[0-9a-f-]+))?$', asset_create_or_update, name='asset_create_or_update'),
     # MVS Simulation

@@ -37,6 +37,7 @@ urlpatterns = [
     re_path(r'^asset/get_form/(?P<asset_type_name>\w+)?(/(?P<asset_uuid>[0-9a-f-]+))?$', get_asset_create_form, name='get_asset_create_form'),
     re_path(r'^asset/create_or_update_post/(?P<scen_id>\d+)/(?P<asset_type_name>\w+)?(/(?P<asset_uuid>[0-9a-f-]+))?$', asset_create_or_update, name='asset_create_or_update'),
     # MVS Simulation
+    path('view_mvs_data_input/<int:scen_id>', view_mvs_data_input, name='view_mvs_data_input'),
     path('topology/mvs_simulation/<int:scenario_id>', request_mvs_simulation, name='request_mvs_simulation'),
     path('topology/update_simulation_rating/', update_simulation_rating, name='update_simulation_rating'),
     # path('topology/simulation_status/<int:scen_id>', check_simulation_status, name='check_simulation_status'),

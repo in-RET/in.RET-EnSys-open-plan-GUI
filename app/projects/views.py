@@ -636,6 +636,33 @@ def asset_create_or_update(request, scen_id=0, asset_type_name="", asset_uuid=No
 
 # region MVS JSON Related
 
+@json_view
+@login_required
+@require_http_methods(["GET"])
+def view_mvs_data_input(request, scen_id=0):
+    if scen_id == 0:
+        return JsonResponse({"status": "error", "error": "No scenario id provided"},
+                            status=500, content_type='application/json')
+    # Load scenario
+    scenario = Scenario.objects.get(pk=scen_id)
+
+    if scenario.project.user != request.user:
+        logger.warning(f"Unauthorized user tried to delete project scenario with db id = {scen_id}.")
+        raise PermissionDenied
+
+
+    try:
+        data_clean = get_topology_json(scenario)
+        print(data_clean)
+    except Exception as e:
+
+        logger.error(f"Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {traceback.format_exc()}.")
+        return JsonResponse({"error":f"Scenario Serialization ERROR! Thrown Exception: {e}."},
+                            status=500, content_type='application/json')
+
+    return JsonResponse(data_clean, status=200, content_type='application/json')
+
+
 # End-point to send MVS simulation request
 @json_view
 @login_required

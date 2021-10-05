@@ -115,7 +115,7 @@
                                             <div class="details">
                                                 <input class="form-check-input me-1" id="project{{ project.id }}scenario-{{ scenario.id }}" type="checkbox" value="project{{ project.id }}scenario-{{ scenario.id }}" aria-label="">
                                                 <label class="form-check-label" for="project{{ project.id }}scenario-{{ scenario.id }}">
-                                                    {{ scenario }}
+                                                    <a class= "form-check-label" href="{% url 'scenario_steps_edit' proj_id=project.id scen_id=scenario.pk step_id=1 %}"> {{ scenario }} </a>
                                                 </label>
                                                 <div class="detail">
                                                     <span class="detail__property">{% translate "Created" %}</span>
@@ -203,130 +203,6 @@
 
 
     </main>
-
-
-
-    <!--<div class="backg">
-        <div id="project_map" class="mapback"></div>
-        <br>
-        <div class="row">
-            <div class="col-sm-10" id="createproj">
-                <div class="input-panel">
-                    <a href="{% url 'project_create' %}" class="btn btn-primary btn-lg" id="button55"
-                       role="button"><span class="glyphicon glyphicon-plus-sign"></span> Create New
-                        Project</a>
-                </div>
-            </div>
-
-            <div class="col-sm-1"></div>
-        </div>
-        <br><br> <br><br><br><br><br><br>
-        <div class="container5">
-
-            <div class="row">
-                <div class="col-sm-1"></div>
-                <div class="col-sm-10" id="box1">
-                    <div class="panel panel-default" id="box2">
-                        <br>
-                        <div class="panel-heading"><h3 class="panel-title" id="listtitle"><strong>Project List </strong>
-                        </h3></div>
-                        <div class="panel-body" id="list5">
-                            <div class="table-responsive">
-                                <table class="table table-striped">
-                                    <thead class="thead-dark">
-                                    <tr>
-                                        <th>#ID</th>
-                                        <th>Project Name</th>
-                                        <th>Date Created</th>
-                                        <th>Members</th>
-                                        <th>Country</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-
-                                    {% for project in project_list %}
-                                        <tr id="list6">
-                                            <th scope="row">{{ forloop.counter }}</th>
-                                            <td id="colname"><a href="{% url 'project_detail' project.pk %}">{{ project.name }}</a></td>
-                                            <td id="colname2">{{ project.date_created }}</td>
-                                            <td id="colname3">{% if project.viewers.count == 0 %}
-                                                Only You
-                                                {% else %}
-                                                <a {% if project.user == request.user %} 
-                                                    onclick="showMembers(event, `{% url 'project_members_list' project.pk %}`, `{% url 'project_revoke_access' project.pk %}`)" 
-                                                    {% endif %}>
-                                                    {{ project.viewers.count }} and You</a>
-                                                    {% endif %}
-                                            </td>
-                                         
-                                            <td id="colname4">{{ project.country }}
-                                                </td>
-                                                <td>
-
-                                                
-                                                    <form style="float: left;" class="form" id="buttonn"
-                                                          action="{% url 'scenario_search' project.pk %}"
-                                                          method="GET">
-                                                        <input class="" type="submit"
-                                                               value="Open"/>&emsp;
-                                                    </form>
-                                                   </td>
-
-                                            <td>
-                                                <div class="dropdown">
-                                            <div class="btn-group" dropdown>
-                                                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                    <span class="glyphicon glyphicon-cog"></span>&nbsp;--><!--<span class="caret" style=" transform: rotate(-90deg);"></span>
-                                                    <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
-
-                                                </button>
-                                                
-                                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                    <a class="dropdown-item" href="{% url 'project_detail' project.pk %}">&nbsp;&nbsp;Show</a>
-                                                    {% if project.user == request.user %}
-                                                    <a class="dropdown-item" href="{% url 'project_update' project.pk %}">&nbsp;&nbsp;Edit</a>
-                                                    
-                                                    <a class="dropdown-item">
-                                                        <form style="float: left;" 
-                                                        action="{% url 'project_delete' project.pk %}"
-                                                        method="POST">
-                                                      {% csrf_token %}
-                                                      <input type="submit" style="background: transparent; border:none;"
-                                                             value="Delete"
-                                                             onclick="return confirm('Are you sure you want to delete?' + '\n' +'This will also delete all related project data.')"/>
-                                                             &emsp; </form></a>
-
-                                                    <a class="dropdown-item" onSubmit="shareProject(event, `{% url 'project_share' project.pk %}`)">
-                                                        <form style="float: left;" class="" style="background:transparent;"
-                                                        onSubmit="shareProject(event, `{% url 'project_share' project.pk %}`)">
-                                                      <input type="submit" style="background: transparent; border:none;" value="Share"/>&emsp;</form></a>
-                                                    {% endif %}
-                                                </div>
-                                            </div>
-                                        </div>
-                                            </td>
-
-                                        </tr>
-                                    {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-                <div class="col-sm-2">
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <br>
-    <br>
--->
-
 
 {% endblock content %}
 

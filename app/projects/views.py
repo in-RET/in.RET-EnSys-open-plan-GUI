@@ -199,7 +199,7 @@ def project_delete(request, proj_id):
         project.delete()
         messages.success(request, 'Project successfully deleted!')
 
-    return HttpResponseRedirect(reverse('project_search', args=[project.id]))
+    return HttpResponseRedirect(reverse('project_search', args=[proj_id]))
 
 
 
@@ -352,7 +352,7 @@ def scenario_create_parameters(request, proj_id, scen_id=None, step_id=1):
         answer = render(
             request,
             f'scenario/scenario_step{step_id}.html',
-            {'form': form, 'proj_id': proj_id, 'project': project, 'scen_id': scen_id, 'step_id': step_id, "step_list": STEP_LIST}
+            {'form': form, 'proj_id': proj_id, 'proj_name': project.name, 'scen_id': scen_id, 'step_id': step_id, "step_list": STEP_LIST}
         )
 
     elif request.method == "POST":

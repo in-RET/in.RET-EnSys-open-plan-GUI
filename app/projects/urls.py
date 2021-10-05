@@ -19,8 +19,6 @@ urlpatterns = [
     path('comment/update/<int:com_id>', comment_update, name='comment_update'),
     path('comment/delete/<int:com_id>', comment_delete, name='comment_delete'),
     # Scenario
-    path('project/<int:proj_id>/scenario/search/', scenario_search, name='scenario_search'),
-    path('project/<int:proj_id>/scenario/search/<int:show_comments>', scenario_search, name='scenario_search'),
     path('project/<int:proj_id>/scenario/create/step', scenario_steps, name='scenario_steps'),
     path('project/<int:proj_id>/scenario/create/step/<int:step_id>', scenario_steps, name='scenario_steps'),
     path('project/<int:proj_id>/scenario/<int:scen_id>/edit/step/<int:step_id>', scenario_steps, name='scenario_steps_edit'),

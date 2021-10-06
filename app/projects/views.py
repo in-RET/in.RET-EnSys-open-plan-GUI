@@ -21,6 +21,7 @@ from .scenario_topology_helpers import handle_storage_unit_form_post, handle_bus
     update_deleted_objects_from_database, duplicate_scenario_objects, duplicate_scenario_connections, get_topology_json
 from .services import create_or_delete_simulation_scheduler, send_feedback_email
 from .constants import DONE, ERROR
+import traceback
 logger = logging.getLogger(__name__)
 
 
@@ -419,27 +420,69 @@ def scenario_create_topology(request, proj_id, scen_id, step_id=2):
 @require_http_methods(["GET", "POST"])
 def scenario_create_constraints(request, proj_id, scen_id, step_id=3):
     scenario = get_object_or_404(Scenario, pk=scen_id)
+    forms = [MinRenewableConstraintForm(), MaxEmissionConstraintForm()]
+
+    constraints_labels = {
+        "minimal_degree_of_autonomy": "Minimal degree of autonomy",
+        "minimal_renewable_factor": "Minimal share of renewables",
+        "maximum_emissions": "Maximal CO2 emissions",
+        "net_zero_energy": "Net zero energy system",
+    }
+    constraints_forms = {
+        "minimal_degree_of_autonomy": MinRenewableConstraintForm,
+        "minimal_renewable_factor": MaxEmissionConstraintForm,
+        "maximum_emissions": MinDOAConstraintForm,
+        "net_zero_energy": NZEConstraintForm,
+    }
+
+    constraints_models = {
+        "minimal_degree_of_autonomy": MinRenewableConstraint,
+        "minimal_renewable_factor": MaxEmissionConstraint,
+        "maximum_emissions": MinDOAConstraint,
+        "net_zero_energy": NZEConstraint,
+    }
+
+    scenario = get_object_or_404(Scenario, pk=scen_id)
+
+    if (scenario.project.user != request.user) and (request.user not in scenario.project.viewers.all()):
+        raise PermissionDenied
 
     if request.method == "GET":
 
+
+        unbound_forms = {k: v(prefix=k) for k,v in constraints_forms.items()}
         return render(request, f'scenario/scenario_step{step_id}.html',
                       {
                           'scenario': scenario,
                           'scen_id': scen_id,
                           'proj_id': scenario.project.id,
                           'step_id': step_id,
-                          "step_list": STEP_LIST
+                          "step_list": STEP_LIST,
+                          "forms": unbound_forms,
+                          "forms_labels": constraints_labels
                       })
     elif request.method == "POST":
+        for constraint_type, form_model in constraints_forms.items():
+            form = form_model(request.POST, prefix=constraint_type)
+
+            if form.is_valid():
+                constraint_instance = form.save(commit=False)
+                constraint_instance.scenario = scenario
+                constraint_instance.save()
+
+
+                messages.success(request, f'constraint {constraint_type} successfully added!')
+
 
         #set the constraints and send the scenario to be simulated
-        return render(request, f'scenario/scenario_step{step_id}.html',
+        return render(request, f'scenario/scenario_step{step_id+1}.html',
               {
                   'scenario': scenario,
                   'scen_id': scen_id,
                   'proj_id': scenario.project.id,
                   'step_id': step_id,
-                  "step_list": STEP_LIST
+                  "step_list": STEP_LIST,
+
               })
 
 

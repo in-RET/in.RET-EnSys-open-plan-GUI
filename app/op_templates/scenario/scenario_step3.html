@@ -4,8 +4,18 @@
 {% load custom_filters %}
 {% load i18n %}
 
+{% block head_block %}
+<style>
+.highlight {
+  background-color: blue;
+}
+</style>
+{% endblock head_block %}
+
 <!-- WRITE HTML CODE WITHIN THESE block content TAGS -->
 {% block progression_content %}
+
+
 
 <main>
 
@@ -55,6 +65,16 @@
         console.log("clicked");
         form_id.click();
     };
+
+
+$(".form-group :input").each(function(){
+    var input = $(this); // This is the jquery object of the input, do what you will
+    input.on('keydown', function () {
+        console.log("Changed");
+        $(this).addClass('highlight');
+    });
+});
+
 </script>
 
 {% endblock end_body_scripts %}
@@ -64,9 +84,7 @@
 
     <div>
         <a class="btn btn--medium btn--hollow btn--previous" href="{% url 'scenario_steps_edit' proj_id scen_id step_id|add:'-1' %}" aria-disabled="true">{% translate "Previous" %}</a>
-        <a onclick="next_btn_clicked()" id=next_btn" class="btn btn--medium" >{% translate "Simulation" %} </a>
-        <a href="{% url 'view_mvs_data_input' scen_id %}" > Proof mvs inputs </a>
-        <a href="{% url 'request_mvs_simulation' scen_id %}" > Run MVS simulation </a>
+        <a onclick="next_btn_clicked()" id=next_btn" class="btn btn--medium" >{% translate "Next" %} </a>
 
 
     </div>

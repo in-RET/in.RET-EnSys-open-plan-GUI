@@ -4,13 +4,6 @@
 {% load custom_filters %}
 {% load i18n %}
 
-{% block head_block %}
-<style>
-.highlight {
-  background-color: blue;
-}
-</style>
-{% endblock head_block %}
 
 <!-- WRITE HTML CODE WITHIN THESE block content TAGS -->
 {% block progression_content %}
@@ -67,16 +60,10 @@
     };
 
 
-$(".form-group :input").each(function(){
-    var input = $(this); // This is the jquery object of the input, do what you will
-    input.on('keydown', function () {
-        console.log("Changed");
-        $(this).addClass('highlight');
-    });
-});
+
 
 </script>
-
+<script src="{% static 'js/form_utils.js' %}"></script>
 {% endblock end_body_scripts %}
 
 {% block footer %}

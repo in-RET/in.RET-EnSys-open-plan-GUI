@@ -45,10 +45,7 @@
 
 {% endblock progression_content %}
 
-
-
-{% block footer %}
-
+{% block end_body_scripts %}
 <script>
 
     var form_id = $("#sumbit_scenario_btn");
@@ -58,13 +55,12 @@
         form_id.click();
     };
 
-
-
-
 </script>
+<script src="{% static 'js/form_utils.js' %}"></script>
+{% endblock end_body_scripts %}
 
 
-
+{% block footer %}
 
 <div class="step-footer">
     <a onclick="javascript:next_btn_clicked()" class="btn btn--medium" >{% translate "Next" %} </a>

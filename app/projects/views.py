@@ -333,9 +333,9 @@ STEP_LIST = [
 @login_required
 @require_http_methods(["GET", "POST"])
 def scenario_create_parameters(request, proj_id, scen_id=None, step_id=1):
-    form = ScenarioCreateForm()
-    project = get_object_or_404(Project, pk=proj_id)
 
+    project = get_object_or_404(Project, pk=proj_id)
+    form = ScenarioCreateForm(initial={'project': project})
     if scen_id == "None":
         scen_id = None
 
@@ -368,7 +368,9 @@ def scenario_create_parameters(request, proj_id, scen_id=None, step_id=1):
                 else:
                     scenario = Scenario.objects.get(id=scen_id)
                 [setattr(scenario, name, value) for name, value in form.cleaned_data.items()]
-                scenario.project = project
+
+                # update the project associated to the scenario
+                proj_id = scenario.project.id
                 scenario.save()
                 answer = HttpResponseRedirect(reverse('scenario_create_topology', args=[proj_id, scenario.id]))
 

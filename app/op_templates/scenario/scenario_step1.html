@@ -1,41 +1,49 @@
 {% extends 'scenario/scenario_progression.html' %}
+{% load static %}
 {% load crispy_forms_tags %}
 {% load i18n %}
 
 <!-- WRITE HTML CODE WITHIN THESE block content TAGS -->
 {% block progression_content %}
+<main>
+    <section class="scenario-create">
 
-<section class="scenario-create">
-
-    <form id="CreateScenarioForm" method="POST" action="{% url 'scenario_create_parameters' proj_id scen_id %}">
-        {% csrf_token %}
-        <div id="FormGroup" class="form-group">
+        <form id="CreateScenarioForm" method="POST" action="{% url 'scenario_create_parameters' proj_id scen_id %}">
+            {% csrf_token %}
+            <div id="FormGroup" class="form-group">
 
 
-            {% for field in form.visible_fields %}
-                <div class="form-group">
-                    {{ field|as_crispy_field }}
-                    {% if field.help_text %}
-                        <small class="form-text text-muted">{{ field.help_text }}</small>
-                    {% endif %}
-                </div>
-            {% endfor %}
+                {% for field in form.visible_fields %}
 
-        </div>
-        <div class="row">
-            <div class="col-sm-4"></div>
-            <div class="col-sm-4">
-                <button style=display:none;" type="submit" id="sumbit_scenario_btn">Send form</button>
+                    <div class="input-item">
+                        <div class="scenario-create__form">
+                            <div>
+                                <label for="id_{{ field.name }}" class="form-label">{% translate field.label %}</label>
+                                <!-- TODO: add class form-control and aria-describedby with constraint_id + "Help" -->
+                                {{ field }}
+                            </div>
+                        </div>
+                        <div class="scenario-create__description">
+                            <div>
+                                <div id="{{ field.name }}Help" class="form-text"> {{ field.help_text }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                {% endfor %}
 
             </div>
-        </div>
-    </form>
+        <button style=display:none;" type="submit" id="sumbit_scenario_btn">Send form</button>
 
-</section>
 
+
+        </form>
+
+
+    </section>
+</main>
 
 {% endblock progression_content %}
-
 
 
 
@@ -54,6 +62,8 @@
 
 
 </script>
+
+
 
 
 <div class="step-footer">

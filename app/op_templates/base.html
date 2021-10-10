@@ -48,11 +48,10 @@
 {% endblock index %}
 
 
-<div>
-    {% include 'messages.html' %}
-    {% block content %}
-    {% endblock %}
-</div>
+<section>{% include 'messages.html' %}</section>
+{% block content %}
+{% endblock %}
+
 
 
 

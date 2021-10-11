@@ -17,7 +17,7 @@ from django.db.models import Q
 from .forms import *
 from .requests import mvs_simulation_request
 from .models import *
-from .scenario_topology_helpers import handle_storage_unit_form_post, handle_bus_form_post, handle_asset_form_post, create_node_interconnection_links, load_scenario_topology_from_db, NodeObject, \
+from .scenario_topology_helpers import handle_storage_unit_form_post, handle_bus_form_post, handle_asset_form_post, load_scenario_topology_from_db, NodeObject, \
     update_deleted_objects_from_database, duplicate_scenario_objects, duplicate_scenario_connections, get_topology_json
 from .services import create_or_delete_simulation_scheduler, send_feedback_email
 from .constants import DONE, ERROR
@@ -383,28 +383,27 @@ def scenario_create_topology(request, proj_id, scen_id, step_id=2):
     # TODO: if the scenario exists, load it, otherwise default form
 
     if request.method == "POST":
+        # called by function save_topology() in templates/scenario/scenario_step2.html
 
         scenario = get_object_or_404(Scenario, pk=scen_id)
         if request.user != scenario.project.user:
             raise PermissionDenied
 
-        topology = json.loads(request.body)
-        node_list = list()
-        [node_list.append(NodeObject(topology[idx])) for idx in range(len(topology))]
+        topologies = json.loads(request.body)
+        node_list = [NodeObject(topology) for topology in topologies]
 
         # delete objects from database which were deleted by the user
         update_deleted_objects_from_database(scen_id, node_list)
-
         # Make sure there are no connections in the Database to prevent inserting the same connections upon updating.
         ConnectionLink.objects.filter(scenario_id=scen_id).delete()
         for node_obj in node_list:
-            create_node_interconnection_links(node_obj, scen_id)
+            node_obj.create_connection_links(scen_id)
             # node_obj.assign_asset_to_proper_group(node_to_db_mapping_dict)
         return JsonResponse({"success": True}, status=200)
-        # return HttpResponseRedirect(reverse('scenario_create_constraints', args=[proj_id, scen_id]))
     else:
 
         scenario = get_object_or_404(Scenario, pk=scen_id)
+        # this is a dict with keys "busses", "assets" and "links"
         topology_data_list = load_scenario_topology_from_db(scen_id)
         return render(request, f'scenario/scenario_step{step_id}.html',
                       {

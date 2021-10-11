@@ -335,11 +335,13 @@ STEP_LIST = [
 def scenario_create_parameters(request, proj_id, scen_id=None, step_id=1):
 
     project = get_object_or_404(Project, pk=proj_id)
-    form = ScenarioCreateForm(initial={'project': project})
+
+    # all projects which the user is able to select (the one the user created)
+    user_projects = request.user.project_set.all()
+
+    form = ScenarioCreateForm(initial={'project': project}, project_queryset=user_projects)
     if scen_id == "None":
         scen_id = None
-
-    # TODO: manage form errors and indicate where is wrong
 
     if request.method == "GET":
         if scen_id is not None:
@@ -348,7 +350,7 @@ def scenario_create_parameters(request, proj_id, scen_id=None, step_id=1):
             if (scenario.project.user != request.user) and (request.user not in scenario.project.viewers.all()):
                 raise PermissionDenied
 
-            form = ScenarioUpdateForm(None, instance=scenario)
+            form = ScenarioUpdateForm(None, instance=scenario, project_queryset=user_projects)
 
         answer = render(
             request,
@@ -358,21 +360,19 @@ def scenario_create_parameters(request, proj_id, scen_id=None, step_id=1):
 
     elif request.method == "POST":
 
-            # TODO make a new scenario entry if the project changed and warn the user upon changing project that it is going to change its settings
-            # proj_id = request.POST.get("project")
-            form = ScenarioCreateForm(request.POST)
+        form = ScenarioCreateForm(request.POST, project_queryset=user_projects)
 
-            if form.is_valid():
-                if scen_id is None:
-                    scenario = Scenario()
-                else:
-                    scenario = Scenario.objects.get(id=scen_id)
-                [setattr(scenario, name, value) for name, value in form.cleaned_data.items()]
+        if form.is_valid():
+            if scen_id is None:
+                scenario = Scenario()
+            else:
+                scenario = Scenario.objects.get(id=scen_id)
+            [setattr(scenario, name, value) for name, value in form.cleaned_data.items()]
 
-                # update the project associated to the scenario
-                proj_id = scenario.project.id
-                scenario.save()
-                answer = HttpResponseRedirect(reverse('scenario_create_topology', args=[proj_id, scenario.id]))
+            # update the project associated to the scenario
+            proj_id = scenario.project.id
+            scenario.save()
+            answer = HttpResponseRedirect(reverse('scenario_create_topology', args=[proj_id, scenario.id]))
 
     return answer
 

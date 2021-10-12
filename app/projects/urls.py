@@ -32,6 +32,7 @@ urlpatterns = [
     path('scenario/update/<int:scen_id>', scenario_update, name='scenario_update'),
     path('scenario/delete/<int:scen_id>', scenario_delete, name='scenario_delete'),
     path('scenario/duplicate/<int:scen_id>', scenario_duplicate, name='scenario_duplicate'),
+    path('scenario/export', scenario_export, name='scenario_export'),
     # path('scenario/upload/<int:proj_id>', LoadScenarioFromFileView.as_view(), name='scenario_upload'),
     # Grid Model (Assets Creation)
     re_path(r'^asset/get_form/(?P<asset_type_name>\w+)?(/(?P<asset_uuid>[0-9a-f-]+))?$', get_asset_create_form, name='get_asset_create_form'),

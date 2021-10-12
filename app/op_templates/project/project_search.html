@@ -113,7 +113,7 @@
                                             {% csrf_token %}
                                         <li class="list-group-item">
                                             <div class="details">
-                                                <input class="form-check-input me-1" id="project{{ project.id }}scenario-{{ scenario.id }}" type="checkbox" value="project{{ project.id }}scenario-{{ scenario.id }}" aria-label="">
+                                                <input class="form-check-input project-{{ project.id }}" id="project{{ project.id }}scenario-{{ scenario.id }}" type="checkbox" value="{{ scenario.id }}" aria-label="">
                                                 <label class="form-check-label" for="project{{ project.id }}scenario-{{ scenario.id }}">
                                                     <a class= "form-check-label" href="{% url 'scenario_steps_edit' proj_id=project.id scen_id=scenario.pk step_id=1 %}"> {{ scenario }} </a>
                                                 </label>
@@ -136,6 +136,7 @@
                                                 <button class="btn btn--action action" type="submit" formaction="{% url 'scenario_delete' scenario.pk %}" formmethod="post">
                                                     <span class="icon icon-delete" aria-hidden="true"></span>
                                                 </button>
+
                                             </div>
                                         </li>
                                         </form>
@@ -146,7 +147,7 @@
 
                                     </ul>
                                 </div>
-                                <button class="btn btn--action action export" type="button">
+                                <button class="btn btn--action action export" type="button" onclick="javascript:export_btn_clicked({{ project.id }})">
                                     <span class="icon icon-export" aria-hidden="true"></span>
                                     {% translate "Export selected" %}
                                 </button>
@@ -381,5 +382,30 @@
             dropdownMenu.hide();
         });
     })();
+</script>
+
+<script>
+
+
+    function export_btn_clicked(project_id){
+        // collect the ids of the scenarios checked by the user under one project
+        var scenario_ids=[];
+        var cb = $('.form-check-input.project-'+project_id);
+        const cb_checked = cb.map((i, obj) => {
+            if(obj.checked === true){
+                scenario_ids.push(obj.value)
+            }
+        });
+        // send the scenario ids to an endpoint which will return files with the scenarios
+        $.ajax({
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            type: "POST",
+            url: "{% url 'scenario_export' %}",
+            data: JSON.stringify(scenario_ids),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+        });
+    };
+
 </script>
 {% endblock end_body_scripts %}

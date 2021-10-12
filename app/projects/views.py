@@ -564,6 +564,12 @@ def scenario_duplicate(request, scen_id):
 
 
 @login_required
+@json_view
+@require_http_methods(["POST"])
+def scenario_export(request):
+    return {"success": False}
+
+@login_required
 @require_http_methods(["POST"])
 def scenario_delete(request, scen_id):
     scenario = get_object_or_404(Scenario, pk=scen_id)

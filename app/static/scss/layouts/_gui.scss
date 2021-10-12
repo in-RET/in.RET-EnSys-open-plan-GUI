@@ -108,7 +108,7 @@
     }
   }
 
-  .gui-component {
+  .drawflow-node {
     position: relative;
     height: 8rem;
     width: 9.5rem;
@@ -138,38 +138,29 @@
       cursor: pointer;
     }
 
-    &__name {
-      @include flex-column-align-justify-center;
-      height: 2.5rem;
-      padding: 0 .5rem;
-
-      span {
-        display: inline-block;
-        word-break: break-all;
-        text-align: center;
-      }
+    .drawflow_content_node {
+      height: 100%;
+      @include flex-column;
+      justify-content: space-around;
+      align-items: center;
     }
 
-    &__bottom {
-      @include flex-row;
+    .inputs {
+      bottom: $gui-component-position-btm;
+      left: $gui-component-position-side;
     }
 
-    .input .node {
-      background-color: #4EC4C4;
+    .outputs {
+      bottom: $gui-component-position-btm;
+      right: $gui-component-position-side;
     }
 
-    .output .node {
-      background-color: #C46A4E;
-    }
+    .inputs,
+    .outputs {
+      position: absolute;
 
-    .input,
-    .output {
-      flex: 1;
-      @include flex-column-align-justify-center;
-      flex-wrap: wrap;
-      max-height: calc(#{$gui-component-bg-size} + 0.5rem);
-
-      .node {
+      .input,
+      .output {
         width: $gui-component-node-size;
         height: $gui-component-node-size;
         border-radius: 100%;
@@ -177,9 +168,12 @@
         cursor: pointer;
       }
 
-      .node--empty {
-        background-color: $white;
-        border: 1px solid $primary-gray-color-3;
+      .input {
+        background-color: #4EC4C4;
+      }
+
+      .output {
+        background-color: #C46A4E;
       }
     }
 

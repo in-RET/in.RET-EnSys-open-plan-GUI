@@ -29,7 +29,7 @@ $text-color-a-sec-hover: $primary-color-2-light;
 $text-color-invert: $white;
 
 $box-shadow-frame: 0px 0px 16px rgba(31, 86, 125, 0.08);
-$box-shadow-form: 0 0 0 0.25rem rgba(31, 86, 125, 0.1);
+$box-shadow-form: 0 0 0 0.25rem rgb(31 86 125 / 10%);
 
 // Media-breaks
 $small-screen: 640px;
@@ -126,6 +126,8 @@ $component-images: (
 $gui-component-bg-size: 4.5rem;
 $gui-component-img-size: 3rem;
 $gui-component-node-size: 0.75rem;
+$gui-component-position-btm: 2rem;
+$gui-component-position-side: 0.9rem;
 
 // Dashboard
 $dashboard-chart-height: 32rem;

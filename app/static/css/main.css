@@ -1627,7 +1627,7 @@ nav.navbar .dropdown-menu li {
   color: #343434;
   font-weight: 300;
 }
-.system-design .drawflow-node {
+.drawflow .drawflow-node {
   position: relative;
   height: 8rem;
   width: 9.5rem;
@@ -1637,10 +1637,10 @@ nav.navbar .dropdown-menu li {
   border-bottom: 4px solid #A4ADFB;
   cursor: move;
 }
-.system-design .drawflow-node:hover {
+.drawflow .drawflow-node:hover {
   background-color: #edf2f5;
 }
-.system-design .drawflow-node:hover::after {
+.drawflow .drawflow-node:hover::after {
   content: "X";
   position: absolute;
   top: 0;
@@ -1655,69 +1655,69 @@ nav.navbar .dropdown-menu li {
   border-radius: 100%;
   cursor: pointer;
 }
-.system-design .drawflow-node .drawflow_content_node {
+.drawflow .drawflow-node .drawflow_content_node {
   height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
 }
-.system-design .drawflow-node .inputs {
+.drawflow .drawflow-node .inputs {
   bottom: 2rem;
   left: 0.9rem;
 }
-.system-design .drawflow-node .outputs {
+.drawflow .drawflow-node .outputs {
   bottom: 2rem;
   right: 0.9rem;
 }
-.system-design .drawflow-node .inputs,
-.system-design .drawflow-node .outputs {
+.drawflow .drawflow-node .inputs,
+.drawflow .drawflow-node .outputs {
   position: absolute;
 }
-.system-design .drawflow-node .inputs .input,
-.system-design .drawflow-node .inputs .output,
-.system-design .drawflow-node .outputs .input,
-.system-design .drawflow-node .outputs .output {
+.drawflow .drawflow-node .inputs .input,
+.drawflow .drawflow-node .inputs .output,
+.drawflow .drawflow-node .outputs .input,
+.drawflow .drawflow-node .outputs .output {
   width: 0.75rem;
   height: 0.75rem;
   border-radius: 100%;
   margin: 0.25rem 0;
   cursor: pointer;
 }
-.system-design .drawflow-node .inputs .input,
-.system-design .drawflow-node .outputs .input {
+.drawflow .drawflow-node .inputs .input,
+.drawflow .drawflow-node .outputs .input {
   background-color: #4EC4C4;
 }
-.system-design .drawflow-node .inputs .output,
-.system-design .drawflow-node .outputs .output {
+.drawflow .drawflow-node .inputs .output,
+.drawflow .drawflow-node .outputs .output {
   background-color: #C46A4E;
 }
-.system-design .drawflow-node .img {
+.drawflow .drawflow-node .img {
   position: relative;
   width: 4.5rem;
   height: 4.5rem;
   background-color: #fff;
   border-radius: 100%;
 }
-.system-design .drawflow-node--providers {
+.drawflow .drawflow-node--providers {
   border-bottom-color: #A4ADFB;
 }
-.system-design .drawflow-node--production {
+.drawflow .drawflow-node--production {
   border-bottom-color: #FFEF9F;
 }
-.system-design .drawflow-node--conversion {
+.drawflow .drawflow-node--conversion {
   border-bottom-color: #7BF1A8;
 }
-.system-design .drawflow-node--storage {
+.drawflow .drawflow-node--storage {
   border-bottom-color: #90F1EF;
 }
-.system-design .drawflow-node--demand {
+.drawflow .drawflow-node--demand {
   border-bottom-color: #FFD6E0;
 }
-.system-design .drawflow-node--bus {
+.drawflow .drawflow-node--bus {
   border-bottom-color: #F4CC9E;
 }
-.system-design .drawflow-node--dso .img::before {
+.drawflow .drawflow-node--dso .img::before {
   content: "";
   position: absolute;
   top: 2.2rem;
@@ -1728,7 +1728,7 @@ nav.navbar .dropdown-menu li {
   height: 3rem;
   width: 3rem;
 }
-.system-design .drawflow-node--pv .img::before {
+.drawflow .drawflow-node--pv .img::before {
   content: "";
   position: absolute;
   top: 2.2rem;
@@ -1739,7 +1739,7 @@ nav.navbar .dropdown-menu li {
   height: 3rem;
   width: 3rem;
 }
-.system-design .drawflow-node--wind_turbine .img::before {
+.drawflow .drawflow-node--wind_turbine .img::before {
   content: "";
   position: absolute;
   top: 2.2rem;
@@ -1750,7 +1750,7 @@ nav.navbar .dropdown-menu li {
   height: 3rem;
   width: 3rem;
 }
-.system-design .drawflow-node--transformer_in .img::before {
+.drawflow .drawflow-node--transformer_in .img::before {
   content: "";
   position: absolute;
   top: 2.2rem;
@@ -1761,7 +1761,7 @@ nav.navbar .dropdown-menu li {
   height: 3rem;
   width: 3rem;
 }
-.system-design .drawflow-node--transformer_out .img::before {
+.drawflow .drawflow-node--transformer_out .img::before {
   content: "";
   position: absolute;
   top: 2.2rem;
@@ -1772,7 +1772,7 @@ nav.navbar .dropdown-menu li {
   height: 3rem;
   width: 3rem;
 }
-.system-design .drawflow-node--storage_in .img::before {
+.drawflow .drawflow-node--storage_in .img::before {
   content: "";
   position: absolute;
   top: 2.2rem;
@@ -1783,7 +1783,7 @@ nav.navbar .dropdown-menu li {
   height: 3rem;
   width: 3rem;
 }
-.system-design .drawflow-node--storage_out .img::before {
+.drawflow .drawflow-node--storage_out .img::before {
   content: "";
   position: absolute;
   top: 2.2rem;
@@ -1794,7 +1794,7 @@ nav.navbar .dropdown-menu li {
   height: 3rem;
   width: 3rem;
 }
-.system-design .drawflow-node--solar_inverter .img::before {
+.drawflow .drawflow-node--solar_inverter .img::before {
   content: "";
   position: absolute;
   top: 2.2rem;
@@ -1805,7 +1805,7 @@ nav.navbar .dropdown-menu li {
   height: 3rem;
   width: 3rem;
 }
-.system-design .drawflow-node--storage .img::before {
+.drawflow .drawflow-node--storage .img::before {
   content: "";
   position: absolute;
   top: 2.2rem;
@@ -1816,7 +1816,7 @@ nav.navbar .dropdown-menu li {
   height: 3rem;
   width: 3rem;
 }
-.system-design .drawflow-node--demand .img::before {
+.drawflow .drawflow-node--demand .img::before {
   content: "";
   position: absolute;
   top: 2.2rem;
@@ -1827,7 +1827,7 @@ nav.navbar .dropdown-menu li {
   height: 3rem;
   width: 3rem;
 }
-.system-design .drawflow-node--bus .img::before {
+.drawflow .drawflow-node--bus .img::before {
   content: "";
   position: absolute;
   top: 2.2rem;

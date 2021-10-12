@@ -4,12 +4,14 @@
 {% load i18n %}
 
 
-{% block start_body_scripts %}
+{% block head_block %}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jerosoler/Drawflow/dist/drawflow.min.css">
+{% endblock head_block %}
+
+
+{% block start_body_scripts %}
 
 <link rel="stylesheet" type="text/css" href="{% static 'css/beautiful1.css' %}"/>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css"
-      integrity="sha256-h20CPZ0QyXlBuAw7A+KluUYx/3pK+c7lYEpqLTlxjYQ=" crossorigin="anonymous"/>
 {% endblock start_body_scripts %}
 
 
@@ -110,31 +112,11 @@
                 </div>
                 <a class="btn btn--small btn--hollow" onclick="clearGridModel()">{% translate "Clear design" %}</a>
             </div>
-            <div class="gui__empty-text">
+            <!--<div class="gui__empty-text">
                 <span>{% translate "Drag and drop components to build your energy system" %}</span>
-            </div>
-            <div class="gui-component gui-component--production gui-component--pv" style="position: absolute; left: 25%; top: 25%" data-bs-toggle="modal" data-bs-target="#pvModal">
-                <div class="gui-component__name">
-              <span>
-                pv_plant_name_XYZ_
-              </span>
-                </div>
-                <div class="gui-component__bottom">
-                    <div class="input">
-                        <div class="node"></div>
-                    </div>
-                    <div class="img"></div>
-                    <div class="output">
-                        <div class="node node--empty"></div>
-                        <div class="node"></div>
-                        <div class="node"></div>
-                        <div class="node"></div>
-                        <div class="node"></div>
-                        <div class="node"></div>
-                    </div>
-                </div>
-            </div>
+            </div>-->
         </div>
+
     </section>
 </main>
 

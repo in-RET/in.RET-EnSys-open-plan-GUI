@@ -285,7 +285,13 @@ async function createNodeObject(nodeName, connectionInputs = 1, connectionOutput
             </div>
           </div>
     </div>
-    <div class="nodeName" >${shownName}</div>`;
+
+    <div class="drawflow-node__name nodeName">
+        <span>
+          ${shownName}
+        </span>
+    </div>
+    <div class="img"></div>`;
 
     return {
         "editorNodeId": editor.addNode(nodeName, connectionInputs, connectionOutputs, pos_x, pos_y, nodeName, nodeData, source_html),

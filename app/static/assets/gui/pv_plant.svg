@@ -1,1 +1,59 @@
-<svg height='100px' width='100px'  fill="#000000" xmlns="http://www.w3.org/2000/svg" data-name="Layer 1" viewBox="0 0 512 512" x="0px" y="0px"><title>solar panels</title><path d="M59.41,496.648H257.118a24,24,0,0,0,23.973-23.974V447.221h28.878A23.973,23.973,0,0,0,332.6,415.328L282.271,271.541a24,24,0,0,0-22.628-16.054H64.074A23.974,23.974,0,0,0,41.446,287.38l12.743,36.406H27.957a6,6,0,0,0-6,6V367.53a6,6,0,0,0,6,6h7.48v99.144A24,24,0,0,0,59.41,496.648Zm209.681-23.974a11.987,11.987,0,0,1-11.973,11.974H59.41a11.987,11.987,0,0,1-11.973-11.974V373.53H71.6l20.173,57.637A24,24,0,0,0,114.4,447.221H269.091ZM208.287,325,226.1,375.909H168.721L150.9,325ZM146.7,313l-15.93-45.515h57.382L204.087,313Zm159.382,62.907H238.818L221,325h67.268ZM189.48,435.221l-16.559-47.312H230.3l16.56,47.312Zm-12.713,0H114.4a11.986,11.986,0,0,1-11.3-8.018L89.345,387.909h70.863Zm-20.759-59.312H85.145L67.328,325H138.19Zm163.726,54.267a11.836,11.836,0,0,1-9.765,5.045H259.577l-16.559-47.312h67.268l10.984,31.383A11.838,11.838,0,0,1,319.734,430.176Zm-48.79-154.671L284.068,313H216.8l-15.93-45.515h58.773A11.986,11.986,0,0,1,270.944,275.505ZM54.309,272.532a11.835,11.835,0,0,1,9.765-5.045H118.06L133.99,313H63.128L52.772,283.416A11.838,11.838,0,0,1,54.309,272.532Zm13.09,89H53.728V335.786h4.661ZM33.957,335.786h7.771V361.53H33.957Z"></path><path d="M365.56,174.2a55.988,55.988,0,0,0,68.923-77.15h0A55.988,55.988,0,1,0,365.56,174.2Zm-.609-92.479a44,44,0,0,1,58.722,20.537h0a43.989,43.989,0,1,1-58.722-20.537Z"></path><path d="M345.922,56.049a6,6,0,0,0,10.811-5.208l-8.3-17.231a6,6,0,0,0-10.811,5.208Z"></path><path d="M425.064,212.492a6,6,0,0,0,5.4-8.606l-8.3-17.23a6,6,0,1,0-10.811,5.208l8.3,17.23A6,6,0,0,0,425.064,212.492Z"></path><path d="M451.955,94.638a5.986,5.986,0,0,0,2.6-.6l17.23-8.3a6,6,0,0,0-5.208-10.811l-17.23,8.3a6,6,0,0,0,2.608,11.407Z"></path><path d="M313.532,148.663l-17.231,8.3a6,6,0,1,0,5.208,10.81l17.231-8.3a6,6,0,0,0-5.208-10.811Z"></path><path d="M406.908,55.975a5.994,5.994,0,0,0,7.644-3.683l10.129-28.959a6,6,0,1,0-11.327-3.962l-10.129,28.96A6,6,0,0,0,406.908,55.975Z"></path><path d="M349.07,227.354a6,6,0,0,0,5.663-4.021l10.128-28.959a6,6,0,1,0-11.327-3.962l-10.128,28.959a6,6,0,0,0,5.664,7.983Z"></path><path d="M486.024,150.663l-28.959-10.129a6,6,0,1,0-3.962,11.327l28.959,10.129a6,6,0,1,0,3.962-11.327Z"></path><path d="M282.062,92.042l28.959,10.128a6,6,0,1,0,3.962-11.327L286.024,80.715a6,6,0,0,0-3.962,11.327Z"></path></svg>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="svg5607"
+   version="1.1"
+   viewBox="0 0 26.458334 26.458334"
+   height="26.458334mm"
+   width="26.458334mm"
+   sodipodi:docname="production_pv.svg"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="961"
+     inkscape:window-height="480"
+     id="namedview9"
+     showgrid="false"
+     inkscape:zoom="2.3599999"
+     inkscape:cx="50.000001"
+     inkscape:cy="50.000001"
+     inkscape:window-x="67"
+     inkscape:window-y="27"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs5601" />
+  <metadata
+     id="metadata5604">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(116.79464,-135.60417)"
+     id="layer1">
+    <path
+       id="path1753"
+       d="m -106.79669,139.538 -0.0486,0.0129 h -6.03322 a 0.46306714,0.46306714 0 0 0 -0.44752,0.58135 l 1.56063,5.91541 h -1.9141 a 0.46306714,0.46306714 0 0 0 -0.46302,0.46302 v 10.76937 a 0.46306714,0.46306714 0 0 0 0.46302,0.4625 h 18.156519 a 0.46306714,0.46306714 0 0 0 0.462501,-0.4625 v -3.30626 h 2.976046 a 0.46306714,0.46306714 0 0 0 0.447,-0.58291 l -3.616832,-13.49737 a 0.46306714,0.46306714 0 0 0 -0.447,-0.34261 h -5.167124 l -0.004,-0.0129 -0.0481,0.0129 h -5.87306 z m -5.48029,0.93896 h 4.77283 l 0.92967,3.47007 h -4.78731 z m 5.73195,0 h 4.96662 l 0.92966,3.47007 h -4.96662 z m 5.9247,0 h 4.56355 l 0.930174,3.47007 h -4.563543 z m 5.737639,4.38061 0.939478,3.50418 h -4.564063 l -0.935346,-3.48919 h 4.559931 z m -16.235189,0.015 h 4.79144 l 0.93483,3.4892 h -4.78989 v 0.0605 z m 5.75056,0 h 4.9661 l 0.93483,3.4892 h -4.96611 z m -7.84862,2.10168 h 1.69499 l 1.75545,6.65489 a 0.46306714,0.46306714 0 0 0 0.44751,0.34468 h 13.332008 v 2.84324 h -17.229958 z m 3.26285,2.31356 h 4.80953 l 1.00769,3.75997 h -4.82555 z m 5.76864,0 h 4.966106 l 1.007172,3.75997 h -4.966098 z m 5.925221,0 h 4.564062 l 1.007688,3.75997 h -4.564062 z"
+       style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:medium;line-height:normal;font-family:sans-serif;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-feature-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;vector-effect:none;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.92604166;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate" />
+  </g>
+</svg>

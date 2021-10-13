@@ -112,12 +112,63 @@ class BusDto:
         self.energy_vector = energy_vector
         self.assets = assets
 
+class ConstraintDto:
+    def __init__(self, label: str, value: ValueTypeDto):
+        self.label = label
+        self.value = value
+
+def get_all_subclasses(python_class):
+    """
+    Credit: https://gist.github.com/pzrq/460424c9382dd50d02b8
+    Helper function to get all the subclasses of a class.
+    :param python_class: Any Python class that implements __subclasses__()
+    """
+    python_class.__subclasses__()
+
+    subclasses = set()
+    check_these = [python_class]
+
+    while check_these:
+        parent = check_these.pop()
+        for child in parent.__subclasses__():
+            if child not in subclasses:
+                subclasses.add(child)
+                check_these.append(child)
+
+    return sorted(subclasses, key=lambda x: x.__name__)
+
+
+def get_concrete_models(base_model):
+    """
+    Credit: https://gist.github.com/pzrq/460424c9382dd50d02b8
+    Helper function to get all concrete models
+    that are subclasses of base_model
+    in sorted order by name.
+    :param base_model: A Django models.Model instance.
+    """
+    found = get_all_subclasses(base_model)
+
+    def filter_func(model):
+        meta = getattr(model, '_meta', '')
+        if getattr(meta, 'abstract', True):
+            # Skip meta classes
+            return False
+        if '_Deferred_' in model.__name__:
+            # See deferred_class_factory() in django.db.models.query_utils
+            # Catches when you do .only('attr') on a queryset
+            return False
+        return True
+
+    subclasses = list(filter(filter_func, found))
+    return sorted(subclasses, key=lambda x: x.__name__)
+
+
 
 class MVSRequestDto:
     def __init__(self, project_data: ProjectDataDto, economic_data: EconomicDataDto,
                  simulation_settings: SimulationSettingsDto, energy_providers: List[AssetDto],
                  energy_consumption: List[AssetDto], energy_conversion: List[AssetDto],
-                 energy_production: List[AssetDto], energy_storage: List[EssDto], energy_busses: List[BusDto]):
+                 energy_production: List[AssetDto], energy_storage: List[EssDto], energy_busses: List[BusDto], constraints: List[ConstraintDto]):
         self.project_data = project_data
         self.economic_data = economic_data
         self.simulation_settings = simulation_settings
@@ -127,6 +178,7 @@ class MVSRequestDto:
         self.energy_production = energy_production
         self.energy_storage = energy_storage
         self.energy_busses = energy_busses
+        self.constraints = constraints
 
 
 # Function to serialize scenario topology models to JSON
@@ -140,6 +192,9 @@ def convert_to_dto(scenario: Scenario):
         Q(asset_type__asset_type__contains='ess') | Q(parent_asset__asset_type__asset_type__contains='ess'))
     bus_list = Bus.objects.filter(scenario=scenario).exclude(
         Q(connectionlink__asset__parent_asset__asset_type__asset_type__contains='ess'))
+
+    constraint_list = [c.objects.get(scenario=scenario) for c in get_concrete_models(Constraint)]
+
 
     # Create  dto objects
     project_data_dto = ProjectDataDto(project.id,
@@ -170,6 +225,7 @@ def convert_to_dto(scenario: Scenario):
     energy_consumption = []
     energy_storage = []
     energy_conversion = []
+    constraints = []
 
     bus_dto_list = []
 
@@ -284,6 +340,12 @@ def convert_to_dto(scenario: Scenario):
         # elif asset.asset_type.asset_category == 'energy_storage':
         #     energy_storage.append(asset_dto)
 
+
+    # Iterate over constraints
+    for constraint in constraint_list:
+        constraint_dto = ConstraintDto(label=constraint.name, value=ValueTypeDto(unit=constraint.unit, value=constraint.value))
+        constraints.append(constraint_dto)
+
     # Iterate over busses
     for bus in bus_list:
         # Find all connections with bus
@@ -304,7 +366,8 @@ def convert_to_dto(scenario: Scenario):
                                     energy_conversion,
                                     energy_production,
                                     energy_storage,
-                                    bus_dto_list)
+                                    bus_dto_list,
+                                    constraints)
 
     return mvs_request_dto
 

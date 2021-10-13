@@ -66,7 +66,6 @@ class Scenario(models.Model):
     def __str__(self):
         return self.name
 
-
 class AssetType(models.Model):
     asset_type = models.CharField(max_length=30, choices=ASSET_TYPE, null=False, unique=True)
     asset_category = models.CharField(max_length=30, choices=ASSET_CATEGORY)
@@ -139,6 +138,33 @@ class ConnectionLink(models.Model):
     flow_direction = models.CharField(max_length=15, choices=FLOW_DIRECTION, null=False)
     scenario = models.ForeignKey(Scenario, on_delete=models.CASCADE, null=False)
 
+
+class Constraint(models.Model):
+    scenario = models.ForeignKey(Scenario, on_delete=models.CASCADE, null=False)
+    activated = models.BooleanField(null=True, blank=False, choices=TRUE_FALSE_CHOICES, default=False)
+
+    class Meta:
+        abstract = True
+
+class MinRenewableConstraint(Constraint):
+    value = models.FloatField(null=False, blank=False, validators=[MinValueValidator(0.0), MaxValueValidator(1.0)], default=0.2)
+    unit = models.CharField(max_length=6, default='factor', editable=False)
+    name = models.CharField(max_length=30, default='minimal_renewable_factor', editable=False)
+
+class MaxEmissionConstraint(Constraint):
+    value = models.FloatField(null=False, blank=False, validators=[MinValueValidator(0.0)], default=0.0)
+    unit = models.CharField(max_length=9, default='kgCO2eq/a', editable=False)
+    name = models.CharField(max_length=30, default='maximum_emissions', editable=False)
+
+class MinDOAConstraint(Constraint):
+    value = models.FloatField(null=False, blank=False, validators=[MinValueValidator(0.0), MaxValueValidator(1.0)], default=0.3)
+    unit = models.CharField(max_length=6, default='factor', editable=False)
+    name = models.CharField(max_length=30, default='minimal_degree_of_autonomy', editable=False)
+
+class NZEConstraint(Constraint):
+    value = models.BooleanField(null=True, blank=False, choices=TRUE_FALSE_CHOICES, default=False)
+    unit = models.CharField(max_length=4, default='bool', editable=False)
+    name = models.CharField(max_length=30, default='net_zero_energy', editable=False)
 
 class ScenarioFile(models.Model):
     title = models.CharField(max_length=50)

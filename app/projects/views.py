@@ -420,8 +420,6 @@ def scenario_create_topology(request, proj_id, scen_id, step_id=2):
 @login_required
 @require_http_methods(["GET", "POST"])
 def scenario_create_constraints(request, proj_id, scen_id, step_id=3):
-    scenario = get_object_or_404(Scenario, pk=scen_id)
-    forms = [MinRenewableConstraintForm(), MaxEmissionConstraintForm()]
 
     constraints_labels = {
         "minimal_degree_of_autonomy": "Minimal degree of autonomy",
@@ -467,8 +465,16 @@ def scenario_create_constraints(request, proj_id, scen_id, step_id=3):
             form = form_model(request.POST, prefix=constraint_type)
 
             if form.is_valid():
-                constraint_instance = form.save(commit=False)
-                constraint_instance.scenario = scenario
+                #check whether the constraint is already associated to a scenario
+                qs = constraints_models[constraint_type].objects.filter(scenario=scenario)
+                if qs.exists():
+                    if len(qs) == 1:
+                        constraint_instance = qs[0]
+                        [setattr(constraint_instance, name, value) for name, value in form.cleaned_data.items()]
+                else:
+                    constraint_instance = form.save(commit=False)
+                    constraint_instance.scenario = scenario
+
                 constraint_instance.save()
 
 

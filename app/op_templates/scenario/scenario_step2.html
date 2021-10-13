@@ -1,6 +1,7 @@
 {% extends 'scenario/scenario_progression.html' %}
 {% load static %}
 {% load crispy_forms_tags %}
+{% load custom_filters %}
 {% load i18n %}
 
 
@@ -27,77 +28,25 @@
                     <span class="icon icon-question" data-bs-toggle="tooltip" title="Lorem ipsum"></span>
                 </div>
             </div>
+
+
+
+
+
             <div class="components__content">
-                <div class="section section--providers">
-                    <div class="section__title">
-                        <h3>{% translate "Providers" %}</h3>
+
+                {% for group_name, group_components in components.items %}
+                    <div class="section section--{{ group_name }}">
+                        <div class="section__title">
+                            <h3>{{ group_names|get_item:group_name|title }}</h3>
+                        </div>
+                        {% for component_id, component_name in group_components.items %}
+                            {% include 'scenario/topology_drag_items.html' with name=component_name alt=component_name|add:" icon" image=component_id|add:".svg" data_node=component_id %}
+                        {% endfor %}
                     </div>
-                    {% include 'scenario/topology_drag_items.html' with name="Electricity DSO" alt="Electric grid icon" image="electric_grid.svg" data_node="dso" %}
-                    {% include 'scenario/topology_drag_items.html' with name="Gas DSOt" alt="Electric grid icon" image="electric_grid.svg" data_node="gas_dso" %}
-                    {% include 'scenario/topology_drag_items.html' with name="H2 DSO" alt="Electric grid icon" image="electric_grid.svg" data_node="h2_dso" %}
-                    {% include 'scenario/topology_drag_items.html' with name="Heat DSO" alt="Electric grid icon" image="electric_grid.svg" data_node="heat_dso" %}
-                </div>
-
-                <div class="section section--production">
-                    <div class="section__title">
-                        <h3>{% translate "Production" %}</h3>
-                    </div>
-                    {% include 'scenario/topology_drag_items.html' with name="PV Plant" alt="" image="pv_plant.svg" data_node="pv_plant" %}
-                    {% include 'scenario/topology_drag_items.html' with name="Wind Plant" alt="" image="wind_plant.svg" data_node="wind_plant" %}
-                    {% include 'scenario/topology_drag_items.html' with name="Biogas Plant" alt="" image=".svg" data_node="biogas_plant" %}
-                    {% include 'scenario/topology_drag_items.html' with name="Geothermal Conversion" alt="" image=".svg" data_node="geothermal_conversion" %}
-                    {% include 'scenario/topology_drag_items.html' with name="Solar Thermal Plant" alt="" image=".svg" data_node="solar_thermal_plant" %}
-
-                </div>
-                <div class="section section--conversion">
-                    <div class="section__title">
-                        <h3>{% translate "Conversion" %}</h3>
-                    </div>
-                    {% include 'scenario/topology_drag_items.html' with name="Transformer Station (in)" alt="" image="transformer_in.svg" data_node="transformer_station_in" %}
-                    {% include 'scenario/topology_drag_items.html' with name="Transformer Station (out)" alt="" image="transformer_out.svg" data_node="transformer_station_out" %}
-                    {% include 'scenario/topology_drag_items.html' with name="Storage Charge Controller (in)" alt="" image="storage_in.svg" data_node="storage_charge_controller_in" %}
-                    {% include 'scenario/topology_drag_items.html' with name="Storage Charge Controller (out)" alt="" image="storage_out.svg" data_node="storage_charge_controller_out" %}
-                    {% include 'scenario/topology_drag_items.html' with name="Solar Inverter" alt="" image="solar_inverter.svg" data_node="solar_inverter" %}
-                    {% include 'scenario/topology_drag_items.html' with name="Diesel Generator" alt="" image=".svg" data_node="diesel_generator" %}
-                    {% include 'scenario/topology_drag_items.html' with name=" Fuel Cell" alt="" image=".svg" data_node="fuel_cell" %}
-                    {% include 'scenario/topology_drag_items.html' with name="Gas Boiler" alt="" image=".svg" data_node="gas_boiler" %}
-                    {% include 'scenario/topology_drag_items.html' with name="Electrolyzer" alt="" image=".svg" data_node="electrolyze" %}
-                    {% include 'scenario/topology_drag_items.html' with name="Heat Pump" alt="" image=".svg" data_node="heat_pump" %}
-
-                </div>
-                <div class="section section--storage">
-                    <div class="section__title">
-                        <h3>{% translate "Storage" %}</h3>
-                    </div>
-
-                    {% include 'scenario/topology_drag_items.html' with name="Electricity Storage" alt="" image="battery.svg" data_node="bess" %}
-                    {% include 'scenario/topology_drag_items.html' with name="Gas Storage" alt="" image=".svg" data_node="gess" %}
-                    {% include 'scenario/topology_drag_items.html' with name="H2 Storage" alt="" image=".svg" data_node="h2ess" %}
-                    {% include 'scenario/topology_drag_items.html' with name="Heat Storage" alt="" image=".svg" data_node="hess" %}
+                {% endfor %}
 
 
-                </div>
-                <div class="section section--demand">
-                    <div class="section__title">
-                        <h3>{% translate "Consumption" %}</h3>
-                    </div>
-
-
-                    {% include 'scenario/topology_drag_items.html' with name="Electricity Demand" alt="House with electricity and person icon" image="demand.svg" data_node="demand" %}
-                    {% include 'scenario/topology_drag_items.html' with name="Gas Demand" alt="" image=".svg" data_node="gas_demand" %}
-                    {% include 'scenario/topology_drag_items.html' with name="H2 Demand" alt="" image=".svg" data_node="h2_demand" %}
-                    {% include 'scenario/topology_drag_items.html' with name="Heat Demand" alt="" image=".svg" data_node="heat_demand" %}
-
-                </div>
-                <div class="section section--bus">
-                    <div class="section__title">
-                        <h3>{% translate "Bus" %}</h3>
-                    </div>
-
-
-                    {% include 'scenario/topology_drag_items.html' with name="Bus" alt="" image="power_antenna.svg" data_node="bus" %}
-
-                </div>
             </div>
         </div>
         <div id="drawflow" class="gui" ondrop="drop(event)" ondragover="allowDrop(event)">

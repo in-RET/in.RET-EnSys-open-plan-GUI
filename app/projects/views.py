@@ -4,6 +4,7 @@ import json
 import logging
 from django.http import HttpResponseForbidden, JsonResponse
 from django.http.response import Http404
+from django.utils.translation import gettext_lazy as _
 from django.shortcuts import *
 from django.urls import reverse, reverse_lazy
 from django.core.exceptions import PermissionDenied
@@ -380,6 +381,50 @@ def scenario_create_parameters(request, proj_id, scen_id=None, step_id=1):
 @require_http_methods(["GET", "POST"])
 def scenario_create_topology(request, proj_id, scen_id, step_id=2):
 
+    components = {
+        "providers": {
+            "dso": _("Electricity DSO"),
+            "gas_dso": _("Gas DSOt" ),
+            "h2_dso": _("H2 DSO" ),
+            "heat_dso": _("Heat DSO" ),
+        },
+        "production": {
+            "pv_plant": _("PV Plant" ),
+            "wind_plant": _("Wind Plant" ),
+            "biogas_plant": _("Biogas Plant" ),
+            "geothermal_conversion": _("Geothermal Conversion" ),
+            "solar_thermal_plant": _("Solar Thermal Plant" ),
+        },
+        "conversion": {
+            "transformer_station_in": _("Transformer Station (in)" ),
+            "transformer_station_out": _("Transformer Station (out)" ),
+            "storage_charge_controller_in": _("Storage Charge Controller (in)" ),
+            "storage_charge_controller_out": _("Storage Charge Controller (out)" ),
+            "solar_inverter": _("Solar Inverter" ),
+            "diesel_generator": _("Diesel Generator" ),
+            "fuel_cell": _(" Fuel Cell" ),
+            "gas_boiler": _("Gas Boiler" ),
+            "electrolyze": _("Electrolyzer" ),
+            "heat_pump": _("Heat Pump" ),
+        },
+        "storage": {
+            "bess": _("Electricity Storage" ),
+            "gess": _("Gas Storage" ),
+            "h2ess": _("H2 Storage" ),
+            "hess": _("Heat Storage" ),
+        },
+        "demand": {
+            "demand": _("Electricity Demand"),
+            "gas_demand": _("Gas Demand" ),
+            "h2_demand": _("H2 Demand" ),
+            "heat_demand": _("Heat Demand" ),
+        },
+        "bus": {"bus": _("Bus")}
+    }
+    group_names = {group: _(group) for group in components.keys()}
+
+
+
     # TODO: if the scenario exists, load it, otherwise default form
 
     if request.method == "POST":
@@ -412,7 +457,9 @@ def scenario_create_topology(request, proj_id, scen_id, step_id=2):
                           'proj_id': scenario.project.id,
                           'topology_data_list': json.dumps(topology_data_list),
                           'step_id': step_id,
-                          "step_list": STEP_LIST
+                          "step_list": STEP_LIST,
+                          "components": components,
+                          "group_names": group_names,
                       })
 
 
@@ -422,10 +469,10 @@ def scenario_create_topology(request, proj_id, scen_id, step_id=2):
 def scenario_create_constraints(request, proj_id, scen_id, step_id=3):
 
     constraints_labels = {
-        "minimal_degree_of_autonomy": "Minimal degree of autonomy",
-        "minimal_renewable_factor": "Minimal share of renewables",
-        "maximum_emissions": "Maximal CO2 emissions",
-        "net_zero_energy": "Net zero energy system",
+        "minimal_degree_of_autonomy": _("Minimal degree of autonomy"),
+        "minimal_renewable_factor": _("Minimal share of renewables"),
+        "maximum_emissions": _("Maximal CO2 emissions"),
+        "net_zero_energy": _("Net zero energy system"),
     }
     constraints_forms = {
         "minimal_degree_of_autonomy": MinRenewableConstraintForm,
@@ -753,7 +800,7 @@ def request_mvs_simulation(request, scenario_id=0):
         simulation.status = results['status']
         simulation.results = results['results']
         simulation.end_date = datetime.now()
-    else:  # PENDING
+    else: # PENDING
         simulation.status = results['status']
         create_or_delete_simulation_scheduler()
 

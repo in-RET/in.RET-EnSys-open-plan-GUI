@@ -5,8 +5,7 @@
     {% include "navbar.html" with user=user scenario_create=True %}
 {% endblock navbar %}
 
-{% comment %}{{ step_map["/step/"+step_id|string] }}{% endcomment %}
-{% block title %} create scenario step {{ step_id }} {% endblock title%}
+{% block title %} {% translate "Scenario step" %} {{ step_id }} {% endblock title%}
 
 <!-- WRITE HTML CODE WITHIN THESE block content TAGS -->
 {% block content %}

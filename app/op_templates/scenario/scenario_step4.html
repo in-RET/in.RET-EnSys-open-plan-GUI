@@ -24,7 +24,7 @@
 
         you can click on Proof mvs inputs, then save the json file and upload it with the browse button to
 
-        <a href="https://mvs-eland.rl-institut.de/">MVS simulation server</a>, as clicking on Run MVS simulation button might not work at the moment
+        <a href="https://mvs-eland.rl-institut.de/">MVS simulation server</a>
 
     </section>
 
@@ -48,8 +48,8 @@
 
     <div>
         <a class="btn btn--medium btn--hollow btn--previous" href="{% url 'scenario_steps_edit' proj_id scen_id step_id %}" aria-disabled="true">{% translate "Previous" %}</a>
-        <a class="btn btn--medium" href="{% url 'view_mvs_data_input' scen_id %}" > Proof mvs inputs </a>
-        <a class="btn btn--medium" href="{% url 'request_mvs_simulation' scen_id %}" > Run MVS simulation </a>
+        <a class="btn btn--medium" href="{% url 'view_mvs_data_input' scen_id %}" >{% translate "Proof parameters JSON file " %} </a>
+        <a class="btn btn--medium" href="{% url 'request_mvs_simulation' scen_id %}" > {% translate "Run simulation %}</a>
 
 
     </div>

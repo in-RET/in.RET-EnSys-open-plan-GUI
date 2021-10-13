@@ -1628,7 +1628,7 @@ nav.navbar .dropdown-menu li {
   font-weight: 300;
 }
 .drawflow .drawflow-node {
-  position: relative;
+  position: absolute;
   height: 8rem;
   width: 9.5rem;
   border-radius: 8px;
@@ -1728,7 +1728,7 @@ nav.navbar .dropdown-menu li {
   height: 3rem;
   width: 3rem;
 }
-.drawflow .drawflow-node--pv .img::before {
+.drawflow .drawflow-node.pv_plant .img::before {
   content: "";
   position: absolute;
   top: 2.2rem;
@@ -1739,62 +1739,62 @@ nav.navbar .dropdown-menu li {
   height: 3rem;
   width: 3rem;
 }
-.drawflow .drawflow-node--wind_turbine .img::before {
+.drawflow .drawflow-node.wind_plant .img::before {
   content: "";
   position: absolute;
   top: 2.2rem;
   right: calc((4.5rem - 3rem) / 2);
   transform: translateY(-50%);
-  background-image: url("/static/assets/gui/wind_turbine.svg");
+  background-image: url("/static/assets/gui/wind_plant.svg");
   background-size: contain;
   height: 3rem;
   width: 3rem;
 }
-.drawflow .drawflow-node--transformer_in .img::before {
+.drawflow .drawflow-node.transformer_station_in .img::before {
   content: "";
   position: absolute;
   top: 2.2rem;
   right: calc((4.5rem - 3rem) / 2);
   transform: translateY(-50%);
-  background-image: url("/static/assets/gui/transformer_in.svg");
+  background-image: url("/static/assets/gui/transformer_station_in.svg");
   background-size: contain;
   height: 3rem;
   width: 3rem;
 }
-.drawflow .drawflow-node--transformer_out .img::before {
+.drawflow .drawflow-node.transformer_station_out .img::before {
   content: "";
   position: absolute;
   top: 2.2rem;
   right: calc((4.5rem - 3rem) / 2);
   transform: translateY(-50%);
-  background-image: url("/static/assets/gui/transformer_out.svg");
+  background-image: url("/static/assets/gui/transformer_station_out.svg");
   background-size: contain;
   height: 3rem;
   width: 3rem;
 }
-.drawflow .drawflow-node--storage_in .img::before {
+.drawflow .drawflow-node.storage_charge_controller_in .img::before {
   content: "";
   position: absolute;
   top: 2.2rem;
   right: calc((4.5rem - 3rem) / 2);
   transform: translateY(-50%);
-  background-image: url("/static/assets/gui/storage_in.svg");
+  background-image: url("/static/assets/gui/storage_charge_controller_in.svg");
   background-size: contain;
   height: 3rem;
   width: 3rem;
 }
-.drawflow .drawflow-node--storage_out .img::before {
+.drawflow .drawflow-node.storage_charge_controller_out .img::before {
   content: "";
   position: absolute;
   top: 2.2rem;
   right: calc((4.5rem - 3rem) / 2);
   transform: translateY(-50%);
-  background-image: url("/static/assets/gui/storage_out.svg");
+  background-image: url("/static/assets/gui/storage_charge_controller_out.svg");
   background-size: contain;
   height: 3rem;
   width: 3rem;
 }
-.drawflow .drawflow-node--solar_inverter .img::before {
+.drawflow .drawflow-node.solar_inverter .img::before {
   content: "";
   position: absolute;
   top: 2.2rem;
@@ -1805,18 +1805,18 @@ nav.navbar .dropdown-menu li {
   height: 3rem;
   width: 3rem;
 }
-.drawflow .drawflow-node--storage .img::before {
+.drawflow .drawflow-node.bees .img::before {
   content: "";
   position: absolute;
   top: 2.2rem;
   right: calc((4.5rem - 3rem) / 2);
   transform: translateY(-50%);
-  background-image: url("/static/assets/gui/battery.svg");
+  background-image: url("/static/assets/gui/bess.svg");
   background-size: contain;
   height: 3rem;
   width: 3rem;
 }
-.drawflow .drawflow-node--demand .img::before {
+.drawflow .drawflow-node.demand .img::before {
   content: "";
   position: absolute;
   top: 2.2rem;
@@ -1827,13 +1827,13 @@ nav.navbar .dropdown-menu li {
   height: 3rem;
   width: 3rem;
 }
-.drawflow .drawflow-node--bus .img::before {
+.drawflow .drawflow-node.bus .img::before {
   content: "";
   position: absolute;
   top: 2.2rem;
   right: calc((4.5rem - 3rem) / 2);
   transform: translateY(-50%);
-  background-image: url("/static/assets/gui/power_antenna.svg");
+  background-image: url("/static/assets/gui/bus.svg");
   background-size: contain;
   height: 3rem;
   width: 3rem;

@@ -18,12 +18,6 @@
 {% endblock start_body_scripts %}
 
 {% block content %}
-<br>
-<button onclick="window.open(`{% url 'scenario_search' project_id %}`, `_self`)" id="backbutton"><span
-        class="glyphicon glyphicon-chevron-left"></span> Back</button>
-
-<br>
-<br>
 
 <div class="row">
     <div class="panel panel-info">
@@ -31,7 +25,7 @@
         <hr class="mt-2">
         <div class="panel-body t1" id="economicDataDiv"></div>
         <br>
-        <a type="button" class="btn btn-info" href="{% url 'download_cost_results' scenario_id %}">Download Cost Results</a>    
+        <a type="button" class="btn btn-info" href="{% url 'download_cost_results' scen_id %}">Download Cost Results</a>
     </div>
 </div>
 
@@ -62,7 +56,7 @@
         </tbody>
     </table>
     <br>
-    <a type="button" class="btn btn-info" href="{% url 'download_scalar_results' scenario_id %}">Download Scalar Results</a>
+    <a type="button" class="btn btn-info" href="{% url 'download_scalar_results' scen_id %}">Download Scalar Results</a>
 </div>
 
 
@@ -105,7 +99,7 @@
     </div>
 
     <br>
-    <a type="button" class="btn btn-info" href="{% url 'download_timeseries_results' scenario_id %}">Download Timeseries</a>
+    <a type="button" class="btn btn-info" href="{% url 'download_timeseries_results' scen_id %}">Download Timeseries</a>
 
 </div>
 
@@ -120,7 +114,7 @@
 
     $('#economicDataDiv').ready(function () {
         $.ajax({
-            url: "{% url 'scenario_economic_results' scenario_id %}",
+            url: "{% url 'scenario_economic_results' scen_id %}",
             type: "GET",
             success: async (data) => { 
                 await data.map(dataObj => drawPieChart(dataObj));
@@ -246,7 +240,7 @@
     function getEnergyVectorAvailableResults(energyVector, selectizeId) {
         // make an Ajax request for the TimeSeries Graphs
         $.ajax({
-            url: "{% url 'scenario_available_results' scenario_id %}",
+            url: "{% url 'scenario_available_results' scen_id %}",
             type: "GET",
             data: { "energy_vector": energyVector },
             success: data => initiateSelectize(data.options.flat(), data.optgroups, selectizeId),
@@ -282,7 +276,7 @@
     function reloadDiagrams(assetNameList, plotlyDivId) {
         // Ajax request to retrieve requested graph data
         $.ajax({
-            url: "{% url 'scenario_request_results' scenario_id %}",
+            url: "{% url 'scenario_request_results' scen_id %}",
             type: "GET",
             data: {
                 assetNameList: assetNameList,

@@ -29,6 +29,7 @@ urlpatterns = [
     path('project/<int:proj_id>/scenario/create_parameters/<scen_id>', scenario_create_parameters, name='scenario_create_parameters'),
     path('project/<int:proj_id>/scenario/create_topology/<int:scen_id>', scenario_create_topology, name='scenario_create_topology'),
     path('project/<int:proj_id>/scenario/create_constraints/<int:scen_id>/', scenario_create_constraints, name='scenario_create_constraints'),
+    path('project/<int:proj_id>/scenario/review/<int:scen_id>/', scenario_review, name='scenario_review'),
     path('scenario/update/<int:scen_id>', scenario_update, name='scenario_update'),
     path('scenario/delete/<int:scen_id>', scenario_delete, name='scenario_delete'),
     path('scenario/duplicate/<int:scen_id>', scenario_duplicate, name='scenario_duplicate'),
@@ -42,7 +43,9 @@ urlpatterns = [
     path('topology/mvs_simulation/<int:scenario_id>', request_mvs_simulation, name='request_mvs_simulation'),
     path('topology/update_simulation_rating/', update_simulation_rating, name='update_simulation_rating'),
     # path('topology/simulation_status/<int:scen_id>', check_simulation_status, name='check_simulation_status'),
-    re_path(r'^topology/simulation_status/(?P<scen_id>\d+)?$', check_simulation_status, name='check_simulation_status'),
+    re_path(r'^topology/simulation_status/(?P<scen_id>\d+)?$', check_simulation_status, name='check_simulation_status_regex'),
+    path('topology/simulation_status/<int:scen_id>', check_simulation_status, name='check_simulation_status'),
+    path('project/<int:proj_id>/scenario/<int:scen_id>', update_simulation_results, name='update_simulation_results'),
     # User Feedback
     path('user_feedback', user_feedback, name='user_feedback'),
    

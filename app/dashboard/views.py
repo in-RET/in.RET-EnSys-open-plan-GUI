@@ -22,11 +22,10 @@ logger = logging.getLogger(__name__)
 @json_view
 @require_http_methods(["GET"])
 def scenario_available_results(request, scen_id):
+
     scenario = get_object_or_404(Scenario, pk=scen_id)
     if (scenario.project.user != request.user) and (request.user not in scenario.project.viewers.all()):
         raise PermissionDenied
-    # if scenario.project.user != request.user:
-    #     return HttpResponseForbidden()
     
     try:
         assets_results_obj = AssetsResults.objects.get(simulation=scenario.simulation)
@@ -127,22 +126,18 @@ def scenario_request_results(request, scen_id):
 @require_http_methods(["GET"])
 def scenario_visualize_results(request, scen_id):
     scenario = get_object_or_404(Scenario, pk=scen_id)
-    # if scenario.project.user != request.user:
-    #     return HttpResponseForbidden()
+
     if (scenario.project.user != request.user) and (request.user not in scenario.project.viewers.all()):
         raise PermissionDenied
-    
-    try:
-        kpi_scalar_results_obj = KPIScalarResults.objects.get(simulation=scenario.simulation)
-        kpi_scalar_values_dict = json.loads(kpi_scalar_results_obj.scalar_values)
 
-        scalar_kpis_json = kpi_scalars_list(kpi_scalar_values_dict, KPI_SCALAR_UNITS, KPI_SCALAR_TOOLTIPS)
+    kpi_scalar_results_obj = KPIScalarResults.objects.get(simulation=scenario.simulation)
+    kpi_scalar_values_dict = json.loads(kpi_scalar_results_obj.scalar_values)
 
-        return render(request, 'scenario/scenario_visualize_results.html',
-        {'scenario_id': scen_id, 'scalar_kpis': scalar_kpis_json, 'project_id': scenario.project.id})
-    except Exception as e:
-        logger.error(f"Dashboard ERROR: MVS Req Id: {scenario.simulation.mvs_token}. Thrown Exception: {e}")
-        raise Http404("Could not retrieve simulation results.")
+    scalar_kpis_json = kpi_scalars_list(kpi_scalar_values_dict, KPI_SCALAR_UNITS, KPI_SCALAR_TOOLTIPS)
+
+    return render(request, 'scenario/scenario_visualize_results.html',
+    {'scen_id': scen_id, 'scalar_kpis': scalar_kpis_json, 'project_id': scenario.project.id})
+
 
 
 @login_required

@@ -16,7 +16,7 @@ from datetime import datetime
 from users.models import CustomUser
 from django.db.models import Q
 from .forms import *
-from .requests import mvs_simulation_request
+from .requests import mvs_simulation_request, mvs_simulation_check_status, get_mvs_simulation_results
 from .models import *
 from .scenario_topology_helpers import handle_storage_unit_form_post, handle_bus_form_post, handle_asset_form_post, load_scenario_topology_from_db, NodeObject, \
     update_deleted_objects_from_database, duplicate_scenario_objects, duplicate_scenario_connections, get_topology_json
@@ -529,9 +529,21 @@ def scenario_create_constraints(request, proj_id, scen_id, step_id=3):
 
                 messages.success(request, f'constraint {constraint_type} successfully added!')
 
+        return HttpResponseRedirect(reverse('scenario_review', args=[proj_id, scen_id]))
 
-        #set the constraints and send the scenario to be simulated
-        return render(request, f'scenario/scenario_step{step_id+1}.html',
+@login_required
+@require_http_methods(["GET", "POST"])
+def scenario_review(request, proj_id, scen_id, step_id=4):
+
+
+    scenario = get_object_or_404(Scenario, pk=scen_id)
+
+    if (scenario.project.user != request.user) and (request.user not in scenario.project.viewers.all()):
+        raise PermissionDenied
+
+    if request.method == "GET":
+
+        return render(request, f'scenario/scenario_step{step_id}.html',
               {
                   'scenario': scenario,
                   'scen_id': scen_id,
@@ -543,11 +555,11 @@ def scenario_create_constraints(request, proj_id, scen_id, step_id=3):
               })
 
 
-
 SCENARIOS_STEPS = [
     scenario_create_parameters,
     scenario_create_topology,
     scenario_create_constraints,
+    scenario_review,
 ]
 
 @login_required
@@ -834,14 +846,22 @@ def update_simulation_rating(request):
 
 @json_view
 @login_required
-@require_http_methods(["POST"])
+@require_http_methods(["GET", "POST"])
 def check_simulation_status(request, scen_id):
-    try:
-        scenario = get_object_or_404(Scenario, pk=scen_id)
-        if scenario.simulation:
-            return JsonResponse({'success': True, "status": scenario.simulation.status}, status=200, content_type='application/json')
-    except Exception as e:
-        return JsonResponse({'success': False, 'cause': str(e)}, status=200, content_type='application/json')
+    scenario = get_object_or_404(Scenario, pk=scen_id)
+    if scenario.simulation:
+        return JsonResponse(mvs_simulation_check_status(scenario.simulation.mvs_token), status=200, content_type='application/json')
 
+
+@login_required
+@require_http_methods(["GET"])
+def update_simulation_results(request, proj_id, scen_id):
+    scenario = get_object_or_404(Scenario, pk=scen_id)
+
+    simulation = scenario.simulation
+
+    get_mvs_simulation_results(simulation)
+
+    return HttpResponseRedirect(reverse('scenario_review', args=[proj_id, scen_id]))
 
 # endregion MVS JSON Related

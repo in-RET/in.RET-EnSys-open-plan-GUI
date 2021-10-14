@@ -82,10 +82,28 @@ def parse_mvs_results(simulation, response_results):
         raise KeyError('There are missing keys from the received dictionary.')
 
     # Write Scalar KPIs to db
-    KPIScalarResults.objects.create(scalar_values=json.dumps(data['kpi']['scalars']), simulation=simulation)
+    qs = KPIScalarResults.objects.filter(simulation=simulation)
+    if qs.exists():
+        kpi_scalar = qs.first()
+        kpi_scalar.scalar_values = json.dumps(data['kpi']['scalars'])
+        kpi_scalar.save()
+    else:
+        KPIScalarResults.objects.create(scalar_values=json.dumps(data['kpi']['scalars']), simulation=simulation)
     # Write Cost Matrix KPIs to db
-    KPICostsMatrixResults.objects.create(cost_values=json.dumps(data['kpi']['cost_matrix']), simulation=simulation)
+    qs = KPICostsMatrixResults.objects.filter(simulation=simulation)
+    if qs.exists():
+        kpi_costs = qs.first()
+        kpi_costs.cost_values = json.dumps(data['kpi']['scalars'])
+        kpi_costs.save()
+    else:
+        KPICostsMatrixResults.objects.create(cost_values=json.dumps(data['kpi']['cost_matrix']), simulation=simulation)
     # Write Assets to db
     data_subdict={category:v for category,v in data.items() if category in asset_key_list}
-    AssetsResults.objects.create(assets_list=json.dumps(data_subdict), simulation=simulation)
+    qs = AssetsResults.objects.filter(simulation=simulation)
+    if qs.exists():
+        asset_results = qs.first()
+        asset_results.asset_list = json.dumps(data_subdict)
+        asset_results.save()
+    else:
+        AssetsResults.objects.create(assets_list=json.dumps(data_subdict), simulation=simulation)
     return response_results

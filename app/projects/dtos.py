@@ -168,7 +168,7 @@ class MVSRequestDto:
     def __init__(self, project_data: ProjectDataDto, economic_data: EconomicDataDto,
                  simulation_settings: SimulationSettingsDto, energy_providers: List[AssetDto],
                  energy_consumption: List[AssetDto], energy_conversion: List[AssetDto],
-                 energy_production: List[AssetDto], energy_storage: List[EssDto], energy_busses: List[BusDto], constraints: List[ConstraintDto]):
+                 energy_production: List[AssetDto], energy_storage: List[EssDto], energy_busses: List[BusDto]):#, constraints: List[ConstraintDto]):
         self.project_data = project_data
         self.economic_data = economic_data
         self.simulation_settings = simulation_settings
@@ -178,7 +178,7 @@ class MVSRequestDto:
         self.energy_production = energy_production
         self.energy_storage = energy_storage
         self.energy_busses = energy_busses
-        self.constraints = constraints
+        #self.constraints = constraints
 
 
 # Function to serialize scenario topology models to JSON
@@ -366,8 +366,8 @@ def convert_to_dto(scenario: Scenario):
                                     energy_conversion,
                                     energy_production,
                                     energy_storage,
-                                    bus_dto_list,
-                                    constraints)
+                                    bus_dto_list)
+                                    # constraints)
 
     return mvs_request_dto
 

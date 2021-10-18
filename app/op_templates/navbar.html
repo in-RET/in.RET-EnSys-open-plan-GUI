@@ -26,7 +26,7 @@
                     {% if not scenario_create %}
                         <li class="nav-item">
                             <!--results.html-->
-                            <a class="nav-link" href="results.html">{% translate "Simulation results" %}</a>
+                            <a class="nav-link" href="{% url 'scenario_visualize_results' %}">{% translate "Simulation results" %}</a>
                         </li>
                         <li class="nav-item">
                             <!--scenario-empty.html-->

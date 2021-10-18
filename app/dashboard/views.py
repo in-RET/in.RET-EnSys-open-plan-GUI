@@ -124,7 +124,12 @@ def scenario_request_results(request, scen_id):
 
 @login_required
 @require_http_methods(["GET"])
-def scenario_visualize_results(request, scen_id):
+def scenario_visualize_results(request, scen_id=None):
+
+
+    if scen_id is None:
+        return render(request, 'scenario/scenario_results_page.html')
+
     scenario = get_object_or_404(Scenario, pk=scen_id)
 
     if (scenario.project.user != request.user) and (request.user not in scenario.project.viewers.all()):

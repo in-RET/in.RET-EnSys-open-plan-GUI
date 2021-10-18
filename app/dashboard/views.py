@@ -2,13 +2,18 @@ from django.core.exceptions import PermissionDenied
 from django.http.response import Http404, HttpResponse
 from dashboard.helpers import storage_asset_to_list
 from dashboard.models import AssetsResults, KPICostsMatrixResults, KPIScalarResults, KPI_COSTS_TOOLTIPS, KPI_COSTS_UNITS, KPI_SCALAR_TOOLTIPS, KPI_SCALAR_UNITS
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponseForbidden
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, HttpResponseRedirect
+from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 from jsonview.decorators import json_view
-from projects.models import Scenario
+from projects.models import Scenario, Simulation
+from projects.services import excuses_design_under_development
 from dashboard.helpers import kpi_scalars_list
+from django.utils.translation import ugettext_lazy as _
+from django.utils.safestring import mark_safe
 from io import BytesIO
 import xlsxwriter
 import json
@@ -126,22 +131,32 @@ def scenario_request_results(request, scen_id):
 @require_http_methods(["GET"])
 def scenario_visualize_results(request, scen_id=None):
 
-
     if scen_id is None:
-        return render(request, 'scenario/scenario_results_page.html')
+        excuses_design_under_development(request)
 
-    scenario = get_object_or_404(Scenario, pk=scen_id)
+        answer = render(request, 'scenario/scenario_results_page.html')
+    else:
+        scenario = get_object_or_404(Scenario, pk=scen_id)
+        proj_id = scenario.project.id
 
-    if (scenario.project.user != request.user) and (request.user not in scenario.project.viewers.all()):
-        raise PermissionDenied
+        if (scenario.project.user != request.user) and (request.user not in scenario.project.viewers.all()):
+            raise PermissionDenied
 
-    kpi_scalar_results_obj = KPIScalarResults.objects.get(simulation=scenario.simulation)
-    kpi_scalar_values_dict = json.loads(kpi_scalar_results_obj.scalar_values)
+        qs = Simulation.objects.filter(scenario=scenario)
+        if qs.exists():
+            kpi_scalar_results_obj = KPIScalarResults.objects.get(simulation=scenario.simulation)
+            kpi_scalar_values_dict = json.loads(kpi_scalar_results_obj.scalar_values)
 
-    scalar_kpis_json = kpi_scalars_list(kpi_scalar_values_dict, KPI_SCALAR_UNITS, KPI_SCALAR_TOOLTIPS)
+            scalar_kpis_json = kpi_scalars_list(kpi_scalar_values_dict, KPI_SCALAR_UNITS, KPI_SCALAR_TOOLTIPS)
 
-    return render(request, 'scenario/scenario_visualize_results.html',
-    {'scen_id': scen_id, 'scalar_kpis': scalar_kpis_json, 'project_id': scenario.project.id})
+            answer = render(request, 'scenario/scenario_visualize_results.html',
+                          {'scen_id': scen_id, 'scalar_kpis': scalar_kpis_json, 'project_id': proj_id})
+        else:
+            # redirect to the page where the simulation is started, or results fetched again
+            messages.error(request, _("Your scenario was never simulated, the results are still pending or there is an error in the simulation. Please click on 'Run simulation', 'Update results' or 'Check status' button "))
+            answer = HttpResponseRedirect(reverse('scenario_review', args=[proj_id, scen_id]))
+
+    return answer
 
 
 

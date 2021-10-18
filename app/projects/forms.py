@@ -1,4 +1,4 @@
-import pandas as pd
+import csv
 import pickle
 import os
 
@@ -15,9 +15,16 @@ from projects.constants import MAP_EPA_MVS
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings as django_settings
 
-
-df = pd.read_csv(staticfiles_storage.path("MVS_parameters_list.csv"), index_col="label")
-PARAMETERS = df.loc[df.category != "hidden"]
+PARAMETERS = {}
+with open(staticfiles_storage.path("MVS_parameters_list.csv")) as csvfile:
+    csvreader = csv.reader(csvfile, delimiter=',', quotechar='"')
+    for i, row in enumerate(csvreader):
+        if i == 0:
+            hdr = row
+            label_idx = hdr.index("label")
+        else:
+            label = row[label_idx]
+            PARAMETERS[label] = {k: v for k, v in zip(hdr, row)}
 
 def gettext_variables(some_string, lang="de"):
     """Save some expressions to be translated to a temporary file
@@ -46,15 +53,22 @@ def get_parameter_info(param_name, parameters=PARAMETERS):
     param_name = MAP_EPA_MVS.get(param_name, param_name)
     help_text = None
     unit = None
-    if param_name in PARAMETERS.index:
-        help_text = PARAMETERS.loc[param_name, ":Definition:"]
-        unit = PARAMETERS.loc[param_name, ":Unit:"]
+    verbose = None
+    if param_name in PARAMETERS:
+        print(param_name)
+        help_text = PARAMETERS[param_name][":Definition:"]
+        unit = PARAMETERS[param_name][":Unit:"]
+        verbose = PARAMETERS[param_name]["verbose"]
         if unit == "None":
             unit = None
+        elif unit == "Factor":
+            unit = ""
+        if verbose == "None":
+            verbose = None
     else:
         print(f"{param_name} is not within range")
 
-    return help_text, unit
+    return help_text, unit, verbose
 
 
 class OpenPlanModelForm(ModelForm):
@@ -62,10 +76,14 @@ class OpenPlanModelForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(OpenPlanModelForm, self).__init__(*args, **kwargs)
         for fieldname, field in self.fields.items():
-            help_text, unit = get_parameter_info(fieldname)
-            print(fieldname)
+            help_text, unit, verbose = get_parameter_info(fieldname)
+
+            if verbose is not None:
+                field.label = verbose
             if unit is not None:
                 field.label = _(str(field.label)) + " (" + _(unit) + ")"
+            else:
+                field.label = _(str(field.label))
 
             if help_text is not None:
                 field.help_text = _(help_text)
@@ -75,10 +93,15 @@ class OpenPlanForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(OpenPlanForm, self).__init__(*args, **kwargs)
         for fieldname, field in self.fields.items():
-            help_text, unit = get_parameter_info(fieldname)
+            help_text, unit, verbose = get_parameter_info(fieldname)
+
+            if verbose is not None:
+                field.label = verbose
 
             if unit is not None:
                 field.label = _(str(field.label)) + " (" + _(unit) + ")"
+            else:
+                field.label = _(str(field.label))
 
             if help_text is not None:
                 field.help_text = _(help_text)

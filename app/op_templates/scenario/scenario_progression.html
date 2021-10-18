@@ -18,11 +18,15 @@
         <div class="wizard__steps">
             <ul>
                 {% for step in step_list %}
-                {% if step_id == forloop.counter %}
-                <li class="active">{% translate step %}</li>
-                {% else %}
-                <li class>{% translate step %}</li>
-                {% endif %}
+
+                <li {% if step_id == forloop.counter %} class="active" {% endif %}>
+                    {% if forloop.counter < max_step %}
+                        <a href="{% url 'scenario_steps_edit' proj_id scen_id forloop.counter %}" >{% translate step %}</a>
+                    {% else %}
+                        {% translate step %}
+                    {% endif %}
+                </li>
+
                 {% endfor %}
             </ul>
         </div>

@@ -15,7 +15,7 @@
     </script>
 {% endblock %}
 
-{% block title %}Projects{% endblock title %}
+{% block title %}{% translate "Projects" %}{% endblock title %}
 
 {% block content %}
     <main>
@@ -115,7 +115,7 @@
                                             <div class="details">
                                                 <input class="form-check-input project-{{ project.id }}" id="project{{ project.id }}scenario-{{ scenario.id }}" type="checkbox" value="{{ scenario.id }}" aria-label="">
                                                 <label class="form-check-label" for="project{{ project.id }}scenario-{{ scenario.id }}">
-                                                    <a class= "form-check-label" href="{% url 'scenario_steps_edit' proj_id=project.id scen_id=scenario.pk step_id=1 %}"> {{ scenario }} </a>
+                                                    <a class= "form-check-label" href="{% url 'scenario_steps_edit' proj_id=project.id scen_id=scenario.id step_id=1 %}"> {{ scenario }} </a>
                                                 </label>
                                                 <div class="detail">
                                                     <span class="detail__property">{% translate "Created" %}</span>
@@ -127,13 +127,13 @@
                                                     <span class="icon icon-results" aria-hidden="true"></span>
                                                     {% translate "Results" %}
                                                 </a>
-                                                <a class="btn btn--action action" href="{% url 'scenario_steps_edit' proj_id=project.id scen_id=scenario.pk step_id=1 %}"> <!-- "scenario-creation-1.html" in B design -->
+                                                <a class="btn btn--action action" href="{% url 'scenario_steps_edit' proj_id=project.id scen_id=scenario.id step_id=1 %}"> <!-- "scenario-creation-1.html" in B design -->
                                                     <span class="icon icon-edit" aria-hidden="true"></span>
                                                 </a>
-                                                <a class="btn btn--action action" href="{% url 'scenario_duplicate' scenario.pk %}">
+                                                <a class="btn btn--action action" href="{% url 'scenario_duplicate' scenario.id %}">
                                                     <span class="icon icon-duplicate" aria-hidden="true"></span>
                                                 </a>
-                                                <button class="btn btn--action action" type="submit" formaction="{% url 'scenario_delete' scenario.pk %}" formmethod="post">
+                                                <button class="btn btn--action action" type="submit" formaction="{% url 'scenario_delete' scenario.id %}" formmethod="post">
                                                     <span class="icon icon-delete" aria-hidden="true"></span>
                                                 </button>
 

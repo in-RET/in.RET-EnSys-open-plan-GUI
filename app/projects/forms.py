@@ -1,13 +1,87 @@
+import pandas as pd
+import pickle
+import os
+
 from crispy_forms.bootstrap import AppendedText, PrependedText, FormActions
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Layout, Row, Column, Field, Fieldset, ButtonHolder
 from django import forms
 from django.forms import ModelForm
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.contrib.staticfiles.storage import staticfiles_storage
 from projects.models import *
+from projects.constants import MAP_EPA_MVS
 
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
+from django.conf import settings as django_settings
 
+
+df = pd.read_csv(staticfiles_storage.path("MVS_parameters_list.csv"), index_col="label")
+PARAMETERS = df.loc[df.category != "hidden"]
+
+def gettext_variables(some_string, lang="de"):
+    """Save some expressions to be translated to a temporary file
+        Because django makemessages cannot detect gettext with variables
+    """
+
+    some_string = str(some_string)
+
+    trans_file = os.path.join(django_settings.STATIC_ROOT, f'personal_translation_{lang}.pickle')
+
+    if os.path.exists(trans_file):
+        with open(trans_file, 'rb') as handle:
+            trans_dict = pickle.load(handle)
+    else:
+        trans_dict = {}
+
+    if some_string is not None:
+        if some_string not in trans_dict:
+            trans_dict[some_string] = ""
+
+        with open(trans_file, 'wb') as handle:
+            pickle.dump(trans_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+
+def get_parameter_info(param_name, parameters=PARAMETERS):
+    param_name = MAP_EPA_MVS.get(param_name, param_name)
+    help_text = None
+    unit = None
+    if param_name in PARAMETERS.index:
+        help_text = PARAMETERS.loc[param_name, ":Definition:"]
+        unit = PARAMETERS.loc[param_name, ":Unit:"]
+        if unit == "None":
+            unit = None
+    else:
+        print(f"{param_name} is not within range")
+
+    return help_text, unit
+
+
+class OpenPlanModelForm(ModelForm):
+    """Class to automatize the assignation and translation of the labels, help_text and units"""
+    def __init__(self, *args, **kwargs):
+        super(OpenPlanModelForm, self).__init__(*args, **kwargs)
+        for fieldname, field in self.fields.items():
+            help_text, unit = get_parameter_info(fieldname)
+            print(fieldname)
+            if unit is not None:
+                field.label = _(str(field.label)) + " (" + _(unit) + ")"
+
+            if help_text is not None:
+                field.help_text = _(help_text)
+
+class OpenPlanForm(forms.Form):
+    """Class to automatize the assignation and translation of the labels, help_text and units"""
+    def __init__(self, *args, **kwargs):
+        super(OpenPlanForm, self).__init__(*args, **kwargs)
+        for fieldname, field in self.fields.items():
+            help_text, unit = get_parameter_info(fieldname)
+
+            if unit is not None:
+                field.label = _(str(field.label)) + " (" + _(unit) + ")"
+
+            if help_text is not None:
+                field.help_text = _(help_text)
 
 class FeedbackForm(ModelForm):
     class Meta:
@@ -51,7 +125,7 @@ class EconomicDataUpdateForm(ModelForm):
         widgets = economic_widgets
 
 
-class ProjectCreateForm(forms.Form):
+class ProjectCreateForm(OpenPlanForm):
     name = forms.CharField(label=_('Project Name'), widget=forms.TextInput(attrs={'placeholder': 'Name...', 'data-toggle': 'tooltip', 'title': _('A self explanatory name for the project.')}))
     description = forms.CharField(label=_('Project Description'),
                                   widget=forms.Textarea(attrs={'placeholder': 'More detailed description here...', 'data-toggle': 'tooltip', 'title': _('A description of what this project objectives or test cases.')}))
@@ -63,8 +137,8 @@ class ProjectCreateForm(forms.Form):
     latitude = forms.FloatField(label=_('Location, latitude'),
                                 widget=forms.NumberInput(attrs={'placeholder': 'click on the map', 'readonly': '',
                                 'data-toggle': 'tooltip', 'title': _("Latitude coordinate of the project's geographical location.")}))
-    duration = forms.IntegerField(label=_('Project Duration (years)'),
-                                  widget=forms.NumberInput(attrs={'placeholder': 'eg. 1 ', 'min':'0', 'max':'100', 'step':'1', 'data-toggle': 'tooltip', 
+    duration = forms.IntegerField(label=_('Project Duration'),
+                                  widget=forms.NumberInput(attrs={'placeholder': 'eg. 1', 'min':'0', 'max':'100', 'step':'1', 'data-toggle': 'tooltip',
                                   'title': _("The number of years the project is intended to be operational. The project duration also sets the installation time of the assets used in the simulation. After the project ends these assets are 'sold' and the refund is charged against the initial investment costs.")}))
     currency = forms.ChoiceField(label=_('Currency'), choices=CURRENCY,
         widget=forms.Select(attrs={'data-toggle': 'tooltip', 'title': _('The currency of the country where the project is implemented.')}))
@@ -100,8 +174,6 @@ class CommentForm(ModelForm):
         model = Comment
         exclude = ['id', 'project']
 
-
-
 # region Scenario
 # TODO build this from the documentation with a for loop over the keys
 scenario_widgets = {
@@ -111,7 +183,7 @@ scenario_widgets = {
     'time_step': forms.NumberInput(attrs={'placeholder': 'eg. 120 minutes', 'min':'1', 'max':'600', 'step':'1', 'data-toggle': 'tooltip',
                                           'title': _('Length of the time-steps.')}),
     'evaluated_period': forms.NumberInput(attrs={'placeholder': 'eg. 10 days', 'min':'1', 'step':'1', 'data-toggle': 'tooltip',
-                                                 'title': _('The number of days for which the simulation is to be run.')}),
+                                                 'title': _("The number of days simulated with the energy system model.")}),
     'capex_fix': forms.NumberInput(attrs={'placeholder': 'e.g. 10000€', 'min':'0', 'data-toggle': 'tooltip',
                                           'title': _('A fixed cost to implement the asset, eg. planning costs which do not depend on the (optimized) asset capacity.')}),
     'capex_var': forms.NumberInput(attrs={'placeholder': 'e.g. 1000€', 'min':'0', 'data-toggle': 'tooltip',
@@ -119,24 +191,24 @@ scenario_widgets = {
     'opex_fix': forms.NumberInput(attrs={'placeholder': 'e.g. 0€', 'min':'0', 'data-toggle': 'tooltip',
                                          'title': _('Actual OPEX of the asset, i.e., specific operational and maintenance costs.')}),
     'opex_var': forms.NumberInput(attrs={'placeholder': 'e.g. 0.6€/kWh', 'min':'0', 'step':'0.00001', 'data-toggle': 'tooltip',
-                                         'title': _('Variable cost associated with a flow through/from the asset (currency/kWh).')}),
+                                         'title': _('Variable cost associated with a flow through/from the asset.')}),
 }
 
 scenario_labels = {
     "project": _("Project"),
     "name": _("Scenario name"),
-    'evaluated_period': _("Evaluated Period (days)"),
-    "time_step": _("Time Step (minutes)"),
+    'evaluated_period': _("Evaluated Period"),
+    "time_step": _("Time Step"),
     "start_date": _("Start Date"),
-    "capex_fix": _("Development costs (currency)"),
-    "capex_var": _("Specific costs (currency)"),
-    "opex_fix": _("Specific OM costs (currency)"),
-    "opex_var": _("Dispatch price (currency/kWh)"),
+    "capex_fix": _("Development costs"),
+    "capex_var": _("Specific costs"),
+    "opex_fix": _("Specific OM costs"),
+    "opex_var": _("Dispatch price"),
 }
 
 scenario_field_order = ["project", "name", "evaluated_period", "time_step", "start_date", "capex_fix", "capex_var", "opex_fix", "opex_var"]
 
-class ScenarioCreateForm(ModelForm):
+class ScenarioCreateForm(OpenPlanModelForm):
     field_order = scenario_field_order
     class Meta:
         model = Scenario
@@ -153,13 +225,8 @@ class ScenarioCreateForm(ModelForm):
             self.fields["project"] = forms.ChoiceField(label="Project", choices=())
         for visible in self.visible_fields():
             visible.field.widget.attrs['class'] = 'form-control'
-            # attempt to get the title as help text
-            visible.help_text = visible.field.widget.attrs.get('title',"")
 
-
-
-
-class ScenarioUpdateForm(ModelForm):
+class ScenarioUpdateForm(OpenPlanModelForm):
     field_order = scenario_field_order
     class Meta:
         model = Scenario
@@ -177,8 +244,6 @@ class ScenarioUpdateForm(ModelForm):
 
         for visible in self.visible_fields():
             visible.field.widget.attrs['class'] = 'form-control'
-            # attempt to get the title as help text
-            visible.help_text = visible.field.widget.attrs.get('title',"")
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         self.helper.form_tag = False  # don't include <form> tag
@@ -186,29 +251,23 @@ class ScenarioUpdateForm(ModelForm):
 # endregion Scenario
 
 
-
-class ConstraintForm(ModelForm):
-    class Meta:
-        model = Constraint
-        exclude = ['scenario']
-
-class MinRenewableConstraintForm(ModelForm):
+class MinRenewableConstraintForm(OpenPlanModelForm):
     class Meta:
         model = MinRenewableConstraint
         exclude = ['scenario']
 
-class MaxEmissionConstraintForm(ModelForm):
+class MaxEmissionConstraintForm(OpenPlanModelForm):
     class Meta:
         model = MaxEmissionConstraint
         exclude = ['scenario']
 
 
-class MinDOAConstraintForm(ModelForm):
+class MinDOAConstraintForm(OpenPlanModelForm):
     class Meta:
         model = MinDOAConstraint
         exclude = ['scenario']
 
-class NZEConstraintForm(ModelForm):
+class NZEConstraintForm(OpenPlanModelForm):
     class Meta:
         model = NZEConstraint
         exclude = ['scenario']
@@ -216,7 +275,7 @@ class NZEConstraintForm(ModelForm):
 
 
 
-class BusForm(ModelForm):
+class BusForm(OpenPlanModelForm):
     def __init__(self, *args, **kwargs):
         bus_type_name = kwargs.pop('asset_type', None) # always = bus
         super().__init__(*args, **kwargs)
@@ -239,7 +298,7 @@ class BusForm(ModelForm):
         }
 
 
-class AssetCreateForm(ModelForm):
+class AssetCreateForm(OpenPlanModelForm):
 
     def __init__(self, *args, **kwargs):
         asset_type_name = kwargs.pop('asset_type', None)
@@ -288,7 +347,7 @@ class AssetCreateForm(ModelForm):
                                                  'data-toggle': 'tooltip', 'title': _('Actual OPEX of the asset, i.e., specific operational and maintenance costs.'),
                                                  'style': 'font-weight:400; font-size:13px;'}),
             'opex_var': forms.NumberInput(attrs={'placeholder': 'Currency', 'min': '0.0', 'step': '.01',
-                                                 'data-toggle': 'tooltip', 'title': _('Variable cost associated with a flow through/from the asset (currency/kWh).'),
+                                                 'data-toggle': 'tooltip', 'title': _('Variable cost associated with a flow through/from the asset.'),
                                                  'style': 'font-weight:400; font-size:13px;'}),
             'lifetime': forms.NumberInput(attrs={'placeholder': 'e.g. 10 years', 'min': '0', 'step': '1',
                                                  'data-toggle': 'tooltip', 'title': _('Number of operational years of the asset until it has to be replaced.'),
@@ -325,7 +384,7 @@ class AssetCreateForm(ModelForm):
                                                                    'data-toggle': 'tooltip', 'title': _('Number of reference periods in one year for the peak demand pricing. Only one of the following are acceptable values: 1 (yearly), 2, 3 ,4, 6, 12 (monthly).'),
                                                                    'style': 'font-weight:400; font-size:13px;', 'min': '1', 'max': '12', 'step': '1'}),
             'renewable_share': forms.NumberInput(attrs={'placeholder': 'e.g. 0.1', 'min': '0.0', 'max': '1.0', 'step': '.0001',
-                                                        'data-toggle': 'tooltip', 'title': _('The share of renewables in the generation mix of the energy supplied by the DSO (utility).'),
+                                                        'data-toggle': 'tooltip', 'title': 'The share of renewables in the generation mix of the energy supplied by the DSO (utility).',
                                                         'style': 'font-weight:400; font-size:13px;'}),
             'installed_capacity': forms.NumberInput(attrs={'placeholder': 'e.g. 50', 'min': '0.0', 'step': '.01',
                                                            'data-toggle': 'tooltip', 'title': _('The already existing installed capacity in-place, which will also be replaced after its lifetime.'),
@@ -339,28 +398,28 @@ class AssetCreateForm(ModelForm):
             "optimize_cap": _("Optimize cap"),
             "dispatchable": _("Dispatchable"),
             "renewable_asset": _("Renewable asset"),
-            "capex_fix": _("Development costs (currency)"),
-            "capex_var": _("Specific costs (currency)"),
-            "opex_fix": _("Specific OM costs (currency)"),
-            "opex_var": _("Dispatch price (currency/kWh)"),
-            "lifetime": _("Asset Lifetime (years)"),
+            "capex_fix": _("Development costs"),
+            "capex_var": _("Specific costs"),
+            "opex_fix": _("Specific OM costs"),
+            "opex_var": _("Dispatch price"),
+            "lifetime": _("Asset Lifetime"),
             "input_timeseries": _("Timeseries vector"),
             "crate": _("Crate"),
             "efficiency": _("Efficiency"),
             "soc_max": _("SoC max"),
             "soc_min": _("SoC min"),
             "maximum_capacity": _("Maximum capacity"),
-            "energy_price": _("Energy price (currency/kWh)"),
-            "feedin_tariff": _("Feedin tariff (currency/kWh)"),
-            "peak_demand_pricing": _("Peak demand pricing (currency/kW)"),
+            "energy_price": _("Energy price  "),
+            "feedin_tariff": _("Feedin tariff  "),
+            "peak_demand_pricing": _("Peak demand pricing"),
             "peak_demand_pricing_period": _("Peak demand pricing period (times/year)"),
             "renewable_share": _("Renewable share"),
             "installed_capacity": _("installed capacity (kW)"),
-            "age_installed": _("Age installed (years)"),
+            "age_installed": _("Age installed"),
         }
 
 
-class StorageForm(forms.Form):
+class StorageForm(OpenPlanForm):
     # ESS fields
     name = forms.CharField(label=_('ESS Name'), widget=forms.TextInput(attrs={'placeholder': 'Name...', 'data-toggle': 'tooltip', 'title': _('A mnemonic name for the ESS unit.')}))
     # Charging Power Fields - chp_... = discharging power
@@ -374,7 +433,7 @@ class StorageForm(forms.Form):
         }),
         validators=[MinValueValidator(0.0)])
     chp_age_installed = forms.IntegerField(
-        label=_('Age installed (years)'),
+        label=_('Age installed'),
         widget=forms.NumberInput(attrs={
             'placeholder': 'e.g. 10', 'min': '0.0', 'step': '1',
             'data-toggle': 'tooltip', 'title': _('The number of years the asset has already been in operation.'),
@@ -382,7 +441,7 @@ class StorageForm(forms.Form):
         }),
         validators=[MinValueValidator(0)])
     chp_capex_fix = forms.FloatField(
-        label=_('Development costs (currency)'),
+        label=_('Development costs'),
         widget=forms.NumberInput(attrs={
             'placeholder': 'e.g. 10000', 'min': '0.0', 'step': '.01',
             'data-toggle': 'tooltip', 'title': _(' A fixed cost to implement the asset, eg. planning costs which do not depend on the (optimized) asset capacity.'),
@@ -390,7 +449,7 @@ class StorageForm(forms.Form):
         }),
         validators=[MinValueValidator(0.0)])
     chp_capex_var = forms.FloatField(
-        label=_('Specific costs (currency)'),
+        label=_('Specific costs'),
         widget=forms.NumberInput(attrs={
             'placeholder': 'e.g. 4000', 'min': '0.0', 'step': '.01',
             'data-toggle': 'tooltip', 'title': _(' Actual CAPEX of the asset, i.e., specific investment costs'),
@@ -398,7 +457,7 @@ class StorageForm(forms.Form):
         }),
         validators=[MinValueValidator(0.0)])
     chp_opex_fix = forms.FloatField(
-        label=_('Specific OM costs (currency)'),
+        label=_('Specific OM costs'),
         widget=forms.NumberInput(attrs={
             'placeholder': 'e.g. 0', 'min': '0.0', 'step': '.01',
             'data-toggle': 'tooltip', 'title': _('Actual OPEX of the asset, i.e., specific operational and maintenance costs.'),
@@ -406,15 +465,15 @@ class StorageForm(forms.Form):
         }),
         validators=[MinValueValidator(0.0)])
     chp_opex_var = forms.FloatField(
-        label=_('Dispatch price (currency/kWh)'),
+        label=_('Dispatch price'),
         widget=forms.NumberInput(attrs={
             'placeholder': 'Currency', 'min': '0.0', 'step': '.01',
-            'data-toggle': 'tooltip', 'title': _('Variable cost associated with a flow through/from the asset (currency/kWh).'),
+            'data-toggle': 'tooltip', 'title': _('Variable cost associated with a flow through/from the asset.'),
             'style': 'font-weight:400; font-size:13px;'
         }),
         validators=[MinValueValidator(0.0)])
     chp_lifetime = forms.IntegerField(
-        label=_('Asset Lifetime (years)'),
+        label=_('Asset Lifetime'),
         widget=forms.NumberInput(attrs={
             'placeholder': 'e.g. 10 years', 'min': '0', 'step': '1',
             'data-toggle': 'tooltip', 'title': _('Number of operational years of the asset until it has to be replaced.'),
@@ -454,7 +513,7 @@ class StorageForm(forms.Form):
         }),
         validators=[MinValueValidator(0.0)])
     dchp_age_installed = forms.IntegerField(
-        label=_('Age installed (years)'),
+        label=_('Age installed'),
         widget=forms.NumberInput(attrs={
             'placeholder': 'e.g. 10', 'min': '0.0', 'step': '1',
             'data-toggle': 'tooltip', 'title': _('The number of years the asset has already been in operation.'),
@@ -462,7 +521,7 @@ class StorageForm(forms.Form):
         }),
         validators=[MinValueValidator(0)])
     dchp_capex_fix = forms.FloatField(
-        label=_('Development costs (currency)'),
+        label=_('Development costs'),
         widget=forms.NumberInput(attrs={
             'placeholder': 'e.g. 10000', 'min': '0.0', 'step': '.01',
             'data-toggle': 'tooltip', 'title': _(' A fixed cost to implement the asset, eg. planning costs which do not depend on the (optimized) asset capacity.'),
@@ -470,7 +529,7 @@ class StorageForm(forms.Form):
         }),
         validators=[MinValueValidator(0.0)])
     dchp_capex_var = forms.FloatField(
-        label=_('Specific costs (currency)'),
+        label=_('Specific costs'),
         widget=forms.NumberInput(attrs={
             'placeholder': 'e.g. 4000', 'min': '0.0', 'step': '.01',
             'data-toggle': 'tooltip', 'title': _(' Actual CAPEX of the asset, i.e., specific investment costs'),
@@ -478,7 +537,7 @@ class StorageForm(forms.Form):
         }),
         validators=[MinValueValidator(0.0)])
     dchp_opex_fix = forms.FloatField(
-        label=_('Specific OM costs (currency)'),
+        label=_('Specific OM costs'),
         widget=forms.NumberInput(attrs={
             'placeholder': 'e.g. 0', 'min': '0.0', 'step': '.01',
             'data-toggle': 'tooltip', 'title': _('Actual OPEX of the asset, i.e., specific operational and maintenance costs.'),
@@ -486,15 +545,15 @@ class StorageForm(forms.Form):
         }),
         validators=[MinValueValidator(0.0)])
     dchp_opex_var = forms.FloatField(
-        label=_('Dispatch price (currency/kWh)'),
+        label=_('Dispatch price'),
         widget=forms.NumberInput(attrs={
             'placeholder': 'Currency', 'min': '0.0', 'step': '.01',
-            'data-toggle': 'tooltip', 'title': _('Variable cost associated with a flow through/from the asset (currency/kWh).'),
+            'data-toggle': 'tooltip', 'title': _('Variable cost associated with a flow through/from the asset.'),
             'style': 'font-weight:400; font-size:13px;'
         }),
         validators=[MinValueValidator(0.0)])
     dchp_lifetime = forms.IntegerField(
-        label=_('Asset Lifetime (years)'),
+        label=_('Asset Lifetime'),
         widget=forms.NumberInput(attrs={
             'placeholder': 'e.g. 10 years', 'min': '0', 'step': '1',
             'data-toggle': 'tooltip', 'title': _('Number of operational years of the asset until it has to be replaced.'),
@@ -535,7 +594,7 @@ class StorageForm(forms.Form):
         }),
         validators=[MinValueValidator(0.0)])
     cp_age_installed = forms.IntegerField(
-        label=_('Age installed (years)'),
+        label=_('Age installed'),
         widget=forms.NumberInput(attrs={
             'placeholder': 'e.g. 10', 'min': '0.0', 'step': '1',
             'data-toggle': 'tooltip', 'title': _('The number of years the asset has already been in operation.'),
@@ -543,7 +602,7 @@ class StorageForm(forms.Form):
         }),
         validators=[MinValueValidator(0)])
     cp_capex_fix = forms.FloatField(
-        label=_('Development costs (currency)'),
+        label=_('Development costs'),
         widget=forms.NumberInput(attrs={
             'placeholder': 'e.g. 10000', 'min': '0.0', 'step': '.01',
             'data-toggle': 'tooltip', 'title': _(' A fixed cost to implement the asset, eg. planning costs which do not depend on the (optimized) asset capacity.'),
@@ -551,7 +610,7 @@ class StorageForm(forms.Form):
         }),
         validators=[MinValueValidator(0.0)])
     cp_capex_var = forms.FloatField(
-        label=_('Specific costs (currency)'),
+        label=_('Specific costs'),
         widget=forms.NumberInput(attrs={
             'placeholder': 'e.g. 4000', 'min': '0.0', 'step': '.01',
             'data-toggle': 'tooltip', 'title': _(' Actual CAPEX of the asset, i.e., specific investment costs'),
@@ -559,7 +618,7 @@ class StorageForm(forms.Form):
         }),
         validators=[MinValueValidator(0.0)])
     cp_opex_fix = forms.FloatField(
-        label=_('Specific OM costs (currency)'),
+        label=_('Specific OM costs'),
         widget=forms.NumberInput(attrs={
             'placeholder': 'e.g. 0', 'min': '0.0', 'step': '.01',
             'data-toggle': 'tooltip', 'title': _('Actual OPEX of the asset, i.e., specific operational and maintenance costs.'),
@@ -567,15 +626,15 @@ class StorageForm(forms.Form):
         }),
         validators=[MinValueValidator(0.0)])
     cp_opex_var = forms.FloatField(
-        label=_('Dispatch price (currency/kWh)'),
+        label=_('Dispatch price'),
         widget=forms.NumberInput(attrs={
             'placeholder': 'Currency', 'min': '0.0', 'step': '.01',
-            'data-toggle': 'tooltip', 'title': _('Variable cost associated with a flow through/from the asset (currency/kWh).'),
+            'data-toggle': 'tooltip', 'title': _('Variable cost associated with a flow through/from the asset.'),
             'style': 'font-weight:400; font-size:13px;'
         }),
         validators=[MinValueValidator(0.0)])
     cp_lifetime = forms.IntegerField(
-        label=_('Asset Lifetime (years)'),
+        label=_('Asset Lifetime'),
         widget=forms.NumberInput(attrs={
             'placeholder': 'e.g. 10 years', 'min': '0', 'step': '1',
             'data-toggle': 'tooltip', 'title': _('Number of operational years of the asset until it has to be replaced.'),
@@ -628,7 +687,7 @@ class StorageForm(forms.Form):
     # Render form
     def __init__(self, *args, **kwargs):
         storage_asset_type_name = kwargs.pop('asset_type', None) # b(attery)ess or h(eat)ess or g(ass)ess or ... 
-        super().__init__(*args, **kwargs)
+        super(StorageForm, self).__init__(*args, **kwargs)
         [self.fields[field].widget.attrs.update({f'df-{field}': ''}) for field in self.fields]
         # self.helper = FormHelper()
         # self.helper.form_id = 'storage_form_id'

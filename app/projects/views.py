@@ -325,10 +325,10 @@ def scenario_search(request, proj_id, show_comments=0):
 
 
 STEP_LIST = [
-    "Scenario Setup",
-    "Energy system design",
-    "Constraints",
-    "Simulation"
+    _("Scenario Setup"),
+    _("Energy system design"),
+    _("Constraints"),
+    _("Simulation")
 ]
 
 @login_required

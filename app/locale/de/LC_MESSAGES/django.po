@@ -28,7 +28,7 @@ msgstr "Ladeleistung"
 
 #: op_templates/asset/storage_asset_create_form.html:30
 msgid "Discharging Power"
-msgstr "Strom entladen"
+msgstr "Entladeleistung"
 
 #: op_templates/asset/storage_asset_create_form.html:46
 msgid "Capacity"
@@ -47,7 +47,7 @@ msgstr "Dokumentation"
 #: op_templates/base.html:70 op_templates/navbar.html:53
 #: op_templates/navbar.html:115
 msgid "Use cases"
-msgstr "Anwendungsfälle"
+msgstr "Anwendungsbeispiele"
 
 #: op_templates/base.html:71 op_templates/navbar.html:56
 #: op_templates/navbar.html:116
@@ -151,7 +151,7 @@ msgstr "Anmelden"
 #: op_templates/navbar.html:133 op_templates/registration/login.html:21
 #: op_templates/registration/signup.html:42
 msgid "Sign up"
-msgstr "Anmelden"
+msgstr "Registrieren"
 
 #: op_templates/project/project_create.html:23
 #: op_templates/project/project_update.html:24
@@ -339,11 +339,11 @@ msgstr "Speichern"
 
 #: op_templates/scenario/scenario_step4.html:51
 msgid "Proof parameters JSON file "
-msgstr "Prüfparameter JSON-Datei "
+msgstr "Prüfe Parameter aus JSON-Datei "
 
 #: projects/forms.py:42
 msgid "eg. 0.1"
-msgstr "eg. 0.1"
+msgstr "z. B. 0.1"
 
 #: projects/forms.py:43
 msgid "Investment Discount factor."
@@ -374,7 +374,7 @@ msgid "Name of the country where the project is being deployed"
 msgstr "Name des Landes, in dem das Projekt eingesetzt werden soll"
 
 #: projects/forms.py:60
-msgid "Location, longitude"
+msgid "Location's longitude"
 msgstr "Standort, Längengrad"
 
 #: projects/forms.py:62
@@ -382,8 +382,8 @@ msgid "Longitude coordinate of the project's geographical location."
 msgstr "Längengradkoordinate des geografischen Standorts des Projekts."
 
 #: projects/forms.py:63
-msgid "Location, latitude"
-msgstr "Standort, Breitengrad"
+msgid "Location's latitude"
+msgstr "Standort Breitengrad"
 
 #: projects/forms.py:65
 msgid "Latitude coordinate of the project's geographical location."
@@ -414,7 +414,7 @@ msgid "The currency of the country where the project is implemented."
 msgstr "Die Währung des Landes, in dem das Projekt durchgeführt wird."
 
 #: projects/forms.py:71
-msgid "Discount Factor"
+msgid "Discount factor"
 msgstr "Abzinsungsfaktor"
 
 #: projects/forms.py:73
@@ -425,8 +425,8 @@ msgid ""
 "capital (WACC) and use it as the discount rate."
 msgstr ""
 "Der Abzinsungsfaktor ist der Faktor, der den Wertverlust des "
-"Wertes des Geldes in der Zukunft, verglichen mit dem aktuellen Wert des gleichen "
-"Geldes berücksichtigt. Die übliche Methode ist die Berechnung der gewichteten durchschnittlichen "
+"Geldes in der Zukunft, verglichen mit dem aktuellen Wert der gleichen Menge "
+"des Geldes berücksichtigt. Die übliche Methode ist die Berechnung der gewichteten durchschnittlichen "
 "Kapitalkosten (WACC) und diese als Abzinsungsfaktor zu verwenden."
 
 #: projects/forms.py:74
@@ -434,6 +434,9 @@ msgid "Tax"
 msgstr "Steuer"
 
 #: projects/forms.py:76
+msgid "Tax factor"
+msgstr "Steuerfaktor"
+
 msgid "Tax factor."
 msgstr "Steuerfaktor."
 
@@ -463,7 +466,8 @@ msgstr " Tatsächliche CAPEX der Anlage, d.h. spezifische Investitionskosten"
 msgid ""
 "Actual OPEX of the asset, i.e., specific operational and maintenance costs."
 msgstr ""
-"Tatsächliche OPEX des Assets, d.h. spezifische Betriebs- und Wartungskosten."
+"Tatsächliche OPEX der Anlage, d.h. spezifische Betriebs- und Wartungskosten."
+
 
 #: projects/forms.py:122 projects/forms.py:291 projects/forms.py:412
 #: projects/forms.py:492 projects/forms.py:573
@@ -527,14 +531,15 @@ msgstr "Energieträger"
 #: projects/forms.py:264
 msgid ""
 "File not properly formatted. Please ensure you upload a comma seperated "
-"array of values. E.g. [1,2,0.32]"
+"array of values, e.g. [1,2,0.32]"
 msgstr ""
-"File not properly formatted. Bitte stelle sicher, dass Sie ein kommagetrenntes "
-"Array von Werten hochladen. Z.B. [1,2,0.32]"
+"Datei nicht korrekt formatiert. Bitte stellen Sie sicher, dass Sie ein kommagetrenntes "
+"Array von Werten hochladen, z. B. [1,2,0.32]"
+
 
 #: projects/forms.py:266
 msgid "Could not parse a file. Did you upload one?"
-msgstr "Konnte keine Datei parsen. Haben Sie eine hochgeladen?"
+msgstr "Konnte keine Datei einlesen. Haben Sie eine hochgeladen?"
 
 #: projects/forms.py:273 projects/forms.py:609
 msgid ""
@@ -575,7 +580,7 @@ msgid ""
 msgstr ""
 "Die C-Rate ist die Rate, mit der der Speicher im Verhältnis zur "
 "Nennkapazität des Speichers geladen oder entladen werden kann. Eine C-Rate von 1 bedeutet, dass die Batterie"
-"in einem einzigen Zeitschritt vollständig entladen oder laden kann."
+"in einem einzigen Zeitschritt vollständig entladen oder geladen werden kann."
 
 #: projects/forms.py:304 projects/forms.py:435 projects/forms.py:515
 #: projects/forms.py:596
@@ -629,7 +634,7 @@ msgid ""
 "(monthly)."
 msgstr ""
 "Anzahl der Referenzperioden in einem Jahr für den Spitzenbedarfspreis. Nur "
-"einer der folgenden Werte ist akzeptabel: 1 (jährlich), 2, 3 ,4, 6, 12 "
+"einer der folgenden Werte wird akzeptiert: 1 (jährlich), 2, 3 ,4, 6, 12 "
 "(monatlich)."
 
 #: projects/forms.py:328
@@ -726,7 +731,7 @@ msgstr "installierte Leistung (kW)"
 #: projects/forms.py:359 projects/forms.py:377 projects/forms.py:457
 #: projects/forms.py:538
 msgid "Age installed"
-msgstr "Installiertes Alter"
+msgstr "Alter der Anlage"
 
 #: projects/forms.py:365
 msgid "ESS Name"
@@ -738,19 +743,19 @@ msgstr "Ein mnemonischer Name für die ESS Einheit."
 
 #: projects/views.py:383
 msgid "Electricity DSO"
-msgstr "Elektrizität DSO"
+msgstr "Elektrizitätsversorger"
 
 #: projects/views.py:384
 msgid "Gas DSO"
-msgstr "Gas DSO"
+msgstr "Gasversorger"
 
 #: projects/views.py:385
 msgid "H2 DSO"
-msgstr "H2 DSO"
+msgstr "H2-Versorger"
 
 #: projects/views.py:386
 msgid "Heat DSO"
-msgstr "Wärme DSO"
+msgstr "Wärmeversorger"
 
 #: projects/views.py:389
 msgid "PV Plant"
@@ -818,15 +823,15 @@ msgstr "Elektrizitätsspeicher"
 
 #: projects/views.py:409
 msgid "Gas Storage"
-msgstr "Gasspeicherung"
+msgstr "Gasspeicher"
 
 #: projects/views.py:410
 msgid "H2 Storage"
-msgstr "H2 Speicherung"
+msgstr "Wasserstoffspeicher"
 
 #: projects/views.py:411
 msgid "Heat Storage"
-msgstr "Wärmespeicherung"
+msgstr "Wärmespeicher"
 
 #: projects/views.py:414
 msgid "Electricity Demand"
@@ -838,7 +843,7 @@ msgstr "Gasnachfrage"
 
 #: projects/views.py:416
 msgid "H2 Demand"
-msgstr "H2-Bedarf"
+msgstr "Wasserstoffbedarf"
 
 #: projects/views.py:417
 msgid "Heat Demand"
@@ -850,11 +855,11 @@ msgstr "Bus"
 
 #: projects/views.py:469
 msgid "Minimal degree of autonomy"
-msgstr "Minimaler Grad der Autonomie"
+msgstr "Kleinster Autarkiegrad"
 
 #: projects/views.py:470
 msgid "Minimal share of renewables"
-msgstr "Minimaler Anteil an erneuerbaren Energien"
+msgstr "Kleinster Anteil Erneuerbarer Energien"
 
 #: projects/views.py:471
 msgid "Maximal CO2 emissions"
@@ -863,6 +868,9 @@ msgstr "Maximale CO2-Emissionen"
 #: projects/views.py:472
 msgid "Net zero energy system"
 msgstr "Netto-Nullenergie-System"
+
+msgid "Description"
+msgstr "Beschreibung"
 
 msgid "Year"
 msgstr "Jahr"

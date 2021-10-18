@@ -124,7 +124,7 @@ class ProjectDetailForm(ModelForm):
             field.disabled = True
 
 
-class EconomicDataDetailForm(ModelForm):
+class EconomicDataDetailForm(OpenPlanModelForm):
     class Meta:
         model = EconomicData
         fields = '__all__'
@@ -141,7 +141,7 @@ economic_widgets = {
     'tax': forms.NumberInput(attrs={'placeholder': 'eg. 0.3', 'min':'0.0', 'max':'1.0', 'step':'0.0001'}),
 }
 
-class EconomicDataUpdateForm(ModelForm):
+class EconomicDataUpdateForm(OpenPlanModelForm):
     class Meta:
         model = EconomicData
         fields = '__all__'
@@ -170,7 +170,7 @@ class ProjectCreateForm(OpenPlanForm):
                                   'data-toggle': 'tooltip', 'title': _('Discount factor is the factor which accounts for the depreciation in the value of money in the future, compared to the current value of the same money. The common method is to calculate the weighted average cost of capital (WACC) and use it as the discount rate.')}))
     tax = forms.FloatField(label=_('Tax'),
                              widget=forms.NumberInput(attrs={'placeholder': 'eg. 0.3', 'min':'0.0', 'max':'1.0', 'step':'0.0001',
-                             'data-toggle': 'tooltip', 'title': _('Tax factor.')}))
+                             'data-toggle': 'tooltip', 'title': _('Tax factor')}))
     
     # Render form
     def __init__(self, *args, **kwargs):
@@ -186,7 +186,7 @@ class ProjectCreateForm(OpenPlanForm):
         self.helper.field_class = 'col-lg-10'
 
 
-class ProjectUpdateForm(ModelForm):
+class ProjectUpdateForm(OpenPlanModelForm):
     class Meta:
         model = Project
         exclude = ['date_created', 'date_updated', 'economic_data', 'user', 'viewers']

@@ -47,7 +47,7 @@
 <div class="step-footer">
 
     <div>
-        <a class="btn btn--medium btn--hollow btn--previous" href="{% url 'scenario_steps_edit' proj_id scen_id step_id %}" aria-disabled="true">{% translate "Previous" %}</a>
+        <a class="btn btn--medium btn--hollow btn--previous" href="{% url 'scenario_steps_edit' proj_id scen_id step_id|add:-1 %}" aria-disabled="true">{% translate "Previous" %}</a>
         <a class="btn btn--medium" href="{% url 'view_mvs_data_input' scen_id %}" >{% translate "Proof parameters JSON file" %} </a>
         <a class="btn btn--medium" href="{% url 'scenario_visualize_results' scen_id %}" >{% translate "Check dashboard" %} </a>
         <a class="btn btn--medium" href="{% url 'update_simulation_results' proj_id scen_id %}" >{% translate "Update results" %} </a>

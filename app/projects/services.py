@@ -1,5 +1,9 @@
 import os
 from django_q.models import Schedule
+from django.contrib import messages
+from django.urls import reverse
+from django.utils.translation import ugettext_lazy as _
+from django.utils.safestring import mark_safe
 from projects.models import Simulation
 from projects.requests import fetch_mvs_simulation_status
 from projects.constants import PENDING
@@ -72,6 +76,7 @@ def create_or_delete_simulation_scheduler(**kwargs):
             return False
 
 
+
 def send_feedback_email(subject, body):
     tz = EWSTimeZone("Europe/Copenhagen")
     try:
@@ -92,3 +97,10 @@ def send_feedback_email(subject, body):
         mail.send_and_save()
     except Exception as ex:
         logger.warning(f"Couldn't send feedback email. Exception raised: {traceback.format_exc()}.")
+
+
+def excuses_design_under_development(request):
+    msg = """This page is still under development. What you see is a design draft of how it should look like. If you have ideas or feedback about the design, you are welcome to submit it using the <a href='{url}'>feedback form</a>"""
+    url = reverse("user_feedback")
+    messages.warning(request, _(mark_safe(msg.format(url=url))))
+

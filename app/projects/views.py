@@ -20,7 +20,7 @@ from .requests import mvs_simulation_request, mvs_simulation_check_status, get_m
 from .models import *
 from .scenario_topology_helpers import handle_storage_unit_form_post, handle_bus_form_post, handle_asset_form_post, load_scenario_topology_from_db, NodeObject, \
     update_deleted_objects_from_database, duplicate_scenario_objects, duplicate_scenario_connections, get_topology_json
-from .services import create_or_delete_simulation_scheduler, send_feedback_email
+from .services import create_or_delete_simulation_scheduler, send_feedback_email, excuses_design_under_development
 from .constants import DONE, ERROR
 import traceback
 logger = logging.getLogger(__name__)
@@ -554,7 +554,7 @@ def scenario_create_constraints(request, proj_id, scen_id, step_id=3, max_step=4
 @require_http_methods(["GET", "POST"])
 def scenario_review(request, proj_id, scen_id, step_id=4, max_step=5):
 
-
+    excuses_design_under_development(request)
     scenario = get_object_or_404(Scenario, pk=scen_id)
 
     if (scenario.project.user != request.user) and (request.user not in scenario.project.viewers.all()):

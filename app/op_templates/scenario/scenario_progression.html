@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block navbar %}
-    {% include "navbar.html" with user=user scenario_create=True %}
+    {% include "navbar.html" with user=user scenario_create=True documentation_url=documentation_url%}
 {% endblock navbar %}
 
 {% block title %} {% translate "Scenario step" %} {{ step_id }} {% endblock title%}

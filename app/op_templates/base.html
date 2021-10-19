@@ -1,5 +1,6 @@
 {% load static %}
 {% load i18n %}
+{% load custom_template_tags %}
 
 <!doctype html>
 <html lang="de">
@@ -36,12 +37,14 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script src="{% static 'js/jquery.bootstrap.modal.forms.min.js' %}"></script>
 {% block start_body_scripts %}{% endblock %}
+
+{% setvar "https://open-plan.readthedocs.io/en/feature-new_documentation/" as documentation_url %}
+
 {% block navbar %}
-    {% include "navbar.html" with user=user %}
+    {% include "navbar.html" with user=user documentation_url=documentation_url %}
 {% endblock navbar %}
 
 {% block topology %}{% endblock %}
-
 
 
 {% block index %}
@@ -55,7 +58,6 @@
 
 
 
-
 <footer class="footer">
     {% block footer %}
 
@@ -66,7 +68,7 @@
         <div class="footer__links">
             <ul>
                 <li><a href="pages/about.html">{% translate "Contact" %}</a></li>
-                <li><a href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">{% translate "Documentation" %}</a></li>
+                <li><a href="{{ documentation_url}}" target="_blank" rel="noreferrer">{% translate "Documentation" %}</a></li>
                 <li><a href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">{% translate "Use cases" %}</a></li>
                 <li><a href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">{% translate "License" %}</a></li>
                 <li><a href="pages/imprint.html">{% translate "Imprint" %}</a></li>

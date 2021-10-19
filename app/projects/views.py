@@ -26,7 +26,7 @@ import traceback
 logger = logging.getLogger(__name__)
 
 
-@login_required
+
 @require_http_methods(["GET"])
 def not_implemented(request):
     """Function returns a message"""

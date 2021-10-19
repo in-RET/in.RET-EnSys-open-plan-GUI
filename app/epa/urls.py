@@ -19,6 +19,8 @@ from django.urls import path, include
 from django.conf.urls import url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
+from .views import imprint, privacy
+
 urlpatterns = (
     i18n_patterns(
         path('admin/', admin.site.urls),
@@ -26,6 +28,8 @@ urlpatterns = (
         path('users/', include('django.contrib.auth.urls')),
         path('', include('projects.urls')),
         path('dashboard/', include('dashboard.urls')),
+        path('imprint/', imprint, name="imprint"),
+        path('privacy/', privacy, name="privacy"),
     )
     + [url(r"^i18n/", include("django.conf.urls.i18n")),]
     + staticfiles_urlpatterns()

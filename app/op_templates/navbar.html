@@ -37,23 +37,23 @@
                             <a class="nav-link" href="{% url 'project_search' %}">{% translate "My projects" %}</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">{% translate "Documentation" %}</a>
+                            <a class="nav-link" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">{% translate "Documentation" %}</a>
                         </li>
                     {% endif %}
                 {% elif signup %}
                     <!--For user signup the nav bar does not display all options-->
                 {% else %}
                     <li class="nav-item">
-                        <a class="nav-link" href="#">{% translate "Contact" %}</a>
+                        <a class="nav-link" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">{% translate "Contact" %}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">{% translate "Documentation" %}</a>
+                        <a class="nav-link" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">{% translate "Documentation" %}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">{% translate "Use cases" %}</a>
+                        <a class="nav-link" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">{% translate "Use cases" %}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">{% translate "License" %}</a>
+                        <a class="nav-link" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">{% translate "License" %}</a>
                     </li>
                 {% endif %}
 
@@ -111,8 +111,8 @@
                         <img src="{% static 'assets/icons/i_profile.svg' %}" alt="Profile icon">
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="#">{% translate "Use cases" %}</a></li>
-                        <li><a class="dropdown-item" href="#">{% translate "License" %}</a></li>
+                        <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">{% translate "Use cases" %}</a></li>
+                        <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">{% translate "License" %}</a></li>
                         <li><a class="dropdown-item" href="about.html">{% translate "Contact" %}</a></li>
                         <li><a class="dropdown-item" href="{% url 'user_feedback' %}">{% translate "Feedback" %}</a></li>
                         <li><a class="dropdown-item" href="account.html">{% translate "Account" %}</a></li>

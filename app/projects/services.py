@@ -99,8 +99,12 @@ def send_feedback_email(subject, body):
         logger.warning(f"Couldn't send feedback email. Exception raised: {traceback.format_exc()}.")
 
 
-def excuses_design_under_development(request):
-    msg = """This page is still under development. What you see is a design draft of how it should look like. If you have ideas or feedback about the design, you are welcome to submit it using the <a href='{url}'>feedback form</a>"""
+def excuses_design_under_development(request, link=False):
+    if link is False:
+        msg = """This page is still under development. What you see is a design draft of how it should look like. If you have ideas or feedback about the design, you are welcome to submit it using the <a href='{url}'>feedback form</a>"""
+    else:
+        msg = """This website is still under development and not all buttons link to what they should yet. This is the case of the link or button you just clicked on. If you have ideas or feedback on how to improve the design, you are welcome to submit it using the <a href='{url}'>feedback form</a>"""
+
     url = reverse("user_feedback")
     messages.warning(request, _(mark_safe(msg.format(url=url))))
 

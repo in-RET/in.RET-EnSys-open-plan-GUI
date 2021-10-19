@@ -6,7 +6,7 @@ from django.http import HttpResponseForbidden, JsonResponse
 from django.http.response import Http404
 from django.utils.translation import gettext_lazy as _
 from django.shortcuts import *
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 from django.core.exceptions import PermissionDenied
 from django.views.decorators.http import require_http_methods
 from django.contrib import messages
@@ -24,6 +24,16 @@ from .services import create_or_delete_simulation_scheduler, send_feedback_email
 from .constants import DONE, ERROR
 import traceback
 logger = logging.getLogger(__name__)
+
+
+@login_required
+@require_http_methods(["GET"])
+def not_implemented(request):
+    """Function returns a message"""
+    redirect_name = request.GET.get('url')
+    excuses_design_under_development(request, link=True)
+
+    return redirect(redirect_name)
 
 
 @require_http_methods(["GET"])

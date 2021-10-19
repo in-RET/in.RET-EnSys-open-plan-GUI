@@ -35,7 +35,7 @@
                         <h2 class="name">
                             {{ project.name }}
                         </h2>
-                        <a href="#" class="location">
+                        <a href="{% url 'not_implemented' %}?url={{ request.get_full_path }}" class="location">
                             <span class="icon-pin" aria-hidden="true"></span>
                             {{ project.country }}
                         </a>
@@ -164,7 +164,7 @@
                                     {% if project.user == request.user %}
                                         <li><a class="dropdown-item" href="{% url 'scenario_steps' project.id %}">{% translate "New scenario" %}</a></li>
                                     {% endif %}
-                                    <li><a class="dropdown-item" href="#">{% translate "From file" %}</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">{% translate "From file" %}</a></li>
                                 </ul>
                             </div>
 
@@ -197,7 +197,7 @@
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="newProjectButton">
                     <li><a class="dropdown-item" href="{% url 'project_create' %}">{% translate "Empty project" %}</a></li>
-                    <li><a class="dropdown-item" href="#">{% translate "From use case" %}</a></li>
+                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">{% translate "From use case" %}</a></li>
                 </ul>
             </div>
         </section>

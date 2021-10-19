@@ -30,7 +30,7 @@
                         </li>
                         <li class="nav-item">
                             <!--scenario-empty.html-->
-                            <a class="nav-link" href="scenario-empty.html">{% translate "New scenario" %}</a>
+                            <a class="nav-link" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">{% translate "New scenario" %}</a>
                         </li>
                         <li class="nav-item">
                             <!--project-view.html-->

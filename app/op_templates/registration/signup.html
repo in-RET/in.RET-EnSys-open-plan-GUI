@@ -10,6 +10,8 @@
 {% endblock navbar %}
 
 {% block index %}
+{% url 'not_implemented' as registration_url %}
+{% url 'not_implemented' as privacy_url %}
 
 <main class="signup">
     <div class="signup-frame">
@@ -36,7 +38,7 @@
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
                 <label class="form-check-label" for="flexCheckDefault">
-                    {% blocktrans %}I have read and accept the <a href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">registration</a> and <a href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">privacy statements</a> from open_plan.{% endblocktrans %}
+                    {% blocktrans %}I have read and accept the <a href="{{ registration_url }}">registration</a> and <a href="{{ privacy_url }}">privacy statements</a> from open_plan.{% endblocktrans %}
                 </label>
             </div>
             <button class="btn btn--large" type="submit" id="submitbutton">{% translate "Sign up" %}</button>

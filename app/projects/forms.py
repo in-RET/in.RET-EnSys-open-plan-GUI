@@ -49,13 +49,12 @@ def gettext_variables(some_string, lang="de"):
             pickle.dump(trans_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
-def get_parameter_info(param_name, parameters=PARAMETERS):
+def set_parameter_info(param_name, field, parameters=PARAMETERS):
     param_name = MAP_EPA_MVS.get(param_name, param_name)
     help_text = None
     unit = None
     verbose = None
     if param_name in PARAMETERS:
-        print(param_name)
         help_text = PARAMETERS[param_name][":Definition:"]
         unit = PARAMETERS[param_name][":Unit:"]
         verbose = PARAMETERS[param_name]["verbose"]
@@ -68,7 +67,16 @@ def get_parameter_info(param_name, parameters=PARAMETERS):
     else:
         print(f"{param_name} is not within range")
 
-    return help_text, unit, verbose
+
+    if verbose is not None:
+        field.label = verbose
+    if unit is not None:
+        field.label = _(str(field.label)) + " (" + _(unit) + ")"
+    else:
+        field.label = _(str(field.label))
+
+    if help_text is not None:
+        field.help_text = _(help_text)
 
 
 class OpenPlanModelForm(ModelForm):
@@ -76,35 +84,15 @@ class OpenPlanModelForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(OpenPlanModelForm, self).__init__(*args, **kwargs)
         for fieldname, field in self.fields.items():
-            help_text, unit, verbose = get_parameter_info(fieldname)
+            set_parameter_info(fieldname, field)
 
-            if verbose is not None:
-                field.label = verbose
-            if unit is not None:
-                field.label = _(str(field.label)) + " (" + _(unit) + ")"
-            else:
-                field.label = _(str(field.label))
-
-            if help_text is not None:
-                field.help_text = _(help_text)
 
 class OpenPlanForm(forms.Form):
     """Class to automatize the assignation and translation of the labels, help_text and units"""
     def __init__(self, *args, **kwargs):
         super(OpenPlanForm, self).__init__(*args, **kwargs)
         for fieldname, field in self.fields.items():
-            help_text, unit, verbose = get_parameter_info(fieldname)
-
-            if verbose is not None:
-                field.label = verbose
-
-            if unit is not None:
-                field.label = _(str(field.label)) + " (" + _(unit) + ")"
-            else:
-                field.label = _(str(field.label))
-
-            if help_text is not None:
-                field.help_text = _(help_text)
+            set_parameter_info(fieldname, field)
 
 class FeedbackForm(ModelForm):
     class Meta:

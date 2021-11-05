@@ -1,6 +1,8 @@
-import csv
 import pickle
 import os
+import json
+import io
+import csv
 
 from crispy_forms.bootstrap import AppendedText, PrependedText, FormActions
 from crispy_forms.helper import FormHelper
@@ -318,6 +320,43 @@ class BusForm(OpenPlanModelForm):
         }
 
 
+def parse_csv_timeseries(file_str):
+    io_string = io.StringIO(file_str)
+    reader = csv.reader(io_string, delimiter=",")
+    timeseries_values = []
+    for row in reader:
+        if len(row) == 1:
+            timeseries_values.append(float(row[0]))
+        else:
+            timeseries_values.append(float(row[1]))
+    return timeseries_values
+
+
+def parse_input_timeseries(timeseries_file):
+
+    timeseries_file_str = timeseries_file.read().decode('utf-8')
+
+    if timeseries_file_str != "":
+        if timeseries_file.name.endswith("json"):
+            timeseries_values = json.loads(timeseries_file_str)
+        elif timeseries_file.name.endswith("csv"):
+            timeseries_values = parse_csv_timeseries(timeseries_file_str)
+
+        elif timeseries_file.name.endswith("txt"):
+            nlines = timeseries_file_str.count("\n") + 1
+            if nlines == 1:
+                timeseries_values = json.loads(timeseries_file_str)
+            else:
+                timeseries_values = parse_csv_timeseries(timeseries_file_str)
+    else:
+        raise ValidationError(
+            _('Input timeseries file "%(fname)s" is empty'),
+            code='empty_file',
+            params={'fname': timeseries_file.name},
+        )
+    return timeseries_values
+
+
 class AssetCreateForm(OpenPlanModelForm):
 
     def __init__(self, *args, **kwargs):
@@ -336,8 +375,8 @@ class AssetCreateForm(OpenPlanModelForm):
 
     def clean_input_timeseries(self):
         try:
-            timeseries_file_str = self.files['input_timeseries'].read().decode('utf-8')
-            input_timeseries_values = json.loads(timeseries_file_str)
+            timeseries_file = self.files['input_timeseries']
+            input_timeseries_values = parse_input_timeseries(timeseries_file)
             return input_timeseries_values
         except json.decoder.JSONDecodeError as ex:
             raise ValidationError(_("File not properly formatted. Please ensure you upload a comma seperated array of values. E.g. [1,2,0.32]"))

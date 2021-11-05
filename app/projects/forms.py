@@ -54,19 +54,25 @@ def set_parameter_info(param_name, field, parameters=PARAMETERS):
     help_text = None
     unit = None
     verbose = None
+    default_value = None
     if param_name in PARAMETERS:
         help_text = PARAMETERS[param_name][":Definition:"]
         unit = PARAMETERS[param_name][":Unit:"]
         verbose = PARAMETERS[param_name]["verbose"]
+        default_value = PARAMETERS[param_name][":Default:"]
         if unit == "None":
             unit = None
         elif unit == "Factor":
             unit = ""
         if verbose == "None":
             verbose = None
+        if default_value == "None":
+            default_value = None
     else:
         print(f"{param_name} is not within range")
 
+        if param_name == "optimize_cap":
+            default_value = False
 
     if verbose is not None:
         field.label = verbose
@@ -77,6 +83,9 @@ def set_parameter_info(param_name, field, parameters=PARAMETERS):
 
     if help_text is not None:
         field.help_text = _(help_text)
+
+    if default_value is not None:
+        field.initial = default_value
 
 
 class OpenPlanModelForm(ModelForm):

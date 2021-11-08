@@ -3,6 +3,7 @@ import os
 import json
 import io
 import csv
+from openpyxl import load_workbook
 
 from crispy_forms.bootstrap import AppendedText, PrependedText, FormActions
 from crispy_forms.helper import FormHelper
@@ -330,27 +331,44 @@ def parse_csv_timeseries(file_str):
 
 
 def parse_input_timeseries(timeseries_file):
+    if timeseries_file.name.endswith("xls") or timeseries_file.name.endswith("xlsx"):
+        wb = load_workbook(filename=timeseries_file.name)
+        worksheet = wb.active
+        timeseries_values = []
+        n_col = worksheet.max_column
 
-    timeseries_file_str = timeseries_file.read().decode('utf-8')
+        col_idx = 0
 
-    if timeseries_file_str != "":
-        if timeseries_file.name.endswith("json"):
-            timeseries_values = json.loads(timeseries_file_str)
-        elif timeseries_file.name.endswith("csv"):
-            timeseries_values = parse_csv_timeseries(timeseries_file_str)
+        if n_col > 1:
+            col_idx = 1
 
-        elif timeseries_file.name.endswith("txt"):
-            nlines = timeseries_file_str.count("\n") + 1
-            if nlines == 1:
-                timeseries_values = json.loads(timeseries_file_str)
-            else:
-                timeseries_values = parse_csv_timeseries(timeseries_file_str)
+        for j in range(0, worksheet.max_row):
+            try:
+                timeseries_values.append(float(worksheet.cell(row=j + 1, column=col_idx + 1).value))
+            except ValueError:
+                pass
+
     else:
-        raise ValidationError(
-            _('Input timeseries file "%(fname)s" is empty'),
-            code='empty_file',
-            params={'fname': timeseries_file.name},
-        )
+        timeseries_file_str = timeseries_file.read().decode('utf-8')
+
+        if timeseries_file_str != "":
+            if timeseries_file.name.endswith("json"):
+                timeseries_values = json.loads(timeseries_file_str)
+            elif timeseries_file.name.endswith("csv"):
+                timeseries_values = parse_csv_timeseries(timeseries_file_str)
+
+            elif timeseries_file.name.endswith("txt"):
+                nlines = timeseries_file_str.count("\n") + 1
+                if nlines == 1:
+                    timeseries_values = json.loads(timeseries_file_str)
+                else:
+                    timeseries_values = parse_csv_timeseries(timeseries_file_str)
+        else:
+            raise ValidationError(
+                _('Input timeseries file "%(fname)s" is empty'),
+                code='empty_file',
+                params={'fname': timeseries_file.name},
+            )
     return timeseries_values
 
 

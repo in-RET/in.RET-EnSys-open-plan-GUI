@@ -12,7 +12,7 @@ from django.forms import ModelForm
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.staticfiles.storage import staticfiles_storage
 from projects.models import *
-from projects.constants import MAP_EPA_MVS
+from projects.constants import MAP_EPA_MVS, RENEWABLE_ASSETS
 
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings as django_settings
@@ -72,9 +72,6 @@ def set_parameter_info(param_name, field, parameters=PARAMETERS):
             default_value = None
     else:
         print(f"{param_name} is not within range")
-
-        if param_name == "optimize_cap":
-            default_value = False
 
     if verbose is not None:
         field.label = verbose
@@ -361,8 +358,11 @@ class AssetCreateForm(OpenPlanModelForm):
 
     def __init__(self, *args, **kwargs):
         asset_type_name = kwargs.pop('asset_type', None)
+
         super().__init__(*args, **kwargs)
+        # which fields exists in the form are decided upon AssetType saved in the db
         asset_type = AssetType.objects.get(asset_type=asset_type_name)
+
         [self.fields.pop(field) for field in list(self.fields) if field not in asset_type.asset_fields]
         ''' DrawFlow specific configuration, add a special attribute to 
             every field in order for the framework to be able to export
@@ -370,6 +370,8 @@ class AssetCreateForm(OpenPlanModelForm):
             !! This addition doesn't affect the previous behavior !!
         '''
         for field in self.fields:
+            if field == "renewable_asset" and asset_type_name in RENEWABLE_ASSETS:
+                self.fields[field].initial = True
             self.fields[field].widget.attrs.update({f'df-{field}': ''})
         ''' ----------------------------------------------------- '''
 

@@ -344,6 +344,15 @@ ASSET_TYPE = (
     ('hess', 'hess'),
 )
 
+RENEWABLE_ASSETS = (
+    "electrolyzer",
+    "heat_pump",
+    "pv_plant",
+    "wind_plant",
+    "biogas_plant",
+    "geothermal_conversion",
+    "solar_thermal_plant",
+)
 BUS_TYPE = (
     ('bus_electricity', 'bus_electricity'),
     ('bus_heat', 'bus_heat'),

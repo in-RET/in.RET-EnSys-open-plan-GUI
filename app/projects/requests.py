@@ -63,6 +63,7 @@ def fetch_mvs_simulation_status(simulation):
         simulation.save()
 
 def get_mvs_simulation_results(simulation):
+    # TODO do not repeat if the simulation is not on the server anymore, or if the results are already loaded
     if simulation.status == DONE:
         response = mvs_simulation_check_status(token=simulation.mvs_token)
         simulation.status = response['status']
@@ -71,6 +72,8 @@ def get_mvs_simulation_results(simulation):
         logger.info(f"The simulation {simulation.id} is finished")
 
         simulation.save()
+    else:
+        fetch_mvs_simulation_status(simulation)
 
 
 def parse_mvs_results(simulation, response_results):

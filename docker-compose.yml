@@ -3,18 +3,18 @@ version: "3.7"
 services:
   db:
     image: mysql:5.7
-    container_name: mysqlDB
+    container_name: open_planDB
     ports:
       - "3306:3306"
     restart: always
     environment:
-      MYSQL_DATABASE: "epa-app-db"
+      MYSQL_DATABASE: "open_plan-app-db"
       MYSQL_ROOT_PASSWORD: "4kFDg@G@*G,#)Fa"
     volumes:
       - db_data:/var/lib/mysql/
   app:
     build: ./app
-    container_name: django-gunicorn
+    container_name: django-open_plan
     restart: always
     env_file:
       - app/epa.env
@@ -29,7 +29,7 @@ services:
       - db:db
   djangoq:
     build: ./app
-    container_name: django-q-cluster
+    container_name: django-q-open_plan
     restart: always
     env_file:
       - app/epa.env

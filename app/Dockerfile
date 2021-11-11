@@ -22,3 +22,5 @@ ADD . ${APP_ROOT}
 RUN adduser appUser -D -h ${APP_ROOT} -s /bin/sh \
     && chown -R appUser ${APP_ROOT}
 USER appUser
+
+CMD ["python", "manage.py", "collectstatic"]

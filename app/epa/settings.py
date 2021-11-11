@@ -51,7 +51,6 @@ INSTALLED_APPS = [
     # 3rd Party
     'crispy_forms',
     'django_q',
-    'widget_tweaks'
 ]
 
 MIDDLEWARE = [
@@ -96,7 +95,7 @@ DATABASES = {
     # ELAND dockerized mysql container
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'epa-app-db',
+        'NAME': 'open_plan-app-db',
         'USER': 'root',
         'PASSWORD': '4kFDg@G@*G,#)Fa',
         'HOST': 'db',

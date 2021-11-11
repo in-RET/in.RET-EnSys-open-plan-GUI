@@ -170,14 +170,15 @@
                         ({ node: nodesToDB.get('node-' + conn.node).uid, input: conn.input }));
                     return obj;
                 }
-
                 const drawflowData = Object.values(editorData)
                     .map(obj=>({
                         db_id: nodesToDB.get('node-'+obj.id).uid,
                         name: obj.name,
                         inputs: Object.entries(obj.inputs).reduce(transformIOs, {}),
                         outputs: Object.entries(obj.outputs).reduce(transformIOs, {}),
-                        data: obj.data
+                        data: obj.data,
+                        pos_x: obj.pos_x,
+                        pos_y: obj.pos_y,
                     }));
 
                  $.ajax({

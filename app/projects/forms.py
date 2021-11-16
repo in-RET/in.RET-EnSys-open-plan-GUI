@@ -432,7 +432,7 @@ class AssetCreateForm(OpenPlanModelForm):
                                                  'data-toggle': 'tooltip', 'title': _('Number of operational years of the asset until it has to be replaced.'),
                                                  'style': 'font-weight:400; font-size:13px;'}),
             # TODO: Try changing this to FileInput
-            'input_timeseries': forms.FileInput(),
+            'input_timeseries': forms.FileInput(attrs={"onchange": "plot_file_trace(obj=this.files, plot_id='timeseries_trace')"}),
             # 'input_timeseries': forms.Textarea(attrs={'placeholder': 'e.g. [4,3,2,5,3,...]',
             #                                           'style': 'font-weight:400; font-size:13px;'}),
             'crate': forms.NumberInput(attrs={'placeholder': 'factor of total capacity (kWh), e.g. 0.7', 'min': '0.0', 'max': '1.0', 'step': '.0001',

@@ -7,15 +7,17 @@
 
 {% block head_block %}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jerosoler/Drawflow/dist/drawflow.min.css">
-<!--<script src="https://cdn.plot.ly/plotly-2.4.2.min.js"></script>-->
-<script src="{% static 'js/plotly.min.js' %}"></script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<!--<script src="{% static 'js/plotly.min.js' %}"></script>-->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
-
 {% endblock head_block %}
 
 
 {% block start_body_scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/1.0.21/jquery.csv.min.js" integrity="sha512-Y8iWYJDo6HiTo5xtml1g4QqHtl/PO1w+dmUpQfQSOTqKNsMhExfyPN2ncNAe9JuJUSKzwK/b6oaNPop4MXzkwg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.1.1/d3.min.js" integrity="sha512-COTaPOlz12cG4fSfcBsxZsjauBAyldqp+8FQUM/dZHm+ts/jR4AFoJhCqxy8K10Jrf3pojfsbq7fAPTb1XaVkg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="{% static 'js/traceplot.js' %}"></script>
+
 <!--
 <link rel="stylesheet" type="text/css" href="{% static 'css/beautiful1.css' %}"/>
 
@@ -42,7 +44,7 @@
             <div class="modal-body">
                 <form>
                 </form>
-                <div id="plot_trace"></div>
+                <div id="timeseries_trace"></div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

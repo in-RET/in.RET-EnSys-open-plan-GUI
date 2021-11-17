@@ -147,7 +147,7 @@ document.addEventListener("dblclick", function (e) {
             editor.editor_mode = "fixed";
             guiModal.show()
         })
-        .catch(err => console.alert("Modal get form JS Error: " + err));
+        .catch(err => alert("Modal get form JS Error: " + err));
 
     }
 });
@@ -207,7 +207,8 @@ const submitForm = (e) => {
             }
 
         },
-        error: err => console.alert("Modal form JS Error: " + err),
+        error: function (err) {
+            assetForm.innerHTML = err.responseJSON.form_html;}, //err => {alert("Modal form JS Error: " + err);console.log(err);}
     })
 }
 

@@ -11,6 +11,11 @@
       {% for error in field.errors %}
       <p class="help-block">{{ error }}</p>
       {% endfor %}
+
+      {% if field.name == "input_timeseries" %}
+        <div id="timeseries_trace"></div>
+
+      {% endif %}
       {% if field.name == "input_timeseries" and input_timeseries_data %}
       <div>
         <a data-toggle="collapse" href="#input_timeseries_data">{% translate "uploaded data" %}</a>

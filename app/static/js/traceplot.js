@@ -1,10 +1,24 @@
-var config = {showLink: false, responsive: false, displayModeBar: false};
+var config = {
+    showLink: false,
+    responsive: true,
+    scrollZoom: true,
+    modeBarButtonsToRemove: [
+        'select2d',
+        'lasso2d',
+        'toImage',
+        'lassoSelect',
+        'boxSelect',
+        'hoverClosestCartesian',
+        'hoverCompareCartesian',
+        'toggleSpikelines']
+}; //displayModeBar: true
 var layout = {
+    height: 140,
     margin:{
-        b:0,
-        l:0,
+        b:30,
+        l:20,
         r:0,
-        t:0,
+        t:10,
     }
 };
 

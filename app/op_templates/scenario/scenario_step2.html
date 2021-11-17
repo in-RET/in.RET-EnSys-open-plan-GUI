@@ -120,7 +120,7 @@
 
 <script>
         const csrfToken = '{{ csrf_token }}';
-        const formGetUrl = `{% url 'get_asset_create_form' %}`;
+        const formGetUrl = `{% url 'get_asset_create_form' scenario.id %}`;
         const formPostUrl = `{% url 'asset_create_or_update' scenario.id %}`;
         const scenarioBelongsToUser = {% if scenario.project.user == request.user %}true{% else %}false{% endif %};
     </script>

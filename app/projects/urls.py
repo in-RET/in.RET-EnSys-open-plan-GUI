@@ -37,7 +37,7 @@ urlpatterns = [
     path('scenario/export', scenario_export, name='scenario_export'),
     # path('scenario/upload/<int:proj_id>', LoadScenarioFromFileView.as_view(), name='scenario_upload'),
     # Grid Model (Assets Creation)
-    re_path(r'^asset/get_form/(?P<asset_type_name>\w+)?(/(?P<asset_uuid>[0-9a-f-]+))?$', get_asset_create_form, name='get_asset_create_form'),
+    re_path(r'^asset/get_form/(?P<scen_id>\d+)/(?P<asset_type_name>\w+)?(/(?P<asset_uuid>[0-9a-f-]+))?$', get_asset_create_form, name='get_asset_create_form'),
     re_path(r'^asset/create_or_update_post/(?P<scen_id>\d+)/(?P<asset_type_name>\w+)?(/(?P<asset_uuid>[0-9a-f-]+))?$', asset_create_or_update, name='asset_create_or_update'),
     # MVS Simulation
     path('view_mvs_data_input/<int:scen_id>', view_mvs_data_input, name='view_mvs_data_input'),

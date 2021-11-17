@@ -762,6 +762,9 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
             form = StorageForm(asset_type=asset_type_name)
         return render(request, 'asset/storage_asset_create_form.html', {'form': form})
     else: # all other assets
+
+
+
         if asset_uuid:
             existing_asset = get_object_or_404(Asset, unique_id=asset_uuid)
             form = AssetCreateForm(asset_type=asset_type_name, instance=existing_asset)
@@ -772,7 +775,14 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
             default_name = f"{asset_type_name}-{n_asset}"
             form = AssetCreateForm(asset_type=asset_type_name, initial={'name':default_name})
             input_timeseries_data= ''
-        return render(request, 'asset/asset_create_form.html', {'form': form, 'input_timeseries_data':input_timeseries_data})
+
+        context = {
+            'form': form,
+            'input_timeseries_data': input_timeseries_data,
+            'input_timeseries_timestamps': json.dumps(scenario.get_timestamps(json_format=True))
+        }
+
+        return render(request, 'asset/asset_create_form.html', context)
 
 
 @login_required

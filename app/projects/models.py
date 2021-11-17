@@ -4,6 +4,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.conf import settings
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
+from datetime import timedelta
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 from .constants import ASSET_CATEGORY, ASSET_TYPE, COUNTRY, CURRENCY, ENERGY_VECTOR, FLOW_DIRECTION, MVS_TYPE, SIMULATION_STATUS, TRUE_FALSE_CHOICES, USER_RATING
@@ -67,6 +68,16 @@ class Scenario(models.Model):
     def __str__(self):
         return self.name
 
+    def get_timestamps(self, json_format=False):
+        answer = []
+        for i in range(self.evaluated_period):
+            iter_date = self.start_date + timedelta(minutes=self.time_step * (i + 1))
+            if json_format is True:
+                iter_date = iter_date.isoformat().replace("T"," ")
+            answer.append(iter_date)
+        return answer
+
+
 class AssetType(models.Model):
     asset_type = models.CharField(max_length=30, choices=ASSET_TYPE, null=False, unique=True)
     asset_category = models.CharField(max_length=30, choices=ASSET_CATEGORY)
@@ -124,6 +135,11 @@ class Asset(TopologyNode):
     @property
     def fields(self):
         return [f.name for f in self._meta.fields + self._meta.many_to_many]
+
+    @property
+    def timestamps(self):
+        return self.scenario.get_timestamps()
+
 
 
 class Bus(TopologyNode):

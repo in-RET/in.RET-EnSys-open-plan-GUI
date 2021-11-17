@@ -1,4 +1,4 @@
-var config = {
+const config = {
     showLink: false,
     responsive: true,
     scrollZoom: true,
@@ -16,24 +16,48 @@ var layout = {
     height: 140,
     margin:{
         b:30,
-        l:20,
+        l:30,
         r:0,
         t:10,
+    },
+    xaxis:{
+        type: "date"
     }
 };
 
 
-function makePlotly( x, y ){
-    console.log("plot ID", PLOT_ID);
+function makePlotly( x, y, plot_id=""){
+
+    // get the handle of the plotly plot
+    if(plot_id == ""){
+        plot_id = PLOT_ID;
+    }
+    var plotDiv = document.getElementById(plot_id);
+
+    // if the timestamps from the scenario are available, loads them
+    var ts_timestamps_div = document.getElementById("input_timeseries_timestamps");
+    if (ts_timestamps_div){
+        var ts_timestamps = JSON.parse(ts_timestamps_div.querySelector("textarea").value);
+        // only replace the x values with timestamps if they match the y values, otherwise the error
+        // will be confusing to the enduser
+        if(ts_timestamps.length == y.length){
+            x = ts_timestamps
+        }
+        else{
+            alert("The number of values in your uploaded timeseries does not match the scenario timestamps.\nPlease change the scenario settings or upload a new timeseries")
+        }
+    }
+    // guess whether x is a number or a date and adjust the axis type accordingly
+    if(isNaN(x[0]) == false){
+        layout.xaxis.type = "linear";
+    }
+    else{
+        layout.xaxis.type = "date";
+    }
     console.log( 'X',x, 'Y',y );
-  var plotDiv = document.getElementById(PLOT_ID);
+    var traces = [{type: "scatter", x: x, y: y}];
 
-  var traces = [{
-    x: x,
-    y: y
-  }];
-
-  Plotly.newPlot(plotDiv, traces, layout, config);
+    Plotly.newPlot(plotDiv, traces, layout, config);
 };
 
 

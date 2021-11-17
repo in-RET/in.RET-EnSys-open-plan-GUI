@@ -143,9 +143,22 @@ document.addEventListener("dblclick", function (e) {
             guiModalDOM.setAttribute("data-node-type", nodeType);
             guiModalDOM.setAttribute("data-node-topo-id", topologyNodeId);
             guiModalDOM.setAttribute("data-node-df-id", topologyNodeId.split("-").pop());
-
             editor.editor_mode = "fixed";
+
+            //update the
+            ts_data_div = document.getElementById("input_timeseries_data");
+            if(ts_data_div){
+                var ts_data = JSON.parse(ts_data_div.querySelector("textarea").value);
+                var ts_data = ts_data.map(String);
+                var ts_idx = [...Array(ts_data.length).keys()];
+                ts_idx = ts_idx.map(String);
+                makePlotly( ts_idx, ts_data, plot_id="timeseries_trace")
+            }
+
+
+
             guiModal.show()
+
         })
         .catch(err => alert("Modal get form JS Error: " + err));
 

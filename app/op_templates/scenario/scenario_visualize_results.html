@@ -3,18 +3,19 @@
 {% load crispy_forms_tags %}
 
 {% block head_block %}
-<link rel="stylesheet" href="{% static 'css/selectize.default.css' %}" type="text/css">
-<link rel="stylesheet" href="https://cdn.datatables.net/1.10.23/css/dataTables.bootstrap.min.css">
-<link rel="stylesheet" href="{% static 'css/visresults.css' %}" type="text/css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha512-6MXa8B6uaO18Hid6blRMetEIoPqHf7Ux1tnyIQdpt9qI5OACx7C+O3IVTr98vwGnlcg0LOLa02i9Y1HpVhlfiw==" crossorigin="anonymous" referrerpolicy="no-referrer">-->
 
+<link rel="stylesheet" href="{% static 'css/selectize.default.css' %}" type="text/css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables.net-bs/1.10.23/dataTables.bootstrap.min.css" integrity="sha512-Z+BWkkwxMpBhQthPeqw2UbG1tamgkRHi1UaYyZ8mTnjt04iXqeVx/Wu4CYzPOn3E+x663DIV+SiAuKDHbTg6FQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet" href="{% static 'css/visresults.css' %}" type="text/css">
 {% endblock head_block %}
 
 {% block start_body_scripts %}
-<script src="https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.10.23/js/dataTables.bootstrap.min.js"></script>
-<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables.net/1.10.23/jquery.dataTables.min.js" integrity="sha512-coE8Qg+5Eb8e0xSXkdSJYln78NclTBgX6rducQWvi3NZooVaR1GVcVA5fRPVetzSqh9CEBv7hzwuQsZLLC0e8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables.net-bs/1.10.23/dataTables.bootstrap.min.js" integrity="sha512-+rDMk0ij80qatwMadCcw2tzSDXb+1Z4YCr4pbVPRQOZTiJg7o8mt3LgE1XU86mIzxW63xfH+0gXEXZ+Adaeq9g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.58.5/plotly.min.js" integrity="sha512-7wMLZxKDFvReIWPUzBfcEKsuOriDUEcWkV2bNHV2/tQUmoZj2eLpkQOF7nBbtwVG8WrSl5rTN87cqnS7ZelhzQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="{% static 'js/selectize.min.js' %}"></script>
-<script src="https://unpkg.com/tippy.js@2.5.2/dist/tippy.all.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tippy.js/2.5.4/tippy.all.min.js" integrity="sha512-9LKXH8DIeFSdiDIWQSOJNZuwLynJNm4x/1eBRpPfRJsEXZWJL+aoH+JNDglF3DcCoQYVBHqXo8sVHOLveoaN0A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 {% endblock start_body_scripts %}
 
 {% block content %}

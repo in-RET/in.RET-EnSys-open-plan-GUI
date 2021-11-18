@@ -96,7 +96,7 @@ def parse_mvs_results(simulation, response_results):
     qs = KPICostsMatrixResults.objects.filter(simulation=simulation)
     if qs.exists():
         kpi_costs = qs.first()
-        kpi_costs.cost_values = json.dumps(data['kpi']['scalars'])
+        kpi_costs.cost_values = json.dumps(data['kpi']['cost_matrix'])
         kpi_costs.save()
     else:
         KPICostsMatrixResults.objects.create(cost_values=json.dumps(data['kpi']['cost_matrix']), simulation=simulation)

@@ -49,7 +49,7 @@
             {% for scalar_kpi in scalar_kpis %}
             <tr>
                 <td></td>
-                <td data-toggle="tooltip" title="{{ scalar_kpi.tooltip }}">{{ scalar_kpi.kpi }}</td>
+                <td data-bs-toggle="tooltip" title="{{ scalar_kpi.tooltip }}">{{ scalar_kpi.kpi }}</td>
                 <td>{{ scalar_kpi.value }}</td>
                 <td>{{ scalar_kpi.unit }}</td>
             </tr>
@@ -67,9 +67,9 @@
     <h2 class="panel-heading" style="text-align: center;">Time Series Analysis</h2>
     <br><br>
     <ul class="nav nav-tabs nav-justified">
-        <li class="active"><a data-toggle="tab" href="#electricity" class="tabb">Electricity</a></li>
-        <li><a data-toggle="tab" href="#heat" class="tabb">Heat</a></li>
-        <li><a data-toggle="tab" href="#gas" class="tabb">Gas</a></li>
+        <li class="nav-item active"><a data-bs-toggle="tab" href="#electricity" class="tabb">Electricity</a></li>
+        <li class="nav-item"><a data-bs-toggle="tab" href="#heat" class="tabb">Heat</a></li>
+        <li class="nav-item"><a data-bs-toggle="tab" href="#gas" class="tabb">Gas</a></li>
     </ul>
 
     <div class="tab-content">

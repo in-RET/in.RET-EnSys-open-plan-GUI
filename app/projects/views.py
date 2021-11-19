@@ -2,6 +2,7 @@
 from django.contrib.auth.decorators import login_required
 import json
 import logging
+import traceback
 from django.http import HttpResponseForbidden, JsonResponse
 from django.http.response import Http404
 from django.utils.translation import gettext_lazy as _
@@ -20,8 +21,8 @@ from .requests import mvs_simulation_request, mvs_simulation_check_status, get_m
 from .models import *
 from .scenario_topology_helpers import handle_storage_unit_form_post, handle_bus_form_post, handle_asset_form_post, load_scenario_topology_from_db, NodeObject, \
     update_deleted_objects_from_database, duplicate_scenario_objects, duplicate_scenario_connections, get_topology_json
-from .services import create_or_delete_simulation_scheduler, send_feedback_email, excuses_design_under_development
 from .constants import DONE, ERROR
+from .services import create_or_delete_simulation_scheduler, excuses_design_under_development, send_feedback_email
 import traceback
 logger = logging.getLogger(__name__)
 
@@ -58,12 +59,15 @@ def user_feedback(request):
             except:
                 feedback.rating = None
             feedback.save()
-            subject = f"[E-LAND] [EPA] Feedback for EPA - {feedback.subject}"
-            body = f"Feedback form for Energy Planning Application\n\nReceived Feedback\n-----------------\n\nTopic: {feedback.subject}\nContent: {feedback.feedback}\n\nInformation abour sender\n------------------------\nName: {feedback.name}\n E-mail Address: {feedback.email}"
-            send_feedback_email(subject, body)
-            messages.success(request, f"Thank you for your feedback.")
+            subject = f"[open_plan] Feedback for open_plan tool - {feedback.subject}"
+            body = f"Feedback form for open_plan tool online api\n\nReceived Feedback\n-----------------\n\nTopic: {feedback.subject}\nContent: {feedback.feedback}\n\nInformation about sender\n------------------------\nName: {feedback.name}\n E-mail Address: {feedback.email}"
+            try:
+                send_feedback_email(subject, body)
+                messages.success(request, f"Thank you for your feedback.")
+            except Exception as e:
+                messages.success(request, e)
             return HttpResponseRedirect(reverse('project_search'))
-    return render(request, 'feedback.html',{'form':form})
+    return render(request, 'feedback.html', {'form':form})
 
 
 @login_required

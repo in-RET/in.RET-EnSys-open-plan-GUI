@@ -15,11 +15,11 @@ import traceback
 logger = logging.getLogger(__name__)
 
 # email account which will send the feedback emails
-EXCHANGE_ACCOUNT = os.getenv("EXCHANGE_ACCOUNT", "dummy@dummy.com")
-EXCHANGE_PW = os.getenv("EXCHANGE_PW", "dummy_pwd")
-EXCHANGE_EMAIL = os.getenv("EXCHANGE_EMAIL", "dummy@dummy.com")
+EXCHANGE_ACCOUNT = os.getenv("EXCHANGE_ACCOUNT")
+EXCHANGE_PW = os.getenv("EXCHANGE_PW")
+EXCHANGE_EMAIL = os.getenv("EXCHANGE_EMAIL")
 # email addresses to which the feedback emails will be sent
-RECIPIENTS = os.getenv("RECIPIENTS", "dummy@dummy.com,dummy2@dummy.com").split(",")
+RECIPIENTS = os.getenv("RECIPIENTS").split(",")
 
 
 r"""Functions meant to be powered by Django-Q.
@@ -76,6 +76,27 @@ def create_or_delete_simulation_scheduler(**kwargs):
             return False
 
 
+def send_feedback_email(subject, body):
+    tz = EWSTimeZone('Europe/Copenhagen')
+    try:
+        credentials = Credentials(EXCHANGE_ACCOUNT, EXCHANGE_PW)
+        account = Account(
+            EXCHANGE_EMAIL, credentials=credentials, autodiscover=True, default_timezone=tz
+        )
+        recipients = [
+            Mailbox(email_address=recipient) for recipient in RECIPIENTS
+        ]
+        mail = Message(
+            account=account,
+            folder=account.sent,
+            subject=subject,
+            body=body,
+            to_recipients=recipients,
+        )
+        mail.send_and_save()
+    except Exception as ex:
+        logger.warning(f"Couldn't send feedback email. Exception raised: {ex}.")
+        raise ex
 
 def send_feedback_email(subject, body):
     tz = EWSTimeZone("Europe/Copenhagen")

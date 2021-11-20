@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-19 16:06+0000\n"
+"POT-Creation-Date: 2021-11-20 14:05+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -28,47 +28,47 @@ msgstr ""
 " einen Fehler in der Simulation. Bitte klicken Sie auf 'Simulation ausführen', "
 "'Ergebnisse aktualisieren' oder 'Status prüfen' "
 
-#: op_templates/asset/asset_create_form.html:16
+#: op_templates/asset/asset_create_form.html:27
 msgid "uploaded data"
 msgstr "hochgeladene Daten"
 
-#: op_templates/asset/storage_asset_create_form.html:14
+#: op_templates/asset/storage_asset_create_form.html:15
 msgid "Charging Power"
 msgstr "Ladeleistung"
 
-#: op_templates/asset/storage_asset_create_form.html:30
+#: op_templates/asset/storage_asset_create_form.html:31
 msgid "Discharging Power"
 msgstr "Entladeleistung"
 
-#: op_templates/asset/storage_asset_create_form.html:46
+#: op_templates/asset/storage_asset_create_form.html:47
 msgid "Capacity"
 msgstr "Kapazität"
 
-#: op_templates/base.html:68 op_templates/navbar.html:48
-#: op_templates/navbar.html:117
+#: op_templates/base.html:73 op_templates/navbar.html:47
+#: op_templates/navbar.html:116
 msgid "Contact"
 msgstr "Kontakt"
 
-#: op_templates/base.html:69 op_templates/navbar.html:41
-#: op_templates/navbar.html:51
+#: op_templates/base.html:74 op_templates/navbar.html:40
+#: op_templates/navbar.html:50
 msgid "Documentation"
 msgstr "Dokumentation"
 
-#: op_templates/base.html:70 op_templates/navbar.html:54
-#: op_templates/navbar.html:115
+#: op_templates/base.html:75 op_templates/navbar.html:53
+#: op_templates/navbar.html:114
 msgid "Use cases"
 msgstr "Anwendungsbeispiele"
 
-#: op_templates/base.html:71 op_templates/navbar.html:57
-#: op_templates/navbar.html:116
+#: op_templates/base.html:76 op_templates/navbar.html:56
+#: op_templates/navbar.html:115
 msgid "License"
 msgstr "Lizenz"
 
-#: op_templates/base.html:72
+#: op_templates/base.html:77 op_templates/legal/imprint.html:12
 msgid "Imprint"
 msgstr "Impressum"
 
-#: op_templates/base.html:73
+#: op_templates/base.html:78
 msgid "Privacy"
 msgstr "Datenschutz"
 
@@ -126,50 +126,52 @@ msgid "Export scenario"
 msgstr "Szenario exportieren"
 
 #: op_templates/navbar.html:30
+
+#: op_templates/navbar.html:29
 #: op_templates/scenario/scenario_results_page.html:18
 msgid "Simulation results"
 msgstr "Simulationsergebnisse"
 
-#: op_templates/navbar.html:34 op_templates/project/project_search.html:165
+#: op_templates/navbar.html:33 op_templates/project/project_search.html:165
 msgid "New scenario"
 msgstr "Neues Szenario"
 
-#: op_templates/navbar.html:38 op_templates/project/project_create.html:25
+#: op_templates/navbar.html:37 op_templates/project/project_create.html:25
 #: op_templates/project/project_update.html:26
 #: op_templates/scenario/scenario_results_page.html:20
 msgid "My projects"
 msgstr "Meine Projekte"
 
-#: op_templates/navbar.html:101
+#: op_templates/navbar.html:100
 msgid "User Info"
 msgstr "Benutzerinfo"
 
-#: op_templates/navbar.html:102
+#: op_templates/navbar.html:101
 msgid "Change Password"
 msgstr "Passwort ändern"
 
-#: op_templates/navbar.html:107
+#: op_templates/navbar.html:106
 msgid "Project List"
 msgstr "Projektliste"
 
-#: op_templates/navbar.html:118
+#: op_templates/navbar.html:117
 msgid "Feedback"
 msgstr "Rückmeldung"
 
-#: op_templates/navbar.html:119
+#: op_templates/navbar.html:118
 msgid "Account"
 msgstr "Konto"
 
-#: op_templates/navbar.html:121
+#: op_templates/navbar.html:120
 msgid "Log out"
 msgstr "Abmelden"
 
-#: op_templates/navbar.html:129 op_templates/registration/signup.html:24
+#: op_templates/navbar.html:128 op_templates/registration/signup.html:25
 msgid "Log in"
 msgstr "Anmelden"
 
-#: op_templates/navbar.html:133 op_templates/registration/login.html:21
-#: op_templates/registration/signup.html:43
+#: op_templates/navbar.html:132 op_templates/registration/login.html:21
+#: op_templates/registration/signup.html:44
 msgid "Sign up"
 msgstr "Registrieren"
 
@@ -294,17 +296,17 @@ msgid "Log In"
 msgstr "Anmelden"
 
 #: op_templates/registration/login.html:18
-#: op_templates/registration/signup.html:21
+#: op_templates/registration/signup.html:22
 msgid "Welcome to the open_plan tool"
 msgstr "Willkommen im open_plan-Tool"
 
 #: op_templates/registration/login.html:27
-#: op_templates/registration/signup.html:30
+#: op_templates/registration/signup.html:31
 msgid "Email address"
 msgstr "E-Mail Adresse"
 
 #: op_templates/registration/login.html:31
-#: op_templates/registration/signup.html:34
+#: op_templates/registration/signup.html:35
 msgid "Password"
 msgstr "Passwort"
 
@@ -312,7 +314,7 @@ msgstr "Passwort"
 msgid "Login"
 msgstr "Anmeldung"
 
-#: op_templates/registration/signup.html:24
+#: op_templates/registration/signup.html:25
 msgid "Do you already have an account?"
 msgstr "Besitzen Sie bereits ein Konto?"
 
@@ -329,21 +331,21 @@ msgstr ""
 msgid "Scenario step"
 msgstr "Schritt des Szenarios"
 
-#: op_templates/scenario/scenario_progression.html:46
-#: op_templates/scenario/scenario_step2.html:226
+#: op_templates/scenario/scenario_progression.html:50
+#: op_templates/scenario/scenario_step2.html:260
 #: op_templates/scenario/scenario_step3.html:73
 #: op_templates/scenario/scenario_step4.html:50
 msgid "Previous"
 msgstr "Vorherige"
 
-#: op_templates/scenario/scenario_progression.html:49
+#: op_templates/scenario/scenario_progression.html:53
 #: op_templates/scenario/scenario_step1.html:66
-#: op_templates/scenario/scenario_step2.html:230
+#: op_templates/scenario/scenario_step2.html:264
 #: op_templates/scenario/scenario_step3.html:74
 msgid "Next"
 msgstr "Weiter"
 
-#: op_templates/scenario/scenario_results_page.html:28 projects/forms.py:228
+#: op_templates/scenario/scenario_results_page.html:28 projects/forms.py:224
 msgid "Project"
 msgstr "Projekt"
 
@@ -351,28 +353,27 @@ msgstr "Projekt"
 msgid "Export results"
 msgstr "Ergebnisse exportieren"
 
-#: op_templates/scenario/scenario_step2.html:34
+#: op_templates/scenario/scenario_step2.html:67
 msgid "Energy components"
 msgstr "Energiekomponenten"
 
-#: op_templates/scenario/scenario_step2.html:64
+#: op_templates/scenario/scenario_step2.html:97
 msgid "Load system design from existing scenario"
 msgstr "Systemauslegung aus bestehendem Szenario laden"
 
-#: op_templates/scenario/scenario_step2.html:69
+#: op_templates/scenario/scenario_step2.html:102
 msgid "Clear design"
 msgstr "Entwurf löschen"
 
-#: op_templates/scenario/scenario_step2.html:72
+#: op_templates/scenario/scenario_step2.html:105
 msgid "Drag and drop components to build your energy system"
 msgstr "Ziehen und Ablegen von Komponenten zum Aufbau Ihres Energiesystems"
 
-#: op_templates/scenario/scenario_step2.html:228
+#: op_templates/scenario/scenario_step2.html:262
 msgid "Save"
 msgstr "Speichern"
 
 #: op_templates/scenario/scenario_step4.html:51
-
 msgid "Proof parameters JSON file"
 msgstr "Prüfe Parameter JSON Datei "
 
@@ -392,65 +393,65 @@ msgstr "Status prüfen"
 msgid "Run simulation"
 msgstr "Simulation ausführen"
 
-#: projects/forms.py:146
+#: projects/forms.py:141
 msgid "eg. 0.1"
 msgstr "z. B. 0.1"
 
-#: projects/forms.py:147
+#: projects/forms.py:142
 msgid "Investment Discount factor."
 msgstr "Investitionsabzinsungsfaktor."
 
-#: projects/forms.py:159
+#: projects/forms.py:154
 msgid "Project Name"
 msgstr "Projektname"
 
-#: projects/forms.py:159
+#: projects/forms.py:154
 msgid "A self explanatory name for the project."
 msgstr "Ein selbsterklärender Name für das Projekt."
 
-#: projects/forms.py:160
+#: projects/forms.py:155
 msgid "Project Description"
 msgstr "Projektbeschreibung"
 
-#: projects/forms.py:161
+#: projects/forms.py:156
 msgid "A description of what this project objectives or test cases."
 msgstr "Eine Beschreibung der Ziele oder Testfälle dieses Projekts."
 
-#: projects/forms.py:162
+#: projects/forms.py:157
 msgid "Country"
 msgstr "Land"
 
-#: projects/forms.py:163
+#: projects/forms.py:158
 msgid "Name of the country where the project is being deployed"
 msgstr "Name des Landes, in dem das Projekt eingesetzt werden soll"
 
 #: projects/forms.py:164
 msgid "Location's longitude"
 msgstr "Standort, Längengrad"
-
+#: projects/forms.py:159
 msgid "Location, longitude"
 msgstr "Standort, Längengrad"
 
-#: projects/forms.py:166
+#: projects/forms.py:161
 msgid "Longitude coordinate of the project's geographical location."
 msgstr "Längengradkoordinate des geografischen Standorts des Projekts."
 
 #: projects/forms.py:167
 msgid "Location's latitude"
 msgstr "Standort Breitengrad"
-
+#: projects/forms.py:162
 msgid "Location, latitude"
 msgstr "Standort Breitengrad"
 
-#: projects/forms.py:169
+#: projects/forms.py:164
 msgid "Latitude coordinate of the project's geographical location."
 msgstr "Breitengrad-Koordinate des geografischen Standorts des Projekts."
 
-#: projects/forms.py:170
+#: projects/forms.py:165
 msgid "Project Duration"
 msgstr "Projektdauer"
 
-#: projects/forms.py:172
+#: projects/forms.py:167
 msgid ""
 "The number of years the project is intended to be operational. The project "
 "duration also sets the installation time of the assets used in the "
@@ -463,11 +464,11 @@ msgstr ""
 "'verkauft' und die Rückerstattung wird mit den ursprünglichen "
 "Investitionskosten verrechnet."
 
-#: projects/forms.py:173
+#: projects/forms.py:168
 msgid "Currency"
 msgstr "Währung"
 
-#: projects/forms.py:174
+#: projects/forms.py:169
 msgid "The currency of the country where the project is implemented."
 msgstr "Die Währung des Landes, in dem das Projekt durchgeführt wird."
 
@@ -475,7 +476,7 @@ msgstr "Die Währung des Landes, in dem das Projekt durchgeführt wird."
 msgid "Discount factor"
 msgstr "Abzinsungsfaktor"
 
-#: projects/forms.py:177
+#: projects/forms.py:172
 msgid ""
 "Discount factor is the factor which accounts for the depreciation in the "
 "value of money in the future, compared to the current value of the same "
@@ -488,15 +489,15 @@ msgstr ""
 "durchschnittlichen Kapitalkosten (WACC) und diese als Abzinsungsfaktor zu "
 "verwenden."
 
-#: projects/forms.py:178
+#: projects/forms.py:173
 msgid "Tax"
 msgstr "Steuer"
 
-#: projects/forms.py:180
+#: projects/forms.py:175
 msgid "Tax factor"
 msgstr "Steuerfaktor"
 
-#: projects/forms.py:214
+#: projects/forms.py:210
 msgid "Length of the time-steps."
 msgstr "Länge der Zeitschritte."
 
@@ -504,7 +505,7 @@ msgstr "Länge der Zeitschritte."
 msgid "The number of days for which the simulation is to be run."
 msgstr "Die Anzahl der Tage, für die die Simulation ausgeführt werden soll."
 
-#: projects/forms.py:218
+#: projects/forms.py:214
 msgid ""
 "A fixed cost to implement the asset, eg. planning costs which do not depend "
 "on the (optimized) asset capacity."
@@ -512,86 +513,86 @@ msgstr ""
 "Fixe Kosten für die Implementierung der Anlage, z.B. Planungskosten, die "
 "nicht von der (optimierten) Anlagenkapazität abhängen."
 
-#: projects/forms.py:220 projects/forms.py:485 projects/forms.py:565
-#: projects/forms.py:646
+#: projects/forms.py:216 projects/forms.py:539 projects/forms.py:619
+#: projects/forms.py:700
 msgid " Actual CAPEX of the asset, i.e., specific investment costs"
 msgstr " Tatsächliche CAPEX der Anlage, d.h. spezifische Investitionskosten"
 
-#: projects/forms.py:222 projects/forms.py:377 projects/forms.py:493
-#: projects/forms.py:573 projects/forms.py:654
+#: projects/forms.py:218 projects/forms.py:431 projects/forms.py:547
+#: projects/forms.py:627 projects/forms.py:708
 msgid ""
 "Actual OPEX of the asset, i.e., specific operational and maintenance costs."
 msgstr ""
 "Tatsächliche OPEX der Anlage, d.h. spezifische Betriebs- und Wartungskosten."
 
-#: projects/forms.py:224 projects/forms.py:380 projects/forms.py:501
-#: projects/forms.py:581 projects/forms.py:662
+#: projects/forms.py:220 projects/forms.py:434 projects/forms.py:555
+#: projects/forms.py:635 projects/forms.py:716
 msgid "Variable cost associated with a flow through/from the asset."
 msgstr ""
 "Variable Kosten, die mit einem Durchfluss durch/von der Anlage verbunden "
 "sind."
 
-#: projects/forms.py:229
+#: projects/forms.py:225
 msgid "Scenario name"
 msgstr "Name des Szenarios"
 
-#: projects/forms.py:230
+#: projects/forms.py:226
 msgid "Evaluated Period"
 msgstr "Ausgewerteter Zeitraum"
 
-#: projects/forms.py:231
+#: projects/forms.py:227
 msgid "Time Step"
 msgstr "Zeitschritt"
 
-#: projects/forms.py:232
+#: projects/forms.py:228
 msgid "Start Date"
 msgstr "Startdatum"
 
-#: projects/forms.py:233 projects/forms.py:431 projects/forms.py:474
-#: projects/forms.py:554 projects/forms.py:635
+#: projects/forms.py:229 projects/forms.py:485 projects/forms.py:528
+#: projects/forms.py:608 projects/forms.py:689
 msgid "Development costs"
 msgstr "Entwicklungskosten"
 
-#: projects/forms.py:234 projects/forms.py:432 projects/forms.py:482
-#: projects/forms.py:562 projects/forms.py:643
+#: projects/forms.py:230 projects/forms.py:486 projects/forms.py:536
+#: projects/forms.py:616 projects/forms.py:697
 msgid "Specific costs"
 msgstr "Spezifische Kosten"
 
-#: projects/forms.py:235 projects/forms.py:433 projects/forms.py:490
-#: projects/forms.py:570 projects/forms.py:651
+#: projects/forms.py:231 projects/forms.py:487 projects/forms.py:544
+#: projects/forms.py:624 projects/forms.py:705
 msgid "Specific OM costs"
 msgstr "Spezifische OM-Kosten"
 
-#: projects/forms.py:236 projects/forms.py:434 projects/forms.py:498
-#: projects/forms.py:578 projects/forms.py:659
+#: projects/forms.py:232 projects/forms.py:488 projects/forms.py:552
+#: projects/forms.py:632 projects/forms.py:713
 msgid "Dispatch price"
 msgstr "Dispatch-Preis"
 
-#: projects/forms.py:322
+#: projects/forms.py:317
 msgid "The energy Vector of the connected assets."
 msgstr "Der Energievektor der angeschlossenen Anlagen."
 
-#: projects/forms.py:326 projects/forms.py:427
+#: projects/forms.py:321 projects/forms.py:481
 msgid "Name"
 msgstr "Name"
 
-#: projects/forms.py:327
+#: projects/forms.py:322
 msgid "Energy carrier"
 msgstr "Energieträger"
 
 #: projects/forms.py:353
 msgid ""
 "File not properly formatted. Please ensure you upload a comma seperated "
-"array of values, e.g. [1,2,0.32]"
+"array of values. E.g. [1,2,0.32]"
 msgstr ""
 "Datei nicht korrekt formatiert. Bitte stellen Sie sicher, dass Sie ein "
 "kommagetrenntes Array von Werten hochladen, z. B. [1,2,0.32]"
 
-#: projects/forms.py:355
+#: projects/forms.py:409
 msgid "Could not parse a file. Did you upload one?"
 msgstr "Konnte keine Datei einlesen. Haben Sie eine hochgeladen?"
 
-#: projects/forms.py:362 projects/forms.py:698
+#: projects/forms.py:416 projects/forms.py:752
 msgid ""
 "True if the user wants to perform capacity optimization for various "
 "components as part of the simulation."
@@ -599,12 +600,12 @@ msgstr ""
 "Wahr, wenn der Benutzer eine Kapazitätsoptimierung für verschiedene "
 "Komponenten als Teil der Simulation durchführen möchte."
 
-#: projects/forms.py:366
+#: projects/forms.py:420
 msgid "Indicate if the asset is renewable or not."
 msgstr "Geben Sie an, ob die Anlage erneuerbar ist oder nicht."
 
-#: projects/forms.py:371 projects/forms.py:477 projects/forms.py:557
-#: projects/forms.py:638
+#: projects/forms.py:425 projects/forms.py:531 projects/forms.py:611
+#: projects/forms.py:692
 msgid ""
 " A fixed cost to implement the asset, eg. planning costs which do not depend "
 "on the (optimized) asset capacity."
@@ -612,17 +613,17 @@ msgstr ""
 " Fixe Kosten für die Implementierung der Anlage, z.B. Planungskosten, die "
 "nicht von der (optimierten) Anlagenkapazität abhängen."
 
-#: projects/forms.py:374
+#: projects/forms.py:428
 msgid " Actual CAPEX of the asset, i.e., specific investment costs."
 msgstr " Tatsächliche CAPEX der Anlage, d.h. spezifische Investitionskosten."
 
-#: projects/forms.py:383 projects/forms.py:509 projects/forms.py:589
-#: projects/forms.py:670
+#: projects/forms.py:437 projects/forms.py:563 projects/forms.py:643
+#: projects/forms.py:724
 msgid "Number of operational years of the asset until it has to be replaced."
 msgstr "Anzahl der Betriebsjahre des Assets, bis es ersetzt werden muss."
 
-#: projects/forms.py:390 projects/forms.py:517 projects/forms.py:597
-#: projects/forms.py:678
+#: projects/forms.py:444 projects/forms.py:571 projects/forms.py:651
+#: projects/forms.py:732
 msgid ""
 "C-rate is the rate at which the storage can charge or discharge relative to "
 "the nominal capacity of the storage. A c-rate of 1 implies that the battery "
@@ -633,12 +634,12 @@ msgstr ""
 "von 1 bedeutet, dass die Batteriein einem einzigen Zeitschritt vollständig "
 "entladen oder geladen werden kann."
 
-#: projects/forms.py:393 projects/forms.py:524 projects/forms.py:604
-#: projects/forms.py:685
+#: projects/forms.py:447 projects/forms.py:578 projects/forms.py:658
+#: projects/forms.py:739
 msgid "Ratio of energy output/energy input."
 msgstr "Verhältnis von Energieoutput/Energieeinsatz."
 
-#: projects/forms.py:396 projects/forms.py:704
+#: projects/forms.py:450 projects/forms.py:758
 msgid ""
 "The maximum permissible level of charge in the battery (generally, it is "
 "when the battery is filled to its nominal capacity), represented by the "
@@ -650,7 +651,7 @@ msgstr ""
 "1.0. Benutzer können auch einen bestimmten Wert als Faktor der "
 "tatsächlichenKapazität angeben."
 
-#: projects/forms.py:399 projects/forms.py:711
+#: projects/forms.py:453 projects/forms.py:765
 msgid ""
 "The minimum permissible level of charge in the battery as a factor of the "
 "nominal capacity of the battery."
@@ -658,19 +659,19 @@ msgstr ""
 "Der minimal zulässige Ladezustand der Batterie als Faktor der Nennkapazität "
 "der Batterie."
 
-#: projects/forms.py:402
+#: projects/forms.py:456
 msgid "The maximum installable capacity."
 msgstr "Die maximal installierbare Kapazität."
 
-#: projects/forms.py:405
+#: projects/forms.py:459
 msgid "Price of electricity sourced from the utility grid."
 msgstr "Preis für Strom aus dem Versorgungsnetz."
 
-#: projects/forms.py:408
+#: projects/forms.py:462
 msgid "Price received for feeding electricity into the grid."
 msgstr "Preis für die Einspeisung von Strom in das Stromnetz."
 
-#: projects/forms.py:411
+#: projects/forms.py:465
 msgid ""
 "Price to be paid additionally for energy-consumption based on the peak "
 "demand of a period."
@@ -678,7 +679,7 @@ msgstr ""
 "Zusätzlich zu zahlender Preis für den Energieverbrauch basierend auf "
 "demSpitzenbedarf einer Periode."
 
-#: projects/forms.py:414
+#: projects/forms.py:468
 msgid ""
 "Number of reference periods in one year for the peak demand pricing. Only "
 "one of the following are acceptable values: 1 (yearly), 2, 3 ,4, 6, 12 "
@@ -695,9 +696,8 @@ msgid ""
 msgstr ""
 "Der Anteil der erneuerbaren Energien am Erzeugungsmix der vom "
 "DSO (Versorgungsunternehmen) gelieferten Energie."
-
-#: projects/forms.py:420 projects/forms.py:461 projects/forms.py:541
-#: projects/forms.py:622
+#: projects/forms.py:474 projects/forms.py:515 projects/forms.py:595
+#: projects/forms.py:676
 msgid ""
 "The already existing installed capacity in-place, which will also be "
 "replaced after its lifetime."
@@ -705,30 +705,30 @@ msgstr ""
 "Die bereits installierte Kapazität vor Ort, die auch nach ihrer Lebensdauer "
 "ersetzt wird."
 
-#: projects/forms.py:423 projects/forms.py:469 projects/forms.py:549
-#: projects/forms.py:630
+#: projects/forms.py:477 projects/forms.py:523 projects/forms.py:603
+#: projects/forms.py:684
 msgid "The number of years the asset has already been in operation."
 msgstr "Die Anzahl der Jahre, die die Anlage bereits in Betrieb ist."
 
-#: projects/forms.py:428 projects/forms.py:695
+#: projects/forms.py:482 projects/forms.py:749
 msgid "Optimize cap"
 msgstr "Kapazität optimieren"
 
-#: projects/forms.py:429 projects/forms.py:528 projects/forms.py:608
-#: projects/forms.py:689
+#: projects/forms.py:483 projects/forms.py:582 projects/forms.py:662
+#: projects/forms.py:743
 msgid "Dispatchable"
 msgstr "Versendbar"
 
-#: projects/forms.py:430
+#: projects/forms.py:484
 msgid "Renewable asset"
 msgstr "Erneuerbare Anlage"
 
-#: projects/forms.py:435 projects/forms.py:506 projects/forms.py:586
-#: projects/forms.py:667
+#: projects/forms.py:489 projects/forms.py:560 projects/forms.py:640
+#: projects/forms.py:721
 msgid "Asset Lifetime"
 msgstr "Anlagenlebensdauer"
 
-#: projects/forms.py:436
+#: projects/forms.py:490
 msgid "Timeseries vector"
 msgstr "Zeitreihenvektor"
 
@@ -737,207 +737,207 @@ msgstr "Zeitreihenvektor"
 msgid "C-Rate"
 msgstr "Ladegeschwindigkeit"
 
-#: projects/forms.py:437 projects/forms.py:514 projects/forms.py:594
-#: projects/forms.py:675
+#: projects/forms.py:491 projects/forms.py:568 projects/forms.py:648
+#: projects/forms.py:729
 msgid "Crate"
 msgstr "Ladegeschwindigkeit"
 
-#: projects/forms.py:438 projects/forms.py:521 projects/forms.py:601
-#: projects/forms.py:682
+#: projects/forms.py:492 projects/forms.py:575 projects/forms.py:655
+#: projects/forms.py:736
 msgid "Efficiency"
 msgstr "Wirkungsgrad"
 
-#: projects/forms.py:439 projects/forms.py:701
+#: projects/forms.py:493 projects/forms.py:755
 msgid "SoC max"
 msgstr "SoC max"
 
-#: projects/forms.py:440 projects/forms.py:708
+#: projects/forms.py:494 projects/forms.py:762
 msgid "SoC min"
 msgstr "SoC min"
 
-#: projects/forms.py:441
+#: projects/forms.py:495
 msgid "Maximum capacity"
 msgstr "Maximale Kapazität"
 
-#: projects/forms.py:442
+#: projects/forms.py:496
 msgid "Energy price"
 msgstr "Energiepreis"
 
-#: projects/forms.py:443
+#: projects/forms.py:497
 msgid "Feedin tariff"
 msgstr "Einspeisetarif"
 
-#: projects/forms.py:444
+#: projects/forms.py:498
 msgid "Peak demand pricing"
 msgstr "Spitzenlasttarif"
 
-#: projects/forms.py:445
+#: projects/forms.py:499
 msgid "Peak demand pricing period (times/year)"
 msgstr "Zeitraum der Spitzenlastbepreisung (Zeiten/Jahr)"
 
-#: projects/forms.py:446
+#: projects/forms.py:500
 msgid "Renewable share"
 msgstr "Erneuerbarer Anteil"
 
-#: projects/forms.py:447 projects/forms.py:458 projects/forms.py:538
-#: projects/forms.py:619
+#: projects/forms.py:501 projects/forms.py:512 projects/forms.py:592
+#: projects/forms.py:673
 msgid "installed capacity (kW)"
 msgstr "installierte Leistung (kW)"
 
-#: projects/forms.py:448 projects/forms.py:466 projects/forms.py:546
-#: projects/forms.py:627
+#: projects/forms.py:502 projects/forms.py:520 projects/forms.py:600
+#: projects/forms.py:681
 msgid "Age installed"
 msgstr "Alter der Anlage"
 
-#: projects/forms.py:454
+#: projects/forms.py:508
 msgid "ESS Name"
 msgstr "ESS Name"
 
-#: projects/forms.py:454
+#: projects/forms.py:508
 msgid "A mnemonic name for the ESS unit."
 msgstr "Ein mnemonischer Name für die ESS Einheit."
 
-#: projects/views.py:346
+#: projects/views.py:342
 msgid "Scenario Setup"
 msgstr "Szenario-Einstellung"
 
-#: projects/views.py:347
+#: projects/views.py:343
 msgid "Energy system design"
 msgstr "Auslegung des Energiesystems"
 
-#: projects/views.py:348
+#: projects/views.py:344
 msgid "Constraints"
 msgstr "Randbedingungen"
 
-#: projects/views.py:349
+#: projects/views.py:345
 msgid "Simulation"
 msgstr "Simulation"
 
-#: projects/views.py:414
+#: projects/views.py:410
 msgid "Electricity DSO"
 msgstr "Elektrizitätsversorger"
 
-#: projects/views.py:415
+#: projects/views.py:411
 msgid "Gas DSO"
 msgstr "Gasversorger"
 
-#: projects/views.py:416
+#: projects/views.py:412
 msgid "H2 DSO"
 msgstr "H2-Versorger"
 
-#: projects/views.py:417
+#: projects/views.py:413
 msgid "Heat DSO"
 msgstr "Wärmeversorger"
 
-#: projects/views.py:420
+#: projects/views.py:416
 msgid "PV Plant"
 msgstr "PV-Anlage"
 
-#: projects/views.py:421
+#: projects/views.py:417
 msgid "Wind Plant"
 msgstr "Windkraftanlage"
 
-#: projects/views.py:422
+#: projects/views.py:418
 msgid "Biogas Plant"
 msgstr "Biogasanlage"
 
-#: projects/views.py:423
+#: projects/views.py:419
 msgid "Geothermal Conversion"
 msgstr "Geothermische Umwandlung"
 
-#: projects/views.py:424
+#: projects/views.py:420
 msgid "Solar Thermal Plant"
 msgstr "Thermische Solaranlage"
 
-#: projects/views.py:427
+#: projects/views.py:423
 msgid "Transformer Station (in)"
 msgstr "Trafostation (in)"
 
-#: projects/views.py:428
+#: projects/views.py:424
 msgid "Transformer Station (out)"
 msgstr "Trafostation (aus)"
 
-#: projects/views.py:429
+#: projects/views.py:425
 msgid "Storage Charge Controller (in)"
 msgstr "Speicherladeregler (in)"
 
-#: projects/views.py:430
+#: projects/views.py:426
 msgid "Storage Charge Controller (out)"
 msgstr "Speicherladeregler (out)"
 
-#: projects/views.py:431
+#: projects/views.py:427
 msgid "Solar Inverter"
 msgstr "Solar-Wechselrichter"
 
-#: projects/views.py:432
+#: projects/views.py:428
 msgid "Diesel Generator"
 msgstr "Diesel-Generator"
 
-#: projects/views.py:433
+#: projects/views.py:429
 msgid " Fuel Cell"
 msgstr " Brennstoffzelle"
 
-#: projects/views.py:434
+#: projects/views.py:430
 msgid "Gas Boiler"
 msgstr "Gasboiler"
 
-#: projects/views.py:435
+#: projects/views.py:431
 msgid "Electrolyzer"
 msgstr "Elektrolyseur"
 
-#: projects/views.py:436
+#: projects/views.py:432
 msgid "Heat Pump"
 msgstr "Wärmepumpe"
 
-#: projects/views.py:439
+#: projects/views.py:435
 msgid "Electricity Storage"
 msgstr "Elektrizitätsspeicher"
 
-#: projects/views.py:440
+#: projects/views.py:436
 msgid "Gas Storage"
 msgstr "Gasspeicher"
 
-#: projects/views.py:441
+#: projects/views.py:437
 msgid "H2 Storage"
 msgstr "Wasserstoffspeicher"
 
-#: projects/views.py:442
+#: projects/views.py:438
 msgid "Heat Storage"
 msgstr "Wärmespeicher"
 
-#: projects/views.py:445
+#: projects/views.py:441
 msgid "Electricity Demand"
 msgstr "Elektrizitätsnachfrage"
 
-#: projects/views.py:446
+#: projects/views.py:442
 msgid "Gas Demand"
 msgstr "Gasnachfrage"
 
-#: projects/views.py:447
+#: projects/views.py:443
 msgid "H2 Demand"
 msgstr "Wasserstoffbedarf"
 
-#: projects/views.py:448
+#: projects/views.py:444
 msgid "Heat Demand"
 msgstr "Wärmebedarf"
 
-#: projects/views.py:450
+#: projects/views.py:446
 msgid "Bus"
 msgstr "Bus"
 
-#: projects/views.py:508
+#: projects/views.py:505
 msgid "Minimal degree of autonomy"
 msgstr "Kleinster Autarkiegrad"
 
-#: projects/views.py:509
+#: projects/views.py:506
 msgid "Minimal share of renewables"
 msgstr "Kleinster Anteil Erneuerbarer Energien"
 
-#: projects/views.py:510
+#: projects/views.py:507
 msgid "Maximal CO2 emissions"
 msgstr "Maximale CO2-Emissionen"
 
-#: projects/views.py:511
+#: projects/views.py:508
 msgid "Net zero energy system"
 msgstr "Netto-Nullenergie-System"
 

@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load crispy_forms_tags %}
+{% load i18n %}
 
 {% block head_block %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha512-6MXa8B6uaO18Hid6blRMetEIoPqHf7Ux1tnyIQdpt9qI5OACx7C+O3IVTr98vwGnlcg0LOLa02i9Y1HpVhlfiw==" crossorigin="anonymous" referrerpolicy="no-referrer">-->
@@ -22,11 +23,11 @@
 
 <div class="row">
     <div class="panel panel-info">
-        <h2 class="panel-heading" style="text-align: center;">Economic Data Summary</h2>
+        <h2 class="panel-heading" style="text-align: center;">{% translate "Economic Data Summary" %}</h2>
         <hr class="mt-2">
         <div class="panel-body t1" id="economicDataDiv"></div>
         <br>
-        <a type="button" class="btn btn-info" href="{% url 'download_cost_results' scen_id %}">Download Cost Results</a>
+        <a type="button" class="btn btn-info" href="{% url 'download_cost_results' scen_id %}">{% translate "Download Cost Results" %}</a>
     </div>
 </div>
 
@@ -34,15 +35,15 @@
 <div class="row panel panel-info" style="font-size: 80%;">
     <br>
 
-    <h2 class="panel-heading" style="text-align: center;">Economic and Technical Analysis</h2>
+    <h2 class="panel-heading" style="text-align: center;">{% translate "Economic and Technical Analysis" %}</h2>
     <br><br>
     <table id="scalarTable" class="table table-striped panel-body">
         <thead>
             <tr>
                 <th style="width: 10%; "></th>
-                <th style="width: 35%; font-size: 17px; ">KPI</th>
-                <th style="width: 20%; font-size: 17px;">Value</th>
-                <th style="width: 30%; font-size: 17px;">Unit</th>
+                <th style="width: 35%; font-size: 17px; ">{% translate "KPI" %}</th>
+                <th style="width: 20%; font-size: 17px;">{% translate "Value" %}</th>
+                <th style="width: 30%; font-size: 17px;">{% translate "Unit" %}</th>
             </tr>
         </thead>
         <tbody>
@@ -57,25 +58,25 @@
         </tbody>
     </table>
     <br>
-    <a type="button" class="btn btn-info" href="{% url 'download_scalar_results' scen_id %}">Download Scalar Results</a>
+    <a type="button" class="btn btn-info" href="{% url 'download_scalar_results' scen_id %}">{% translate "Download Scalar Results" %}</a>
 </div>
 
 
 <!-- TimeSeries -->
 <div class="row panel panel-info">
     <br>
-    <h2 class="panel-heading" style="text-align: center;">Time Series Analysis</h2>
+    <h2 class="panel-heading" style="text-align: center;">{% translate "Time Series Analysis" %}</h2>
     <br><br>
     <ul class="nav nav-tabs nav-justified">
-        <li class="nav-item active"><a data-bs-toggle="tab" href="#electricity" class="tabb">Electricity</a></li>
-        <li class="nav-item"><a data-bs-toggle="tab" href="#heat" class="tabb">Heat</a></li>
-        <li class="nav-item"><a data-bs-toggle="tab" href="#gas" class="tabb">Gas</a></li>
+        <li class="nav-item active"><a data-bs-toggle="tab" href="#electricity" class="tabb">{% translate "Electricity" %}</a></li>
+        <li class="nav-item"><a data-bs-toggle="tab" href="#heat" class="tabb">{% translate "Heat" %}</a></li>
+        <li class="nav-item"><a data-bs-toggle="tab" href="#gas" class="tabb">{% translate "Gas" %}</a></li>
     </ul>
 
     <div class="tab-content">
         <div id="electricity" class="tab-pane fade in active">
             <div class="panel-body">
-                <label for="select-diagrams-electricity" style="padding: 0 10px;">Select Electricity assets:</label>
+                <label for="select-diagrams-electricity" style="padding: 0 10px;">{% translate "Select Electricity assets:" %}</label>
                 <input type="text" id="select-diagrams-electricity" class="select-diagrams"
                     onchange="reloadDiagrams(this.value, 'ElectricityGraphDiv')" />
             </div>
@@ -83,7 +84,7 @@
         </div>
         <div id="heat" class="tab-pane fade">
             <div class="panel-body">
-                <label for="select-diagrams-heat" style="padding: 0 10px;">Select Heat assets:</label>
+                <label for="select-diagrams-heat" style="padding: 0 10px;">{% translate "Select Heat assets:" %}</label>
                 <input type="text" id="select-diagrams-heat" class="select-diagrams"
                     onchange="reloadDiagrams(this.value, 'HeatGraphDiv')" />
             </div>
@@ -91,7 +92,7 @@
         </div>
         <div id="gas" class="tab-pane fade">
             <div class="panel-body">
-                <label for="select-diagrams-gas" style="padding: 0 10px;">Select Gas assets:</label>
+                <label for="select-diagrams-gas" style="padding: 0 10px;">{% translate "Select Gas assets:" %}</label>
                 <input type="text" id="select-diagrams-gas" class="select-diagrams"
                     onchange="reloadDiagrams(this.value, 'GasGraphDiv')" />
             </div>
@@ -100,7 +101,7 @@
     </div>
 
     <br>
-    <a type="button" class="btn btn-info" href="{% url 'download_timeseries_results' scen_id %}">Download Timeseries</a>
+    <a type="button" class="btn btn-info" href="{% url 'download_timeseries_results' scen_id %}">{% translate "Download Timeseries" %}</a>
 
 </div>
 

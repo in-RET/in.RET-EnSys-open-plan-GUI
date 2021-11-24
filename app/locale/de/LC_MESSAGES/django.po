@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-20 14:05+0000\n"
+"POT-Creation-Date: 2021-11-24 09:21+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -44,31 +44,31 @@ msgstr "Entladeleistung"
 msgid "Capacity"
 msgstr "Kapazität"
 
-#: op_templates/base.html:73 op_templates/navbar.html:47
+#: op_templates/base.html:79 op_templates/navbar.html:47
 #: op_templates/navbar.html:116
 msgid "Contact"
 msgstr "Kontakt"
 
-#: op_templates/base.html:74 op_templates/navbar.html:40
+#: op_templates/base.html:80 op_templates/navbar.html:40
 #: op_templates/navbar.html:50
 msgid "Documentation"
 msgstr "Dokumentation"
 
-#: op_templates/base.html:75 op_templates/navbar.html:53
+#: op_templates/base.html:81 op_templates/navbar.html:53
 #: op_templates/navbar.html:114
 msgid "Use cases"
 msgstr "Anwendungsbeispiele"
 
-#: op_templates/base.html:76 op_templates/navbar.html:56
+#: op_templates/base.html:82 op_templates/navbar.html:56
 #: op_templates/navbar.html:115
 msgid "License"
 msgstr "Lizenz"
 
-#: op_templates/base.html:77 op_templates/legal/imprint.html:12
+#: op_templates/base.html:83 op_templates/legal/imprint.html:12
 msgid "Imprint"
 msgstr "Impressum"
 
-#: op_templates/base.html:78
+#: op_templates/base.html:84
 msgid "Privacy"
 msgstr "Datenschutz"
 
@@ -712,6 +712,7 @@ msgstr "Energieträger"
 msgid "Input timeseries file \"%(fname)s\" is empty"
 msgstr ""
 
+#: projects/forms.py:407
 msgid ""
 "File not properly formatted. Please ensure you upload a comma seperated "
 "array of values. E.g. [1,2,0.32]"

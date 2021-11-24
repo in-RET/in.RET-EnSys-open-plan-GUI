@@ -24,9 +24,9 @@ msgid ""
 "an error in the simulation. Please click on 'Run simulation', 'Update "
 "results' or 'Check status' button "
 msgstr ""
-"Ihr Szenario wurde nie simuliert, die Ergebnisse stehen noch aus oder es gibt "
-" einen Fehler in der Simulation. Bitte klicken Sie auf 'Simulation ausführen', "
-"'Ergebnisse aktualisieren' oder 'Status prüfen' "
+"Ihr Szenario wurde nie simuliert, die Ergebnisse stehen noch aus oder es "
+"gibt  einen Fehler in der Simulation. Bitte klicken Sie auf 'Simulation "
+"ausführen', 'Ergebnisse aktualisieren' oder 'Status prüfen' "
 
 #: op_templates/asset/asset_create_form.html:27
 msgid "uploaded data"
@@ -120,12 +120,138 @@ msgstr ""
 msgid "Try out"
 msgstr "Ausprobieren"
 
-#: op_templates/legal/imprint.html:8 op_templates/legal/privacy.html:8
-#: op_templates/scenario/export.html:8
-msgid "Export scenario"
-msgstr "Szenario exportieren"
+#: op_templates/legal/about.html:5 op_templates/legal/privacy.html:5
+msgid "Privacy - open_plan"
+msgstr ""
 
-#: op_templates/navbar.html:30
+#: op_templates/legal/imprint.html:4
+msgid "Imprint - open_plan"
+msgstr ""
+
+#: op_templates/legal/imprint.html:22
+msgid "Herausgegeben von:"
+msgstr ""
+
+#: op_templates/legal/imprint.html:23
+msgid ""
+"Diese Internetseite wird betrieben von der Reiner Lemoine Institut gGmbH"
+msgstr ""
+
+#: op_templates/legal/imprint.html:25
+msgid "Geschäftsführung:"
+msgstr ""
+
+#: op_templates/legal/imprint.html:28
+msgid "Postanschrift:"
+msgstr ""
+
+#: op_templates/legal/imprint.html:29
+msgid "Reiner Lemoine Institut gGmbH"
+msgstr ""
+
+#: op_templates/legal/imprint.html:33
+msgid "Telefon"
+msgstr ""
+
+#: op_templates/legal/imprint.html:36
+msgid "Handelsregister"
+msgstr ""
+
+#: op_templates/legal/imprint.html:38
+msgid "Steuernummer"
+msgstr ""
+
+#: op_templates/legal/imprint.html:40
+msgid "USt-IdNr."
+msgstr ""
+
+#: op_templates/legal/imprint.html:42
+msgid "Disclaimer"
+msgstr ""
+
+#: op_templates/legal/imprint.html:44
+msgid "Haftungshinweis"
+msgstr ""
+
+#: op_templates/legal/imprint.html:45
+msgid ""
+"Die Inhalte sind mit größter Sorgfalt recherchiert. Dennoch übernehmen die "
+"Autor*innen keinerlei Gewähr für die Aktualität, Korrektheit, "
+"Vollständigkeit oder Qualität der bereitgestellten Informationen. "
+"Haftungsansprüche gegen die Autor*innen, welche sich auf Schäden materieller "
+"oder ideeller Art beziehen die durch die Nutzung oder Nichtnutzung der "
+"dargebotenen Informationen bzw. durch die Nutzung fehlerhafter und "
+"unvollständiger Informationen verursacht wurden, sind grundsätzlich "
+"ausgeschlossen, sofern seitens der Autor*innen kein nachweislich "
+"vorsätzliches oder grob fahrlässiges Verschulden vorliegt. Alle Angebote "
+"sind freibleibend und unverbindlich. Die Autor*innen behalten es sich "
+"ausdrücklich vor, Teile der Seiten oder das gesamte Angebot ohne gesonderte "
+"Ankündigung zu verändern, zu ergänzen, zu löschen oder die Veröffentlichung "
+"zeitweise oder endgültig einzustellen."
+msgstr ""
+
+#: op_templates/legal/imprint.html:47
+msgid "Verweise und Links"
+msgstr ""
+
+#: op_templates/legal/imprint.html:48
+msgid ""
+"Bei direkten oder indirekten Verweisen auf fremde Internetseiten („Links”), "
+"die außerhalb des Verantwortungsbereiches der Autor*innen liegen, würde eine "
+"Haftungsverpflichtung ausschließlich in dem Fall in Kraft treten, in dem die "
+"Autor*innen von den Inhalten Kenntnis hat und es ihm technisch möglich und "
+"zumutbar wäre, die Nutzung im Falle rechtswidriger Inhalte zu verhindern. "
+"Die Autor*innen erklären daher ausdrücklich, dass zum Zeitpunkt der "
+"Linksetzung die entsprechenden verlinkten Seiten frei von illegalen Inhalten "
+"waren. Die Autor*innen haben keinerlei Einfluss auf die aktuelle und "
+"zukünftige Gestaltung und auf die Inhalte der gelinkten/verknüpften Seiten. "
+"Deshalb distanzieren sie sich hiermit ausdrücklich von allen Inhalten aller "
+"gelinkten /verknüpften Seiten, die nach der Linksetzung verändert wurden. "
+"Diese Feststellung gilt für alle innerhalb des eigenen Internetangebotes "
+"gesetzten Links und Verweise sowie für Fremdeinträge in von Autor*innen "
+"eingerichteten Gästebüchern, Diskussionsforen und Mailinglisten. Für "
+"illegale, fehlerhafte oder unvollständige Inhalte und insbesondere für "
+"Schäden, die aus der Nutzung oder Nichtnutzung solcherart dargebotener "
+"Informationen entstehen, haften allein die Anbieter*innen der Seite, auf "
+"welche verwiesen wurde, nicht der- oder diejenige, der/die über Links auf "
+"die jeweilige Veröffentlichung lediglich verweist."
+msgstr ""
+
+#: op_templates/legal/imprint.html:50
+msgid "Urheber- und Kennzeichenrecht"
+msgstr ""
+
+#: op_templates/legal/imprint.html:51
+msgid ""
+"Die Autor*innen sind bestrebt, in allen Publikationen die Urheberrechte der "
+"verwendeten Grafiken, Tondokumente, Videosequenzen und Texte zu beachten, "
+"von ihnen selbst erstellte Grafiken, Tondokumente, Videosequenzen und Texte "
+"zu nutzen oder auf lizenzfreie Grafiken, Tondokumente, Videosequenzen und "
+"Texte zurückzugreifen. Alle innerhalb des Internetangebotes genannten und "
+"ggf. durch Dritte geschützten Marken- und Warenzeichen unterliegen "
+"uneingeschränkt den Bestimmungen des jeweils gültigen Kennzeichenrechts und "
+"den Besitzrechten der jeweiligen eingetragenen Eigentümer*innen. Allein "
+"aufgrund der bloßen Nennung ist nicht der Schluss zu ziehen, dass "
+"Markenzeichen nicht durch Rechte Dritter geschützt sind! Das Copyright für "
+"veröffentlichte, von Autor*innen selbst erstellte Objekte bleibt allein bei "
+"den Autor*innen der Seiten. Eine Vervielfältigung oder Verwendung solcher "
+"Grafiken, Tondokumente, Videosequenzen und Texte in anderen elektronischen "
+"oder gedruckten Publikationen ist ohne ausdrückliche Zustimmung der "
+"Autor*innen nicht gestattet."
+msgstr ""
+
+#: op_templates/legal/imprint.html:53
+msgid "Rechtswirksamkeit dieses Haftungsausschlusses"
+msgstr ""
+
+#: op_templates/legal/imprint.html:54
+msgid ""
+"Dieser Haftungsausschluss ist als Teil des Internetangebotes zu betrachten, "
+"von dem aus auf diese Seite verwiesen wurde. Sofern Teile oder einzelne "
+"Formulierungen dieses Textes der geltenden Rechtslage nicht, nicht mehr oder "
+"nicht vollständig entsprechen sollten, bleiben die übrigen Teile des "
+"Dokumentes in ihrem Inhalt und ihrer Gültigkeit davon unberührt."
+msgstr ""
 
 #: op_templates/navbar.html:29
 #: op_templates/scenario/scenario_results_page.html:18
@@ -319,13 +445,18 @@ msgid "Do you already have an account?"
 msgstr "Besitzen Sie bereits ein Konto?"
 
 #: op_templates/registration/signup.html:41
+#, python-format
 msgid ""
 "I have read and accept the <a href=\"%(registration_url)s\">registration</a> "
 "and <a href=\"%(privacy_url)s\">privacy statements</a> from open_plan."
 msgstr ""
-"Ich habe die <a href=\"%(registration_url)s\">Registrierungs </a> und "
-"<a href=\"%(privacy_url)s\">Datenschutzbestimmungen</a> von open_plan "
-"gelesen und akzeptiert."
+"Ich habe die <a href=\"%(registration_url)s\">Registrierungs </a> und <a "
+"href=\"%(privacy_url)s\">Datenschutzbestimmungen</a> von open_plan gelesen "
+"und akzeptiert."
+
+#: op_templates/scenario/export.html:4
+msgid "Export scenario"
+msgstr "Szenario exportieren"
 
 #: op_templates/scenario/scenario_progression.html:8
 msgid "Scenario step"
@@ -425,22 +556,16 @@ msgstr "Land"
 msgid "Name of the country where the project is being deployed"
 msgstr "Name des Landes, in dem das Projekt eingesetzt werden soll"
 
-#: projects/forms.py:164
-msgid "Location's longitude"
-msgstr "Standort, Längengrad"
 #: projects/forms.py:159
-msgid "Location, longitude"
+msgid "Location's longitude"
 msgstr "Standort, Längengrad"
 
 #: projects/forms.py:161
 msgid "Longitude coordinate of the project's geographical location."
 msgstr "Längengradkoordinate des geografischen Standorts des Projekts."
 
-#: projects/forms.py:167
-msgid "Location's latitude"
-msgstr "Standort Breitengrad"
 #: projects/forms.py:162
-msgid "Location, latitude"
+msgid "Location's latitude"
 msgstr "Standort Breitengrad"
 
 #: projects/forms.py:164
@@ -472,8 +597,10 @@ msgstr "Währung"
 msgid "The currency of the country where the project is implemented."
 msgstr "Die Währung des Landes, in dem das Projekt durchgeführt wird."
 
-#: projects/forms.py:175
-msgid "Discount factor"
+#: projects/forms.py:170
+#, fuzzy
+#| msgid "Discount factor"
+msgid "Discount Factor"
 msgstr "Abzinsungsfaktor"
 
 #: projects/forms.py:172
@@ -501,9 +628,9 @@ msgstr "Steuerfaktor"
 msgid "Length of the time-steps."
 msgstr "Länge der Zeitschritte."
 
-#: projects/forms.py:114
-msgid "The number of days for which the simulation is to be run."
-msgstr "Die Anzahl der Tage, für die die Simulation ausgeführt werden soll."
+#: projects/forms.py:212
+msgid "The number of days simulated with the energy system model."
+msgstr "Die Anzahl der Tage, die mit dem Energiesystemmodell simuliert wurden."
 
 #: projects/forms.py:214
 msgid ""
@@ -580,7 +707,11 @@ msgstr "Name"
 msgid "Energy carrier"
 msgstr "Energieträger"
 
-#: projects/forms.py:353
+#: projects/forms.py:373
+#, python-format
+msgid "Input timeseries file \"%(fname)s\" is empty"
+msgstr ""
+
 msgid ""
 "File not properly formatted. Please ensure you upload a comma seperated "
 "array of values. E.g. [1,2,0.32]"

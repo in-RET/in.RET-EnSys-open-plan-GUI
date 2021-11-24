@@ -58,10 +58,12 @@ def create_or_delete_simulation_scheduler(**kwargs):
         True if Scheduler object is created or False otherwise.
 
     """
+    mvs_token = kwargs.get("mvs_token", "")
+
     if Schedule.objects.count() == 0:
-        logger.info(f"No Scheduler found. Creating a new Scheduler to check Simulation objects.")
+        logger.info(f"No Scheduler found. Creating a new Scheduler to check Simulation {mvs_token}.")
         schedule = Schedule.objects.create(
-            name="djangoQ_Scheduler",
+            name=f"djangoQ_Scheduler-{mvs_token}",
             func="projects.services.check_simulation_objects",
             # args='5',
             schedule_type=Schedule.MINUTES,
@@ -69,10 +71,10 @@ def create_or_delete_simulation_scheduler(**kwargs):
             # kwargs={'test_arg': 1, 'test_arg2': "test"}
         )
         if schedule.id:
-            logger.info(f"New Scheduler Created to track simulation objects status.")
+            logger.info(f"New Scheduler Created to track simulation {mvs_token} objects status.")
             return True
         else:
-            logger.debug(f"Scheduler already exists. Skipping.")
+            logger.debug(f"Scheduler already exists for {mvs_token}. Skipping.")
             return False
 
 

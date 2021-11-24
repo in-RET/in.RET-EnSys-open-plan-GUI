@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-24 09:21+0000\n"
+"POT-Creation-Date: 2021-11-24 09:25+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -523,6 +523,66 @@ msgstr "Status prüfen"
 #: op_templates/scenario/scenario_step4.html:60
 msgid "Run simulation"
 msgstr "Simulation ausführen"
+
+#: op_templates/scenario/scenario_visualize_results.html:26
+msgid "Economic Data Summary"
+msgstr ""
+
+#: op_templates/scenario/scenario_visualize_results.html:30
+msgid "Download Cost Results"
+msgstr ""
+
+#: op_templates/scenario/scenario_visualize_results.html:38
+msgid "Economic and Technical Analysis"
+msgstr ""
+
+#: op_templates/scenario/scenario_visualize_results.html:44
+msgid "KPI"
+msgstr ""
+
+#: op_templates/scenario/scenario_visualize_results.html:45
+msgid "Value"
+msgstr ""
+
+#: op_templates/scenario/scenario_visualize_results.html:46
+msgid "Unit"
+msgstr ""
+
+#: op_templates/scenario/scenario_visualize_results.html:61
+msgid "Download Scalar Results"
+msgstr ""
+
+#: op_templates/scenario/scenario_visualize_results.html:68
+msgid "Time Series Analysis"
+msgstr ""
+
+#: op_templates/scenario/scenario_visualize_results.html:71
+msgid "Electricity"
+msgstr "Elektrizität"
+
+#: op_templates/scenario/scenario_visualize_results.html:72
+msgid "Heat"
+msgstr "Wärme"
+
+#: op_templates/scenario/scenario_visualize_results.html:73
+msgid "Gas"
+msgstr "Gas"
+
+#: op_templates/scenario/scenario_visualize_results.html:79
+msgid "Select Electricity assets:"
+msgstr ""
+
+#: op_templates/scenario/scenario_visualize_results.html:87
+msgid "Select Heat assets:"
+msgstr ""
+
+#: op_templates/scenario/scenario_visualize_results.html:95
+msgid "Select Gas assets:"
+msgstr ""
+
+#: op_templates/scenario/scenario_visualize_results.html:104
+msgid "Download Timeseries"
+msgstr ""
 
 #: projects/forms.py:141
 msgid "eg. 0.1"
@@ -1102,9 +1162,6 @@ msgstr "€/Energieträgereinheit"
 
 msgid "Energy vector/commodity. Convention: For an energy conversion asset define energyVector of the output. For a sink define based on inflow. For a source define based on output flow. For a storage, define based on stored energy carrier."
 msgstr "Energievektor/Rohstoff. Konvention: Für eine Energieumwandlungsanlage definieren Sie energyVector des Ausgangs. Für eine Senke definieren Sie auf Basis des Zuflusses. Für eine Quelle definieren Sie auf der Basis des Ausgangsflusses. Für einen Speicher definieren Sie basierend auf dem gespeicherten Energieträger."
-
-msgid "The number of days simulated with the energy system model."
-msgstr "Die Anzahl der Tage, die mit dem Energiesystemmodell simuliert wurden."
 
 msgid "Day"
 msgstr "Tag"

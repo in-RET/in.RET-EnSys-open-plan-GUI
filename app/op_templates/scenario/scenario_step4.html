@@ -19,13 +19,32 @@
 
 <main>
 
-    <section class="scenario-create">
-    SECTION WIP
+    <section class="dashboard">
+        <div>
 
-        you can click on Proof mvs inputs, then save the json file and upload it with the browse button to
+            {% if simulation_status %}
+                <div class="row">
+                    The simulation <a href="https://mvs-eland.rl-institut.de/check/{{ mvs_token }}">{{ mvs_token }}</a> has been started, its status is <span>{{ simulation_status }}</span>
+                </div>
+                <div class="row">
+                    {% if simulation_status == "DONE" %}
+                        <a class="btn btn--medium" href="{% url 'update_simulation_results' proj_id scen_id %}" >{% translate "Update results" %} </a>
+                        <a class="btn btn--medium" href="{% url 'scenario_visualize_results' scen_id %}" >{% translate "Check dashboard" %} </a>
+                    {% elif simulation_status == "ERROR" %}
+                        <p>{{ simulation_error_msg }}</p>
+                        <a class="btn btn--medium" href="{% url 'view_mvs_data_input' scen_id %}" >{% translate "Proof parameters JSON file" %} </a>
+                        <a class="btn btn--medium" href="" >{% translate "Link to send bug report automatically" %} </a>
 
-        <a href="https://mvs-eland.rl-institut.de/">MVS simulation server</a>
-
+                    {% elif simulation_status == "PENDING" %}
+                        <form method="post" action="{% url 'check_simulation_status' scen_id %}">
+                            {% csrf_token %}
+                            <button class="btn btn--medium" type="submit" > {% translate "Check status" %}</button>
+                        </form>
+                    {% endif %}
+                </div>
+            {% endif %}
+            <div class="row"></div>
+        </div>
     </section>
 
 
@@ -48,13 +67,7 @@
 
     <div>
         <a class="btn btn--medium btn--hollow btn--previous" href="{% url 'scenario_steps_edit' proj_id scen_id step_id|add:-1 %}" aria-disabled="true">{% translate "Previous" %}</a>
-        <a class="btn btn--medium" href="{% url 'view_mvs_data_input' scen_id %}" >{% translate "Proof parameters JSON file" %} </a>
-        <a class="btn btn--medium" href="{% url 'scenario_visualize_results' scen_id %}" >{% translate "Check dashboard" %} </a>
-        <a class="btn btn--medium" href="{% url 'update_simulation_results' proj_id scen_id %}" >{% translate "Update results" %} </a>
-        <form method="post" action="{% url 'check_simulation_status' scen_id %}">
-            {% csrf_token %}
-            <button class="btn btn--medium" type="submit" > {% translate "Check status" %}</button>
-        </form>
+
         <form method="post" action="{% url 'request_mvs_simulation' scen_id %}">
             {% csrf_token %}
             <button class="btn btn--medium" type="submit" > {% translate "Run simulation" %}</button>

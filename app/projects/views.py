@@ -576,16 +576,36 @@ def scenario_review(request, proj_id, scen_id, step_id=4, max_step=5):
 
     if request.method == "GET":
 
-        return render(request, f'scenario/scenario_step{step_id}.html',
-              {
-                  'scenario': scenario,
-                  'scen_id': scen_id,
-                  'proj_id': scenario.project.id,
-                  'proj_name': scenario.project.name,
-                  'step_id': step_id,
-                  "step_list": STEP_LIST,
-                  "max_step": max_step
-              })
+        context = {
+            'scenario': scenario,
+            'scen_id': scen_id,
+            'proj_id': scenario.project.id,
+            'proj_name': scenario.project.name,
+            'step_id': step_id,
+            "step_list": STEP_LIST,
+            "max_step": max_step
+        }
+
+        qs = Simulation.objects.filter(scenario_id=scen_id)
+
+        if qs.exists():
+            simulation = qs.first()
+            context.update(
+                {
+                    'simulation_status': simulation.status,
+                    'secondsElapsed': simulation.elapsed_seconds,
+                    'rating': simulation.user_rating,
+                    "mvs_token": simulation.mvs_token
+                }
+            )
+            if simulation.status == ERROR:
+                context.update(
+                    {'simulation_error_msg': simulation.errors}
+                )
+        else:
+            print("no simulation existing")
+
+        return render(request, f'scenario/scenario_step{step_id}.html', context)
 
 
 SCENARIOS_STEPS = [
@@ -833,53 +853,59 @@ def view_mvs_data_input(request, scen_id=0):
 
 
 # End-point to send MVS simulation request
-@json_view
+#@json_view
 @login_required
 @require_http_methods(["GET", "POST"])
-def request_mvs_simulation(request, scenario_id=0):
-    if scenario_id == 0:
-        return JsonResponse({"status": "error", "error": "No scenario id provided"},
+def request_mvs_simulation(request, scen_id=0):
+    if scen_id == 0:
+        answer = JsonResponse({"status": "error", "error": "No scenario id provided"},
                             status=500, content_type='application/json')
     # Load scenario
-    scenario = Scenario.objects.get(pk=scenario_id)
+    scenario = Scenario.objects.get(pk=scen_id)
     try:
         data_clean = get_topology_json(scenario)
+        #err = 1/0
     except Exception as e:
-        logger.error(f"Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {e}.")
-        return JsonResponse({"error":f"Scenario Serialization ERROR! Thrown Exception: {e}."},
-                        status=500, content_type='application/json')
-    
-    # delete existing simulation
-    Simulation.objects.filter(scenario_id=scenario_id).delete()
-    # Create empty Simulation model object
-    simulation = Simulation(start_date=datetime.now(), scenario_id=scenario_id)
+        error_msg = f"Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {e}."
+        logger.error(error_msg)
+        messages.error(request, error_msg)
+        answer = JsonResponse({"error":f"Scenario Serialization ERROR! Thrown Exception: {e}."},
+                         status=500, content_type='application/json')
+
     # Make simulation request to MVS
     results = mvs_simulation_request(data_clean)
 
     if results is None:
-        return JsonResponse({"status": "error", "error": "Could not communicate with the MVS."},
+        error_msg = "Could not communicate with the simulation server."
+        logger.error(error_msg)
+        messages.error(request, error_msg)
+        # TODO redirect to prefilled feedback form / bug form
+        answer = JsonResponse({"status": "error", "error": error_msg},
                             status=407, content_type='application/json')
-    
-    simulation.mvs_token = results['id'] if results['id'] else None
+    else:
 
-    if 'status' in results.keys() and (results['status'] == DONE or results['status'] == ERROR):
-        simulation.status = results['status']
-        simulation.results = results['results']
-        simulation.end_date = datetime.now()
-    else: # PENDING
-        simulation.status = results['status']
-        create_or_delete_simulation_scheduler()
+        # delete existing simulation
+        Simulation.objects.filter(scenario_id=scen_id).delete()
+        # Create empty Simulation model object
+        simulation = Simulation(start_date=datetime.now(), scenario_id=scen_id)
 
-    simulation.elapsed_seconds = (datetime.now() - simulation.start_date).seconds
-    simulation.save()
+        simulation.mvs_token = results['id'] if results['id'] else None
 
-    return JsonResponse({'status': simulation.status,
-                         'secondsElapsed': simulation.elapsed_seconds,
-                         'rating': simulation.user_rating,
-                         "mvs_request_json": data_clean,
-                         "mvs_token": simulation.mvs_token
-                         },
-                        status=200, content_type='application/json')
+        if 'status' in results.keys() and (results['status'] == DONE or results['status'] == ERROR):
+            simulation.status = results['status']
+            simulation.results = results['results']
+            simulation.end_date = datetime.now()
+        else: # PENDING
+            simulation.status = results['status']
+            # create a task which will update simulation status
+            create_or_delete_simulation_scheduler(mvs_token=simulation.mvs_token)
+
+        simulation.elapsed_seconds = (datetime.now() - simulation.start_date).seconds
+        simulation.save()
+
+        answer = HttpResponseRedirect(reverse('scenario_review', args=[scenario.project.id, scen_id]))
+
+    return answer
 
 
 @json_view

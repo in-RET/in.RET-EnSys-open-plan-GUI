@@ -1,4 +1,6 @@
 import os
+import traceback
+import logging
 from django_q.models import Schedule
 from django.contrib import messages
 from django.urls import reverse
@@ -8,9 +10,7 @@ from projects.models import Simulation
 from projects.requests import fetch_mvs_simulation_status
 from projects.constants import PENDING
 from concurrent.futures import ThreadPoolExecutor
-from exchangelib import Account, Credentials, Mailbox, Message, EWSTimeZone
-import logging
-import traceback
+from exchangelib import Account, Credentials, Mailbox, Message, EWSTimeZone, Configuration
 
 logger = logging.getLogger(__name__)
 
@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 EXCHANGE_ACCOUNT = os.getenv("EXCHANGE_ACCOUNT")
 EXCHANGE_PW = os.getenv("EXCHANGE_PW")
 EXCHANGE_EMAIL = os.getenv("EXCHANGE_EMAIL")
+EXCHANGE_SERVER = os.getenv("EXCHANGE_SERVER")
 # email addresses to which the feedback emails will be sent
 RECIPIENTS = os.getenv("RECIPIENTS").split(",")
 
@@ -82,8 +83,11 @@ def send_feedback_email(subject, body):
     tz = EWSTimeZone('Europe/Copenhagen')
     try:
         credentials = Credentials(EXCHANGE_ACCOUNT, EXCHANGE_PW)
+
+        config = Configuration(server=EXCHANGE_SERVER, credentials=credentials)
+
         account = Account(
-            EXCHANGE_EMAIL, credentials=credentials, autodiscover=True, default_timezone=tz
+            EXCHANGE_EMAIL, credentials=credentials, autodiscover=False, default_timezone=tz, config=config
         )
         recipients = [
             Mailbox(email_address=recipient) for recipient in RECIPIENTS
@@ -97,7 +101,7 @@ def send_feedback_email(subject, body):
         )
         mail.send_and_save()
     except Exception as ex:
-        logger.warning(f"Couldn't send feedback email. Exception raised: {ex}.")
+        logger.warning(f"Couldn't send feedback email. Exception raised: {traceback.format_exc()}.")
         raise ex
 
 def send_feedback_email(subject, body):

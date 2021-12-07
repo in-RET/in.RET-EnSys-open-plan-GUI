@@ -144,7 +144,16 @@ class Asset(TopologyNode):
     def timestamps(self):
         return self.scenario.get_timestamps()
 
+    @property
+    def input_timeseries_values(self):
+        if self.input_timeseries != '':
+            answer = json.loads(self.input_timeseries)
+        else:
+            answer = []
+        return answer
 
+    def empty_input_timeseries(self):
+        return self.input_timeseries == ''
 
 class Bus(TopologyNode):
     type = models.CharField(max_length=20, choices=ENERGY_VECTOR)

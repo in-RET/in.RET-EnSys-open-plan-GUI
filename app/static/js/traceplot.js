@@ -44,7 +44,7 @@ function makePlotly( x, y, plot_id=""){
             x = ts_timestamps
         }
         else{
-            alert("The number of values in your uploaded timeseries does not match the scenario timestamps.\nPlease change the scenario settings or upload a new timeseries")
+            alert("The number of values in your uploaded timeseries (" + y.length + ") does not match the scenario timestamps (" + ts_timestamps.length + ").\nPlease change the scenario settings or upload a new timeseries")
         }
     }
     // guess whether x is a number or a date and adjust the axis type accordingly

@@ -376,6 +376,9 @@ class AssetCreateForm(OpenPlanModelForm):
 
     def __init__(self, *args, **kwargs):
         asset_type_name = kwargs.pop('asset_type', None)
+        self.existing_asset = kwargs.get('instance', None)
+
+
 
         super().__init__(*args, **kwargs)
         # which fields exists in the form are decided upon AssetType saved in the db
@@ -391,12 +394,23 @@ class AssetCreateForm(OpenPlanModelForm):
             if field == "renewable_asset" and asset_type_name in RENEWABLE_ASSETS:
                 self.fields[field].initial = True
             self.fields[field].widget.attrs.update({f'df-{field}': ''})
+            if field == "input_timeseries":
+                self.fields[field].required = self.empty_input_timeseries()
         ''' ----------------------------------------------------- '''
 
+    def empty_input_timeseries(self):
+        if self.existing_asset is not None:
+            return self.existing_asset.empty_input_timeseries()
+        else:
+            return True
     def clean_input_timeseries(self):
+        """Override built-in Form method which is called upon form validation"""
         try:
-            timeseries_file = self.files['input_timeseries']
-            input_timeseries_values = parse_input_timeseries(timeseries_file)
+            timeseries_file = self.files.get('input_timeseries', None)
+            if self.empty_input_timeseries() is True:
+                input_timeseries_values = parse_input_timeseries(timeseries_file)
+            else:
+                input_timeseries_values = self.existing_asset.input_timeseries_values
             return input_timeseries_values
         except json.decoder.JSONDecodeError as ex:
             raise ValidationError(_("File not properly formatted. Please ensure you upload a comma seperated array of values. E.g. [1,2,0.32]"))

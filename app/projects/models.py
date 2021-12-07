@@ -70,11 +70,15 @@ class Scenario(models.Model):
 
     def get_timestamps(self, json_format=False):
         answer = []
+
+        n_occurence_per_day = int((24 * 60)/self.time_step)
+
         for i in range(self.evaluated_period):
-            iter_date = self.start_date + timedelta(minutes=self.time_step * (i + 1))
-            if json_format is True:
-                iter_date = iter_date.isoformat().replace("T"," ")
-            answer.append(iter_date)
+            for j in range(n_occurence_per_day):
+                iter_date = self.start_date + timedelta(days=i+1, minutes=self.time_step * (j + 1))
+                if json_format is True:
+                    iter_date = iter_date.isoformat().replace("T"," ")
+                answer.append(iter_date)
         return answer
 
 

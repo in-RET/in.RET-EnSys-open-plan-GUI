@@ -244,8 +244,27 @@ $("#guiModal").on('hide.bs.modal', function (event) {
 
 /* Create node on the gui */
 async function createNodeObject(nodeName, connectionInputs = 1, connectionOutputs = 1, nodeData = {}, pos_x, pos_y) {
-    const shownName = (typeof nodeData.name === 'undefined') ? nodeName : nodeData.name;
 
+    // automate the naming of assets to avoid name duplicates
+    const editorData = editor.export().drawflow.Home.data;
+    const node_list = Object.values(editorData);
+    const node_classes = node_list.map(obj => obj.class);
+    let existing_items = 0;
+    node_classes.map(name => {if(name.includes(nodeName)){++existing_items}});
+
+    let shownName;
+    if(typeof nodeData.name === "undefined"){
+        if(existing_items == 0){
+            shownName = nodeName + "-0"
+        }
+        else{
+            shownName = nodeName + "-" + existing_items
+        }
+        nodeData.name = shownName;
+    }
+    else{
+        shownName = nodeData.name;
+    }
 
     const source_html = `<div class="box" ${ASSET_TYPE_NAME}="${nodeName}">
     </div>

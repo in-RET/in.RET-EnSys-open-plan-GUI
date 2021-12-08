@@ -54,6 +54,9 @@ function makePlotly( x, y, plot_id=""){
     else{
         layout.xaxis.type = "date";
     }
+    layout.xaxis.autorange = "true";
+    layout["yaxis"] = {autorange: "true"};
+
     console.log( 'X',x, 'Y',y );
     var traces = [{type: "scatter", x: x, y: y}];
 

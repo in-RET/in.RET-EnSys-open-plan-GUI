@@ -406,14 +406,18 @@ class AssetCreateForm(OpenPlanModelForm):
     def clean_input_timeseries(self):
         """Override built-in Form method which is called upon form validation"""
         try:
+            input_timeseries_values = []
             timeseries_file = self.files.get('input_timeseries', None)
-            if self.empty_input_timeseries() is True:
+            # read the timeseries from file if any
+            if timeseries_file is not None:
                 input_timeseries_values = parse_input_timeseries(timeseries_file)
             else:
-                input_timeseries_values = self.existing_asset.input_timeseries_values
+                # set the previous timeseries from the asset if any
+                if self.empty_input_timeseries() is False:
+                    input_timeseries_values = self.existing_asset.input_timeseries_values
             return input_timeseries_values
         except json.decoder.JSONDecodeError as ex:
-            raise ValidationError(_("File not properly formatted. Please ensure you upload a comma seperated array of values. E.g. [1,2,0.32]"))
+            raise ValidationError(_("File not properly formatted. Please ensure you upload a comma separated array of values. E.g. [1,2,0.32]"))
         except Exception as ex:
             raise ValidationError(_("Could not parse a file. Did you upload one?"))
 

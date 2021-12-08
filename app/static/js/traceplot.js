@@ -61,11 +61,12 @@ function makePlotly( x, y, plot_id=""){
     var traces = [{type: "scatter", x: x, y: y}];
 
     Plotly.newPlot(plotDiv, traces, layout, config);
+    // simulate a click on autoscale
+    plotDiv.querySelector('[data-title="Autoscale"]').click()
 };
 
 
 var PLOT_ID = "";
-
 
 
 function plot_file_trace(obj, plot_id="") {
@@ -80,15 +81,43 @@ function plot_file_trace(obj, plot_id="") {
         var myfile = flist[0];
         if (myfile) {
         if(myfile.name.includes(".csv")){getAsText(myfile);}
-          else if (myfile.name.includes(".xls")){
-          alert("xls files not yet supported for quick vizualisation (but the data will be saved into the database)")
-          }
+        else if (myfile.name.includes(".txt")){getAsText(myfile);}
+        else if (myfile.name.includes(".xls")){getAsExcel(myfile);}
         }
 
     } else {
       alert('FileReader are not supported in this browser.');
     }
 }
+function getAsExcel(fileToRead){
+    var reader = new FileReader();
+
+    reader.readAsBinaryString(fileToRead);
+
+    reader.onload = function(e) {
+          var data = e.target.result;
+          var wb = XLSX.read(data, {
+            type: 'binary'
+          });
+           var ws = wb.Sheets[wb.SheetNames[0]];
+           const nsheets = wb.SheetNames.length;
+           if (nsheets > 1){
+             alert("Your file has more than one sheet, only the sheet " + wb.SheetNames[0] + " will be parsed." );
+           }
+           var XL_row_object = XLSX.utils.sheet_to_row_object_array(ws);
+           // TODO support column names (now it is ignored, info is in Object.keys)
+           processData(XL_row_object.map(row => Object.values(row)));
+
+        };
+
+    reader.onerror = function(ex) {
+      console.log(ex);
+    };
+
+
+
+  };
+
 
 // taken from https://github.com/MounirMesselmeni/html-fileapi
  function getAsText(fileToRead) {
@@ -106,35 +135,37 @@ function plot_file_trace(obj, plot_id="") {
       processData(d3array);
     }
 
-    function processData(array_2D) {
-        const ncols = d3array[0].length;
-        var dateFormat = d3.timeParse("%Y-%m-%d %H:%M:%S")
-        var x = [], y = [];
-        // there are only the timeseries values
-        if (ncols == 1){
-            for (var i=0; i<array_2D.length; i++) {
-                var line = array_2D[i];
-                    x.push(String(i));
-                    y.push(line[0]);
-                    }
-        }
-        // it is assumed here that first column is timestamp and second column is timeseries values
-        else if (ncols == 2){
-            for (var i=0; i<array_2D.length; i++) {
-                var line = array_2D[i];
-                    x.push(line[0]);
-                    y.push(line[1]);
-                    }
-        }
-        else{
-            alert("File has more than 3 columns!!!");
-        }
-        // provide x and y to plotly maker
-        makePlotly(x,y);
-    }
 
     function errorHandler(evt) {
       if(evt.target.error.name == "NotReadableError") {
-          alert("Canno't read file !");
+          alert("Cannot read file !");
       }
     }
+
+
+function processData(array_2D) {
+    const ncols = array_2D[0].length;
+    var dateFormat = d3.timeParse("%Y-%m-%d %H:%M:%S")
+    var x = [], y = [];
+    // there are only the timeseries values
+    if (ncols == 1){
+        for (var i=0; i<array_2D.length; i++) {
+            var line = array_2D[i];
+                x.push(String(i));
+                y.push(line[0]);
+                }
+    }
+    // it is assumed here that first column is timestamp and second column is timeseries values
+    else if (ncols == 2){
+        for (var i=0; i<array_2D.length; i++) {
+            var line = array_2D[i];
+                x.push(line[0]);
+                y.push(line[1]);
+                }
+    }
+    else{
+        alert("File has more than 2 columns.\nIt is expected one column: the timeseries values\nOr two columns: the first one with timestamps and the second one with the timeseries values");
+    }
+    // provide x and y to plotly maker
+    makePlotly(x,y);
+}

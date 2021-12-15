@@ -395,12 +395,12 @@ class AssetCreateForm(OpenPlanModelForm):
                 self.fields[field].initial = True
             self.fields[field].widget.attrs.update({f'df-{field}': ''})
             if field == "input_timeseries":
-                self.fields[field].required = self.empty_input_timeseries()
+                self.fields[field].required = self.is_input_timeseries_empty()
         ''' ----------------------------------------------------- '''
 
-    def empty_input_timeseries(self):
+    def is_input_timeseries_empty(self):
         if self.existing_asset is not None:
-            return self.existing_asset.empty_input_timeseries()
+            return self.existing_asset.is_input_timeseries_empty()
         else:
             return True
     def clean_input_timeseries(self):
@@ -413,7 +413,7 @@ class AssetCreateForm(OpenPlanModelForm):
                 input_timeseries_values = parse_input_timeseries(timeseries_file)
             else:
                 # set the previous timeseries from the asset if any
-                if self.empty_input_timeseries() is False:
+                if self.is_input_timeseries_empty() is False:
                     input_timeseries_values = self.existing_asset.input_timeseries_values
             return input_timeseries_values
         except json.decoder.JSONDecodeError as ex:

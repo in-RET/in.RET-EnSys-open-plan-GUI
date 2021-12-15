@@ -146,13 +146,13 @@ class Asset(TopologyNode):
 
     @property
     def input_timeseries_values(self):
-        if self.input_timeseries != '':
+        if self.is_input_timeseries_empty() is False:
             answer = json.loads(self.input_timeseries)
         else:
             answer = []
         return answer
 
-    def empty_input_timeseries(self):
+    def is_input_timeseries_empty(self):
         return self.input_timeseries == ''
 
 class Bus(TopologyNode):

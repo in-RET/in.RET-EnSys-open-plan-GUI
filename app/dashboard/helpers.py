@@ -1,3 +1,34 @@
+import csv
+from django.contrib.staticfiles.storage import staticfiles_storage
+
+KPIS = {}
+MANAGEMENT_CAT = "management"
+ECONOMIC_CAT = "economic"
+TECHNICAL_CAT = "technical"
+ENVIRONEMENTAL_CAT = "environemental"
+TABLES = {MANAGEMENT_CAT: {}, ECONOMIC_CAT: {}, TECHNICAL_CAT: {}, ENVIRONEMENTAL_CAT: {}}
+
+EMPTY_SUBCAT = "none"
+
+with open(staticfiles_storage.path("MVS_kpis_list.csv")) as csvfile:
+    csvreader = csv.reader(csvfile, delimiter=',', quotechar='"')
+    for i, row in enumerate(csvreader):
+        if i == 0:
+            hdr = row
+            label_idx = hdr.index("label")
+            cat_idx = hdr.index("category")
+            subcat_idx = hdr.index("subcategory")
+        else:
+            label = row[label_idx]
+            KPIS[label] = {k: v for k, v in zip(hdr, row)}
+
+            cat = row[cat_idx]
+            subcat = row[subcat_idx]
+            if subcat == MANAGEMENT_CAT:
+                TABLES[MANAGEMENT_CAT][cat] = label
+            elif subcat != EMPTY_SUBCAT and subcat != MANAGEMENT_CAT:
+                if cat in TABLES:
+                    TABLES[cat][subcat] = label
 
 def storage_asset_to_list(assets_results_json):
     """
@@ -34,3 +65,4 @@ def kpi_scalars_list(kpi_scalar_values_dict, KPI_SCALAR_UNITS, KPI_SCALAR_TOOLTI
             for key, val in kpi_scalar_values_dict.items()
         ]
     )
+

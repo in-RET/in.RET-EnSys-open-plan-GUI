@@ -9,7 +9,7 @@ from django.shortcuts import render, get_object_or_404, HttpResponseRedirect
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 from jsonview.decorators import json_view
-from projects.models import Scenario, Simulation
+from projects.models import Project, Scenario, Simulation
 from projects.services import excuses_design_under_development
 from dashboard.helpers import kpi_scalars_list
 from django.utils.translation import ugettext_lazy as _
@@ -128,14 +128,29 @@ def scenario_request_results(request, scen_id):
 
 
 @login_required
-@require_http_methods(["GET"])
-def scenario_visualize_results(request, scen_id=None):
+@require_http_methods(["POST", "GET"])
+def scenario_visualize_results(request, proj_id=None, scen_id=None):
+
+    user_projects = request.user.project_set.all()
+
+    if request.POST:
+        proj_id = int(request.POST.get("proj_id"))
+
+    if proj_id is None:
+        proj_id = request.user.project_set.first().id
+
+    project = get_object_or_404(Project, pk=proj_id)
+    if (project.user != request.user) and (request.user not in project.viewers.all()):
+        raise PermissionDenied
+
+    user_scenarios = project.scenario_set.all()
 
     if scen_id is None:
         excuses_design_under_development(request)
 
-        answer = render(request, 'scenario/scenario_results_page.html')
+        answer = render(request, 'scenario/scenario_results_page.html', {"project_list": user_projects, 'proj_id': proj_id, "scenario_list": user_scenarios})
     else:
+
         scenario = get_object_or_404(Scenario, pk=scen_id)
         proj_id = scenario.project.id
 

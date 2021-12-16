@@ -28,10 +28,14 @@
                     {% translate "Project" %}
                 </div>
                 <div class="project-name">
-                    <select class="form-select" aria-label="Default select example">
-                        <option value="1" selected>PV Potsdam 2025</option>
-                        <option value="2">Scenario 2</option>
-                    </select>
+                    <form action="{% url 'scenario_visualize_results' %}" method="POST">
+                        {% csrf_token %}
+                        <select name="proj_id" class="form-select" aria-label="Default select example" onchange="this.form.submit()">
+                        {% for project in project_list %}
+                            <option value="{{ project.id }}" {% if forloop.counter == proj_id %} selected {% endif %}> {{ project.name }}  </option>
+                        {% endfor %}
+                        </select>
+                    </form>
                 </div>
             </div>
             <div class="header-results__export">
@@ -48,42 +52,12 @@
                 <div class="dashboard__scenarios">
                     <h2>My scenarios</h2>
                     <div class="scenario-select">
-                        <div class="scenario-select__item">
-                            PV Potsdam Scenario 1
-                        </div>
-                        <div class="scenario-select__item selected">
-                            PV Potsdam Scenario 2
-                        </div>
-                        <div class="scenario-select__item">
-                            PV Potsdam Scenario 3
-                        </div>
-                        <div class="scenario-select__item selected">
-                            PV Potsdam Scenario 4
-                        </div>
-                        <div class="scenario-select__item selected">
-                            PV Potsdam Scenario 5
-                        </div>
-                        <div class="scenario-select__item">
-                            PV Potsdam Scenario 6
-                        </div>
-                        <div class="scenario-select__item">
-                            PV Potsdam Scenario 7
-                        </div>
-                        <div class="scenario-select__item">
-                            PV Potsdam Scenario 8
-                        </div>
-                        <div class="scenario-select__item selected">
-                            PV Potsdam Scenario 9
-                        </div>
-                        <div class="scenario-select__item selected">
-                            PV Potsdam Scenario 10
-                        </div>
-                        <div class="scenario-select__item">
-                            PV Potsdam Scenario 11
-                        </div>
-                        <div class="scenario-select__item">
-                            PV Potsdam Scenario 12
-                        </div>
+                        {% for scenario in scenario_list %}
+                            <div class="scenario-select__item">
+                                {{ scenario.name }}
+                            </div>
+                        {% endfor %}
+
                     </div>
                 </div>
             </div>

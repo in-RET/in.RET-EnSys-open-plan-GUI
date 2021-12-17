@@ -53,9 +53,9 @@
                     <h2>My scenarios</h2>
                     <div class="scenario-select">
                         {% for scenario in scenario_list %}
-                            <div class="scenario-select__item">
+                            <button id="scenario-{{ proj_id }}-{{ scenario.id}}" class="scenario-select__item" onclick="update_selected_scenarios(this)">
                                 {{ scenario.name }}
-                            </div>
+                            </button>
                         {% endfor %}
 
                     </div>
@@ -222,4 +222,20 @@
 
 
 {% block end_body_scripts %}
+
+<script>
+function update_selected_scenarios(target){
+    console.log(target);
+    const proj_id = target.id.split("-")[1];
+
+    const scen_id = target.id.split("-")[2];
+
+    // TODO send an ajax request and in the view update the db object which remembers which scenarios were selected for the given project
+    // then provide the data in the session so that one does not need to always transfer a ton of data
+    // structure should call the list and the success should then call other function which collect the data in the session's cache and plot it(session cache should use mvs tokens to know if a simulation was updated or not)
+    console.log(scen_id);
+}
+
+
+</script>
 {% endblock end_body_scripts %}

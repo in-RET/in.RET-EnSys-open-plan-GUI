@@ -43,6 +43,9 @@ class Project(models.Model):
     def __str__(self):
         return self.name
 
+    def get_scenarios_with_results(self):
+        return self.scenario_set.filter(simulation__isnull=False).filter(simulation__results__isnull=False)
+
 
 class Comment(models.Model):
     name = models.CharField(max_length=60)

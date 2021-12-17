@@ -1,6 +1,6 @@
 from django.core.exceptions import PermissionDenied
 from django.http.response import Http404, HttpResponse
-from dashboard.helpers import storage_asset_to_list
+from dashboard.helpers import storage_asset_to_list, kpi_scalars_list
 from dashboard.models import AssetsResults, KPICostsMatrixResults, KPIScalarResults, KPI_COSTS_TOOLTIPS, KPI_COSTS_UNITS, KPI_SCALAR_TOOLTIPS, KPI_SCALAR_UNITS
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -11,7 +11,6 @@ from django.views.decorators.http import require_http_methods
 from jsonview.decorators import json_view
 from projects.models import Project, Scenario, Simulation
 from projects.services import excuses_design_under_development
-from dashboard.helpers import kpi_scalars_list
 from django.utils.translation import ugettext_lazy as _
 from django.utils.safestring import mark_safe
 from io import BytesIO
@@ -143,7 +142,8 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
     if (project.user != request.user) and (request.user not in project.viewers.all()):
         raise PermissionDenied
 
-    user_scenarios = project.scenario_set.all()
+    user_scenarios = project.get_scenarios_with_results()
+
 
     if scen_id is None:
         excuses_design_under_development(request)

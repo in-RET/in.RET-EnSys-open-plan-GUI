@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load custom_filters %}
+{% load custom_template_tags %}
 {% load i18n %}
 
 {% block head_block %}
@@ -53,7 +55,12 @@
                     <h2>My scenarios</h2>
                     <div class="scenario-select">
                         {% for scenario in scenario_list %}
-                            <button id="scenario-{{ proj_id }}-{{ scenario.id}}" class="scenario-select__item" onclick="update_selected_scenarios(this)">
+                        {% if scenario.id|stringformat:'s' in request.session.selected_scenarios %}
+                            {% setvar "selected" as selected %}
+                        {% else%}
+                            {% setvar "" as selected %}
+                        {% endif %}
+                            <button id="scenario-{{ proj_id }}-{{ scenario.id}}" class="scenario-select__item {{ selected }}" onclick="update_selected_scenarios(this)">
                                 {{ scenario.name }}
                             </button>
                         {% endfor %}

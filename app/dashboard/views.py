@@ -134,6 +134,7 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
 
     if request.POST:
         proj_id = int(request.POST.get("proj_id"))
+        request.session["selected_scenarios"] = []
 
     if proj_id is None:
         proj_id = request.user.project_set.first().id
@@ -174,6 +175,31 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
     return answer
 
 
+@login_required
+@json_view
+@require_http_methods(["GET"])
+def update_selected_scenarios(request, scen_id):
+    if request.is_ajax():
+        selected_scenario = request.session.get("selected_scenarios", [])
+        status_code = 200
+        if scen_id in selected_scenario:
+            if len(selected_scenario) > 1:
+                selected_scenario.pop(selected_scenario.index(scen_id))
+                msg = _(f"Scenario {scen_id} was deselected")
+            else:
+                msg = _(f"At least one scenario need to be selected")
+                status_code = 405
+
+        else:
+            selected_scenario.append(scen_id)
+            msg = _(f"Scenario {scen_id} was selected")
+            # TODO maybe store the data in the session
+
+        request.session["selected_scenarios"] = selected_scenario
+        answer = JsonResponse({"success": msg}, status=status_code, content_type='application/json')
+    else:
+        answer = JsonResponse({"error": "This url is only for AJAX calls"}, status=405, content_type='application/json')
+    return answer
 
 @login_required
 @json_view

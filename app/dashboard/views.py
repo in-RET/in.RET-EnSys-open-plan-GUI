@@ -125,7 +125,6 @@ def scenario_request_results(request, scen_id):
         return JsonResponse({"Error":"Could not retrieve timeseries data."}, status=404, content_type='application/json', safe=False)
 
 
-
 @login_required
 @require_http_methods(["POST", "GET"])
 def scenario_visualize_results(request, proj_id=None, scen_id=None):

@@ -1,6 +1,6 @@
 from django.core.exceptions import PermissionDenied
 from django.http.response import Http404, HttpResponse
-from dashboard.helpers import storage_asset_to_list, kpi_scalars_list
+from dashboard.helpers import storage_asset_to_list, kpi_scalars_list, KPI_PARAMETERS, TABLES
 from dashboard.models import AssetsResults, KPICostsMatrixResults, KPIScalarResults, KPI_COSTS_TOOLTIPS, KPI_COSTS_UNITS, KPI_SCALAR_TOOLTIPS, KPI_SCALAR_UNITS
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -204,11 +204,40 @@ def update_selected_scenarios(request, scen_id):
 @login_required
 @json_view
 @require_http_methods(["GET"])
-def scenario_economic_results(request, scen_id):
+def request_kpi_table(request, table_style=None):
+
+    # TODO fetch selected scenarios values here
+    selected_scenario = request.session.get("selected_scenarios", [])
+    scen_id = int(selected_scenario[0])  # TODO: fetch multiple scenarios results
+    scenario = get_object_or_404(Scenario, pk=scen_id)
+
+    kpi_scalar_results_obj = KPIScalarResults.objects.get(simulation=scenario.simulation)
+    kpi_scalar_results_dict = json.loads(kpi_scalar_results_obj.scalar_values)
+
+    table = TABLES.get(table_style, None)
+    if table is not None:
+        for subtable_title, subtable_content in table.items():
+            for param in subtable_content:
+                # TODO: provide multiple scenarios results
+                param["scen_values"] = [kpi_scalar_results_dict.get(param["id"], "not implemented yet")]
+
+        answer = JsonResponse(table, status=200, content_type='application/json')
+    else:
+        allowed_styles = ", ".join(TABLES.keys())
+        answer = JsonResponse({"error":f"The kpi table sytle {table_style} is not implemented. Please try one of {allowed_styles}"}, status=404, content_type='application/json')
+    return answer
+
+@login_required
+@json_view
+@require_http_methods(["GET"])
+def scenario_economic_results(request, scen_id=None):
     """
     This view gathers all simulation specific cost matrix KPI results
     and sends them to the client for representation.
     """
+    if scen_id is None:
+        return JsonResponse({"error":"No scenario name provided"}, status=404, content_type='application/json', safe=False)
+
     scenario = get_object_or_404(Scenario, pk=scen_id)
 
     # if scenario.project.user != request.user:

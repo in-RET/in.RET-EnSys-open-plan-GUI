@@ -124,8 +124,8 @@
                 <div class="col col-md-12">
                     <div class="chart">
                         <div class="chart__header">
-                            <div>
-                                <span class="title">KPI Comparison</span>
+                            <div style="display: flex;gap: 10px;align-items: center;">
+                                <span class="title">Choose KPI table display</span>
                                 <span><select id="kpi-table-style" name="kpi-table-style" class="form-select" aria-label="Default select example" onchange="update_kpi_table_style(this)">
                                     {% for style in table_styles %}
                                     <option value="{{ style }}"> {{ style }}  </option>

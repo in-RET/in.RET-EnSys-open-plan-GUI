@@ -47,6 +47,21 @@ with open(staticfiles_storage.path("MVS_kpis_list.csv")) as csvfile:
                             {"name": _(verbose), "id": label, "unit": _(unit)}
                         )
 
+KPI_PARAMETERS = {}
+with open(staticfiles_storage.path("MVS_kpis_list.csv")) as csvfile:
+    csvreader = csv.reader(csvfile, delimiter=',', quotechar='"')
+    for i, row in enumerate(csvreader):
+        if i == 0:
+            hdr = [el.replace(' ', '_').replace(':', '').lower() for el in row]
+            print(hdr)
+            label_idx = hdr.index("label")
+            cat_idx = hdr.index("category")
+        else:
+            label = row[label_idx]
+            category = row[cat_idx]
+            if category != "files":
+                KPI_PARAMETERS[label] = {k: _(v) if k == "verbose" or k == "definition" else v for k, v in zip(hdr, row)}
+
 def storage_asset_to_list(assets_results_json):
     """
     bring all storage subassets one level up to show their flows.

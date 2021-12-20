@@ -126,10 +126,14 @@
                         <div class="chart__header">
                             <div>
                                 <span class="title">KPI Comparison</span>
+                                <span><select id="kpi-table-style" name="kpi-table-style" class="form-select" aria-label="Default select example" onchange="update_kpi_table_style(this)">
+                                    {% for style in table_styles %}
+                                    <option value="{{ style }}"> {{ style }}  </option>
+                                    {% endfor %}
+                                </select></span>
                                 <span class="view" data-bs-toggle="modal" data-bs-target="#KPIModal">
-                      <span class="icon icon-i_arrow_right"></span>
-                      View KPIs
-                    </span>
+                                    <span class="icon icon-i_arrow_right"></span> View KPIs
+                                </span>
                             </div>
                             <div class="dropdown">
                                 <button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
@@ -142,7 +146,7 @@
                             </div>
                         </div>
                         <div class="chart__plot">
-                            <div id="tester"></div>
+                            <table class="table" id="selectedKPITable"></table>
                         </div>
                     </div>
                 </div>
@@ -284,6 +288,77 @@
 {% block end_body_scripts %}
 
 <script>
+function update_kpi_table_style(target){
+    $.ajax({
+        url: "{% url 'request_kpi_table' %}" + target.value, // TODO add scenarios in the arguments to provide answers
+        type: "GET",
+        success: async (table_data) => {
+
+        const parentDiv = document.getElementById("selectedKPITable");
+        parentDiv.innerHTML = "";
+
+
+        /* create KPI table headers */
+        const tableHead = document.createElement('thead');
+        const table_headers = ["Indicator", "Scen1 Value"]; // todo add dynamically more scenarios here
+        const table_length = table_headers.length;
+        const tableHeadContent = document.createElement('tr');
+        table_headers.map(hdr =>
+            {
+                var tableHdr = document.createElement('th');
+                tableHdr.innerHTML = hdr;
+                tableHeadContent.appendChild(tableHdr);
+            }
+        );
+        tableHead.appendChild(tableHeadContent)
+        parentDiv.appendChild(tableHead);
+
+
+        for(subBody in table_data) {
+            var tableBody = document.createElement('tbody');
+            tableBody.id = subBody;
+            /* add subtable title */
+            const tableSubSectionTitleRow = document.createElement('tr');
+            var tableSubSectionTitle = document.createElement('th');
+            tableSubSectionTitle.innerHTML = subBody;
+            tableSubSectionTitleRow.appendChild(tableSubSectionTitle);
+            for(i=0;i<table_length-1;++i){
+                tableSubSectionTitleRow.appendChild(document.createElement('td'));
+            }
+
+            tableBody.appendChild(tableSubSectionTitle);
+
+            /* add subtable lines for each parameter */
+            // (param should be a json object) with keys name (type str), unit type (str) and scen_values
+            table_data[subBody].map(param =>{
+                var tableSubSectionParamRow = document.createElement('tr');
+                var cell = tableSubSectionParamRow.insertCell(0);
+                cell.innerHTML = `{% blocktranslate %}` + param.name +`{% endblocktranslate %}` + " (" + `{% blocktranslate %}` + param.unit +`{% endblocktranslate %}` + ")";
+                //cell.append(" just to see");
+                // todo for loop over scenario values
+                for(i=0;i<param.scen_values.length;++i){
+                    cell = tableSubSectionParamRow.insertCell(1 + i);
+                    cell.innerHTML = param.scen_values[i];
+                }
+                tableBody.appendChild(tableSubSectionParamRow);
+            });
+
+
+            parentDiv.appendChild(tableBody);
+        }
+
+
+        },
+        error: function (xhr, errmsg) {
+            console.log("backend_error!")
+            //Show the error message
+            $('#message-div').html("<div class='alert-error'>" +
+                "<strong>Success: </strong> We have encountered an error: " + errmsg + "</div>");
+        }
+    });
+
+};
+
 function update_selected_scenarios(target){
     const proj_id = target.id.split("-")[1];
     const scen_id = target.id.split("-")[2];

@@ -21,6 +21,47 @@
 {% block title %}{% translate "Results" %}{% endblock title %}
 
 {% block content %}
+
+
+
+<div class="modal fade modal--dashboard" id="KPIModal" tabindex="-1" aria-labelledby="KPIModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="KPIModalLabel">{% translate "KPI Overview" %}</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table" id="kpiTable">
+                    <thead>
+                    <tr>
+                        <th scope="col">{% translate "Name" %}</th>
+                        <th scope="col">{% translate "Unit" %}</th>
+                        <th scope="col">{% translate "Definition" %}</th>
+                        <th scope="col"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for kpi_id, kpi in kpi_list.items %}
+                    <tr>
+                        <td scope="row">{% translate kpi.verbose %}</td>
+                        <td>{% translate kpi.unit %}</td>
+                        <td>{% translate kpi.definition %}</td>
+                        <td><button class="btn btn--small btn--transparent">+ {% translate "Add to results" %}</button></td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn--medium" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 <main>
     <section class="header">
         <div>

@@ -377,6 +377,9 @@ function update_selected_scenarios(target){
                 $(".scenario-select__item").map((i, item) => {item.classList.remove("selected");});
                 target.classList.add("selected"); // TODO change "add" to "toggle" when multi-scenario selection is allowed
                 //TODO: call functions which update graphs and so from here
+
+                /* Update the kpi table */
+                update_kpi_table_style(document.getElementById("kpi-table-style"));
             },
             error: function (xhr, errmsg) {
                 if (xhr.status != 405){

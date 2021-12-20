@@ -1,5 +1,9 @@
+import os
 import csv
 from django.contrib.staticfiles.storage import staticfiles_storage
+from django.utils.translation import ugettext_lazy as _
+import pickle
+from django.conf import settings as django_settings
 
 KPIS = {}
 MANAGEMENT_CAT = "management"
@@ -16,19 +20,32 @@ with open(staticfiles_storage.path("MVS_kpis_list.csv")) as csvfile:
         if i == 0:
             hdr = row
             label_idx = hdr.index("label")
+            verbose_idx = hdr.index("verbose")
+            unit_idx = hdr.index(":Unit:")
             cat_idx = hdr.index("category")
             subcat_idx = hdr.index("subcategory")
         else:
             label = row[label_idx]
+            verbose = row[verbose_idx]
+            unit = row[unit_idx]
             KPIS[label] = {k: v for k, v in zip(hdr, row)}
 
             cat = row[cat_idx]
             subcat = row[subcat_idx]
             if subcat == MANAGEMENT_CAT:
-                TABLES[MANAGEMENT_CAT][cat] = label
-            elif subcat != EMPTY_SUBCAT and subcat != MANAGEMENT_CAT:
+                # reverse the category and the subcategory for this special table (management is not a parameter type, whereas all other table are also parameter types)
+                subcat = cat
+                cat = MANAGEMENT_CAT
+
+            if subcat != EMPTY_SUBCAT:
                 if cat in TABLES:
-                    TABLES[cat][subcat] = label
+                    if subcat not in TABLES[cat]:
+                        TABLES[cat][subcat] = []
+                    if label not in TABLES[cat][subcat]:
+                        # the _() make the text translatable if it is mentionned in the django.po file
+                        TABLES[cat][subcat].append(
+                            {"name": _(verbose), "id": label, "unit": _(unit)}
+                        )
 
 def storage_asset_to_list(assets_results_json):
     """

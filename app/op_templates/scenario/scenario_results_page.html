@@ -63,11 +63,14 @@
                             <button id="scenario-{{ proj_id }}-{{ scenario.id}}" class="scenario-select__item {{ selected }}" onclick="update_selected_scenarios(this)">
                                 {{ scenario.name }}
                             </button>
+                        {% empty %}
+                            {% translate "You have no scenario with completed simulation, please run simulations to display results" %}
                         {% endfor %}
 
                     </div>
                 </div>
             </div>
+            {% if scenario_list %}
             <div class="row">
                 <div class="col col-md-8">
                     <div class="chart">
@@ -222,6 +225,7 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
         </div>
     </section>
 </main>

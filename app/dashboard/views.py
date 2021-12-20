@@ -130,6 +130,8 @@ def scenario_request_results(request, scen_id):
 @require_http_methods(["POST", "GET"])
 def scenario_visualize_results(request, proj_id=None, scen_id=None):
 
+    excuses_design_under_development(request)
+
     user_projects = request.user.project_set.all()
 
     if request.POST:
@@ -145,11 +147,14 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
 
     user_scenarios = project.get_scenarios_with_results()
 
+    if user_scenarios.exists() is False:
+        pass
+    else:
+        if len(request.session.get("selected_scenarios", [])) == 0:
+            request.session["selected_scenarios"] = [user_scenarios.first().id]
+
 
     if scen_id is None:
-        excuses_design_under_development(request)
-
-
         answer = render(request, 'scenario/scenario_results_page.html', {"project_list": user_projects, 'proj_id': proj_id, "scenario_list": user_scenarios, "kpi_list": KPI_PARAMETERS, "table_styles": TABLES})
     else:
 
@@ -163,6 +168,7 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
             raise PermissionDenied
 
         qs = Simulation.objects.filter(scenario=scenario)
+
         if qs.exists():
             kpi_scalar_results_obj = KPIScalarResults.objects.get(simulation=scenario.simulation)
             kpi_scalar_values_dict = json.loads(kpi_scalar_results_obj.scalar_values)
@@ -192,7 +198,6 @@ def update_selected_scenarios(request, scen_id):
             else:
                 msg = _(f"At least one scenario need to be selected")
                 status_code = 405
-
         else:
             # TODO: uncomment following and delete the line after when multi-scenario selection is allowed
             # selected_scenario.append(scen_id)
@@ -205,6 +210,7 @@ def update_selected_scenarios(request, scen_id):
     else:
         answer = JsonResponse({"error": "This url is only for AJAX calls"}, status=405, content_type='application/json')
     return answer
+
 
 @login_required
 @json_view

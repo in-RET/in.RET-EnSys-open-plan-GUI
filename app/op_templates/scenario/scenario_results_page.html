@@ -257,7 +257,7 @@
             </div>-->
             <div class="row">
                 <div class="col">
-                    <div class="chart">
+                    <div class="chart" style="height: fit-content;">
                         <div class="chart__header">
                             <div>
                                 <span class="title">Time series</span>
@@ -273,7 +273,45 @@
                             </div>
                         </div>
                         <div class="chart__plot">
-                            <div id="tester2"></div>
+                            <div id="test"></div>
+                        </div>
+                    </div>
+                    <div class="chart" style="height: fit-content;">
+                        <div class="chart__header">
+                            <div>
+                                <span class="title">Time series</span>
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuTS" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="icon icon-more"></span>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuTS">
+                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as .xls</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as PDF</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="chart__plot">
+                            <div id="test1"></div>
+                        </div>
+                    </div>
+                    <div class="chart" style="height: fit-content;">
+                        <div class="chart__header">
+                            <div>
+                                <span class="title">Time series</span>
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuTS" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="icon icon-more"></span>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuTS">
+                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as .xls</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as PDF</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="chart__plot">
+                            <div id="test2"></div>
                         </div>
                     </div>
                 </div>
@@ -294,6 +332,11 @@
         $('#kpiTable').DataTable();
         // update the kpi table
         update_kpi_table_style(document.getElementById("kpi-table-style"));
+        const scen_id = "{{ scen_id }}"
+        scenario_visualize_timeseries(scen_id);
+        scenario_visualize_stacked_timeseries(scen_id);
+        scenario_visualize_stacked_stacked_total_flow(scen_id);
+        scenario_visualize_stacked_capacities(scen_id);
     });
 
 function update_kpi_table_style(target){
@@ -388,6 +431,12 @@ function update_selected_scenarios(target){
 
                 /* Update the kpi table */
                 update_kpi_table_style(document.getElementById("kpi-table-style"));
+
+                scenario_visualize_timeseries(scen_id);
+                scenario_visualize_stacked_timeseries(scen_id);
+                scenario_visualize_stacked_stacked_total_flow(scen_id);
+                scenario_visualize_stacked_capacities(scen_id);
+
             },
             error: function (xhr, errmsg) {
                 if (xhr.status != 405){
@@ -469,9 +518,13 @@ function scenario_visualize_stacked_capacities(scen_id){
 };
 
 
+    <!-- TODO: Add fancy titles names -->
+
+
     function drawScatterPLot(dataList) {
         {#console.log(dataList[0].values)#}
         const data= dataList[0].values;
+
         const layout= {
             title: dataList[0].title,
             yaxis:{
@@ -479,6 +532,7 @@ function scenario_visualize_stacked_capacities(scen_id){
             }
         }
         Plotly.newPlot('test', data, layout);
+
     }
 
     function drawstackedScatterPlot(dataList) {
@@ -492,6 +546,7 @@ function scenario_visualize_stacked_capacities(scen_id){
             const layout = {
                 title: dataList.commodity,
                 showlegend: true,
+
                 paper_bgcolor: "transparent",
                 yaxis:{
                     title: dataList.yaxistitle,
@@ -512,6 +567,7 @@ function scenario_visualize_stacked_capacities(scen_id){
         const layout = {
             title: title,
             barmode: 'stack',
+
             yaxis:{
                 title: dataList[0].yaxistitle,
                 categoryorder:'category ascending'
@@ -520,6 +576,7 @@ function scenario_visualize_stacked_capacities(scen_id){
         Plotly.newPlot(newGraph.id, data, layout);
 
     }
+
 
 </script>
 {% endblock end_body_scripts %}

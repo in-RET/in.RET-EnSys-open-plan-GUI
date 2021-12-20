@@ -173,11 +173,17 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
         pass
     else:
         if len(request.session.get("selected_scenarios", [])) == 0:
-            request.session["selected_scenarios"] = [user_scenarios.first().id]
+            scen_id = user_scenarios.first().id
+            request.session["selected_scenarios"] = [str(scen_id)]
+
 
 
     if scen_id is None:
-        answer = render(request, 'scenario/scenario_results_page.html', {"project_list": user_projects, 'proj_id': proj_id, "scenario_list": user_scenarios, "kpi_list": KPI_PARAMETERS, "table_styles": TABLES})
+        context = {"project_list": user_projects, 'proj_id': proj_id, "scenario_list": user_scenarios, "kpi_list": KPI_PARAMETERS, "table_styles": TABLES}
+        default_scen_id = request.session.get("selected_scenarios", [])
+        if len(default_scen_id) > 0:
+            context["scen_id"] = default_scen_id[0]
+        answer = render(request, 'scenario/scenario_results_page.html', context)
     else:
 
 
@@ -371,15 +377,17 @@ def scenario_visualize_stacked_timeseries(request, scen_id):
         # create new dict which has as its keys the commodities (Electricity, Heat, Gas, H2)
         # and as its values the corresponding asset dictionaries {energy_consumption: [{asset_type: ...}, .. ], ..}
 
-        new_dict = {commodity:
-                        {asset:
-                             [asset_obj
-                              for asset_obj in asset_list
-                              if asset_obj['energy_vector'] == commodity
-                              ]
-                         for asset, asset_list in assets_results_json.items()}
-                    for commodity in commodity_list
-                    }
+        new_dict = {
+            commodity: {
+                asset: [
+                     asset_obj
+                    for asset_obj in asset_list
+                    if asset_obj['energy_vector'] == commodity
+                ]
+                for asset, asset_list in assets_results_json.items()
+            }
+            for commodity in commodity_list
+        }
 
         ts_data = {commodity: get_asset_and_ts(asset_dict) for commodity, asset_dict in new_dict.items()}
         datetime_list = scenario.get_timestamps(json_format=True)
@@ -399,8 +407,10 @@ def scenario_visualize_stacked_timeseries(request, scen_id):
                         'fill': 'none' if asset_obj['type_oemof'] == 'sink' else 'tonexty',
                         'mode': 'none' if asset_obj['type_oemof'] != 'sink' else '',
                     }
+
                     for asset, asset_list in asset_list.items()
                     for asset_obj in asset_list
+                    if asset_obj['flow']['value']
                 ],
                 'commodity': commodity,
                 'yaxistitle': 'Energie'

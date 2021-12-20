@@ -232,15 +232,35 @@
 
 <script>
 function update_selected_scenarios(target){
-    console.log(target);
     const proj_id = target.id.split("-")[1];
-
     const scen_id = target.id.split("-")[2];
 
-    // TODO send an ajax request and in the view update the db object which remembers which scenarios were selected for the given project
-    // then provide the data in the session so that one does not need to always transfer a ton of data
-    // structure should call the list and the success should then call other function which collect the data in the session's cache and plot it(session cache should use mvs tokens to know if a simulation was updated or not)
-    console.log(scen_id);
+
+
+    // call the list and the success should then call other function which collect the data in the session's cache and plot it(session cache should use mvs tokens to know if a simulation was updated or not)
+    if(scen_id != null){
+
+        $.ajax({
+            url: "{% url 'update_selected_scenarios' %}" + scen_id,
+            type: "GET",
+            success: async (data) => {
+                await console.log(data);
+                // TODO: remove next line when multi-scenario selection is allowed
+                $(".scenario-select__item").map((i, item) => {item.classList.remove("selected");});
+                target.classList.add("selected"); // TODO change "add" to "toggle" when multi-scenario selection is allowed
+                //TODO: call functions which update graphs and so from here
+            },
+            error: function (xhr, errmsg) {
+                if (xhr.status != 405){
+                    console.log("backend_error!")
+                    //Show the error message
+                    $('#message-div').html("<div class='alert-error'>" +
+                        "<strong>Success: </strong> We have encountered an error: " + errmsg + "</div>");
+                }
+            }
+        });
+    }
+}
 }
 
 

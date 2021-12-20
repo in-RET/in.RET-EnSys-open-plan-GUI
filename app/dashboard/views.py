@@ -149,10 +149,14 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
     if scen_id is None:
         excuses_design_under_development(request)
 
-        answer = render(request, 'scenario/scenario_results_page.html', {"project_list": user_projects, 'proj_id': proj_id, "scenario_list": user_scenarios})
+
+        answer = render(request, 'scenario/scenario_results_page.html', {"project_list": user_projects, 'proj_id': proj_id, "scenario_list": user_scenarios, "kpi_list": KPI_PARAMETERS, "table_styles": TABLES})
     else:
 
+
         scenario = get_object_or_404(Scenario, pk=scen_id)
+        # TODO: change this when multi-scenario selection is allowed
+        request.session["selected_scenarios"] = [str(scenario.id)]
         proj_id = scenario.project.id
 
         if (scenario.project.user != request.user) and (request.user not in scenario.project.viewers.all()):
@@ -165,8 +169,7 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
 
             scalar_kpis_json = kpi_scalars_list(kpi_scalar_values_dict, KPI_SCALAR_UNITS, KPI_SCALAR_TOOLTIPS)
 
-            answer = render(request, 'scenario/scenario_visualize_results.html',
-                          {'scen_id': scen_id, 'scalar_kpis': scalar_kpis_json, 'project_id': proj_id})
+            answer = render(request, 'scenario/scenario_results_page.html', {'scen_id': scen_id, 'scalar_kpis': scalar_kpis_json, 'proj_id': proj_id, "project_list": user_projects, "scenario_list": user_scenarios, "kpi_list": KPI_PARAMETERS, "table_styles": TABLES})
         else:
             # redirect to the page where the simulation is started, or results fetched again
             messages.error(request, _("Your scenario was never simulated, the results are still pending or there is an error in the simulation. Please click on 'Run simulation', 'Update results' or 'Check status' button "))
@@ -191,7 +194,9 @@ def update_selected_scenarios(request, scen_id):
                 status_code = 405
 
         else:
-            selected_scenario.append(scen_id)
+            # TODO: uncomment following and delete the line after when multi-scenario selection is allowed
+            # selected_scenario.append(scen_id)
+            selected_scenario = [scen_id]
             msg = _(f"Scenario {scen_id} was selected")
             # TODO maybe store the data in the session
 

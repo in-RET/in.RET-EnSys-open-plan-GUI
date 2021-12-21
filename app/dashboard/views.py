@@ -22,15 +22,37 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+# Input: dictionary with assets assigned to their respective asset class (energy_consumption, energy_production etc.)
+# Returns an dictionary with keys: asset_name and values: optimized flows
+def get_asset_and_ts(assets_results_json):
+    dict_with_ts = dict()
+
+    for key, value in assets_results_json.items():
+        dict_with_ts[key] = []
+        for asset in value:
+            if 'flow' in asset.keys() and 'consumption_period' not in asset['label']:
+                dict_with_ts[key].append({'flow': asset['flow'],
+                                          'type_oemof': asset['type_oemof'],  # source, sink, transformer
+                                          'label': asset['label'],
+                                          'installed_capacity': asset['installed_capacity'],
+                                          })
+
+    return dict_with_ts
+
+
+# def sink_or_source_list():
+
+commodity_list = ['Electricity', 'Heat', 'Gas', 'H2']
+
+
 @login_required
 @json_view
 @require_http_methods(["GET"])
 def scenario_available_results(request, scen_id):
-
     scenario = get_object_or_404(Scenario, pk=scen_id)
     if (scenario.project.user != request.user) and (request.user not in scenario.project.viewers.all()):
         raise PermissionDenied
-    
+
     try:
         assets_results_obj = AssetsResults.objects.get(simulation=scenario.simulation)
         assets_results_json = json.loads(assets_results_obj.assets_list)
@@ -50,7 +72,7 @@ def scenario_available_results(request, scen_id):
                 for asset in assets_results_json[asset_category]
                 # show only assets of a certain Energy Vector
                 if asset['energy_vector'] == request.GET['energy_vector']
-                and any(key in ['flow','timeseries_soc'] for key in asset.keys())
+                   and any(key in ['flow', 'timeseries_soc'] for key in asset.keys())
             ]
             for asset_category in assets_results_json.keys()
         ]
@@ -72,7 +94,7 @@ def scenario_request_results(request, scen_id):
     #     return HttpResponseForbidden()
     if (scenario.project.user != request.user) and (request.user not in scenario.project.viewers.all()):
         raise PermissionDenied
-    
+
     # real data
     try:
         asset_name_list = request.GET.get('assetNameList').split(',')
@@ -81,23 +103,23 @@ def scenario_request_results(request, scen_id):
 
         # Generate available asset category list
         asset_category_list = [asset_category for asset_category in assets_results_json.keys()]
-        
+
         # bring all storage subasset one level up to show their flows.
         storage_asset_to_list(assets_results_json)
 
         # Asset category to asset type
         asset_name_to_category = {
-                asset_name['label']: asset_category
-                for asset_category in asset_category_list
-                for asset_name in assets_results_json[asset_category]
-            }
+            asset_name['label']: asset_category
+            for asset_category in asset_category_list
+            for asset_name in assets_results_json[asset_category]
+        }
 
         # Create the datetimes index. Constrains: step in minutes and evaluated_period in days
         base_date = scenario.start_date
         datetime_list = [
-            datetime.datetime.timestamp(base_date + datetime.timedelta(minutes=step)) 
-            for step in range(0, 24*scenario.evaluated_period*scenario.time_step, scenario.time_step)
-            ]
+            datetime.datetime.timestamp(base_date + datetime.timedelta(minutes=step))
+            for step in range(0, 24 * scenario.evaluated_period * scenario.time_step, scenario.time_step)
+        ]
 
         # Generate results JSON per asset name
         results_json = [
@@ -110,7 +132,8 @@ def scenario_request_results(request, scen_id):
                 'yAxis':
                     {
                         'values': asset['flow']['value'] if 'flow' in asset else asset['timeseries_soc']['value'],
-                        'label': asset['flow']['unit'] if 'flow' in asset else asset['timeseries_soc']['unit'],  # 'Power'
+                        'label': asset['flow']['unit'] if 'flow' in asset else asset['timeseries_soc']['unit'],
+                        # 'Power'
                     },
                 'title': asset_name
             }
@@ -122,8 +145,8 @@ def scenario_request_results(request, scen_id):
         return JsonResponse(results_json, status=200, content_type='application/json', safe=False)
     except Exception as e:
         logger.error(f"Dashboard ERROR: MVS Req Id: {scenario.simulation.mvs_token}. Thrown Exception: {e}")
-        return JsonResponse({"Error":"Could not retrieve timeseries data."}, status=404, content_type='application/json', safe=False)
-
+        return JsonResponse({"Error": "Could not retrieve timeseries data."}, status=404,
+                            content_type='application/json', safe=False)
 
 @login_required
 @require_http_methods(["POST", "GET"])
@@ -173,15 +196,15 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
             kpi_scalar_values_dict = json.loads(kpi_scalar_results_obj.scalar_values)
 
             scalar_kpis_json = kpi_scalars_list(kpi_scalar_values_dict, KPI_SCALAR_UNITS, KPI_SCALAR_TOOLTIPS)
-
             answer = render(request, 'scenario/scenario_results_page.html', {'scen_id': scen_id, 'scalar_kpis': scalar_kpis_json, 'proj_id': proj_id, "project_list": user_projects, "scenario_list": user_scenarios, "kpi_list": KPI_PARAMETERS, "table_styles": TABLES})
+
         else:
             # redirect to the page where the simulation is started, or results fetched again
-            messages.error(request, _("Your scenario was never simulated, the results are still pending or there is an error in the simulation. Please click on 'Run simulation', 'Update results' or 'Check status' button "))
+            messages.error(request,
+                           _("Your scenario was never simulated, the results are still pending or there is an error in the simulation. Please click on 'Run simulation', 'Update results' or 'Check status' button "))
             answer = HttpResponseRedirect(reverse('scenario_review', args=[proj_id, scen_id]))
 
     return answer
-
 
 @login_required
 @json_view
@@ -254,36 +277,213 @@ def scenario_economic_results(request, scen_id=None):
     #     return HttpResponseForbidden()
     if (scenario.project.user != request.user) and (request.user not in scenario.project.viewers.all()):
         raise PermissionDenied
-    
+
     try:
         kpi_cost_results_obj = KPICostsMatrixResults.objects.get(simulation=scenario.simulation)
         kpi_cost_values_dict = json.loads(kpi_cost_results_obj.cost_values)
 
         new_dict = dict()
         for asset_name in kpi_cost_values_dict.keys():
-            for category,v in kpi_cost_values_dict[asset_name].items():
+            for category, v in kpi_cost_values_dict[asset_name].items():
                 new_dict.setdefault(category, {})[asset_name] = v
-        
+
         # non-dummy data
         results_json = [
             {
-                'values': [(round(value,3) if 'currency/kWh' in KPI_COSTS_UNITS[category] else round(value,2)) for value in new_dict[category].values()],
-                'labels': [asset.replace('_',' ').upper() for asset in new_dict[category].keys()],
+                'values': [(round(value, 3) if '€/kWh' in KPI_COSTS_UNITS[category] else round(value, 2))
+                           for value in new_dict[category].values()],
+                'labels': [asset.replace('_', ' ').upper() for asset in new_dict[category].keys()],
                 'type': 'pie',
-                'title': category.replace('_',' ').upper(),
+                'title': category.replace('_', ' ').upper(),
                 'titleTooltip': KPI_COSTS_TOOLTIPS[category],
                 'units': [KPI_COSTS_UNITS[category] for _ in new_dict[category].keys()]
             }
             for category in new_dict.keys()
-            if category in KPI_COSTS_UNITS.keys() and sum(new_dict[category].values()) > 0.0  # there is at least one non zero value
-            and len(list(filter(lambda asset_name: new_dict[category][asset_name] > 0.0 ,new_dict[category]))) > 1.0
+            if category in KPI_COSTS_UNITS.keys() and sum(
+                new_dict[category].values()) > 0.0  # there is at least one non zero value
+               and len(list(filter(lambda asset_name: new_dict[category][asset_name] > 0.0, new_dict[category]))) > 1.0
             # there are more than one assets with value > 0
         ]
+
         return JsonResponse(results_json, status=200, content_type='application/json', safe=False)
     except Exception as e:
         logger.error(f"Dashboard ERROR: MVS Req Id: {scenario.simulation.mvs_token}. Thrown Exception: {e}")
-        return JsonResponse({"error":f"Could not retrieve kpi cost data."}, status=404, content_type='application/json', safe=False)
+        return JsonResponse({"error": f"Could not retrieve kpi cost data."}, status=404,
+                            content_type='application/json', safe=False)
 
+
+# TODO: Check for same units for all assets
+# TODO: If providers are used in model, delete duplicate time-series "DSO_consumption_period"
+#  (naive string matching solution in get_asset_and_ts() done)
+@login_required
+@json_view
+@require_http_methods(["GET"])
+def scenario_visualize_timeseries(request, scen_id):
+    scenario = get_object_or_404(Scenario, pk=scen_id)
+    if (scenario.project.user != request.user) and (request.user not in scenario.project.viewers.all()):
+        raise PermissionDenied
+
+    try:
+        assets_results_obj = AssetsResults.objects.get(simulation=scenario.simulation)
+        assets_results_json = json.loads(assets_results_obj.assets_list)
+        #import pdb;pdb.set_trace()
+        ts_data = get_asset_and_ts(assets_results_json)
+        datetime_list = scenario.get_timestamps(json_format=True)
+
+        results_json = [
+            {'values':
+                [
+                    {
+                        'x': datetime_list,
+                        'y': asset_obj['flow']['value'],
+                        'name': asset_obj['label']+' in '+asset_obj['flow']['unit'],
+                        'type': 'scatter',
+                        'line': {'shape': 'hv'},
+
+                    }
+                    for asset, asset_list in ts_data.items()
+                    for asset_obj in asset_list
+                ],
+            'title': 'Alle Zeitreihen'
+            }
+        ]
+
+        # import pdb;pdb.set_trace()
+        return JsonResponse(results_json, status=200, content_type='application/json', safe=False)
+    except Exception as e:
+        logger.error(f"Dashboard ERROR: MVS Req Id: {scenario.simulation.mvs_token}. Thrown Exception: {e}")
+        return JsonResponse({"error": f"Could not retrieve kpi cost data."}, status=404,
+                            content_type='application/json', safe=False)
+
+# TODO: Remove area plot from sink assets
+def scenario_visualize_stacked_timeseries(request, scen_id):
+    scenario = get_object_or_404(Scenario, pk=scen_id)
+    if (scenario.project.user != request.user) and (request.user not in scenario.project.viewers.all()):
+        raise PermissionDenied
+
+    try:
+        assets_results_obj = AssetsResults.objects.get(simulation=scenario.simulation)
+        assets_results_json = json.loads(assets_results_obj.assets_list)
+
+        # create new dict which has as its keys the commodities (Electricity, Heat, Gas, H2)
+        # and as its values the corresponding asset dictionaries {energy_consumption: [{asset_type: ...}, .. ], ..}
+
+        new_dict = {commodity:
+                        {asset:
+                             [asset_obj
+                              for asset_obj in asset_list
+                              if asset_obj['energy_vector'] == commodity
+                              ]
+                         for asset, asset_list in assets_results_json.items()}
+                    for commodity in commodity_list
+                    }
+
+        ts_data = {commodity: get_asset_and_ts(asset_dict) for commodity, asset_dict in new_dict.items()}
+        datetime_list = scenario.get_timestamps(json_format=True)
+
+        results_json = [
+            {'values':
+                [
+                    {
+                        'x': datetime_list,
+                        'y': asset_obj['flow']['value'],
+                        'name': asset_obj['label']+' in '+asset_obj['flow']['unit'],
+                        'type': 'scatter',
+                        'line': {'shape': 'hv'},
+                        'stackgroup': asset_obj['type_oemof'],
+                        'fill': 'none' if asset_obj['type_oemof'] == 'sink' else 'tonexty',
+                    }
+                    for asset, asset_list in asset_list.items()
+                    for asset_obj in asset_list
+                ],
+                'commodity': commodity
+            }
+            for commodity, asset_list in ts_data.items()
+        ]
+
+        return JsonResponse(results_json, status=200, content_type='application/json', safe=False)
+    except Exception as e:
+        logger.error(f"Dashboard ERROR: MVS Req Id: {scenario.simulation.mvs_token}. Thrown Exception: {e}")
+        return JsonResponse({"error": f"Could not retrieve kpi cost data."}, status=404,
+                            content_type='application/json', safe=False)
+
+
+# TODO: Sector coupling must be refined (including transformer flows)
+def scenario_visualize_stacked_total_flow(request, scen_id):
+    scenario = get_object_or_404(Scenario, pk=scen_id)
+    if (scenario.project.user != request.user) and (request.user not in scenario.project.viewers.all()):
+        raise PermissionDenied
+
+    try:
+        assets_results_obj = AssetsResults.objects.get(simulation=scenario.simulation)
+        assets_results_json = json.loads(assets_results_obj.assets_list)
+
+        ts_data = get_asset_and_ts(assets_results_json)
+
+        results_json = [
+            {'values':
+                [
+                    {
+                        'x': ['Erzeugung', 'Nutzung'],
+                        'y': [sum(asset_obj['flow']['value']), 0]
+                        if asset_obj['type_oemof'] == 'source'
+                        else [0, sum(asset_obj['flow']['value'])],
+                        'name': asset_obj['label']+' in '+asset_obj['flow']['unit'],
+                        'type': 'bar',
+
+                    }
+                    for asset, asset_list in ts_data.items()
+                    for asset_obj in asset_list
+                    if asset_obj['type_oemof'] in ['source', 'sink']
+                ],
+                'title': 'Erzeugung und Nutzung'
+            }
+        ]
+
+        # import pdb;pdb.set_trace()
+
+        return JsonResponse(results_json, status=200, content_type='application/json', safe=False)
+    except Exception as e:
+        logger.error(f"Dashboard ERROR: MVS Req Id: {scenario.simulation.mvs_token}. Thrown Exception: {e}")
+        return JsonResponse({"error": f"Could not retrieve kpi cost data."}, status=404,
+                            content_type='application/json', safe=False)
+
+# TODO: Check if optimized capacities are being loaded (I think not) 
+def scenario_visualize_stacked_capacities(request, scen_id):
+    scenario = get_object_or_404(Scenario, pk=scen_id)
+    if (scenario.project.user != request.user) and (request.user not in scenario.project.viewers.all()):
+        raise PermissionDenied
+
+    try:
+        assets_results_obj = AssetsResults.objects.get(simulation=scenario.simulation)
+        assets_results_json = json.loads(assets_results_obj.assets_list)
+
+        ts_data = get_asset_and_ts(assets_results_json)
+
+        results_json = [
+            {'values':
+                [
+                    {
+                        'x': ['Installierte Kapazität'],
+                        'y': [asset_obj['installed_capacity']['value']],
+                        'name': asset_obj['label']+' in '+asset_obj['flow']['unit'],
+                        'type': 'bar',
+
+                    }
+                    for asset, asset_list in ts_data.items()
+                    for asset_obj in asset_list
+                ],
+            'title': 'Installierte Kapazität',
+            }
+        ]
+
+        #import pdb;pdb.set_trace()
+
+        return JsonResponse(results_json, status=200, content_type='application/json', safe=False)
+    except Exception as e:
+        logger.error(f"Dashboard ERROR: MVS Req Id: {scenario.simulation.mvs_token}. Thrown Exception: {e}")
+        return JsonResponse({"error": f"Could not retrieve kpi cost data."}, status=404,
+                            content_type='application/json', safe=False)
 
 
 @login_required
@@ -293,28 +493,27 @@ def download_scalar_results(request, scen_id):
 
     if (scenario.project.user != request.user) and (request.user not in scenario.project.viewers.all()):
         raise PermissionDenied
-    
+
     try:
         kpi_scalar_results_obj = KPIScalarResults.objects.get(simulation=scenario.simulation)
         kpi_scalar_values_dict = json.loads(kpi_scalar_results_obj.scalar_values)
         scalar_kpis_json = kpi_scalars_list(kpi_scalar_values_dict, KPI_SCALAR_UNITS, KPI_SCALAR_TOOLTIPS)
-        
+
         output = BytesIO()
         workbook = xlsxwriter.Workbook(output)
         worksheet = workbook.add_worksheet('Scalars')
 
         for idx, kpi_obj in enumerate(scalar_kpis_json):
-            if idx==0:
+            if idx == 0:
                 worksheet.write_row(0, 0, kpi_obj.keys())
-            worksheet.write_row(idx+1, 0, kpi_obj.values())
-        
+            worksheet.write_row(idx + 1, 0, kpi_obj.values())
+
         workbook.close()
         output.seek(0)
     except Exception as e:
-        logger.error(f"Dashboard ERROR: Could not generate KPI Scalars download file with Scenario Id: {scen_id}. Thrown Exception: {e}")
+        logger.error(
+            f"Dashboard ERROR: Could not generate KPI Scalars download file with Scenario Id: {scen_id}. Thrown Exception: {e}")
         raise Http404()
-
-    
 
     filename = 'kpi_scalar_results.xlsx'
     response = HttpResponse(
@@ -333,11 +532,11 @@ def download_cost_results(request, scen_id):
 
     if (scenario.project.user != request.user) and (request.user not in scenario.project.viewers.all()):
         raise PermissionDenied
-    
+
     try:
         kpi_cost_results_obj = KPICostsMatrixResults.objects.get(simulation=scenario.simulation)
         kpi_cost_values_dict = json.loads(kpi_cost_results_obj.cost_values)
-        
+
         output = BytesIO()
         workbook = xlsxwriter.Workbook(output)
         worksheet = workbook.add_worksheet('Costs')
@@ -347,15 +546,14 @@ def download_cost_results(request, scen_id):
             if col == 0:
                 worksheet.write_column(1, 0, asset_dict.keys())
                 worksheet.write_row(0, 1, kpi_cost_values_dict.keys())
-            worksheet.write_column(1, col+1, asset_dict.values())
-        
+            worksheet.write_column(1, col + 1, asset_dict.values())
+
         workbook.close()
         output.seek(0)
     except Exception as e:
-        logger.error(f"Dashboard ERROR: Could not generate KPI Costs download file with Scenario Id: {scen_id}. Thrown Exception: {e}")
+        logger.error(
+            f"Dashboard ERROR: Could not generate KPI Costs download file with Scenario Id: {scen_id}. Thrown Exception: {e}")
         raise Http404()
-
-    
 
     filename = 'kpi_individual_costs.xlsx'
     response = HttpResponse(
@@ -374,26 +572,26 @@ def download_timeseries_results(request, scen_id):
 
     if (scenario.project.user != request.user) and (request.user not in scenario.project.viewers.all()):
         raise PermissionDenied
-    
+
     try:
         assets_results_obj = AssetsResults.objects.get(simulation=scenario.simulation)
         assets_results_json = json.loads(assets_results_obj.assets_list)
         # Create the datetimes index. Constrains: step in minutes and evaluated_period in days
         base_date = scenario.start_date
         datetime_list = [
-            datetime.datetime.timestamp(base_date + datetime.timedelta(minutes=step)) 
-            for step in range(0, 24*scenario.evaluated_period*scenario.time_step, scenario.time_step)
+            datetime.datetime.timestamp(base_date + datetime.timedelta(minutes=step))
+            for step in range(0, 24 * scenario.evaluated_period * scenario.time_step, scenario.time_step)
         ]
 
         output = BytesIO()
         workbook = xlsxwriter.Workbook(output)
         merge_format = workbook.add_format({
-            'bold':     True,
-            'align':    'center',
-            'valign':   'vcenter',
+            'bold': True,
+            'align': 'center',
+            'valign': 'vcenter',
         })
 
-        KEY1, KEY2, KEY3, KEY4 = ('timeseries_soc', 'input power', 'output power' ,'storage capacity')
+        KEY1, KEY2, KEY3, KEY4 = ('timeseries_soc', 'input power', 'output power', 'storage capacity')
 
         for key in assets_results_json.keys():
             worksheet = workbook.add_worksheet(key)
@@ -401,34 +599,34 @@ def download_timeseries_results(request, scen_id):
             if key != 'energy_storage':
                 worksheet.write_column(2, 0, datetime_list)
                 for col, asset in enumerate(assets_results_json[key]):
-                    if all(key in asset.keys() for key in ['label','flow']):
-                        worksheet.write(0, col+1, asset['label'])
-                        worksheet.write(1, col+1, asset['flow']['unit'])
-                        worksheet.write_column(2, col+1, asset['flow']['value'])
+                    if all(key in asset.keys() for key in ['label', 'flow']):
+                        worksheet.write(0, col + 1, asset['label'])
+                        worksheet.write(1, col + 1, asset['flow']['unit'])
+                        worksheet.write_column(2, col + 1, asset['flow']['value'])
             else:
                 worksheet.write_column(3, 0, datetime_list)
                 col = 0
                 for idx, storage_asset in enumerate(assets_results_json[key]):
                     if all(key in storage_asset.keys() for key in ['label', KEY1, KEY2, KEY3, KEY4]):
-                        worksheet.merge_range(0, col+1, 0, col+4, storage_asset['label'], merge_format)
-                        
-                        worksheet.write(1, col+1, KEY1)
-                        worksheet.write(2, col+1, storage_asset[KEY1]['unit'])
-                        worksheet.write_column(3, col+1, storage_asset[KEY1]['value'])
+                        worksheet.merge_range(0, col + 1, 0, col + 4, storage_asset['label'], merge_format)
 
-                        worksheet.write(1, col+2, KEY2)
-                        worksheet.write(2, col+2, storage_asset[KEY2]['flow']['unit'])
-                        worksheet.write_column(3, col+2, storage_asset[KEY2]['flow']['value'])
+                        worksheet.write(1, col + 1, KEY1)
+                        worksheet.write(2, col + 1, storage_asset[KEY1]['unit'])
+                        worksheet.write_column(3, col + 1, storage_asset[KEY1]['value'])
 
-                        worksheet.write(1, col+3, KEY3)
-                        worksheet.write(2, col+3, storage_asset[KEY3]['flow']['unit'])
-                        worksheet.write_column(3, col+3, storage_asset[KEY3]['flow']['value'])
+                        worksheet.write(1, col + 2, KEY2)
+                        worksheet.write(2, col + 2, storage_asset[KEY2]['flow']['unit'])
+                        worksheet.write_column(3, col + 2, storage_asset[KEY2]['flow']['value'])
 
-                        worksheet.write(1, col+4, KEY4)
-                        worksheet.write(2, col+4, storage_asset[KEY4]['flow']['unit'])
-                        worksheet.write_column(3, col+4, storage_asset[KEY3]['flow']['value'])
+                        worksheet.write(1, col + 3, KEY3)
+                        worksheet.write(2, col + 3, storage_asset[KEY3]['flow']['unit'])
+                        worksheet.write_column(3, col + 3, storage_asset[KEY3]['flow']['value'])
 
-                        col+=5
+                        worksheet.write(1, col + 4, KEY4)
+                        worksheet.write(2, col + 4, storage_asset[KEY4]['flow']['unit'])
+                        worksheet.write_column(3, col + 4, storage_asset[KEY3]['flow']['value'])
+
+                        col += 5
 
         workbook.close()
         output.seek(0)
@@ -442,6 +640,6 @@ def download_timeseries_results(request, scen_id):
 
         return response
     except Exception as e:
-        logger.error(f"Dashboard ERROR: Could not generate Timeseries Results file for the Scenario with Id: {scen_id}. Thrown Exception: {e}")
+        logger.error(
+            f"Dashboard ERROR: Could not generate Timeseries Results file for the Scenario with Id: {scen_id}. Thrown Exception: {e}")
         raise Http404()
-

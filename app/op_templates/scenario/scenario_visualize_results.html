@@ -31,6 +31,23 @@
     </div>
 </div>
 
+
+
+<div class="row">
+    <div class="panel panel-info">
+        <h2 class="panel-heading" style="text-align: center;">Minh Test Figures</h2>
+        <hr class="mt-2">
+{#        <div id="testplot1"></div>#}
+        <div id="test"></div>
+        <div id="test1"></div>
+        <div id="test2"></div>
+
+{#        <div class="panel-body t1" id="timeseries_data"></div>#}
+
+        <a type="button" class="btn btn-info" href="{% url 'download_cost_results' scen_id %}">Download Cost Results</a>
+    </div>
+</div>
+
 <!-- Scalar Results -->
 <div class="row panel panel-info" style="font-size: 80%;">
     <br>
@@ -110,6 +127,28 @@
 
 {% block end_body_scripts %}
 <script>
+
+{#var plotid = $("#testplot1")[0];#}
+{#console.log(plotid);#}
+{##}
+{#	var trace1 = {#}
+{#        x: [1, 2, 3, 4],#}
+{#        y: [10, 15, 13, 17],#}
+{#        type: 'scatter'#}
+{#        };#}
+{##}
+{#    var trace2 = {#}
+{#        x: [1, 2, 3, 4],#}
+{#        y: [16, 5, 11, 9],#}
+{#        type: 'scatter'#}
+{#        };#}
+{##}
+{#    var data = [trace1, trace2];#}
+{#    Plotly.newPlot(plotid, data);#}
+
+
+
+
     $(document).ready(function () {
         $('#scalarTable').DataTable();
     });
@@ -135,7 +174,7 @@
         const data = [{
             values: dataList.values,
             labels: dataList.labels,
-            
+
             marker: {
                 colors: [('0.444444444444', '#ffeab0'),
                         ('0.555555555556', 'rgb(224,243,248)'),
@@ -161,7 +200,7 @@
             textposition: "inside",
             automargin: true,
         }];
-        
+
         //data.map(dat => console.log(`${dataList.title} \n ${dat.values} \n ${dat.labels}`));
 
         const layout = {
@@ -199,6 +238,118 @@
             maxWidth: '50rem',
             themes: 'material'
         });
+    }
+
+
+    $('#timeseries_data').ready(function () {
+        $.ajax({
+            url: "{% url 'scenario_visualize_timeseries' scen_id %}",
+            type: "GET",
+            success: async (dataList) => {
+                await drawScatterPLot(dataList);
+            },
+            error: function (xhr, errmsg) {
+                console.log("backend_error!")
+                //Show the error message
+                $('#message-div').html("<div class='alert-error'>" +
+                    "<strong>Success: </strong> We have encountered an error: " + errmsg + "</div>");
+            }
+        });
+    });
+
+    $('#stacked_timeseries_data').ready(function () {
+        $.ajax({
+            url: "{% url 'scenario_visualize_stacked_timeseries' scen_id %}",
+            type: "GET",
+            success: async (data) => {
+                await data.map(dataObj => drawstackedScatterPlot(dataObj));
+            },
+            error: function (xhr, errmsg) {
+                console.log("backend_error!")
+                //Show the error message
+                $('#message-div').html("<div class='alert-error'>" +
+                    "<strong>Success: </strong> We have encountered an error: " + errmsg + "</div>");
+            }
+        });
+    });
+
+
+    $('#stacked_total_flow').ready(function () {
+        $.ajax({
+            url: "{% url 'scenario_visualize_stacked_total_flow' scen_id %}",
+            type: "GET",
+            success: async (data) => {
+                await drawstackedBarChart(data);
+            },
+            error: function (xhr, errmsg) {
+                console.log("backend_error!")
+                //Show the error message
+                $('#message-div').html("<div class='alert-error'>" +
+                    "<strong>Success: </strong> We have encountered an error: " + errmsg + "</div>");
+            }
+        });
+    });
+
+    $('#stacked_capacities').ready(function () {
+        $.ajax({
+            url: "{% url 'scenario_visualize_stacked_capacities' scen_id %}",
+            type: "GET",
+            success: async (data) => {
+                await drawstackedBarChart(data);
+            },
+            error: function (xhr, errmsg) {
+                console.log("backend_error!")
+                //Show the error message
+                $('#message-div').html("<div class='alert-error'>" +
+                    "<strong>Success: </strong> We have encountered an error: " + errmsg + "</div>");
+            }
+        });
+    });
+
+    <!-- TODO: Add fancy titles names -->
+
+    function drawScatterPLot(dataList) {
+        {#console.log(dataList[0].values)#}
+        const data= dataList[0].values;
+        const layout= {
+            title: dataList[0].title,
+        }
+        Plotly.newPlot('test', data, layout);
+    }
+
+    function drawstackedScatterPlot(dataList) {
+
+        const data = dataList.values;
+
+        const parentDiv = document.getElementById("test1");
+        const newGraph = document.createElement('div');
+        newGraph.id = "scatter" + dataList.commodity.replaceAll(' ', '');
+        parentDiv.appendChild(newGraph);
+
+        const layout = {
+            title: dataList.commodity,
+            paper_bgcolor: "transparent"
+        }
+        Plotly.newPlot(newGraph.id, data, layout);
+    }
+
+    function drawstackedBarChart(dataList) {
+
+        const data = dataList[0].values;
+        const title = dataList[0].title;
+
+        const parentDiv = document.getElementById("test2");
+        const newGraph = document.createElement('div');
+        newGraph.id = "bar" + title.replaceAll(' ', '');
+        parentDiv.appendChild(newGraph);
+
+        const layout = {
+            title: title,
+            barmode: 'stack',
+            xaxis: {'categoryorder':'category ascending'},
+        }
+        Plotly.newPlot(newGraph.id, data, layout);
+
     }
 
     function addPagination() {
@@ -340,5 +491,6 @@
 
         // endregion
 </script> <!-- Time Series Data -->
+
 
 {% endblock end_body_scripts %}

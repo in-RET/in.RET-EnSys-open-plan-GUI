@@ -211,7 +211,7 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
 @require_http_methods(["GET"])
 def update_selected_scenarios(request, scen_id):
     if request.is_ajax():
-        selected_scenario = request.session.get("selected_scenarios", [])
+        selected_scenario = request.session.get("selected_scenarios", [])               #array with scenario id's ['1','5','10']
         status_code = 200
         if scen_id in selected_scenario:
             if len(selected_scenario) > 1:
@@ -238,7 +238,7 @@ def update_selected_scenarios(request, scen_id):
 @json_view
 @require_http_methods(["GET"])
 def request_kpi_table(request, table_style=None):
-
+    #import pdb; pdb.set_trace()
     # TODO fetch selected scenarios values here
     selected_scenario = request.session.get("selected_scenarios", [])
     scen_id = int(selected_scenario[0])  # TODO: fetch multiple scenarios results
@@ -336,7 +336,9 @@ def scenario_visualize_timeseries(request, scen_id):
                     {
                         'x': datetime_list,
                         'y': asset_obj['flow']['value'],
-                        'name': asset_obj['label']+' in '+asset_obj['flow']['unit'],
+                        'name': asset_obj['label']+' in '+asset_obj['flow']['unit']
+                                if asset_obj['flow']['unit']!='?'
+                                else asset_obj['label']+' in kWh',
                         'type': 'scatter',
                         'line': {'shape': 'hv'},
 
@@ -344,7 +346,8 @@ def scenario_visualize_timeseries(request, scen_id):
                     for asset, asset_list in ts_data.items()
                     for asset_obj in asset_list
                 ],
-            'title': 'Alle Zeitreihen'
+            'title': 'Alle Zeitreihen',
+            'yaxistitle': 'Energie',
             }
         ]
 
@@ -355,7 +358,7 @@ def scenario_visualize_timeseries(request, scen_id):
         return JsonResponse({"error": f"Could not retrieve kpi cost data."}, status=404,
                             content_type='application/json', safe=False)
 
-# TODO: Remove area plot from sink assets
+
 def scenario_visualize_stacked_timeseries(request, scen_id):
     scenario = get_object_or_404(Scenario, pk=scen_id)
     if (scenario.project.user != request.user) and (request.user not in scenario.project.viewers.all()):
@@ -387,16 +390,20 @@ def scenario_visualize_stacked_timeseries(request, scen_id):
                     {
                         'x': datetime_list,
                         'y': asset_obj['flow']['value'],
-                        'name': asset_obj['label']+' in '+asset_obj['flow']['unit'],
+                        'name': asset_obj['label']+' in '+asset_obj['flow']['unit']
+                                if asset_obj['flow']['unit']!='?'
+                                else asset_obj['label']+' in kWh',
                         'type': 'scatter',
                         'line': {'shape': 'hv'},
                         'stackgroup': asset_obj['type_oemof'],
                         'fill': 'none' if asset_obj['type_oemof'] == 'sink' else 'tonexty',
+                        'mode': 'none' if asset_obj['type_oemof'] != 'sink' else '',
                     }
                     for asset, asset_list in asset_list.items()
                     for asset_obj in asset_list
                 ],
-                'commodity': commodity
+                'commodity': commodity,
+                'yaxistitle': 'Energie'
             }
             for commodity, asset_list in ts_data.items()
         ]
@@ -428,7 +435,9 @@ def scenario_visualize_stacked_total_flow(request, scen_id):
                         'y': [sum(asset_obj['flow']['value']), 0]
                         if asset_obj['type_oemof'] == 'source'
                         else [0, sum(asset_obj['flow']['value'])],
-                        'name': asset_obj['label']+' in '+asset_obj['flow']['unit'],
+                        'name': asset_obj['label']+' in '+asset_obj['flow']['unit']
+                                if asset_obj['flow']['unit']!='?'
+                                else asset_obj['label']+' in kWh',
                         'type': 'bar',
 
                     }
@@ -436,7 +445,8 @@ def scenario_visualize_stacked_total_flow(request, scen_id):
                     for asset_obj in asset_list
                     if asset_obj['type_oemof'] in ['source', 'sink']
                 ],
-                'title': 'Erzeugung und Nutzung'
+                'title': 'Erzeugung und Nutzung',
+                'yaxistitle': 'Kumulierte Energie',
             }
         ]
 
@@ -448,7 +458,8 @@ def scenario_visualize_stacked_total_flow(request, scen_id):
         return JsonResponse({"error": f"Could not retrieve kpi cost data."}, status=404,
                             content_type='application/json', safe=False)
 
-# TODO: Check if optimized capacities are being loaded (I think not) 
+# TODO: Add optimized capacities
+# TODO: installed capacities and cumulative flow are being displayed in the same div, make them appear in seperate divs
 def scenario_visualize_stacked_capacities(request, scen_id):
     scenario = get_object_or_404(Scenario, pk=scen_id)
     if (scenario.project.user != request.user) and (request.user not in scenario.project.viewers.all()):
@@ -466,7 +477,9 @@ def scenario_visualize_stacked_capacities(request, scen_id):
                     {
                         'x': ['Installierte Kapazität'],
                         'y': [asset_obj['installed_capacity']['value']],
-                        'name': asset_obj['label']+' in '+asset_obj['flow']['unit'],
+                        'name': asset_obj['label']+' in '+asset_obj['flow']['unit']
+                                if asset_obj['flow']['unit']!='?'
+                                else asset_obj['label']+' in kWh',
                         'type': 'bar',
 
                     }
@@ -474,6 +487,7 @@ def scenario_visualize_stacked_capacities(request, scen_id):
                     for asset_obj in asset_list
                 ],
             'title': 'Installierte Kapazität',
+            'yaxistitle': 'Installierte Leistung'
             }
         ]
 

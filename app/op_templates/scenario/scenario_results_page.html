@@ -401,6 +401,125 @@ function update_selected_scenarios(target){
     }
 }
 
+function scenario_visualize_timeseries(scen_id){
+ $.ajax({
+            url: "{% url 'scenario_visualize_timeseries' %}" + scen_id,
+            type: "GET",
+            success: async (dataList) => {
+
+                await drawScatterPLot(dataList);
+            },
+            error: function (xhr, errmsg) {
+                console.log("backend_error!")
+                //Show the error message
+                $('#message-div').html("<div class='alert-error'>" +
+                    "<strong>Success: </strong> We have encountered an error: " + errmsg + "</div>");
+            }
+        });
+};
+
+function scenario_visualize_stacked_timeseries(scen_id){
+ $.ajax({
+            url: "{% url 'scenario_visualize_stacked_timeseries'%}" +  scen_id,
+            type: "GET",
+            success: async (data) => {
+            console.log(data)
+                await data.map(dataObj => drawstackedScatterPlot(dataObj));
+            },
+            error: function (xhr, errmsg) {
+                console.log("backend_error!")
+                //Show the error message
+                $('#message-div').html("<div class='alert-error'>" +
+                    "<strong>Success: </strong> We have encountered an error: " + errmsg + "</div>");
+            }
+        });
+};
+
+
+function scenario_visualize_stacked_stacked_total_flow(scen_id){
+ $.ajax({
+            url: "{% url 'scenario_visualize_stacked_total_flow' %}" + scen_id,
+            type: "GET",
+            success: async (data) => {
+                await drawstackedBarChart(data);
+            },
+            error: function (xhr, errmsg) {
+                console.log("backend_error!")
+                //Show the error message
+                $('#message-div').html("<div class='alert-error'>" +
+                    "<strong>Success: </strong> We have encountered an error: " + errmsg + "</div>");
+            }
+        });
+};
+
+function scenario_visualize_stacked_capacities(scen_id){
+ $.ajax({
+            url: "{% url 'scenario_visualize_stacked_capacities' %}" + scen_id,
+            type: "GET",
+            success: async (data) => {
+                await drawstackedBarChart(data);
+            },
+            error: function (xhr, errmsg) {
+                console.log("backend_error!")
+                //Show the error message
+                $('#message-div').html("<div class='alert-error'>" +
+                    "<strong>Success: </strong> We have encountered an error: " + errmsg + "</div>");
+            }
+        });
+};
+
+
+    function drawScatterPLot(dataList) {
+        {#console.log(dataList[0].values)#}
+        const data= dataList[0].values;
+        const layout= {
+            title: dataList[0].title,
+            yaxis:{
+                title: dataList[0].yaxistitle,
+            }
+        }
+        Plotly.newPlot('test', data, layout);
+    }
+
+    function drawstackedScatterPlot(dataList) {
+
+        const data = dataList.values;
+        if(data.length >0){
+            const parentDiv = document.getElementById("test1");
+            const newGraph = document.createElement('div');
+            newGraph.id = "scatter" + dataList.commodity.replaceAll(' ', '');
+            parentDiv.appendChild(newGraph);
+            const layout = {
+                title: dataList.commodity,
+                showlegend: true,
+                paper_bgcolor: "transparent",
+                yaxis:{
+                    title: dataList.yaxistitle,
+                }
+            }
+            Plotly.newPlot(newGraph.id, data, layout);
+        }
+    }
+
+    function drawstackedBarChart(dataList) {
+        console.log(dataList[0].values)
+        const data = dataList[0].values;
+        const title = dataList[0].title;
+        const parentDiv = document.getElementById("test2");
+        const newGraph = document.createElement('div');
+        newGraph.id = "bar" + title.replaceAll(' ', '');
+        parentDiv.appendChild(newGraph);
+        const layout = {
+            title: title,
+            barmode: 'stack',
+            yaxis:{
+                title: dataList[0].yaxistitle,
+                categoryorder:'category ascending'
+            }
+        }
+        Plotly.newPlot(newGraph.id, data, layout);
+
+    }
 
 </script>
 {% endblock end_body_scripts %}

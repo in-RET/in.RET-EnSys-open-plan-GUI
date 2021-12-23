@@ -436,6 +436,7 @@ function update_selected_scenarios(target){
                 scenario_visualize_stacked_timeseries(scen_id);
                 scenario_visualize_stacked_stacked_total_flow(scen_id);
                 scenario_visualize_stacked_capacities(scen_id);
+                scenario_visualize_stacked_optimized_capacities(scen_id);
 
             },
             error: function (xhr, errmsg) {
@@ -455,7 +456,6 @@ function scenario_visualize_timeseries(scen_id){
             url: "{% url 'scenario_visualize_timeseries' %}" + scen_id,
             type: "GET",
             success: async (dataList) => {
-
                 await drawScatterPLot(dataList);
             },
             error: function (xhr, errmsg) {
@@ -472,7 +472,6 @@ function scenario_visualize_stacked_timeseries(scen_id){
             url: "{% url 'scenario_visualize_stacked_timeseries'%}" +  scen_id,
             type: "GET",
             success: async (data) => {
-            console.log(data)
                 await data.map(dataObj => drawstackedScatterPlot(dataObj));
             },
             error: function (xhr, errmsg) {
@@ -517,14 +516,25 @@ function scenario_visualize_stacked_capacities(scen_id){
         });
 };
 
-
-    <!-- TODO: Add fancy titles names -->
-
+function scenario_visualize_stacked_optimized_capacities(scen_id){
+ $.ajax({
+            url: "{% url 'scenario_visualize_stacked_optimized_capacities' %}" + scen_id,
+            type: "GET",
+            success: async (data) => {
+                await drawstackedBarChart(data);
+            },
+            error: function (xhr, errmsg) {
+                console.log("backend_error!")
+                //Show the error message
+                $('#message-div').html("<div class='alert-error'>" +
+                    "<strong>Success: </strong> We have encountered an error: " + errmsg + "</div>");
+            }
+        });
+};
 
     function drawScatterPLot(dataList) {
         {#console.log(dataList[0].values)#}
         const data= dataList[0].values;
-
         const layout= {
             title: dataList[0].title,
             yaxis:{
@@ -536,7 +546,6 @@ function scenario_visualize_stacked_capacities(scen_id){
     }
 
     function drawstackedScatterPlot(dataList) {
-
         const data = dataList.values;
         if(data.length >0){
             const parentDiv = document.getElementById("test1");
@@ -546,7 +555,6 @@ function scenario_visualize_stacked_capacities(scen_id){
             const layout = {
                 title: dataList.commodity,
                 showlegend: true,
-
                 paper_bgcolor: "transparent",
                 yaxis:{
                     title: dataList.yaxistitle,
@@ -567,16 +575,13 @@ function scenario_visualize_stacked_capacities(scen_id){
         const layout = {
             title: title,
             barmode: 'stack',
-
             yaxis:{
                 title: dataList[0].yaxistitle,
                 categoryorder:'category ascending'
             }
         }
         Plotly.newPlot(newGraph.id, data, layout);
-
     }
-
 
 </script>
 {% endblock end_body_scripts %}

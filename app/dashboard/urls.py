@@ -14,6 +14,7 @@ urlpatterns = [
     re_path(r'^scenario/results/request_stacked_timeseries/(?P<scen_id>\d+)?$', scenario_visualize_stacked_timeseries, name='scenario_visualize_stacked_timeseries'),
     re_path(r'^scenario/results/request_stacked_total_flow/(?P<scen_id>\d+)?$', scenario_visualize_stacked_total_flow, name='scenario_visualize_stacked_total_flow'),
     re_path(r'^scenario/results/request_stacked_capacities/(?P<scen_id>\d+)?$', scenario_visualize_stacked_capacities, name='scenario_visualize_stacked_capacities'),
+    re_path(r'^scenario/results/request_stacked_optimized_capacities/(?P<scen_id>\d+)?$', scenario_visualize_stacked_optimized_capacities, name='scenario_visualize_stacked_optimized_capacities'),
     path('scenario/results/download_scalars/<int:scen_id>', download_scalar_results, name='download_scalar_results'),
     path('scenario/results/download_costs/<int:scen_id>', download_cost_results, name='download_cost_results'),
     path('scenario/results/download_timeseries/<int:scen_id>', download_timeseries_results, name='download_timeseries_results'),

@@ -18,7 +18,7 @@ import xlsxwriter
 import json
 import datetime
 import logging
-
+import ast
 logger = logging.getLogger(__name__)
 
 
@@ -244,7 +244,7 @@ def update_selected_scenarios(request, scen_id):
 @json_view
 @require_http_methods(["GET"])
 def request_kpi_table(request, table_style=None):
-    #import pdb; pdb.set_trace()
+
     # TODO fetch selected scenarios values here
     selected_scenario = request.session.get("selected_scenarios", [])
     scen_id = int(selected_scenario[0])  # TODO: fetch multiple scenarios results
@@ -318,7 +318,7 @@ def scenario_economic_results(request, scen_id=None):
                             content_type='application/json', safe=False)
 
 
-# TODO: Check for same units for all assets
+# TODO: Improve automatic unit recognition and selection
 # TODO: If providers are used in model, delete duplicate time-series "DSO_consumption_period"
 #  (naive string matching solution in get_asset_and_ts() done)
 @login_required
@@ -434,7 +434,6 @@ def scenario_visualize_stacked_total_flow(request, scen_id):
     try:
         assets_results_obj = AssetsResults.objects.get(simulation=scenario.simulation)
         assets_results_json = json.loads(assets_results_obj.assets_list)
-
         ts_data = get_asset_and_ts(assets_results_json)
 
         results_json = [
@@ -460,16 +459,15 @@ def scenario_visualize_stacked_total_flow(request, scen_id):
             }
         ]
 
-        # import pdb;pdb.set_trace()
-
         return JsonResponse(results_json, status=200, content_type='application/json', safe=False)
     except Exception as e:
         logger.error(f"Dashboard ERROR: MVS Req Id: {scenario.simulation.mvs_token}. Thrown Exception: {e}")
         return JsonResponse({"error": f"Could not retrieve kpi cost data."}, status=404,
                             content_type='application/json', safe=False)
 
-# TODO: Add optimized capacities
+
 # TODO: installed capacities and cumulative flow are being displayed in the same div, make them appear in seperate divs
+
 def scenario_visualize_stacked_capacities(request, scen_id):
     scenario = get_object_or_404(Scenario, pk=scen_id)
     if (scenario.project.user != request.user) and (request.user not in scenario.project.viewers.all()):
@@ -497,12 +495,52 @@ def scenario_visualize_stacked_capacities(request, scen_id):
                     for asset_obj in asset_list
                 ],
             'title': 'Installierte Kapazität',
-            'yaxistitle': 'Installierte Leistung'
+            'yaxistitle': 'Leistung'
             }
         ]
 
         #import pdb;pdb.set_trace()
 
+        return JsonResponse(results_json, status=200, content_type='application/json', safe=False)
+    except Exception as e:
+        logger.error(f"Dashboard ERROR: MVS Req Id: {scenario.simulation.mvs_token}. Thrown Exception: {e}")
+        return JsonResponse({"error": f"Could not retrieve kpi cost data."}, status=404,
+                            content_type='application/json', safe=False)
+
+
+def scenario_visualize_stacked_optimized_capacities(request, scen_id):
+    scenario = get_object_or_404(Scenario, pk=scen_id)
+    if (scenario.project.user != request.user) and (request.user not in scenario.project.viewers.all()):
+        raise PermissionDenied
+
+    try:
+        assets_results_obj = AssetsResults.objects.get(simulation=scenario.simulation)
+        assets_results_json = json.loads(assets_results_obj.assets_list)
+        results_dict = json.loads(Scenario.objects.first().simulation.results)
+        kpi_scalar_matrix = results_dict['kpi']['scalar_matrix']
+        #import pdb;pdb.set_trace()
+        ts_data = get_asset_and_ts(assets_results_json)
+
+        results_json = [
+            {'values':
+                [
+                    {
+                        'x': ['Optimierte Kapazität'],
+                        'y': [asset_parameters['optimizedAddCap']],
+                        'name': asset+' in '+asset_parameters['unit']
+                                if asset_parameters['unit']!='?'
+                                else asset+' in kW',
+                        'type': 'bar',
+
+                    }
+                    for asset, asset_parameters in kpi_scalar_matrix.items()
+                ],
+            'title': 'Optimierte Kapazität',
+            'yaxistitle': 'Leistung'
+            }
+        ]
+
+        #import pdb;pdb.set_trace()
         return JsonResponse(results_json, status=200, content_type='application/json', safe=False)
     except Exception as e:
         logger.error(f"Dashboard ERROR: MVS Req Id: {scenario.simulation.mvs_token}. Thrown Exception: {e}")

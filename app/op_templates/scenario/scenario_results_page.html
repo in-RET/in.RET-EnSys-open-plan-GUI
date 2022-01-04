@@ -335,8 +335,9 @@
         const scen_id = "{{ scen_id }}"
         scenario_visualize_timeseries(scen_id);
         scenario_visualize_stacked_timeseries(scen_id);
-        scenario_visualize_stacked_stacked_total_flow(scen_id);
+        scenario_visualize_stacked_total_flow(scen_id);
         scenario_visualize_stacked_capacities(scen_id);
+        scenario_visualize_stacked_optimized_capacities(scen_id);
     });
 
 function update_kpi_table_style(target){
@@ -434,7 +435,7 @@ function update_selected_scenarios(target){
 
                 scenario_visualize_timeseries(scen_id);
                 scenario_visualize_stacked_timeseries(scen_id);
-                scenario_visualize_stacked_stacked_total_flow(scen_id);
+                scenario_visualize_stacked_total_flow(scen_id);
                 scenario_visualize_stacked_capacities(scen_id);
                 scenario_visualize_stacked_optimized_capacities(scen_id);
 
@@ -484,7 +485,7 @@ function scenario_visualize_stacked_timeseries(scen_id){
 };
 
 
-function scenario_visualize_stacked_stacked_total_flow(scen_id){
+function scenario_visualize_stacked_total_flow(scen_id){
  $.ajax({
             url: "{% url 'scenario_visualize_stacked_total_flow' %}" + scen_id,
             type: "GET",
@@ -565,7 +566,7 @@ function scenario_visualize_stacked_optimized_capacities(scen_id){
     }
 
     function drawstackedBarChart(dataList) {
-        console.log(dataList[0].values)
+
         const data = dataList[0].values;
         const title = dataList[0].title;
         const parentDiv = document.getElementById("test2");

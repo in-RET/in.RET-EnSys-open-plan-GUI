@@ -332,7 +332,6 @@ def scenario_visualize_timeseries(request, scen_id):
     try:
         assets_results_obj = AssetsResults.objects.get(simulation=scenario.simulation)
         assets_results_json = json.loads(assets_results_obj.assets_list)
-        #import pdb;pdb.set_trace()
         ts_data = get_asset_and_ts(assets_results_json)
         datetime_list = scenario.get_timestamps(json_format=True)
 
@@ -357,7 +356,6 @@ def scenario_visualize_timeseries(request, scen_id):
             }
         ]
 
-        # import pdb;pdb.set_trace()
         return JsonResponse(results_json, status=200, content_type='application/json', safe=False)
     except Exception as e:
         logger.error(f"Dashboard ERROR: MVS Req Id: {scenario.simulation.mvs_token}. Thrown Exception: {e}")
@@ -499,8 +497,6 @@ def scenario_visualize_stacked_capacities(request, scen_id):
             }
         ]
 
-        #import pdb;pdb.set_trace()
-
         return JsonResponse(results_json, status=200, content_type='application/json', safe=False)
     except Exception as e:
         logger.error(f"Dashboard ERROR: MVS Req Id: {scenario.simulation.mvs_token}. Thrown Exception: {e}")
@@ -518,8 +514,6 @@ def scenario_visualize_stacked_optimized_capacities(request, scen_id):
         assets_results_json = json.loads(assets_results_obj.assets_list)
         results_dict = json.loads(Scenario.objects.first().simulation.results)
         kpi_scalar_matrix = results_dict['kpi']['scalar_matrix']
-        #import pdb;pdb.set_trace()
-        ts_data = get_asset_and_ts(assets_results_json)
 
         results_json = [
             {'values':
@@ -540,7 +534,6 @@ def scenario_visualize_stacked_optimized_capacities(request, scen_id):
             }
         ]
 
-        #import pdb;pdb.set_trace()
         return JsonResponse(results_json, status=200, content_type='application/json', safe=False)
     except Exception as e:
         logger.error(f"Dashboard ERROR: MVS Req Id: {scenario.simulation.mvs_token}. Thrown Exception: {e}")

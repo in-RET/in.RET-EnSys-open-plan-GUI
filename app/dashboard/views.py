@@ -341,9 +341,9 @@ def scenario_visualize_timeseries(request, scen_id):
                     {
                         'x': datetime_list,
                         'y': asset_obj['flow']['value'],
-                        'name': asset_obj['label']+' in '+asset_obj['flow']['unit']
+                        'name': asset_obj['label'].replace('_', ' ').upper()+' in '+asset_obj['flow']['unit']
                                 if asset_obj['flow']['unit']!='?'
-                                else asset_obj['label']+' in kWh',
+                                else asset_obj['label'].replace('_', ' ').upper()+' in kWh',
                         'type': 'scatter',
                         'line': {'shape': 'hv'},
 
@@ -353,6 +353,7 @@ def scenario_visualize_timeseries(request, scen_id):
                 ],
             'title': 'Alle Zeitreihen',
             'yaxistitle': 'Energie',
+            'div': 'all_timeseries',
             }
         ]
 
@@ -396,9 +397,9 @@ def scenario_visualize_stacked_timeseries(request, scen_id):
                     {
                         'x': datetime_list,
                         'y': asset_obj['flow']['value'],
-                        'name': asset_obj['label']+' in '+asset_obj['flow']['unit']
+                        'name': asset_obj['label'].replace('_', ' ').upper()+' in '+asset_obj['flow']['unit']
                                 if asset_obj['flow']['unit']!='?'
-                                else asset_obj['label']+' in kWh',
+                                else asset_obj['label'].replace('_', ' ').upper()+' in kWh',
                         'type': 'scatter',
                         'line': {'shape': 'hv'},
                         'stackgroup': asset_obj['type_oemof'],
@@ -411,7 +412,8 @@ def scenario_visualize_stacked_timeseries(request, scen_id):
                     if asset_obj['flow']['value']
                 ],
                 'commodity': commodity,
-                'yaxistitle': 'Energie'
+                'yaxistitle': 'Energie',
+                'div': 'stacked_timeseries',
             }
             for commodity, asset_list in ts_data.items()
         ]
@@ -438,13 +440,13 @@ def scenario_visualize_stacked_total_flow(request, scen_id):
             {'values':
                 [
                     {
-                        'x': ['Erzeugung', 'Nutzung'],
+                        'x': ['Erzeugung', 'Verbrauch'],
                         'y': [sum(asset_obj['flow']['value']), 0]
                         if asset_obj['type_oemof'] == 'source'
                         else [0, sum(asset_obj['flow']['value'])],
-                        'name': asset_obj['label']+' in '+asset_obj['flow']['unit']
+                        'name': asset_obj['label'].replace('_', ' ').upper()+' in '+asset_obj['flow']['unit']
                                 if asset_obj['flow']['unit']!='?'
-                                else asset_obj['label']+' in kWh',
+                                else asset_obj['label'].replace('_', ' ').upper()+' in kWh',
                         'type': 'bar',
 
                     }
@@ -452,8 +454,9 @@ def scenario_visualize_stacked_total_flow(request, scen_id):
                     for asset_obj in asset_list
                     if asset_obj['type_oemof'] in ['source', 'sink']
                 ],
-                'title': 'Erzeugung und Nutzung',
+                'title': 'Erzeugung und Verbrauch',
                 'yaxistitle': 'Kumulierte Energie',
+                'div': 'stacked_total_flow',
             }
         ]
 
@@ -463,8 +466,6 @@ def scenario_visualize_stacked_total_flow(request, scen_id):
         return JsonResponse({"error": f"Could not retrieve kpi cost data."}, status=404,
                             content_type='application/json', safe=False)
 
-
-# TODO: installed capacities and cumulative flow are being displayed in the same div, make them appear in seperate divs
 
 def scenario_visualize_stacked_capacities(request, scen_id):
     scenario = get_object_or_404(Scenario, pk=scen_id)
@@ -483,9 +484,9 @@ def scenario_visualize_stacked_capacities(request, scen_id):
                     {
                         'x': ['Installierte Kapazität'],
                         'y': [asset_obj['installed_capacity']['value']],
-                        'name': asset_obj['label']+' in '+asset_obj['flow']['unit']
+                        'name': asset_obj['label'].replace('_', ' ').upper()+' in '+asset_obj['flow']['unit']
                                 if asset_obj['flow']['unit']!='?'
-                                else asset_obj['label']+' in kWh',
+                                else asset_obj['label'].replace('_', ' ').upper()+' in kWh',
                         'type': 'bar',
 
                     }
@@ -493,7 +494,8 @@ def scenario_visualize_stacked_capacities(request, scen_id):
                     for asset_obj in asset_list
                 ],
             'title': 'Installierte Kapazität',
-            'yaxistitle': 'Leistung'
+            'yaxistitle': 'Leistung',
+            'div': 'capacities',
             }
         ]
 
@@ -503,17 +505,23 @@ def scenario_visualize_stacked_capacities(request, scen_id):
         return JsonResponse({"error": f"Could not retrieve kpi cost data."}, status=404,
                             content_type='application/json', safe=False)
 
-
+# TODO: push optimizedAddCap for DSO to KPI as "Spitzenlast"/ "Peak Demand"
+# TODO: Make a note appear if all components have optimized_capacity = False because no figure will be shown
 def scenario_visualize_stacked_optimized_capacities(request, scen_id):
     scenario = get_object_or_404(Scenario, pk=scen_id)
     if (scenario.project.user != request.user) and (request.user not in scenario.project.viewers.all()):
         raise PermissionDenied
 
     try:
-        assets_results_obj = AssetsResults.objects.get(simulation=scenario.simulation)
-        assets_results_json = json.loads(assets_results_obj.assets_list)
         results_dict = json.loads(Scenario.objects.first().simulation.results)
         kpi_scalar_matrix = results_dict['kpi']['scalar_matrix']
+        assets_results_obj = AssetsResults.objects.get(simulation=scenario.simulation)
+        assets_results_json = json.loads(assets_results_obj.assets_list)
+        asset_optimizeCap = dict()
+
+        for asset, asset_list in assets_results_json.items():
+            for asset_obj in asset_list:
+                asset_optimizeCap[asset_obj['label']] = asset_obj['optimize_capacity']['value']
 
         results_json = [
             {'values':
@@ -521,16 +529,18 @@ def scenario_visualize_stacked_optimized_capacities(request, scen_id):
                     {
                         'x': ['Optimierte Kapazität'],
                         'y': [asset_parameters['optimizedAddCap']],
-                        'name': asset+' in '+asset_parameters['unit']
+                        'name': asset.replace('_', ' ').upper()+' in '+asset_parameters['unit']
                                 if asset_parameters['unit']!='?'
-                                else asset+' in kW',
+                                else asset.replace('_', ' ').upper()+' in kW',
                         'type': 'bar',
 
                     }
                     for asset, asset_parameters in kpi_scalar_matrix.items()
+                    if asset_optimizeCap[asset] is True
                 ],
             'title': 'Optimierte Kapazität',
-            'yaxistitle': 'Leistung'
+            'yaxistitle': 'Leistung',
+            'div': 'capacities',
             }
         ]
 

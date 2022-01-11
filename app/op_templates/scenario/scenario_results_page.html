@@ -257,10 +257,12 @@
             </div>-->
             <div class="row">
                 <div class="col">
+
+
                     <div class="chart" style="height: fit-content;">
                         <div class="chart__header">
                             <div>
-                                <span class="title">Time series</span>
+                                <span class="title">All time series</span>
                             </div>
                             <div class="dropdown">
                                 <button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuTS" data-bs-toggle="dropdown" aria-expanded="false">
@@ -273,13 +275,15 @@
                             </div>
                         </div>
                         <div class="chart__plot">
-                            <div id="test"></div>
+                            <div id="all_timeseries"></div>
                         </div>
                     </div>
+
+
                     <div class="chart" style="height: fit-content;">
                         <div class="chart__header">
                             <div>
-                                <span class="title">Time series</span>
+                                <span class="title">Stacked time series by sector</span>
                             </div>
                             <div class="dropdown">
                                 <button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuTS" data-bs-toggle="dropdown" aria-expanded="false">
@@ -292,13 +296,15 @@
                             </div>
                         </div>
                         <div class="chart__plot">
-                            <div id="test1"></div>
+                            <div id="stacked_timeseries"></div>
                         </div>
                     </div>
+
+
                     <div class="chart" style="height: fit-content;">
                         <div class="chart__header">
                             <div>
-                                <span class="title">Time series</span>
+                                <span class="title">Aggregated total flow over project period</span>
                             </div>
                             <div class="dropdown">
                                 <button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuTS" data-bs-toggle="dropdown" aria-expanded="false">
@@ -311,11 +317,33 @@
                             </div>
                         </div>
                         <div class="chart__plot">
-                            <div id="test2"></div>
+                            <div id="stacked_total_flow"></div>
+                        </div>
+                    </div>
+
+
+                    <div class="chart" style="height: fit-content;">
+                        <div class="chart__header">
+                            <div>
+                                <span class="title">Installed and optimized capacities</span>
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuTS" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="icon icon-more"></span>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuTS">
+                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as .xls</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as PDF</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="chart__plot">
+                            <div id="capacities"></div>
                         </div>
                     </div>
                 </div>
             </div>
+            {# TODO: make button or add kpi/scalar matrix results to downloadable excel sheet #}
             <a type="button" class="btn btn-info" href="{% url 'download_timeseries_results' scen_id %}">{% translate "Download Timeseries" %}</a>
             {% endif %}
         </div>
@@ -535,7 +563,6 @@ function scenario_visualize_stacked_optimized_capacities(scen_id){
 };
 
     function drawScatterPLot(dataList) {
-        {#console.log(dataList[0].values)#}
         const data= dataList[0].values;
         const layout= {
             title: dataList[0].title,
@@ -543,14 +570,14 @@ function scenario_visualize_stacked_optimized_capacities(scen_id){
                 title: dataList[0].yaxistitle,
             }
         }
-        Plotly.newPlot('test', data, layout);
+        Plotly.newPlot(dataList[0].div, data, layout);
 
     }
 
     function drawstackedScatterPlot(dataList) {
         const data = dataList.values;
         if(data.length >0){
-            const parentDiv = document.getElementById("test1");
+            const parentDiv = document.getElementById(dataList.div);
             const newGraph = document.createElement('div');
             newGraph.id = "scatter" + dataList.commodity.replaceAll(' ', '');
             parentDiv.appendChild(newGraph);
@@ -570,7 +597,7 @@ function scenario_visualize_stacked_optimized_capacities(scen_id){
 
         const data = dataList[0].values;
         const title = dataList[0].title;
-        const parentDiv = document.getElementById("test2");
+        const parentDiv = document.getElementById(dataList[0].div);
         const newGraph = document.createElement('div');
         newGraph.id = "bar" + title.replaceAll(' ', '');
         parentDiv.appendChild(newGraph);

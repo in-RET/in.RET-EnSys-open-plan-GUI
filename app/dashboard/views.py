@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 
 # Input: dictionary with assets assigned to their respective asset class (energy_consumption, energy_production etc.)
-# Returns an dictionary with keys: asset_name and values: optimized flows
+# Returns a dictionary with keys: asset_name and values: optimized flows
 def get_asset_and_ts(assets_results_json):
     dict_with_ts = dict()
 
@@ -42,7 +42,7 @@ def get_asset_and_ts(assets_results_json):
 
 # def sink_or_source_list():
 
-commodity_list = ['Electricity', 'Heat', 'Gas', 'H2']
+sectors = ['Electricity', 'Heat', 'Gas', 'H2']
 
 
 @login_required
@@ -252,18 +252,32 @@ def request_kpi_table(request, table_style=None):
 
     kpi_scalar_results_obj = KPIScalarResults.objects.get(simulation=scenario.simulation)
     kpi_scalar_results_dict = json.loads(kpi_scalar_results_obj.scalar_values)
-
+    proj = get_object_or_404(Project)
+    unit_conv = {'currency': proj.economic_data.currency, 'Faktor': '%'}
     table = TABLES.get(table_style, None)
+
+    # do some unit substitution
+    for l in table.values():
+        for e in l:
+            if e['unit'] in unit_conv:
+                sub = unit_conv[e['unit']]
+                e['unit'] = sub
+
+    #import pdb; pdb.set_trace()
+
     if table is not None:
         for subtable_title, subtable_content in table.items():
             for param in subtable_content:
                 # TODO: provide multiple scenarios results
                 param["scen_values"] = [kpi_scalar_results_dict.get(param["id"], "not implemented yet")]
-
         answer = JsonResponse(table, status=200, content_type='application/json')
+
     else:
         allowed_styles = ", ".join(TABLES.keys())
         answer = JsonResponse({"error":f"The kpi table sytle {table_style} is not implemented. Please try one of {allowed_styles}"}, status=404, content_type='application/json')
+
+    #import pdb;pdb.set_trace()
+
     return answer
 
 @login_required
@@ -385,7 +399,7 @@ def scenario_visualize_stacked_timeseries(request, scen_id):
                 ]
                 for asset, asset_list in assets_results_json.items()
             }
-            for commodity in commodity_list
+            for commodity in sectors
         }
 
         ts_data = {commodity: get_asset_and_ts(asset_dict) for commodity, asset_dict in new_dict.items()}

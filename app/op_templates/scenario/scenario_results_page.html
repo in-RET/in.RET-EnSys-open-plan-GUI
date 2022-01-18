@@ -414,13 +414,14 @@ function update_kpi_table_style(target){
             table_data[subBody].map(param =>{
                 var tableSubSectionParamRow = document.createElement('tr');
                 var cell = tableSubSectionParamRow.insertCell(0);
-                cell.innerHTML = `{% blocktranslate %}` + param.name +`{% endblocktranslate %}` + " (" + `{% blocktranslate %}` + param.unit +`{% endblocktranslate %}` + ")";
+                cell.innerHTML = `{% blocktranslate %}` + param.name +`{% endblocktranslate %}`;
                 //cell.append(" just to see");
                 // todo for loop over scenario values
+                // TODO: resolve NaN error during rounding
                 for(i=0;i<param.scen_values.length;++i){
                     cell = tableSubSectionParamRow.insertCell(1 + i);
-                    cell.innerHTML = param.scen_values[i];
-                }
+                    cell.innerHTML = (Math.round( param.scen_values[i]* 100.0) / 100.0) +" " + param.unit
+                };
                 tableBody.appendChild(tableSubSectionParamRow);
             });
 

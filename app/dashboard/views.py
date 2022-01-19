@@ -13,6 +13,7 @@ from projects.models import Project, Scenario, Simulation
 from projects.services import excuses_design_under_development
 from django.utils.translation import ugettext_lazy as _
 from django.utils.safestring import mark_safe
+from numbers import Number
 from io import BytesIO
 import xlsxwriter
 import json
@@ -41,6 +42,13 @@ def get_asset_and_ts(assets_results_json):
 
 
 # def sink_or_source_list():
+
+def round_only_numbers(input, decimal_place):
+    if isinstance(input, Number):
+        return round(input, decimal_place)
+    else:
+        return input
+
 
 sectors = ['Electricity', 'Heat', 'Gas', 'H2']
 
@@ -263,20 +271,16 @@ def request_kpi_table(request, table_style=None):
                 sub = unit_conv[e['unit']]
                 e['unit'] = sub
 
-    #import pdb; pdb.set_trace()
-
     if table is not None:
         for subtable_title, subtable_content in table.items():
             for param in subtable_content:
                 # TODO: provide multiple scenarios results
-                param["scen_values"] = [kpi_scalar_results_dict.get(param["id"], "not implemented yet")]
+                param["scen_values"] = [round_only_numbers(kpi_scalar_results_dict.get(param["id"], "not implemented yet"), 2)]
         answer = JsonResponse(table, status=200, content_type='application/json')
 
     else:
         allowed_styles = ", ".join(TABLES.keys())
         answer = JsonResponse({"error":f"The kpi table sytle {table_style} is not implemented. Please try one of {allowed_styles}"}, status=404, content_type='application/json')
-
-    #import pdb;pdb.set_trace()
 
     return answer
 

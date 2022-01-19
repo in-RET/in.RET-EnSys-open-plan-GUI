@@ -417,10 +417,9 @@ function update_kpi_table_style(target){
                 cell.innerHTML = `{% blocktranslate %}` + param.name +`{% endblocktranslate %}`;
                 //cell.append(" just to see");
                 // todo for loop over scenario values
-                // TODO: resolve NaN error during rounding
                 for(i=0;i<param.scen_values.length;++i){
                     cell = tableSubSectionParamRow.insertCell(1 + i);
-                    cell.innerHTML = (Math.round( param.scen_values[i]* 100.0) / 100.0) +" " + param.unit
+                    cell.innerHTML = param.scen_values[i] +" " + param.unit
                 };
                 tableBody.appendChild(tableSubSectionParamRow);
             });

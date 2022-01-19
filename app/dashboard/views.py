@@ -50,6 +50,69 @@ def round_only_numbers(input, decimal_place):
         return input
 
 
+def nested_dictionary_crawler(dictionary, list_of_keys, path):
+    for key, value in dictionary.items():
+        path.append(key)
+        if isinstance(value, dict):
+            nested_dictionary_crawler(value, list_of_keys, path)
+        else:
+            list_of_keys.append(list(path))
+            path.pop()
+            continue
+    if path != []:
+        path.pop()
+    return list_of_keys
+
+
+def get_nested_value(dct, keys):
+    r"""Get a value from a succession of keys within a nested dict structure
+
+    Parameters
+    ----------
+    dct: dict
+        the (potentially nested) dict from which we want to get a value
+    keys: tuple
+        Tuple containing the succession of keys which lead to the value within the nested dict
+
+    Returns
+    -------
+    The value under the path within the (potentially nested) dict
+
+    Example
+    -------
+    >>> dct = dict(a=dict(a1=1, a2=2),b=dict(b1=dict(b11=11,b12=dict(b121=121))))
+    >>> print(get_nested_value(dct, ("b", "b1", "b12","b121")))
+    121
+    """
+    if isinstance(keys, tuple) is True:
+        if len(keys) > 1:
+            answer = get_nested_value(dct[keys[0]], keys[1:])
+        elif len(keys) == 1:
+            answer = dct[keys[0]]
+        else:
+            raise ValueError(
+                "The tuple argument 'keys' from get_nested_value() should not be empty"
+            )
+    else:
+        raise TypeError("The argument 'keys' from get_nested_value() should be a tuple")
+    return answer
+
+
+def dict_keyword_mapper(dictionary, keyword):
+    if keyword == 'KPI_individual_sectors':
+        print(get_nested_value(dictionary, ('kpi','KPI_individual_sectors')))
+    if keyword == 'cost_matrix':
+        print(get_nested_value(dictionary, ('kpi','cost_matrix')))
+    if keyword == 'scalar_matrix':
+        print(get_nested_value(dictionary, ('kpi','scalar_matrix')))
+    if keyword == 'scalars':
+        print(get_nested_value(dictionary, ('kpi','scalars')))
+    if keyword == 'project_data':
+        print(get_nested_value(dictionary, ('project_data')))
+    if keyword == 'simulation_settings':
+        print(get_nested_value(dictionary, ('simulation_settings')))
+
+
 sectors = ['Electricity', 'Heat', 'Gas', 'H2']
 
 

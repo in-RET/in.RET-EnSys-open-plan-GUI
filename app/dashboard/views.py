@@ -1,6 +1,6 @@
 from django.core.exceptions import PermissionDenied
 from django.http.response import Http404, HttpResponse
-from dashboard.helpers import storage_asset_to_list, kpi_scalars_list, KPI_PARAMETERS, TABLES
+from dashboard.helpers import *
 from dashboard.models import AssetsResults, KPICostsMatrixResults, KPIScalarResults, KPI_COSTS_TOOLTIPS, KPI_COSTS_UNITS, KPI_SCALAR_TOOLTIPS, KPI_SCALAR_UNITS
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -13,7 +13,6 @@ from projects.models import Project, Scenario, Simulation
 from projects.services import excuses_design_under_development
 from django.utils.translation import ugettext_lazy as _
 from django.utils.safestring import mark_safe
-from numbers import Number
 from io import BytesIO
 import xlsxwriter
 import json
@@ -21,99 +20,6 @@ import datetime
 import logging
 import ast
 logger = logging.getLogger(__name__)
-
-
-# Input: dictionary with assets assigned to their respective asset class (energy_consumption, energy_production etc.)
-# Returns a dictionary with keys: asset_name and values: optimized flows
-def get_asset_and_ts(assets_results_json):
-    dict_with_ts = dict()
-
-    for key, value in assets_results_json.items():
-        dict_with_ts[key] = []
-        for asset in value:
-            if 'flow' in asset.keys() and 'consumption_period' not in asset['label']:
-                dict_with_ts[key].append({'flow': asset['flow'],
-                                          'type_oemof': asset['type_oemof'],  # source, sink, transformer
-                                          'label': asset['label'],
-                                          'installed_capacity': asset['installed_capacity'],
-                                          })
-
-    return dict_with_ts
-
-
-# def sink_or_source_list():
-
-def round_only_numbers(input, decimal_place):
-    if isinstance(input, Number):
-        return round(input, decimal_place)
-    else:
-        return input
-
-
-def nested_dictionary_crawler(dictionary, list_of_keys, path):
-    for key, value in dictionary.items():
-        path.append(key)
-        if isinstance(value, dict):
-            nested_dictionary_crawler(value, list_of_keys, path)
-        else:
-            list_of_keys.append(list(path))
-            path.pop()
-            continue
-    if path != []:
-        path.pop()
-    return list_of_keys
-
-
-def get_nested_value(dct, keys):
-    r"""Get a value from a succession of keys within a nested dict structure
-
-    Parameters
-    ----------
-    dct: dict
-        the (potentially nested) dict from which we want to get a value
-    keys: tuple
-        Tuple containing the succession of keys which lead to the value within the nested dict
-
-    Returns
-    -------
-    The value under the path within the (potentially nested) dict
-
-    Example
-    -------
-    >>> dct = dict(a=dict(a1=1, a2=2),b=dict(b1=dict(b11=11,b12=dict(b121=121))))
-    >>> print(get_nested_value(dct, ("b", "b1", "b12","b121")))
-    121
-    """
-    if isinstance(keys, tuple) is True:
-        if len(keys) > 1:
-            answer = get_nested_value(dct[keys[0]], keys[1:])
-        elif len(keys) == 1:
-            answer = dct[keys[0]]
-        else:
-            raise ValueError(
-                "The tuple argument 'keys' from get_nested_value() should not be empty"
-            )
-    else:
-        raise TypeError("The argument 'keys' from get_nested_value() should be a tuple")
-    return answer
-
-
-def dict_keyword_mapper(dictionary, keyword):
-    if keyword == 'KPI_individual_sectors':
-        print(get_nested_value(dictionary, ('kpi','KPI_individual_sectors')))
-    if keyword == 'cost_matrix':
-        print(get_nested_value(dictionary, ('kpi','cost_matrix')))
-    if keyword == 'scalar_matrix':
-        print(get_nested_value(dictionary, ('kpi','scalar_matrix')))
-    if keyword == 'scalars':
-        print(get_nested_value(dictionary, ('kpi','scalars')))
-    if keyword == 'project_data':
-        print(get_nested_value(dictionary, ('project_data')))
-    if keyword == 'simulation_settings':
-        print(get_nested_value(dictionary, ('simulation_settings')))
-
-
-sectors = ['Electricity', 'Heat', 'Gas', 'H2']
 
 
 @login_required
@@ -288,7 +194,7 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
 @require_http_methods(["GET"])
 def update_selected_scenarios(request, scen_id):
     if request.is_ajax():
-        selected_scenario = request.session.get("selected_scenarios", [])               #array with scenario id's ['1','5','10']
+        selected_scenario = request.session.get("selected_scenarios", [])     #array with scenario id's ['1','5','10']
         status_code = 200
         if scen_id in selected_scenario:
             if len(selected_scenario) > 1:

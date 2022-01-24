@@ -195,7 +195,7 @@ class MinDOAConstraint(Constraint):
     name = models.CharField(max_length=30, default='minimal_degree_of_autonomy', editable=False)
 
 class NZEConstraint(Constraint):
-    value = models.BooleanField(null=True, blank=False, choices=TRUE_FALSE_CHOICES, default=False)
+    value = models.BooleanField(null=True, blank=False, choices=BOOL_CHOICES, default=False)
     unit = models.CharField(max_length=4, default='bool', editable=False)
     name = models.CharField(max_length=30, default='net_zero_energy', editable=False)
 

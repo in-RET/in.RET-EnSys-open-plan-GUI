@@ -290,7 +290,7 @@ class MinDOAConstraintForm(OpenPlanModelForm):
 class NZEConstraintForm(OpenPlanModelForm):
     class Meta:
         model = NZEConstraint
-        exclude = ['scenario']
+        exclude = ['scenario', 'value']
 
 
 

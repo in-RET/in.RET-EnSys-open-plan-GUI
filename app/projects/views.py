@@ -560,6 +560,9 @@ def scenario_create_constraints(request, proj_id, scen_id, step_id=3, max_step=4
                     constraint_instance = form.save(commit=False)
                     constraint_instance.scenario = scenario
 
+                if constraint_type == "net_zero_energy":
+                    constraint_instance.value = constraint_instance.activated
+
                 constraint_instance.save()
 
         return HttpResponseRedirect(reverse('scenario_review', args=[proj_id, scen_id]))

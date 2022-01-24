@@ -515,15 +515,15 @@ def scenario_create_constraints(request, proj_id, scen_id, step_id=3, max_step=4
     }
     constraints_forms = {
         "minimal_degree_of_autonomy": MinRenewableConstraintForm,
-        "minimal_renewable_factor": MaxEmissionConstraintForm,
-        "maximum_emissions": MinDOAConstraintForm,
+        "minimal_renewable_factor": MinDOAConstraintForm,
+        "maximum_emissions": MaxEmissionConstraintForm,
         "net_zero_energy": NZEConstraintForm,
     }
 
     constraints_models = {
         "minimal_degree_of_autonomy": MinRenewableConstraint,
-        "minimal_renewable_factor": MaxEmissionConstraint,
-        "maximum_emissions": MinDOAConstraint,
+        "minimal_renewable_factor": MinDOAConstraint,
+        "maximum_emissions": MaxEmissionConstraint,
         "net_zero_energy": NZEConstraint,
     }
 
@@ -546,10 +546,9 @@ def scenario_create_constraints(request, proj_id, scen_id, step_id=3, max_step=4
             #check whether the constraint is already associated to the scenario
             qs = constraints_models[constraint_type].objects.filter(scenario=scenario)
             if qs.exists():
-                unbound_forms[constraint_type]= constraint_form(prefix=constraint_type, instance=qs[0])
+                unbound_forms[constraint_type] = constraint_form(prefix=constraint_type, instance=qs[0])
             else:
-                unbound_forms[constraint_type]= constraint_form(prefix=constraint_type)
-
+                unbound_forms[constraint_type] = constraint_form(prefix=constraint_type)
         return render(request, f'scenario/scenario_step{step_id}.html',
                       {
                           'scenario': scenario,

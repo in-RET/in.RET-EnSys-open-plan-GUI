@@ -21,7 +21,7 @@
                     <div class="input-item">
                         <div class="scenario-create__form">
                             <div>
-                                <label class="form-label">{{ forms_labels|get_item:constraint_id }}</label>
+                                <label class="form-label">{{ forms_labels|get_item:constraint_id }} ({{ form.instance.unit }})</label>
                                 {% for field in form.visible_fields %}
                                     <!-- TODO: add class form-control and aria-describedby with constraint_id + "Help" -->
                                     {{ field|as_crispy_field }}

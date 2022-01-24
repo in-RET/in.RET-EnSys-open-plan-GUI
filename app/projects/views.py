@@ -532,7 +532,15 @@ def scenario_create_constraints(request, proj_id, scen_id, step_id=3, max_step=4
         if qs_sim.exists():
             max_step = 5
 
-        unbound_forms = {k: v(prefix=k) for k,v in constraints_forms.items()}
+        # prepare the forms for each constraint
+        unbound_forms = {}
+        for constraint_type, constraint_form in constraints_forms.items():
+            #check whether the constraint is already associated to the scenario
+            qs = constraints_models[constraint_type].objects.filter(scenario=scenario)
+            if qs.exists():
+                unbound_forms[constraint_type]= constraint_form(prefix=constraint_type, instance=qs[0])
+            else:
+                unbound_forms[constraint_type]= constraint_form(prefix=constraint_type)
         return render(request, f'scenario/scenario_step{step_id}.html',
                       {
                           'scenario': scenario,

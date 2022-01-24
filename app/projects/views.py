@@ -21,7 +21,7 @@ from .requests import mvs_simulation_request, mvs_simulation_check_status, get_m
 from .models import *
 from .scenario_topology_helpers import handle_storage_unit_form_post, handle_bus_form_post, handle_asset_form_post, load_scenario_topology_from_db, NodeObject, \
     update_deleted_objects_from_database, duplicate_scenario_objects, duplicate_scenario_connections, get_topology_json
-from .constants import DONE, ERROR
+from .constants import DONE, ERROR, MODIFIED
 from .services import create_or_delete_simulation_scheduler, excuses_design_under_development, send_feedback_email
 import traceback
 logger = logging.getLogger(__name__)
@@ -392,7 +392,14 @@ def scenario_create_parameters(request, proj_id, scen_id=None, step_id=1, max_st
                 scenario = Scenario()
             else:
                 scenario = Scenario.objects.get(id=scen_id)
-            [setattr(scenario, name, value) for name, value in form.cleaned_data.items()]
+
+            qs_sim = Simulation.objects.filter(scenario=scenario)
+            # update the parameter values which are different from existing values
+            for name, value in form.cleaned_data.items():
+                if getattr(scenario, name) != value:
+                    setattr(scenario, name, value)
+                    if qs_sim.exists():
+                        qs_sim.update(status=MODIFIED)
 
             # update the project associated to the scenario
             proj_id = scenario.project.id
@@ -525,10 +532,11 @@ def scenario_create_constraints(request, proj_id, scen_id, step_id=3, max_step=4
     if (scenario.project.user != request.user) and (request.user not in scenario.project.viewers.all()):
         raise PermissionDenied
 
+    qs_sim = Simulation.objects.filter(scenario=scenario)
+
     if request.method == "GET":
 
         # if a simulation object linked to this scenario exists, all steps have been already fullfilled
-        qs_sim = Simulation.objects.filter(scenario=scenario)
         if qs_sim.exists():
             max_step = 5
 
@@ -541,6 +549,7 @@ def scenario_create_constraints(request, proj_id, scen_id, step_id=3, max_step=4
                 unbound_forms[constraint_type]= constraint_form(prefix=constraint_type, instance=qs[0])
             else:
                 unbound_forms[constraint_type]= constraint_form(prefix=constraint_type)
+
         return render(request, f'scenario/scenario_step{step_id}.html',
                       {
                           'scenario': scenario,
@@ -558,12 +567,17 @@ def scenario_create_constraints(request, proj_id, scen_id, step_id=3, max_step=4
             form = form_model(request.POST, prefix=constraint_type)
 
             if form.is_valid():
-                #check whether the constraint is already associated to a scenario
+                #check whether the constraint is already associated to the scenario
                 qs = constraints_models[constraint_type].objects.filter(scenario=scenario)
                 if qs.exists():
                     if len(qs) == 1:
                         constraint_instance = qs[0]
-                        [setattr(constraint_instance, name, value) for name, value in form.cleaned_data.items()]
+                        for name, value in form.cleaned_data.items():
+                            if getattr(constraint_instance, name) != value:
+                                setattr(constraint_instance, name, value)
+                                if qs_sim.exists():
+                                    qs_sim.update(status=MODIFIED)
+
                 else:
                     constraint_instance = form.save(commit=False)
                     constraint_instance.scenario = scenario

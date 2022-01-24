@@ -386,5 +386,13 @@ def remove_empty_elements(d):
 def get_topology_json(scenario_to_convert):
     mvs_request_dto = convert_to_dto(scenario_to_convert)
     dumped_data = json.loads(json.dumps(mvs_request_dto.__dict__, default=lambda o: o.__dict__))
+
+    # format the constraints in MVS format directly, thus avoiding the need to maintain MVS-EPA
+    # parser in multi-vector-simulator package
+    constraint_dict = {}
+    for constraint in dumped_data["constraints"]:
+        constraint_dict[constraint["label"]] = constraint["value"]
+    dumped_data["constraints"] = constraint_dict
+
     # Remove None values
     return remove_empty_elements(dumped_data)

@@ -23,9 +23,17 @@
         <div>
 
             {% if simulation_status %}
+
                 <div class="row">
+
+                    <a class="btn btn--medium" href="{% url 'view_mvs_data_input' scen_id %}" >{% translate "Proof parameters JSON file" %} </a>
+                    {% if simulation_status != "MODIFIED" %}
                     The simulation <a href="https://mvs-eland.rl-institut.de/check/{{ mvs_token }}">{{ mvs_token }}</a> has been started, its status is <span>{{ simulation_status }}</span>
+                    {% else %}
+                    The parameters of the scenario linked to the simulation <a href="https://mvs-eland.rl-institut.de/check/{{ mvs_token }}">{{ mvs_token }}</a> have been changed, you can rerun the simulation to update the results, please note that existing results will be erased only if the simulation does not have errors
+                    {% endif %}
                 </div>
+
                 <div class="row">
                     {% if simulation_status == "DONE" %}
                         <a class="btn btn--medium" style="display:none;" href="{% url 'update_simulation_results' proj_id scen_id %}" >{% translate "Update results" %} </a>
@@ -42,8 +50,10 @@
                         </form>
                     {% endif %}
                 </div>
+            {% else %}
+                <div class="row">{% translate "You can now click on 'Run simulation' button" %}</div>
             {% endif %}
-            <div class="row"></div>
+
         </div>
     </section>
 

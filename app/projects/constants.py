@@ -253,6 +253,8 @@ TRUE_FALSE_CHOICES = (
     (False, 'No')
 )
 
+BOOL_CHOICES = ((True, "Yes"), (False, "No"))
+
 FLOW_DIRECTION = (
     ('B2A', 'Bus_to_Asset'),
     ('A2B', 'Asset_to_Bus'),

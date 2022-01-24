@@ -7,7 +7,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from datetime import timedelta
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
-from .constants import ASSET_CATEGORY, ASSET_TYPE, COUNTRY, CURRENCY, ENERGY_VECTOR, FLOW_DIRECTION, MVS_TYPE, SIMULATION_STATUS, TRUE_FALSE_CHOICES, USER_RATING
+from .constants import ASSET_CATEGORY, ASSET_TYPE, COUNTRY, CURRENCY, ENERGY_VECTOR, FLOW_DIRECTION, MVS_TYPE, SIMULATION_STATUS, TRUE_FALSE_CHOICES, BOOL_CHOICES, USER_RATING
 
 
 
@@ -174,7 +174,7 @@ class ConnectionLink(models.Model):
 
 class Constraint(models.Model):
     scenario = models.ForeignKey(Scenario, on_delete=models.CASCADE, null=False)
-    activated = models.BooleanField(null=True, blank=False, choices=TRUE_FALSE_CHOICES, default=False)
+    activated = models.BooleanField(null=True, blank=False, choices=BOOL_CHOICES, default=False)
 
     class Meta:
         abstract = True

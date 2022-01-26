@@ -115,7 +115,24 @@ def round_only_numbers(input, decimal_place):
 
 
 def nested_dictionary_crawler(dct, list_of_key_paths = [], path = []):
-
+    r"""Get a list of key paths from nested dict structure
+            Parameters
+            ----------
+            dct: dict
+                the (potentially nested) dict from which we want to get a value
+            list_of_key_paths: list of lists
+                list containing all found key paths
+            path: list
+                list containing current path
+            Returns
+            -------
+            List of key paths within the nested dictionary structure, each key path is itself a list.
+            Example
+            -------
+            >>> dct = dict(a=dict(a1=1, a2=2),b=dict(b1=dict(b11=11,b12=dict(b121=121))))
+            >>> print(dct)
+            [[a, a1], [a, a2], [b, b1, b11], [b, b1, b12, b121]]
+            """
     for key, value in dct.items():
         path.append(key)
         if isinstance(value, dict):

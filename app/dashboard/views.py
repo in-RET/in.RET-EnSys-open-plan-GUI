@@ -229,7 +229,7 @@ def request_kpi_table(request, table_style=None):
 
     kpi_scalar_results_obj = KPIScalarResults.objects.get(simulation=scenario.simulation)
     kpi_scalar_results_dict = json.loads(kpi_scalar_results_obj.scalar_values)
-    proj = get_object_or_404(Project)
+    proj = get_object_or_404(Project, id=scenario.project.id)
     unit_conv = {'currency': proj.economic_data.currency, 'Faktor': '%'}
     table = TABLES.get(table_style, None)
 

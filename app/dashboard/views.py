@@ -245,6 +245,8 @@ def request_kpi_table(request, table_style=None):
             for param in subtable_content:
                 # TODO: provide multiple scenarios results
                 param["scen_values"] = [round_only_numbers(kpi_scalar_results_dict.get(param["id"], "not implemented yet"), 2)]
+                if "currency" in param["unit"]:
+                    param["unit"] = param["unit"].replace("currency", scenario.get_currency())
         answer = JsonResponse(table, status=200, content_type='application/json')
 
     else:

@@ -84,6 +84,9 @@ class Scenario(models.Model):
                 answer.append(iter_date)
         return answer
 
+    def get_currency(self):
+        return self.project.economic_data.currency
+
 
 class AssetType(models.Model):
     asset_type = models.CharField(max_length=30, choices=ASSET_TYPE, null=False, unique=True)

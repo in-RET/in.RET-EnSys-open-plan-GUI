@@ -319,7 +319,6 @@ def scenario_visualize_timeseries(request, scen_id):
     try:
         assets_results_obj = AssetsResults.objects.get(simulation=scenario.simulation)
         assets_results_json = json.loads(assets_results_obj.assets_list)
-        ts_data = get_asset_and_ts(assets_results_json)
         datetime_list = scenario.get_timestamps(json_format=True)
 
         results_json = [
@@ -335,8 +334,9 @@ def scenario_visualize_timeseries(request, scen_id):
                         'line': {'shape': 'hv'},
 
                     }
-                    for asset, asset_list in ts_data.items()
+                    for asset_list in assets_results_json.values()
                     for asset_obj in asset_list
+                    if 'flow' in asset_obj.keys() and 'consumption_period' not in asset_obj['label']
                 ],
             'title': 'Alle Zeitreihen',
             'yaxistitle': 'Energie',
@@ -360,7 +360,7 @@ def scenario_visualize_stacked_timeseries(request, scen_id):
         assets_results_obj = AssetsResults.objects.get(simulation=scenario.simulation)
         assets_results_json = json.loads(assets_results_obj.assets_list)
 
-        # create new dict which has as its keys the commodities (Electricity, Heat, Gas, H2)
+        # create new dict which has as its keys sectors (Electricity, Heat, Gas, H2)
         # and as its values the corresponding asset dictionaries {energy_consumption: [{asset_type: ...}, .. ], ..}
 
         new_dict = {
@@ -375,9 +375,7 @@ def scenario_visualize_stacked_timeseries(request, scen_id):
             for commodity in sectors
         }
 
-        ts_data = {commodity: get_asset_and_ts(asset_dict) for commodity, asset_dict in new_dict.items()}
         datetime_list = scenario.get_timestamps(json_format=True)
-
         results_json = [
             {'values':
                 [
@@ -394,15 +392,15 @@ def scenario_visualize_stacked_timeseries(request, scen_id):
                         'mode': 'none' if asset_obj['type_oemof'] != 'sink' else '',
                     }
 
-                    for asset, asset_list in asset_list.items()
+                    for asset_class, asset_list in asset_class_list.items()
                     for asset_obj in asset_list
-                    if asset_obj['flow']['value']
+                    if 'flow' in asset_obj.keys() and 'consumption_period' not in asset_obj['label']
                 ],
                 'commodity': commodity,
                 'yaxistitle': 'Energie',
                 'div': 'stacked_timeseries',
             }
-            for commodity, asset_list in ts_data.items()
+            for commodity, asset_class_list in new_dict.items()
         ]
 
         return JsonResponse(results_json, status=200, content_type='application/json', safe=False)
@@ -421,7 +419,6 @@ def scenario_visualize_stacked_total_flow(request, scen_id):
     try:
         assets_results_obj = AssetsResults.objects.get(simulation=scenario.simulation)
         assets_results_json = json.loads(assets_results_obj.assets_list)
-        ts_data = get_asset_and_ts(assets_results_json)
 
         results_json = [
             {'values':
@@ -437,9 +434,11 @@ def scenario_visualize_stacked_total_flow(request, scen_id):
                         'type': 'bar',
 
                     }
-                    for asset, asset_list in ts_data.items()
+                    for asset, asset_list in assets_results_json.items()
                     for asset_obj in asset_list
                     if asset_obj['type_oemof'] in ['source', 'sink']
+                    if 'flow' in asset_obj.keys() and 'consumption_period' not in asset_obj['label']
+
                 ],
                 'title': 'Erzeugung und Verbrauch',
                 'yaxistitle': 'Kumulierte Energie',
@@ -463,8 +462,6 @@ def scenario_visualize_stacked_capacities(request, scen_id):
         assets_results_obj = AssetsResults.objects.get(simulation=scenario.simulation)
         assets_results_json = json.loads(assets_results_obj.assets_list)
 
-        ts_data = get_asset_and_ts(assets_results_json)
-
         results_json = [
             {'values':
                 [
@@ -477,8 +474,9 @@ def scenario_visualize_stacked_capacities(request, scen_id):
                         'type': 'bar',
 
                     }
-                    for asset, asset_list in ts_data.items()
+                    for asset, asset_list in assets_results_json.items()
                     for asset_obj in asset_list
+                    if 'flow' in asset_obj.keys() and 'consumption_period' not in asset_obj['label']
                 ],
             'title': 'Installierte Kapazität',
             'yaxistitle': 'Leistung',
@@ -494,6 +492,7 @@ def scenario_visualize_stacked_capacities(request, scen_id):
 
 # TODO: push optimizedAddCap for DSO to KPI as "Spitzenlast"/ "Peak Demand"
 # TODO: Make a note appear if all components have optimized_capacity = False because no figure will be shown
+# TODO: Change "if results_dict = json.loads(Scenario.objects.first().simulation.results)"
 def scenario_visualize_stacked_optimized_capacities(request, scen_id):
     scenario = get_object_or_404(Scenario, pk=scen_id)
     if (scenario.project.user != request.user) and (request.user not in scenario.project.viewers.all()):

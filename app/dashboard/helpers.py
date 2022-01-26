@@ -106,22 +106,6 @@ def kpi_scalars_list(kpi_scalar_values_dict, KPI_SCALAR_UNITS, KPI_SCALAR_TOOLTI
         ]
     )
 
-# Input: dictionary with assets assigned to their respective asset class (energy_consumption, energy_production etc.)
-# Returns a dictionary with keys: asset_name and values: time series of optimized flows
-def get_asset_and_ts(assets_results_json):
-    dict_with_ts = dict()
-
-    for key, value in assets_results_json.items():
-        dict_with_ts[key] = []
-        for asset in value:
-            if 'flow' in asset.keys() and 'consumption_period' not in asset['label']:
-                dict_with_ts[key].append({'flow': asset['flow'],
-                                          'type_oemof': asset['type_oemof'],  # source, sink, transformer
-                                          'label': asset['label'],
-                                          'installed_capacity': asset['installed_capacity'],
-                                          })
-    return dict_with_ts
-
 
 def round_only_numbers(input, decimal_place):
     if isinstance(input, Number):
@@ -131,27 +115,7 @@ def round_only_numbers(input, decimal_place):
 
 
 def nested_dictionary_crawler(dct, list_of_key_paths = [], path = []):
-    r"""Get a list of key paths from nested dict structure
 
-        Parameters
-        ----------
-        dct: dict
-            the (potentially nested) dict from which we want to get a value
-        list_of_key_paths: list of lists
-            list containing all found key paths
-        path: list
-            list containing current path
-
-        Returns
-        -------
-        List of key paths within the nested dictionary structure, each key path is itself a list.
-
-        Example
-        -------
-        >>> dct = dict(a=dict(a1=1, a2=2),b=dict(b1=dict(b11=11,b12=dict(b121=121))))
-        >>> print(dct)
-        [[a, a1], [a, a2], [b, b1, b11], [b, b1, b12, b121]]
-        """
     for key, value in dct.items():
         path.append(key)
         if isinstance(value, dict):

@@ -601,6 +601,8 @@ def scenario_review(request, proj_id, scen_id, step_id=4, max_step=5):
 
     if request.method == "GET":
 
+
+
         context = {
             'scenario': scenario,
             'scen_id': scen_id,
@@ -898,6 +900,12 @@ def request_mvs_simulation(request, scen_id=0):
         messages.error(request, error_msg)
         answer = JsonResponse({"error":f"Scenario Serialization ERROR! Thrown Exception: {e}."},
                          status=500, content_type='application/json')
+
+    if request.method == "POST":
+        output_lp_file = request.POST.get("output_lp_file", None)
+        if output_lp_file == "on":
+            data_clean["simulation_settings"]["output_lp_file"] = "true"
+
 
     # Make simulation request to MVS
     results = mvs_simulation_request(data_clean)

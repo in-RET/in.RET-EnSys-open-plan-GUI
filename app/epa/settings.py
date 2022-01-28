@@ -182,9 +182,10 @@ PROXY_CONFIG = ({
     "https://": PROXY_ADDRESS_LINK,
 }) if USE_PROXY else ({})
 
-MVS_API_HOST=os.getenv('MVS_API_HOST', 'https://mvs-eland.rl-institut.de')
-MVS_POST_URL = f"{MVS_API_HOST}/sendjson/"
+MVS_API_HOST = os.getenv('MVS_API_HOST', 'https://mvs-eland.rl-institut.de')
+MVS_POST_URL = f"{MVS_API_HOST}/sendjson/openplan"
 MVS_GET_URL = f"{MVS_API_HOST}/check/"
+MVS_LP_FILE_URL = f"{MVS_API_HOST}/get_lp_file/"
 
 # Allow iframes to show in page
 X_FRAME_OPTIONS = 'SAMEORIGIN'

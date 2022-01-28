@@ -16,6 +16,7 @@ from crispy_forms.templatetags import crispy_forms_filters
 from datetime import datetime
 from users.models import CustomUser
 from django.db.models import Q
+from epa.settings import MVS_GET_URL, MVS_LP_FILE_URL
 from .forms import *
 from .requests import mvs_simulation_request, mvs_simulation_check_status, get_mvs_simulation_results
 from .models import *
@@ -607,7 +608,9 @@ def scenario_review(request, proj_id, scen_id, step_id=4, max_step=5):
             'proj_name': scenario.project.name,
             'step_id': step_id,
             "step_list": STEP_LIST,
-            "max_step": max_step
+            "max_step": max_step,
+            "MVS_GET_URL": MVS_GET_URL,
+            "MVS_LP_FILE_URL": MVS_LP_FILE_URL,
         }
 
         qs = Simulation.objects.filter(scenario_id=scen_id)

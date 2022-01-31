@@ -1,6 +1,6 @@
 import uuid
 from django.shortcuts import get_object_or_404
-from projects.models import Bus, AssetType, Scenario, ConnectionLink, Asset
+from projects.models import Bus, AssetType, Scenario, ConnectionLink, Asset, Project, EconomicData
 import json
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 from projects.forms import AssetCreateForm, BusForm, StorageForm
@@ -236,6 +236,53 @@ def duplicate_scenario_connections(connections_list, scenario, asset_map, bus_ma
         connection.scenario = scenario
         connection.save()
 # endregion
+
+
+def load_scenario_from_dict(model_data, project=None, user=None):
+    """
+    """
+    assets = model_data.pop("assets")
+    busses = model_data.pop("busses")
+
+    if project is None:
+        if "project" in model_data:
+            project_data = model_data.pop("project")
+            # TODO create project first here
+            project_data["user"] = user
+            economic_data = EconomicData(**project["economic_data"])
+            economic_data.save()
+            project = Project(**project)
+            project.save()
+        else:
+            raise ValueError("Project of a scenario cannot be None")
+    else:
+        if "project" in model_data:
+            project_data = model_data.pop("project")
+
+    scenario = Scenario(**model_data)
+    scenario.project = project
+    scenario.save()
+
+    for asset_data in assets:
+        asset_type = asset_data.pop("asset_info")
+        asset_data["asset_type"] = AssetType.objects.get(asset_type=asset_type["asset_type"])
+        asset = Asset(**asset_data)
+        asset.scenario = scenario
+        asset.save()
+
+    for bus_data in busses:
+        bus_inputs = bus_data.pop("inputs")
+        bus_outputs = bus_data.pop("outputs")
+        bus = Bus(**bus_data)
+        bus.scenario = scenario
+        bus.save()
+        for link_data in bus_inputs + bus_outputs:
+            asset_name = link_data.pop("asset")
+            new_connection = ConnectionLink(**link_data)
+            new_connection.scenario = scenario
+            new_connection.bus = bus
+            new_connection.asset = scenario.asset_set.get(name=asset_name)
+            new_connection.save()
 
 
 class NodeObject:

@@ -147,6 +147,10 @@
 
                                     </ul>
                                 </div>
+                                <form id="exportScenarios-project-{{ project.id }}" action = "{% url 'scenario_export' project.id %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="scenario_ids">
+                                </form>
                                 <button class="btn btn--action action export" type="button" onclick="javascript:export_btn_clicked({{ project.id }})">
                                     <span class="icon icon-export" aria-hidden="true"></span>
                                     {% translate "Export selected" %}
@@ -396,15 +400,11 @@
                 scenario_ids.push(obj.value)
             }
         });
-        // send the scenario ids to an endpoint which will return files with the scenarios
-        $.ajax({
-            headers: {'X-CSRFToken': '{{ csrf_token }}'},
-            type: "POST",
-            url: "{% url 'scenario_export' %}",
-            data: JSON.stringify(scenario_ids),
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
-        });
+        var exportForm = document.getElementById("exportScenarios-project-"+project_id);
+        console.log(JSON.stringify(scenario_ids))
+
+        exportForm.querySelector("input[name='scenario_ids']").value = JSON.stringify(scenario_ids);
+        exportForm.submit()
     };
 
 </script>

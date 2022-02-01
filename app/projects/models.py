@@ -106,6 +106,7 @@ class Scenario(models.Model):
         A dict with the parameters describing a scenario model
         """
         dm = model_to_dict(self, exclude=["id"])
+        dm["start_date"] = str(dm["start_date"])
         if bind_project_data is True:
             dm["project"] = self.project.export()
         else:

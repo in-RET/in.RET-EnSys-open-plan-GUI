@@ -714,9 +714,22 @@ def scenario_duplicate(request, scen_id):
 
 
 @login_required
-@json_view
 @require_http_methods(["POST"])
-def scenario_export(request):
+def scenario_export(request, proj_id):
+    response = HttpResponseRedirect(reverse('project_search', args=[proj_id]))
+
+    # get the selected scenarios under the project view and export them into a file
+    scenario_ids = request.POST.get("scenario_ids")
+    if scenario_ids is not None:
+        scenario_ids = json.loads(scenario_ids)
+        scenario_data = []
+        for scen_id in scenario_ids:
+            scenario = get_object_or_404(Scenario, pk=int(scen_id))
+            scenario_data.append(scenario.export(bind_project_data=True))
+        response = HttpResponse(json.dumps(scenario_data), content_type="application/json")
+        response['Content-Disposition'] = 'attachment; filename=scenario.json'
+    return response
+
     return {"success": False}
 
 @login_required

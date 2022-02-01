@@ -195,8 +195,8 @@
 
                                     {% if project.user == request.user %}
                                         <li><a class="dropdown-item" href="{% url 'scenario_steps' project.id %}">{% translate "New scenario" %}</a></li>
+                                        <li><a class="dropdown-item" onclick="showUploadScenario(event, `{% url 'scenario_upload' project.id %}`)">{% translate "From file" %}</a></li>
                                     {% endif %}
-                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">{% translate "From file" %}</a></li>
                                 </ul>
                             </div>
 
@@ -295,6 +295,24 @@
         }
     });
 </script>
+
+<script>
+    var uploadScenarioModalDOM = document.getElementById("uploadScenarioModal");
+    var uploadScenarioModal = new bootstrap.Modal(uploadScenarioModalDOM);
+    var uploadScenarioButton = document.getElementById("uploadScenarioBtn");
+
+    function showUploadScenario(event, url){
+        // update the url linked to the form
+        uploadScenarioModalDOM.querySelector('.modal-body form').setAttribute("action",url);
+        uploadScenarioModal.show()
+    }
+
+    function uploadScenario(event){
+        //simulate click on the form here
+        uploadScenarioButton.click()
+    }
+</script>
+
 
 <script>
     function shareProject (e, projectShareUrl) {

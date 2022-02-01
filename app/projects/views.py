@@ -21,7 +21,7 @@ from .forms import *
 from .requests import mvs_simulation_request, mvs_simulation_check_status, get_mvs_simulation_results
 from .models import *
 from .scenario_topology_helpers import handle_storage_unit_form_post, handle_bus_form_post, handle_asset_form_post, load_scenario_topology_from_db, NodeObject, \
-    update_deleted_objects_from_database, duplicate_scenario_objects, duplicate_scenario_connections, get_topology_json
+    update_deleted_objects_from_database, duplicate_scenario_objects, duplicate_scenario_connections, get_topology_json, load_scenario_from_dict
 from .constants import DONE, ERROR, MODIFIED
 from .services import create_or_delete_simulation_scheduler, excuses_design_under_development, send_feedback_email
 import traceback
@@ -44,6 +44,40 @@ def home(request):
         return HttpResponseRedirect(reverse('project_search'))
     else:
         return render(request, "index.html")
+
+
+
+@login_required
+@require_http_methods(["POST"])
+def scenario_upload(request, proj_id):
+
+    # read the scenario file to a dict
+    scenario_data = request.FILES["file"].read()
+    scenario_data = json.loads(scenario_data)
+
+    project = get_object_or_404(Project, pk=proj_id)
+
+    if project.user != request.user:
+        raise PermissionDenied
+
+    new_scenario_name = request.POST.get("name")
+
+    # make a single scenario within a list
+    if isinstance(scenario_data, list) is False:
+        scenario_data = [scenario_data]
+
+    # load each of the scenario from the file into the database
+    n_scenarios = len(scenario_data)
+    for i, scen in enumerate(scenario_data):
+        if new_scenario_name != "":
+            if n_scenarios > 1:
+                scen["name"] = f"{new_scenario_name}_{i+1}"
+            else:
+                scen["name"] = new_scenario_name
+
+        load_scenario_from_dict(scen, project=project, user=request.user)
+
+    return HttpResponseRedirect(reverse('project_search'))
 
 
 # region Project

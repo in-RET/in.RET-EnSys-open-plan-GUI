@@ -260,8 +260,11 @@ def project_search(request, proj_id=None):
     # project_list = Project.objects.filter(user=request.user)
     # shared_project_list = Project.objects.filter(viewers=request.user)
     combined_projects_list = Project.objects.filter(Q(user=request.user) | Q(viewers=request.user)).distinct()
+
+    scenario_upload_form = UploadFileForm()
+
     return render(request, 'project/project_search.html',
-                  {'project_list': combined_projects_list, "proj_id": proj_id })
+                  {'project_list': combined_projects_list, "proj_id": proj_id , "scenario_upload_form": scenario_upload_form})
 
 
 @login_required

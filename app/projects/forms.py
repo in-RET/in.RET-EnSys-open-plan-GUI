@@ -188,6 +188,9 @@ class ProjectUpdateForm(OpenPlanModelForm):
         model = Project
         exclude = ['date_created', 'date_updated', 'economic_data', 'user', 'viewers']
 
+class UploadFileForm(forms.Form):
+    name = forms.CharField(label=_("New scenario name"), required=False)
+    file = forms.FileField(label=_("Scenario file"))
 
 class CommentForm(ModelForm):
     class Meta:

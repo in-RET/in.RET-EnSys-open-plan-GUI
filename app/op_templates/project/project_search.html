@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load custom_filters %}
+{% load crispy_forms_tags %}
 {% load static %}
 {% load i18n %}
 
@@ -18,6 +19,33 @@
 {% block title %}{% translate "Projects" %}{% endblock title %}
 
 {% block content %}
+
+
+<!-- Modal -->
+<div class="modal fade modal--gui" id="uploadScenarioModal" tabindex="-1" role="dialog" aria-labelledby="uploadScenarioModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="uploadScenarioModalLabel">{% translate "Scenario upload" %}</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ scenario_upload_form|crispy }}
+                    <input id="uploadScenarioBtn" type="submit" style="display:none;">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate "Close" %}</button>
+                <button class="btn btn--medium" onclick="uploadScenario(event)">{% translate "Upload" %}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
     <main>
         <section class="header">
             <div>

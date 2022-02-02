@@ -114,36 +114,71 @@ def round_only_numbers(input, decimal_place):
         return input
 
 
-def nested_dictionary_crawler(dct, list_of_key_paths = [], path = []):
-    r"""Get a list of key paths from nested dict structure
+def nested_dict_crawler(dct, path = [], path_dct = dict()):
+    r"""A recursive algorithm that crawls through a (nested) dictionary and returns
+    a dictionary of keys and a list of its paths within the (nested) dictionary to the respective key
             Parameters
             ----------
             dct: dict
-                the (potentially nested) dict from which we want to get a value
-            list_of_key_paths: list of lists
-                list containing all found key paths
+                the (potentially nested) dict from which we want to get the value
             path: list
-                list containing current path
+                storing the current path that the algorithm is on
+            path_dct: dict
+                result dictionary where each key is assigned to its (multiple) paths within the (nested) dictionary
+            Returns
+            -------
+            Dictionary of key and paths to the respective key within the nested dictionary structure
+            Example
+            -------
+            >>> dct = dict(a=dict(a1=1, a2=2),b=dict(b1=dict(b11=11,b12=dict(b121=121))))
+            >>> nested_dict_crawler(dct)
+            {'a1': [('a', 'a1')], 'a2': [('a', 'a2')], 'a': [('a',)], 'b11': [('b', 'b1', 'b11')],
+            'b121': [('b', 'b1', 'b12', 'b121')], 'b12': [('b', 'b1', 'b12')], 'b1': [('b', 'b1')], 'b': [('b',)]}
+            """
+    for key, value in dct.items():
+        path.append(key)
+
+        if isinstance(value, dict):
+            nested_dict_crawler(value, path, path_dct)
+            if path[-1] in path_dct and tuple(path) not in path_dct.get(path[-1], []):
+                path_dct[path[-1]].append(tuple(path))
+            else:
+                path_dct[path[-1]] = [tuple(path)]
+        else:
+            if path[-1] in path_dct and tuple(path) not in path_dct.get(path[-1], []):
+                path_dct[path[-1]].append(tuple(path))
+            else:
+                path_dct[path[-1]] = [tuple(path)]
+        path.pop()
+    return path_dct
+
+
+def dict_keyword_mapper(results_dct,kw_dct, kw):
+    r"""Get a list of key paths from nested dict structure
+            Parameters
+            ----------
+            results_dct: dict
+                the (potentially nested) dict from which we want to get a value
+            kw_dct: dict
+                keyword dictionary of results_dct that contains a list of paths to a key assigned to the respective key
+            kw: string
+                keyword from which we want the value within results_dct without knowing the path to it
             Returns
             -------
             List of key paths within the nested dictionary structure, each key path is itself a list.
             Example
             -------
             >>> dct = dict(a=dict(a1=1, a2=2),b=dict(b1=dict(b11=11,b12=dict(b121=121))))
-            >>> print(dct)
-            [[a, a1], [a, a2], [b, b1, b11], [b, b1, b12, b121]]
+            >>> dict_keyword_mapper(dct, nested_dict_crawler(dct), 'b121')
+            121
             """
-    for key, value in dct.items():
-        path.append(key)
-        if isinstance(value, dict):
-            nested_dictionary_crawler(value, list_of_key_paths, path)
+    if kw in kw_dct:
+        if len(kw_dct[kw]) == 1:
+            print(get_nested_value(results_dct, kw_dct[kw][0]))
         else:
-            list_of_key_paths.append(list(path))
-            path.pop()
-            continue
-    if path != []:
-        path.pop()
-    return list_of_key_paths
+            print('Multiple keys found:', kw_dct[kw])
+    else:
+        print('No key found for ', kw, '.')
 
 
 def get_nested_value(dct, keys):
@@ -180,18 +215,13 @@ def get_nested_value(dct, keys):
     return answer
 
 
-def dict_keyword_mapper(dictionary, keyword):
-    if keyword == 'KPI_individual_sectors':
-        print(get_nested_value(dictionary, ('kpi','KPI_individual_sectors')))
-    if keyword == 'cost_matrix':
-        print(get_nested_value(dictionary, ('kpi','cost_matrix')))
-    if keyword == 'scalar_matrix':
-        print(get_nested_value(dictionary, ('kpi','scalar_matrix')))
-    if keyword == 'scalars':
-        print(get_nested_value(dictionary, ('kpi','scalars')))
-    if keyword == 'project_data':
-        print(get_nested_value(dictionary, ('project_data')))
-    if keyword == 'simulation_settings':
-        print(get_nested_value(dictionary, ('simulation_settings')))
-
+def dict_keyword_tester(results_dict, keyword_dict):
+    dict_keyword_mapper(results_dict, keyword_dict, 'KPI_individual_sectors')
+    dict_keyword_mapper(results_dict, keyword_dict, 'cost_matrix')
+    dict_keyword_mapper(results_dict, keyword_dict, 'scalar_matrix')
+    dict_keyword_mapper(results_dict, keyword_dict, 'scalars')
+    dict_keyword_mapper(results_dict, keyword_dict, 'project_data')
+    dict_keyword_mapper(results_dict, keyword_dict, 'kpi')
+    dict_keyword_mapper(results_dict, keyword_dict, 'simulation_settings')
+    dict_keyword_mapper(results_dict, keyword_dict, 'renewable_factor')
 

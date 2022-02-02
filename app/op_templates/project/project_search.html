@@ -145,10 +145,10 @@
                                                 <label class="form-check-label" for="project{{ project.id }}scenario-{{ scenario.id }}">
                                                     <a class= "form-check-label" href="{% url 'scenario_steps_edit' proj_id=project.id scen_id=scenario.id step_id=1 %}"> {{ scenario }} </a>
                                                 </label>
-                                                <div class="detail">
+                                                <!--<div class="detail">
                                                     <span class="detail__property">{% translate "Created" %}</span>
                                                     <span class="detail__value">{{ project.date_created }}</span>
-                                                </div>
+                                                </div>-->
                                             </div>
                                             <div class="actions">
                                                 <a class="btn btn--action results" href="{% url 'scenario_visualize_results' scenario.id %}">
@@ -446,9 +446,8 @@
                 scenario_ids.push(obj.value)
             }
         });
+        // assign scenario_ids to the input field within the export form and submit the form
         var exportForm = document.getElementById("exportScenarios-project-"+project_id);
-        console.log(JSON.stringify(scenario_ids))
-
         exportForm.querySelector("input[name='scenario_ids']").value = JSON.stringify(scenario_ids);
         exportForm.submit()
     };

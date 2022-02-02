@@ -46,9 +46,9 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate "Close" %}</button>
                 {% if scenario.project.user == request.user %}
-                <button class="btn btn--medium" onclick="submitForm(event)">Save</button>
+                <button class="btn btn--medium" onclick="submitForm(event)">{% translate "Save" %}</button>
                 {% endif %}
             </div>
         </div>

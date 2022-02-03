@@ -5,6 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from numbers import Number
 import pickle
 from django.conf import settings as django_settings
+from .models import ReportItem
 
 #### CONSTANTS ####
 
@@ -224,6 +225,7 @@ def get_nested_value(dct, keys):
         raise TypeError("The argument 'keys' from get_nested_value() should be a tuple")
     return answer
 
+
 class KPIFinder():
     """Helper to access a kpi value in a nested dict only providing the kpi name"""
     def __init__(self, results_dct):
@@ -238,3 +240,9 @@ class KPIFinder():
 
     def get_unit(self, kpi_name):
         return dict_keyword_mapper(self.results_dct, self.kpi_mapping, kpi_name)['unit']
+
+
+def get_project_reportitems(project):
+    """Given a project, return the ReportItem instances linked to that project"""
+    qs = project.scenario_set.filter(simulation__isnull=False).filter(simulation__reportitem__isnull=False).values_list("simulation__reportitem", flat=True).distinct()
+    return ReportItem.objects.filter(id__in=[ri for ri in qs])

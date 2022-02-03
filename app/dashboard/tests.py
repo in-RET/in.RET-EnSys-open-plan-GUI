@@ -4,7 +4,7 @@ from django.test import TestCase
 # from .models import Project, Simulation
 # from io import BytesIO
 # from django.urls import reverse
-from .helpers import dict_keyword_mapper, nested_dict_crawler
+from .helpers import dict_keyword_mapper, nested_dict_crawler, KPIFinder
 
 #class SimulationServiceTest(TestCase):
 #    fixtures = ['fixtures/benchmarks_fixture.json',]
@@ -73,3 +73,29 @@ class TestAccessKPIs(TestCase):
             },
             nested_dict_crawler(dct),
         )
+
+
+class TestKPIFinder(TestCase):
+    """Tests to define what the KPIFinder methods get, get_value and get_unit should return from a given result dict"""
+
+    def setUp(self):
+        self.result_dct = dict(
+            a=dict(a1=1, a2=dict(unit="EUR", value=30)),
+            b=dict(b1=dict(b11=11, b12=dict(unit="kWh", value=12))),
+        )
+        self.kpis = KPIFinder(self.result_dct)
+
+    def test_kpi_finder_finds_get(self):
+
+        self.assertDictEqual(self.kpis.get("a2"), dict(unit="EUR", value=30))
+        self.assertDictEqual(self.kpis.get("b12"), dict(unit="kWh", value=12))
+
+    def test_kpi_finder_finds_get_value(self):
+
+        self.assertEqual(self.kpis.get_value("a2"), 30)
+        self.assertEqual(self.kpis.get_value("b12"), 12)
+
+    def test_kpi_finder_finds_get_unit(self):
+
+        self.assertEqual(self.kpis.get_value("a2"), "EUR")
+        self.assertEqual(self.kpis.get_value("b12"), "kWh")

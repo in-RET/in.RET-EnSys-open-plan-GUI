@@ -181,6 +181,22 @@ def dict_keyword_mapper(results_dct,kw_dct, kw):
         print('No key found for ', kw, '.')
 
 
+class KPIFinder():
+    """Helper to access a kpi value in a nested dict only providing the kpi name"""
+    def __init__(self, results_dct):
+        self.results_dct = results_dct
+        self.kpi_mapping = nested_dict_crawler(self.results_dct)
+
+    def get(self, kpi_name):
+        pass
+
+    def get_value(self, kpi_name):
+        pass
+
+    def get_unit(self, kpi_name):
+        pass
+
+
 def get_nested_value(dct, keys):
     r"""Get a value from a succession of keys within a nested dict structure
 

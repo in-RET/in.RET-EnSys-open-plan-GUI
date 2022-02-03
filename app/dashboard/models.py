@@ -1,3 +1,6 @@
+import json
+
+from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from projects.models import Simulation
 
@@ -99,6 +102,15 @@ KPI_SCALAR_TOOLTIPS = {
     "costs_upfront_in_year_zero": "The costs which will have to be paid upfront when project begin, ie. In year 0."
 }
 
+# TODO have this in a csv structure to also create the doc and tool tips
+REPORT_TYPES = (
+    ("timeseries", _("Timeseries Graph")),
+    ("timeseries_stacked", _("Timeseries Graph")),
+    ("capacities", _("Installed and optimized capacities")),
+    ("bar", _("Bar chart")),
+    ("pie", _("Pie chart")),
+    ("load_duration", _("Load duration curve")),
+)
 
 class KPIScalarResults(models.Model):
     scalar_values = models.TextField()  # to store the scalars dict
@@ -113,3 +125,44 @@ class KPICostsMatrixResults(models.Model):
 class AssetsResults(models.Model):
     assets_list = models.TextField()  # to store the assets list
     simulation = models.ForeignKey(Simulation, on_delete=models.CASCADE)
+# # TODO change the form from this model to adapt the choices depending on single scenario/compare scenario or sensitivity
+class ReportItem(models.Model):
+    title = models.CharField(max_length=120)
+    report_type = models.CharField(max_length=50, choices=REPORT_TYPES)
+    simulations = models.ManyToManyField(Simulation)
+    parameters = models.TextField() # to store the parameter lists
+    initial_simulations = None
+    def __init__(self, *args, **kwargs):
+        if "simulations" in kwargs:
+            self.initial_simulations = kwargs.pop("simulations")
+            self.initial_simulations = self.__parse_simulation_list(self.initial_simulations)
+        super().__init__(*args, **kwargs)
+
+    #
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.initial_simulations is not None:
+            self.simulations.add(*self.initial_simulations)
+
+    def update_simulations(self, list_simulation):
+        list_simulation = self.__parse_simulation_list(list_simulation)
+        if list_simulation:
+            self.simulations.clear()
+            self.simulations.add(*list_simulation)
+
+    def __parse_simulation_list(self, simulation_list):
+        if not isinstance(simulation_list, list):
+            simulation_list = [simulation_list]
+
+        if len(simulation_list) > 0:
+            if isinstance(simulation_list[0], int):
+                simulation_list = [s for s in Simulation.objects.filter(id__in=simulation_list)]
+        return simulation_list
+
+    @property
+    def parameters_dict(self):
+        try:
+            answer = json.loads(self.parameters)
+        except json.decoder.JSONDecodeError:
+            answer = {}
+        return answer

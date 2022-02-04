@@ -136,15 +136,20 @@ class AssetsResults(models.Model):
     simulation = models.ForeignKey(Simulation, on_delete=models.CASCADE)
 # # TODO change the form from this model to adapt the choices depending on single scenario/compare scenario or sensitivity
 class ReportItem(models.Model):
-    title = models.CharField(max_length=120)
+    title = models.CharField(max_length=120, default="", blank=True)
     report_type = models.CharField(max_length=50, choices=REPORT_TYPES)
     simulations = models.ManyToManyField(Simulation)
-    parameters = models.TextField() # to store the parameter lists
+    parameters = models.TextField(
+        default="", blank=True
+    )  # to store the parameter lists
     initial_simulations = None
+
     def __init__(self, *args, **kwargs):
         if "simulations" in kwargs:
             self.initial_simulations = kwargs.pop("simulations")
-            self.initial_simulations = self.__parse_simulation_list(self.initial_simulations)
+            self.initial_simulations = self.__parse_simulation_list(
+                self.initial_simulations
+            )
         super().__init__(*args, **kwargs)
 
     #
@@ -165,7 +170,9 @@ class ReportItem(models.Model):
 
         if len(simulation_list) > 0:
             if isinstance(simulation_list[0], int):
-                simulation_list = [s for s in Simulation.objects.filter(id__in=simulation_list)]
+                simulation_list = [
+                    s for s in Simulation.objects.filter(id__in=simulation_list)
+                ]
         return simulation_list
 
     @property

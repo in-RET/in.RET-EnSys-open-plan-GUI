@@ -440,6 +440,17 @@ function update_kpi_table_style(target){
 
 };
 
+/* loop over scenario selection buttons and return the ids of the selected ones */
+function fetchSelectedScenarios(){
+    var selectedScenarios = [];
+    $(".scenario-select__item").map((i, item) => {
+        if(item.classList.contains("selected")){
+            selectedScenarios.push(item.id.split("-")[2])
+        }
+    });
+    return selectedScenarios
+};
+
 function update_selected_scenarios(target){
     const proj_id = target.id.split("-")[1];
     const scen_id = target.id.split("-")[2];

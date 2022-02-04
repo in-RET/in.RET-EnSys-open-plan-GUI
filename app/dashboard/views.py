@@ -11,7 +11,8 @@ from django.views.decorators.http import require_http_methods
 from jsonview.decorators import json_view
 from projects.models import Project, Scenario, Simulation
 from projects.services import excuses_design_under_development
-from .forms import ReportItemForm
+from dashboard.models import ReportItem
+from dashboard.forms import ReportItemForm, TimeseriesGraphForm, graph_parameters_form_factory
 from django.utils.translation import ugettext_lazy as _
 from django.utils.safestring import mark_safe
 from io import BytesIO
@@ -195,14 +196,26 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
 @require_http_methods(["POST"])
 def report_create_graph(request, proj_id):
     if request.POST:
-        form = ReportItemForm(request.POST)
-        if form.is_valid():
-            pass
-        import pdb;pdb.set_trace()
-        answer = JsonResponse({"success": "report_create_graph"}, status=200, content_type='application/json')
+        qs = request.POST
+        report_form = ReportItemForm(qs, proj_id=proj_id)
+        if report_form.is_valid():
+            report_item = report_form.save(commit=False)
+
+            graph_parameter_form = graph_parameters_form_factory(report_item.report_type, qs)
+            if graph_parameter_form.is_valid():
+                report_item.parameters = json.dumps(graph_parameter_form.cleaned_data)
+                report_item.save()
+                scen_ids = [int(s) for s in report_form.cleaned_data["scenarios"]]
+                report_item.update_simulations([sim for sim in Simulation.objects.filter(scenario__id__in=scen_ids).values_list("id", flat=True)])
+                # TODO here return the graph id with the parameters values (not only their names)
+                answer = JsonResponse({"graph_id": f"reportItem{proj_id}-{report_item.id}", "parameters": graph_parameter_form.cleaned_data}, status=200, content_type='application/json')
+        else:
+            answer = JsonResponse({"error": "report_create_graph forms were not good"}, status=405, content_type='application/json')
     else:
         answer = JsonResponse({"error": "This url is only for post calls"}, status=405, content_type='application/json')
     return answer
+
+
 
 
 @login_required
@@ -217,6 +230,10 @@ def ajax_get_graph_parameters_form(request, proj_id):
         # Converts the scenario ids provided as list of strings to a list of scenario ids as list of ints
         initial_values["scenarios"] = [int(s) for s in json.loads(request.POST.get("selected_scenarios"))]
 
+
+        report_item_form = ReportItemForm(initial=initial_values, proj_id=proj_id)
+
+        answer = render(request, "report/report_item_parameters_form.html", context={"report_item_form": report_item_form, "graph_parameters_form": graph_parameters_form_factory(initial_values["report_type"])})
     else:
         answer = JsonResponse({"error": "This url is only for post calls"}, status=405, content_type='application/json')
     return answer

@@ -192,6 +192,17 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
 
 @login_required
 @json_view
+@require_http_methods(["POST"])
+def report_create_graph(request):
+    if request.POST:
+        form = ReportItemForm(request.POST)
+        if form.is_valid():
+            pass
+        import pdb;pdb.set_trace()
+        answer = JsonResponse({"success": "report_create_graph"}, status=200, content_type='application/json')
+    else:
+        answer = JsonResponse({"error": "This url is only for post calls"}, status=405, content_type='application/json')
+    return answer
 
 
 @login_required

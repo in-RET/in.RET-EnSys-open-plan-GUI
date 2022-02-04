@@ -103,13 +103,22 @@ KPI_SCALAR_TOOLTIPS = {
 }
 
 # TODO have this in a csv structure to also create the doc and tool tips
+GRAPH_TIMESERIES = "timeseries"
+GRAPH_TIMESERIES_STACKED = "timeseries_stacked"
+GRAPH_CAPACITIES = "capacities"
+GRAPH_BAR = "bar"
+GRAPH_PIE = "pie"
+GRAPH_LOAD_DURATION = "load_duration"
+GRAPH_SANKEY = "sankey"
+
 REPORT_TYPES = (
-    ("timeseries", _("Timeseries Graph")),
-    ("timeseries_stacked", _("Timeseries Graph")),
-    ("capacities", _("Installed and optimized capacities")),
-    ("bar", _("Bar chart")),
-    ("pie", _("Pie chart")),
-    ("load_duration", _("Load duration curve")),
+    (GRAPH_TIMESERIES, _("Timeseries graph")),
+    (GRAPH_TIMESERIES_STACKED, _("Stacked timeseries graph")),
+    (GRAPH_CAPACITIES, _("Installed and optimized capacities")),
+    (GRAPH_BAR, _("Bar chart")),
+    (GRAPH_PIE, _("Pie chart")),
+    (GRAPH_LOAD_DURATION, _("Load duration curve")),
+    (GRAPH_SANKEY, _("Sankey diagram")),
 )
 
 class KPIScalarResults(models.Model):

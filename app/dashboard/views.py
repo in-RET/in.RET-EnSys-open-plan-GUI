@@ -210,9 +210,13 @@ def report_create_graph(request, proj_id):
 @require_http_methods(["POST"])
 def ajax_get_graph_parameters_form(request, proj_id):
     if request.is_ajax():
-        # todo prefill with the graph type at least
-        form = ReportItemForm()
-        answer = render(request, "report/report_item_parameters_form.html", context={"form": form})
+        # Prefill the form with initial values
+        initial_values = {}
+        initial_values["title"] = request.POST.get("title")
+        initial_values["report_type"] = request.POST.get("report_type")
+        # Converts the scenario ids provided as list of strings to a list of scenario ids as list of ints
+        initial_values["scenarios"] = [int(s) for s in json.loads(request.POST.get("selected_scenarios"))]
+
     else:
         answer = JsonResponse({"error": "This url is only for post calls"}, status=405, content_type='application/json')
     return answer

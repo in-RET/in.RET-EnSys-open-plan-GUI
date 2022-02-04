@@ -71,9 +71,8 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form method="POST" enctype="multipart/form-data" action ="{% url 'report_create_graph' %}">
+                <form method="POST" enctype="multipart/form-data" action="{% url 'report_create_graph' proj_id %}" graph-parameter-url="{% url 'ajax_get_graph_parameters_form' proj_id %}">
                     {% csrf_token %}
-                    <input type="hidden" id="reportitem-parameters-form">
                 </form>
             </div>
             <div class="modal-footer">
@@ -657,15 +656,15 @@ function scenario_visualize_stacked_optimized_capacities(scen_id){
     var createReportItemModal = new bootstrap.Modal(createReportItemModalDOM);
     var createReportItemForm = createReportItemModalDOM.querySelector("form");
 
+    var urlForm = createReportItemForm.getAttribute("graph-parameter-url");
     function updateReportItemParametersForm(graphType){
         $.ajax({
-            url: `{% url 'ajax_get_graph_parameters_form' %}`,
+            url: urlForm,
             type: "POST",
             headers: {'X-CSRFToken': '{{ csrf_token }}'},
             data: {
               'graph_type': graphType, 'simulation_ids': JSON.stringify(fetchSelectedScenarios())
             },
-            contentType: "application/json; charset=utf-8",
             success: function (formData) {
                // find and keep the csrf token of the form
                var csrfToken = createReportItemForm.querySelector('input[name="csrfmiddlewaretoken"]');

@@ -193,7 +193,7 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
 @login_required
 @json_view
 @require_http_methods(["POST"])
-def report_create_graph(request):
+def report_create_graph(request, proj_id):
     if request.POST:
         form = ReportItemForm(request.POST)
         if form.is_valid():
@@ -208,8 +208,7 @@ def report_create_graph(request):
 @login_required
 @json_view
 @require_http_methods(["POST"])
-def ajax_get_graph_parameters_form(request):
-    # TODO get the type of graph here
+def ajax_get_graph_parameters_form(request, proj_id):
     if request.is_ajax():
         # todo prefill with the graph type at least
         form = ReportItemForm()

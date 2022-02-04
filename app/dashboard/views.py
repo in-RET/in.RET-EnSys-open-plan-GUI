@@ -11,6 +11,7 @@ from django.views.decorators.http import require_http_methods
 from jsonview.decorators import json_view
 from projects.models import Project, Scenario, Simulation
 from projects.services import excuses_design_under_development
+from .forms import ReportItemForm
 from django.utils.translation import ugettext_lazy as _
 from django.utils.safestring import mark_safe
 from io import BytesIO
@@ -188,6 +189,24 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
             answer = HttpResponseRedirect(reverse('scenario_review', args=[proj_id, scen_id]))
 
     return answer
+
+@login_required
+@json_view
+
+
+@login_required
+@json_view
+@require_http_methods(["POST"])
+def ajax_get_graph_parameters_form(request):
+    # TODO get the type of graph here
+    if request.is_ajax():
+        # todo prefill with the graph type at least
+        form = ReportItemForm()
+        answer = render(request, "report/report_item_parameters_form.html", context={"form": form})
+    else:
+        answer = JsonResponse({"error": "This url is only for post calls"}, status=405, content_type='application/json')
+    return answer
+
 
 @login_required
 @json_view

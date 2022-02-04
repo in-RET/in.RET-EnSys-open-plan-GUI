@@ -18,4 +18,5 @@ urlpatterns = [
     path('scenario/results/download_scalars/<int:scen_id>', download_scalar_results, name='download_scalar_results'),
     path('scenario/results/download_costs/<int:scen_id>', download_cost_results, name='download_cost_results'),
     path('scenario/results/download_timeseries/<int:scen_id>', download_timeseries_results, name='download_timeseries_results'),
+    path('ajax/get-graph-parameters-form', ajax_get_graph_parameters_form, name='ajax_get_graph_parameters_form'),
 ]

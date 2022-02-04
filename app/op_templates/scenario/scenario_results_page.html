@@ -60,7 +60,29 @@
     </div>
 </div>
 
-
+<!-- Modal -->
+<div class="modal fade modal--dashboard" id="createReportItemModal" tabindex="-1" role="dialog" aria-labelledby="createReportItemModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createReportItemModalLabel">{% translate "Add a new report item" %}</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" enctype="multipart/form-data" action ="{% url 'report_create_graph' %}">
+                    {% csrf_token %}
+                    <input type="hidden" id="reportitem-parameters-form">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate "Close" %}</button>
+                <button class="btn btn--medium" onclick="createReportItem(event)">{% translate "Create" %}</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <main>
     <section class="header">
@@ -624,4 +646,52 @@ function scenario_visualize_stacked_optimized_capacities(scen_id){
     }
 
 </script>
+
+
+<script>
+
+    /** Add a new report item **/
+
+    var createReportItemModalDOM = document.getElementById("createReportItemModal");
+    var createReportItemModal = new bootstrap.Modal(createReportItemModalDOM);
+    var createReportItemForm = createReportItemModalDOM.querySelector("form");
+
+    function updateReportItemParametersForm(graphType){
+        $.ajax({
+            url: `{% url 'ajax_get_graph_parameters_form' %}`,
+            type: "POST",
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            data: {
+              'graph_type': graphType, 'simulation_ids': JSON.stringify(fetchSelectedScenarios())
+            },
+            contentType: "application/json; charset=utf-8",
+            success: function (formData) {
+               // find and keep the csrf token of the form
+               var csrfToken = createReportItemForm.querySelector('input[name="csrfmiddlewaretoken"]');
+
+               // update the report item graph
+               createReportItemForm.innerHTML = csrfToken.outerHTML + formData;
+
+               // (re)link the changing of report_item type combobox to loading new parameters form
+               // the name of the id is linked with the name of the attribute of ReportItem model in dashboard/models.py
+               $("#id_report_type").change(function (event) {
+               var reportItemType = $(this).val();
+                    updateReportItemParametersForm(reportItemType)
+               })
+            }
+        });
+    };
+
+    function showCreateReportItemModal(event){
+        updateReportItemParametersForm("timeseries")
+        createReportItemModal.show()
+    }
+
+    function createReportItem(event){
+        //submit the form to create a new report item
+        createReportItemForm.submit()
+    }
+</script>
+
+
 {% endblock end_body_scripts %}

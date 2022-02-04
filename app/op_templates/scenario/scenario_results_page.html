@@ -655,15 +655,24 @@ function scenario_visualize_stacked_optimized_capacities(scen_id){
     var createReportItemModalDOM = document.getElementById("createReportItemModal");
     var createReportItemModal = new bootstrap.Modal(createReportItemModalDOM);
     var createReportItemForm = createReportItemModalDOM.querySelector("form");
+    var reportItemTitle = createReportItemForm.querySelector('input[id="id_title"]');
+    var reportItemTitleText = ''
 
     var urlForm = createReportItemForm.getAttribute("graph-parameter-url");
     function updateReportItemParametersForm(graphType){
+        // Passes the existing text of the title to the form initials
+        reportItemTitle = createReportItemForm.querySelector('input[id="id_title"]');
+        if(reportItemTitle){
+            reportItemTitleText = reportItemTitle.value
+        }
         $.ajax({
             url: urlForm,
             type: "POST",
             headers: {'X-CSRFToken': '{{ csrf_token }}'},
             data: {
-              'graph_type': graphType, 'simulation_ids': JSON.stringify(fetchSelectedScenarios())
+              'title': reportItemTitleText,
+              'report_type': graphType,
+              'selected_scenarios': JSON.stringify(fetchSelectedScenarios())
             },
             success: function (formData) {
                // find and keep the csrf token of the form
@@ -689,6 +698,7 @@ function scenario_visualize_stacked_optimized_capacities(scen_id){
 
     function createReportItem(event){
         //submit the form to create a new report item
+        reportItemTitleText = ''
         createReportItemForm.submit()
     }
 </script>

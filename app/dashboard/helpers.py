@@ -5,7 +5,6 @@ from django.utils.translation import ugettext_lazy as _
 from numbers import Number
 import pickle
 from django.conf import settings as django_settings
-from .models import ReportItem
 
 #### CONSTANTS ####
 
@@ -239,10 +238,5 @@ class KPIFinder():
         return dict_keyword_mapper(self.results_dct, self.kpi_mapping, kpi_name)['value']
 
     def get_unit(self, kpi_name):
-        return dict_keyword_mapper(self.results_dct, self.kpi_mapping, kpi_name)['unit']
+        return dict_keyword_mapper(self.results_dct, self.kpi_mapping, kpi_name)['unit']])
 
-
-def get_project_reportitems(project):
-    """Given a project, return the ReportItem instances linked to that project"""
-    qs = project.scenario_set.filter(simulation__isnull=False).filter(simulation__reportitem__isnull=False).values_list("simulation__reportitem", flat=True).distinct()
-    return ReportItem.objects.filter(id__in=[ri for ri in qs])

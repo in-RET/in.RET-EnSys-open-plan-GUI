@@ -264,3 +264,13 @@ class ReportItem(models.Model):
         except json.decoder.JSONDecodeError:
             answer = {}
         return answer
+
+def get_project_reportitems(project):
+    """Given a project, return the ReportItem instances linked to that project"""
+    qs = (
+        project.scenario_set.filter(simulation__isnull=False)
+        .filter(simulation__reportitem__isnull=False)
+        .values_list("simulation__reportitem", flat=True)
+        .distinct()
+    )
+    return ReportItem.objects.filter(id__in=[ri for ri in qs])

@@ -134,6 +134,88 @@ class KPICostsMatrixResults(models.Model):
 class AssetsResults(models.Model):
     assets_list = models.TextField()  # to store the assets list
     simulation = models.ForeignKey(Simulation, on_delete=models.CASCADE)
+    __asset_names = None
+    __available_timseries = None
+    __asset_categories = None
+
+    @property
+    def assets_dict(self):
+        try:
+            answer = json.loads(self.assets_list)
+        except json.decoder.JSONDecodeError:
+            answer = {}
+        return answer
+
+    @property
+    def asset_names(self):
+        if self.__asset_names is None:
+            self.__asset_names = []
+            asset_dict = self.assets_dict
+            for category in asset_dict:
+                for asset in asset_dict[category]:
+                    self.__asset_names.append(asset["label"])
+        return self.__asset_names
+
+    @property
+    def available_timeseries(self):
+        """Returns a dict which keys are asset labels and values are asset results only for timeseries asset
+
+        An asset is deemed a timeseries when its results contain the key "flow"
+        """
+        if self.__available_timseries is None:
+            self.__available_timseries = {}
+            asset_dict = self.assets_dict
+            for category in asset_dict:
+                for asset in asset_dict[category]:
+                    if "flow" in asset and "_consumption_period" not in asset["label"]:
+                        asset["category"] = category
+                        self.__available_timseries[asset["label"]] = asset
+        return self.__available_timseries
+
+    @property
+    def asset_categories(self):
+        if self.__asset_categories is None:
+            self.__asset_categories = tuple(self.assets_dict.keys())
+        return self.__asset_categories
+
+    def single_asset_results(self, asset_name, asset_category=None):
+        """Provided the name of an asset, return the results linked to this asset"""
+        asset_dict = self.assets_dict
+        answer = None
+        if asset_category is not None:
+            categories = [asset_category]
+        else:
+            categories = self.__asset_categories
+
+        for category in categories:
+            for asset in asset_dict[category]:
+                if asset_name == asset["label"]:
+                    if answer is None:
+                        answer = asset
+                        answer["category"] = category
+                        break
+                    else:
+                        raise ValueError(
+                            f"Asset named {asset_name} appears twice in simulations results, this should not be possible"
+                        )
+        return answer
+
+    def single_asset_timeseries(self, asset_name, asset_category=None):
+        """Provided the user name of the asset, return the timeseries linked to this asset"""
+        if self.__available_timeseries is None:
+            asset_results = self.single_asset_results(asset_name, asset_category)
+
+        else:
+            asset_results = self.__available_timeseries.get(asset_name)
+
+        if "flow" in asset_results:
+            answer = {
+                "value": asset_results["flow"]["value"],
+                "unit": asset_results["flow"]["unit"],
+                "label": asset_name,
+            }
+        else:
+            return None
 # # TODO change the form from this model to adapt the choices depending on single scenario/compare scenario or sensitivity
 class ReportItem(models.Model):
     title = models.CharField(max_length=120, default="", blank=True)

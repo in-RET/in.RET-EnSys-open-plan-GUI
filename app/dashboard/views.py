@@ -200,12 +200,14 @@ def report_create_graph(request, proj_id):
         report_form = ReportItemForm(qs, proj_id=proj_id)
         if report_form.is_valid():
             report_item = report_form.save(commit=False)
+            scen_ids = [int(s) for s in report_form.cleaned_data["scenarios"]]
 
-            graph_parameter_form = graph_parameters_form_factory(report_item.report_type, qs)
+
+            graph_parameter_form = graph_parameters_form_factory(report_item.report_type, qs, scenario_ids=scen_ids)
             if graph_parameter_form.is_valid():
                 report_item.parameters = json.dumps(graph_parameter_form.cleaned_data)
                 report_item.save()
-                scen_ids = [int(s) for s in report_form.cleaned_data["scenarios"]]
+
                 report_item.update_simulations([sim for sim in Simulation.objects.filter(scenario__id__in=scen_ids).values_list("id", flat=True)])
                 # TODO here return the graph id with the parameters values (not only their names)
                 answer = JsonResponse({"graph_id": f"reportItem{proj_id}-{report_item.id}", "parameters": graph_parameter_form.cleaned_data}, status=200, content_type='application/json')
@@ -233,7 +235,7 @@ def ajax_get_graph_parameters_form(request, proj_id):
 
         report_item_form = ReportItemForm(initial=initial_values, proj_id=proj_id)
 
-        answer = render(request, "report/report_item_parameters_form.html", context={"report_item_form": report_item_form, "graph_parameters_form": graph_parameters_form_factory(initial_values["report_type"])})
+        answer = render(request, "report/report_item_parameters_form.html", context={"report_item_form": report_item_form, "graph_parameters_form": graph_parameters_form_factory(initial_values["report_type"], scenario_ids=initial_values["scenarios"])})
     else:
         answer = JsonResponse({"error": "This url is only for post calls"}, status=405, content_type='application/json')
     return answer

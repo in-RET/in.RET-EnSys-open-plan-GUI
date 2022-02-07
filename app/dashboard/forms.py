@@ -4,6 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.forms import ModelForm
 from dashboard.models import (
     ReportItem,
+    AssetsResults,
     GRAPH_TIMESERIES,
     GRAPH_TIMESERIES_STACKED,
     GRAPH_CAPACITIES,
@@ -48,11 +49,27 @@ class TimeseriesGraphForm(forms.Form):
     )
     y = forms.MultipleChoiceField(
         label=_("Timeseries variable(s)"),
-        choices=tuple([(k, KPI_PARAMETERS[k]["verbose"]) for k in KPI_PARAMETERS]),
+        choices=tuple(),
     )
+
+    def __init__(self, *args, **kwargs):
+        scen_ids = kwargs.pop("scenario_ids", None)
+        super().__init__(*args, **kwargs)
+
+        if scen_ids is not None:
+            # list available assets parameters for each simulations
+            assets_results_across_simulations = AssetsResults.objects.filter(
+                simulation__scenario__id__in=scen_ids
+            )
+            self.fields["y"].choices = [
+                (n, n)
+                for assets_results in assets_results_across_simulations
+                for n in assets_results.available_timeseries
+            ]
 
 
 def graph_parameters_form_factory(report_type, *args, **kwargs):
+    """Linked to dashboard/models.py:ReportItem.fetch_parameters_values"""
     if report_type == GRAPH_TIMESERIES:
         answer = TimeseriesGraphForm(*args, **kwargs)
     # GRAPH_TIMESERIES_STACKED,

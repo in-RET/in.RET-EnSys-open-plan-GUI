@@ -61,11 +61,15 @@ class TimeseriesGraphForm(forms.Form):
             assets_results_across_simulations = AssetsResults.objects.filter(
                 simulation__scenario__id__in=scen_ids
             )
-            self.fields["y"].choices = [
-                (n, n)
-                for assets_results in assets_results_across_simulations
-                for n in assets_results.available_timeseries
-            ]
+            choices = None
+            for assets_results in assets_results_across_simulations:
+                new_choices = [(n, n) for n in assets_results.available_timeseries]
+                if choices is None:
+                    choices = set(new_choices)
+                else:
+                    choices = choices.intersection(new_choices)
+
+            self.fields["y"].choices = tuple(choices)
 
 
 def graph_parameters_form_factory(report_type, *args, **kwargs):

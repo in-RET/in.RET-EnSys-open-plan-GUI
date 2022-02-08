@@ -132,8 +132,12 @@ def nested_dict_crawler(dct, path=None, path_dct=None):
             -------
             >>> dct = dict(a=dict(a1=1, a2=2),b=dict(b1=dict(b11=11,b12=dict(b121=121))))
             >>> nested_dict_crawler(dct)
-            {'a1': [('a', 'a1')], 'a2': [('a', 'a2')], 'a': [('a',)], 'b11': [('b', 'b1', 'b11')],
-            'b121': [('b', 'b1', 'b12', 'b121')], 'b12': [('b', 'b1', 'b12')], 'b1': [('b', 'b1')], 'b': [('b',)]}
+            {
+                "a1": [("a", "a1")],
+                "a2": [("a", "a2")],
+                "b11": [("b", "b1", "b11")],
+                "b121": [("b", "b1", "b12", "b121")],
+            }
             """
     if path is None:
         path = []

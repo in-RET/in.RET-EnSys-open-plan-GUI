@@ -79,6 +79,7 @@ class TestKPIFinder(TestCase):
         self.result_dct = dict(
             a=dict(a1=1, a2=dict(unit="EUR", value=30)),
             b=dict(b1=dict(b11=11, b12=dict(unit="kWh", value=12))),
+            c=dict(b1=dict(b11=11)),
         )
         self.kpis = KPIFinder(self.result_dct)
 
@@ -96,3 +97,7 @@ class TestKPIFinder(TestCase):
 
         self.assertEqual(self.kpis.get_unit("a2"), "EUR")
         self.assertEqual(self.kpis.get_unit("b12"), "kWh")
+
+    def test_kpi_finder_finds_doubled_path(self):
+        self.assertEqual(self.kpis.get("b11"), [('b', 'b1', 'b11'), ('c', 'b1', 'b11')])
+

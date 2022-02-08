@@ -71,7 +71,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form method="POST" enctype="multipart/form-data" action="{% url 'report_create_graph' proj_id %}" graph-parameter-url="{% url 'ajax_get_graph_parameters_form' proj_id %}">
+                <form method="POST" enctype="multipart/form-data" ajax-post-url="{% url 'report_create_graph' proj_id %}" graph-parameter-url="{% url 'ajax_get_graph_parameters_form' proj_id %}">
                     {% csrf_token %}
                 </form>
             </div>
@@ -94,6 +94,9 @@
         </div>
     </section>
     <section class="header-results">
+            <button id="reportBtn" class="view" onclick="javascript:showCreateReportItemModal(event)">
+                                    Add graph
+            </button>
         <div>
             <div class="header-results__scenario">
                 <div class="project-title">

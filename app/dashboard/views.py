@@ -198,21 +198,28 @@ def report_create_graph(request, proj_id):
     if request.POST:
         qs = request.POST
         report_form = ReportItemForm(qs, proj_id=proj_id)
+        answer_context = {"report_form": report_form.as_table(), "report_type": qs.get("report_type")}
         if report_form.is_valid():
+            # scenario selection and graph type are valid
             report_item = report_form.save(commit=False)
             scen_ids = [int(s) for s in report_form.cleaned_data["scenarios"]]
-
-
             graph_parameter_form = graph_parameters_form_factory(report_item.report_type, qs, scenario_ids=scen_ids)
             if graph_parameter_form.is_valid():
+                # parameters choosen for the scenario selection and graph type are valid
                 report_item.parameters = json.dumps(graph_parameter_form.cleaned_data)
                 report_item.save()
-
+                # link the report item with all simulations matching the provided list of scenario ids
                 report_item.update_simulations([sim for sim in Simulation.objects.filter(scenario__id__in=scen_ids).values_list("id", flat=True)])
-                # TODO here return the graph id with the parameters values (not only their names)
-                answer = JsonResponse({"graph_id": f"reportItem{proj_id}-{report_item.id}", "parameters": graph_parameter_form.cleaned_data}, status=200, content_type='application/json')
+
+                answer_context = {"graph_id": f"reportItem{proj_id}-{report_item.id}", "parameters": report_item.fetch_parameters_values(), "title": report_item.title}
+
+                answer = JsonResponse(answer_context, status=200, content_type='application/json')
+            else:
+                # TODO workout the passing of post when there are errors (in crisp format)
+                answer = JsonResponse(answer_context, status=422, content_type='application/json')
         else:
-            answer = JsonResponse({"error": "report_create_graph forms were not good"}, status=405, content_type='application/json')
+            # TODO workout the passing of post when there are errors (in crisp format)
+            answer = JsonResponse(answer_context, status=422, content_type='application/json')
     else:
         answer = JsonResponse({"error": "This url is only for post calls"}, status=405, content_type='application/json')
     return answer

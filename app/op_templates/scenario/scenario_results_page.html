@@ -713,10 +713,34 @@ function scenario_visualize_stacked_optimized_capacities(scen_id){
         createReportItemModal.show()
     }
 
-    function createReportItem(event){
+    const createReportItem = (event) => {
         //submit the form to create a new report item
-        reportItemTitleText = ''
-        createReportItemForm.submit()
+
+        // get the data of the form
+        const createReportUrl = createReportItemForm.getAttribute("ajax-post-url");
+
+        const formData = new FormData(createReportItemForm);
+        $.ajax({
+            headers: {'X-CSRFToken': `{{ csrf_token }}` },
+            type: "POST",
+            url: createReportUrl,
+            data: formData,
+            processData: false,  // tells jQuery not to treat the data
+            contentType: false,   // tells jQuery not to define contentType
+            success: function (jsonRes) {
+
+                // TODO recieve the graph data and call the function to plot it
+
+                reportItemTitle = '';
+                reportItemScenarios = [];
+                createReportItemModal.hide();
+            },
+            error: function (err) {
+                var jsonRes = err.responseJSON;
+                createReportItemForm.innerHTML = jsonRes.report_form;
+                updateReportItemParametersForm(jsonRes.report_type)
+                }, //err => {alert("Modal form JS Error: " + err);console.log(err);}
+        })
     }
 </script>
 

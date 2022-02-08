@@ -1,3 +1,4 @@
+import copy
 import json
 
 from django.utils.translation import ugettext_lazy as _
@@ -135,7 +136,7 @@ class AssetsResults(models.Model):
     assets_list = models.TextField()  # to store the assets list
     simulation = models.ForeignKey(Simulation, on_delete=models.CASCADE)
     __asset_names = None
-    __available_timseries = None
+    __available_timeseries = None
     __asset_categories = None
 
     @property
@@ -162,15 +163,15 @@ class AssetsResults(models.Model):
 
         An asset is deemed a timeseries when its results contain the key "flow"
         """
-        if self.__available_timseries is None:
-            self.__available_timseries = {}
+        if self.__available_timeseries is None:
+            self.__available_timeseries = {}
             asset_dict = self.assets_dict
             for category in asset_dict:
                 for asset in asset_dict[category]:
                     if "flow" in asset and "_consumption_period" not in asset["label"]:
                         asset["category"] = category
-                        self.__available_timseries[asset["label"]] = asset
-        return self.__available_timseries
+                        self.__available_timeseries[asset["label"]] = asset
+        return self.__available_timeseries
 
     @property
     def asset_categories(self):
@@ -215,7 +216,9 @@ class AssetsResults(models.Model):
                 "label": asset_name,
             }
         else:
-            return None
+            answer = None
+        return answer
+
 # # TODO change the form from this model to adapt the choices depending on single scenario/compare scenario or sensitivity
 class ReportItem(models.Model):
     title = models.CharField(max_length=120, default="", blank=True)
@@ -265,6 +268,32 @@ class ReportItem(models.Model):
             answer = {}
         return answer
 
+    def fetch_parameters_values(self):
+        parameters = json.loads(self.parameters)
+        if self.report_type == GRAPH_TIMESERIES:
+            y_variables = parameters.get("y", None)
+            if y_variables is not None:
+                simulations_results = []
+
+                for simulation in self.simulations.all():
+                    y_values = []
+                    assets_results_obj = AssetsResults.objects.get(
+                        simulation=simulation
+                    )
+                    asset_timeseries = assets_results_obj.available_timeseries
+                    for y_var in y_variables:
+                        if y_var in asset_timeseries:
+                            y_values.append(
+                                assets_results_obj.single_asset_timeseries(y_var)
+                            )
+                    simulations_results.append(
+                        {
+                            "scenario_name": simulation.scenario.name,
+                            "scenario_id": simulation.scenario.id,
+                            "traces": y_values,
+                        }
+                    )
+                return simulations_results
 def get_project_reportitems(project):
     """Given a project, return the ReportItem instances linked to that project"""
     qs = (

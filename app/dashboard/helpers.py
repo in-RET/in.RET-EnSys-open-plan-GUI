@@ -238,5 +238,5 @@ class KPIFinder():
         return dict_keyword_mapper(self.results_dct, self.kpi_mapping, kpi_name)['value']
 
     def get_unit(self, kpi_name):
-        return dict_keyword_mapper(self.results_dct, self.kpi_mapping, kpi_name)['unit']])
+        return dict_keyword_mapper(self.results_dct, self.kpi_mapping, kpi_name)['unit']
 

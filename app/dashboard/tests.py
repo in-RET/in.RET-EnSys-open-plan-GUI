@@ -60,7 +60,10 @@ class TestAccessKPIs(TestCase):
         If a KPI value is not a simple scalar but a dict in the format {'unit':..., 'value':...},
         the crawler should stop the path finding there and consider this last dict to be the value of the KPI
         """
-        dct = dict(a=dict(a1=1, a2=dict(unit="EUR", value=30)),b=dict(b1=dict(b11=11, b12=dict(unit="kWh", value=12))),)
+        dct = dict(
+            a=dict(a1=1, a2=dict(unit="EUR", value=30)),
+            b=dict(b1=dict(b11=11, b12=dict(unit="kWh", value=12))),
+        )
         self.assertDictEqual(
             {
                 "a1": [("a", "a1")],
@@ -99,5 +102,4 @@ class TestKPIFinder(TestCase):
         self.assertEqual(self.kpis.get_unit("b12"), "kWh")
 
     def test_kpi_finder_finds_doubled_path(self):
-        self.assertEqual(self.kpis.get("b11"), [('b', 'b1', 'b11'), ('c', 'b1', 'b11')])
-
+        self.assertEqual(self.kpis.get("b11"), [("b", "b1", "b11"), ("c", "b1", "b11")])

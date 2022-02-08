@@ -114,7 +114,7 @@ def round_only_numbers(input, decimal_place):
         return input
 
 
-def nested_dict_crawler(dct, path = [], path_dct = dict()):
+def nested_dict_crawler(dct, path=None, path_dct=None):
     r"""A recursive algorithm that crawls through a (nested) dictionary and returns
     a dictionary of keys and a list of its paths within the (nested) dictionary to the respective key
             Parameters
@@ -135,17 +135,23 @@ def nested_dict_crawler(dct, path = [], path_dct = dict()):
             {'a1': [('a', 'a1')], 'a2': [('a', 'a2')], 'a': [('a',)], 'b11': [('b', 'b1', 'b11')],
             'b121': [('b', 'b1', 'b12', 'b121')], 'b12': [('b', 'b1', 'b12')], 'b1': [('b', 'b1')], 'b': [('b',)]}
             """
+    if path is None:
+        path = []
+    if path_dct is None:
+        path_dct = dict()
+
     for key, value in dct.items():
         path.append(key)
-
         if isinstance(value, dict):
-            nested_dict_crawler(value, path, path_dct)
-            if path[-1] in path_dct and tuple(path) not in path_dct.get(path[-1], []):
-                path_dct[path[-1]].append(tuple(path))
+            if 'value' in value.keys() and 'unit' in value.keys():
+                if path[-1] in path_dct:
+                    path_dct[path[-1]].append(tuple(path))
+                else:
+                    path_dct[path[-1]] = [tuple(path)]
             else:
-                path_dct[path[-1]] = [tuple(path)]
+                nested_dict_crawler(value, path, path_dct)
         else:
-            if path[-1] in path_dct and tuple(path) not in path_dct.get(path[-1], []):
+            if path[-1] in path_dct:
                 path_dct[path[-1]].append(tuple(path))
             else:
                 path_dct[path[-1]] = [tuple(path)]
@@ -174,27 +180,11 @@ def dict_keyword_mapper(results_dct,kw_dct, kw):
             """
     if kw in kw_dct:
         if len(kw_dct[kw]) == 1:
-            print(get_nested_value(results_dct, kw_dct[kw][0]))
+            return get_nested_value(results_dct, kw_dct[kw][0])
         else:
-            print('Multiple keys found:', kw_dct[kw])
+            return kw_dct[kw]
     else:
-        print('No key found for ', kw, '.')
-
-
-class KPIFinder():
-    """Helper to access a kpi value in a nested dict only providing the kpi name"""
-    def __init__(self, results_dct):
-        self.results_dct = results_dct
-        self.kpi_mapping = nested_dict_crawler(self.results_dct)
-
-    def get(self, kpi_name):
-        pass
-
-    def get_value(self, kpi_name):
-        pass
-
-    def get_unit(self, kpi_name):
-        pass
+        return f'No key found for {kw}'
 
 
 def get_nested_value(dct, keys):
@@ -230,14 +220,17 @@ def get_nested_value(dct, keys):
         raise TypeError("The argument 'keys' from get_nested_value() should be a tuple")
     return answer
 
+class KPIFinder():
+    """Helper to access a kpi value in a nested dict only providing the kpi name"""
+    def __init__(self, results_dct):
+        self.results_dct = results_dct
+        self.kpi_mapping = nested_dict_crawler(self.results_dct)
 
-def dict_keyword_tester(results_dict, keyword_dict):
-    dict_keyword_mapper(results_dict, keyword_dict, 'KPI_individual_sectors')
-    dict_keyword_mapper(results_dict, keyword_dict, 'cost_matrix')
-    dict_keyword_mapper(results_dict, keyword_dict, 'scalar_matrix')
-    dict_keyword_mapper(results_dict, keyword_dict, 'scalars')
-    dict_keyword_mapper(results_dict, keyword_dict, 'project_data')
-    dict_keyword_mapper(results_dict, keyword_dict, 'kpi')
-    dict_keyword_mapper(results_dict, keyword_dict, 'simulation_settings')
-    dict_keyword_mapper(results_dict, keyword_dict, 'renewable_factor')
+    def get(self, kpi_name):
+        return dict_keyword_mapper(self.results_dct, self.kpi_mapping, kpi_name)
 
+    def get_value(self, kpi_name):
+        return dict_keyword_mapper(self.results_dct, self.kpi_mapping, kpi_name)['value']
+
+    def get_unit(self, kpi_name):
+        return dict_keyword_mapper(self.results_dct, self.kpi_mapping, kpi_name)['unit']

@@ -506,7 +506,6 @@ def scenario_visualize_stacked_optimized_capacities(request, scen_id):
         assets_results_obj = AssetsResults.objects.get(simulation=scenario.simulation)
         assets_results_json = json.loads(assets_results_obj.assets_list)
         asset_optimizeCap = dict()
-
         for asset, asset_list in assets_results_json.items():
             for asset_obj in asset_list:
                 asset_optimizeCap[asset_obj['label']] = asset_obj['optimize_capacity']['value']

@@ -195,6 +195,8 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
 @json_view
 @require_http_methods(["POST"])
 def report_create_graph(request, proj_id):
+    """This ajax view is triggered by clicking on "create" in the form to add a report item"""
+
     if request.POST:
         qs = request.POST
         report_form = ReportItemForm(qs, proj_id=proj_id)
@@ -211,9 +213,7 @@ def report_create_graph(request, proj_id):
                 # link the report item with all simulations matching the provided list of scenario ids
                 report_item.update_simulations([sim for sim in Simulation.objects.filter(scenario__id__in=scen_ids).values_list("id", flat=True)])
 
-                answer_context = {"graph_id": f"reportItem{proj_id}-{report_item.id}", "parameters": report_item.fetch_parameters_values(), "title": report_item.title}
-
-                answer = JsonResponse(answer_context, status=200, content_type='application/json')
+                answer = JsonResponse(report_item.render_json, status=200, content_type='application/json')
             else:
                 # TODO workout the passing of post when there are errors (in crisp format)
                 answer = JsonResponse(answer_context, status=422, content_type='application/json')

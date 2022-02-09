@@ -268,6 +268,10 @@ class ReportItem(models.Model):
             answer = {}
         return answer
 
+    @property
+    def project_id(self):
+        return self.simulations.all().values_list("scenario__project", flat=True).distinct().get()
+
     def fetch_parameters_values(self):
         parameters = json.loads(self.parameters)
         if self.report_type == GRAPH_TIMESERIES:
@@ -294,6 +298,16 @@ class ReportItem(models.Model):
                         }
                     )
                 return simulations_results
+
+    @property
+    def render_json(self):
+
+        return {
+            "graph_id": f"reportItem{self.project_id}-{self.id}",
+            "parameters": self.fetch_parameters_values(),
+            "title": self.title
+        }
+
 def get_project_reportitems(project):
     """Given a project, return the ReportItem instances linked to that project"""
     qs = (

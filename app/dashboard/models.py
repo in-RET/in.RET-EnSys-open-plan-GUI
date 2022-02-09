@@ -335,6 +335,7 @@ class ReportItem(models.Model):
                             "scenario_name": simulation.scenario.name,
                             "scenario_id": simulation.scenario.id,
                             "traces": y_values,
+                            "timestamps": simulation.scenario.get_timestamps(),
                         }
                     )
                 return simulations_results

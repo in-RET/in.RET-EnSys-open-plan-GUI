@@ -1,5 +1,8 @@
 import copy
 import json
+import jsonschema
+import traceback
+import logging
 
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
@@ -16,6 +19,8 @@ from dashboard.helpers import (
 )
 
 from projects.models import Simulation
+
+logger = logging.getLogger(__name__)
 
 KPI_COSTS_TOOLTIPS = {
     "Replacement_costs_during_project_lifetime": "Costs for replacement of assets which occur over the project lifetime.",
@@ -289,6 +294,24 @@ class ReportItem(models.Model):
             .get()
         )
 
+    def proof_parameters_follow_schema(self, parameter_dict=None):
+        if parameter_dict is None:
+            parameter_dict = self.parameters_dict
+
+        jschema = GRAPH_PARAMETERS_SCHEMAS[self.report_type]
+        try:
+            jsonschema.validate(parameter_dict, jschema)
+            answer = True
+        except jsonschema.exceptions.ValidationError:
+            answer = False
+            logger.warning(
+                f"jsonschema validation error! Report item: {self.id} ({self.title}). Thrown Exception: {traceback.format_exc()}."
+            )
+        return answer
+
+    def safely_assign_parameters(self, parameter_dict):
+        if self.proof_parameters_follow_schema(parameter_dict) is True:
+            self.parameters = json.dumps(parameter_dict)
     def fetch_parameters_values(self):
         parameters = json.loads(self.parameters)
         if self.report_type == GRAPH_TIMESERIES:

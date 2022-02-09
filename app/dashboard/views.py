@@ -208,7 +208,7 @@ def report_create_graph(request, proj_id):
             graph_parameter_form = graph_parameters_form_factory(report_item.report_type, qs, scenario_ids=scen_ids)
             if graph_parameter_form.is_valid():
                 # parameters choosen for the scenario selection and graph type are valid
-                report_item.parameters = json.dumps(graph_parameter_form.cleaned_data)
+                report_item.safely_assign_parameters(graph_parameter_form.cleaned_data)
                 report_item.save()
                 # link the report item with all simulations matching the provided list of scenario ids
                 report_item.update_simulations([sim for sim in Simulation.objects.filter(scenario__id__in=scen_ids).values_list("id", flat=True)])

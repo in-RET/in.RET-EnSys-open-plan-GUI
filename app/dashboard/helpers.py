@@ -240,3 +240,51 @@ class KPIFinder():
     def get_unit(self, kpi_name):
         return dict_keyword_mapper(self.results_dct, self.kpi_mapping, kpi_name)['unit']
 
+
+# TODO have this in a csv structure to also create the doc and tool tips
+GRAPH_TIMESERIES = "timeseries"
+GRAPH_TIMESERIES_STACKED = "timeseries_stacked"
+GRAPH_CAPACITIES = "capacities"
+GRAPH_BAR = "bar"
+GRAPH_PIE = "pie"
+GRAPH_LOAD_DURATION = "load_duration"
+GRAPH_SANKEY = "sankey"
+
+REPORT_TYPES = (
+    (GRAPH_TIMESERIES, _("Timeseries graph")),
+    (GRAPH_TIMESERIES_STACKED, _("Stacked timeseries graph")),
+    (GRAPH_CAPACITIES, _("Installed and optimized capacities")),
+    (GRAPH_BAR, _("Bar chart")),
+    (GRAPH_PIE, _("Pie chart")),
+    (GRAPH_LOAD_DURATION, _("Load duration curve")),
+    (GRAPH_SANKEY, _("Sankey diagram")),
+)
+
+# Used to proof the text sent back by the html form before saving it to the database
+GRAPH_PARAMETERS_SCHEMAS = {
+    GRAPH_TIMESERIES: {
+        "type": "object",
+        "required": ["y", "energy_vector"],
+        "properties": {
+            "y": {
+                "oneOf": [
+                    {"type": "string"},
+                    {"type": "array", "items": {"type": "string"}},
+                ]
+            },
+            "energy_vector": {
+                "oneOf": [
+                    {"type": "string"},
+                    {"type": "array", "items": {"type": "string"}},
+                ]
+            },
+        },
+        "additionalProperties": False,
+    },
+    GRAPH_TIMESERIES_STACKED: {},
+    GRAPH_CAPACITIES: {},
+    GRAPH_BAR: {},
+    GRAPH_PIE: {},
+    GRAPH_LOAD_DURATION: {},
+    GRAPH_SANKEY: {},
+}

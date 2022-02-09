@@ -3,6 +3,18 @@ import json
 
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
+from dashboard.helpers import (
+    KPI_PARAMETERS,
+    GRAPH_TIMESERIES,
+    GRAPH_TIMESERIES_STACKED,
+    GRAPH_CAPACITIES,
+    GRAPH_BAR,
+    GRAPH_PIE,
+    GRAPH_LOAD_DURATION,
+    GRAPH_SANKEY,
+    GRAPH_PARAMETERS_SCHEMAS,
+)
+
 from projects.models import Simulation
 
 KPI_COSTS_TOOLTIPS = {
@@ -270,7 +282,12 @@ class ReportItem(models.Model):
 
     @property
     def project_id(self):
-        return self.simulations.all().values_list("scenario__project", flat=True).distinct().get()
+        return (
+            self.simulations.all()
+            .values_list("scenario__project", flat=True)
+            .distinct()
+            .get()
+        )
 
     def fetch_parameters_values(self):
         parameters = json.loads(self.parameters)
@@ -305,7 +322,7 @@ class ReportItem(models.Model):
         return {
             "graph_id": f"reportItem{self.project_id}-{self.id}",
             "parameters": self.fetch_parameters_values(),
-            "title": self.title
+            "title": self.title,
         }
 
 def get_project_reportitems(project):

@@ -5,6 +5,11 @@ from django.forms import ModelForm
 from dashboard.models import (
     ReportItem,
     AssetsResults,
+)
+
+
+from dashboard.helpers import (
+    KPI_PARAMETERS,
     GRAPH_TIMESERIES,
     GRAPH_TIMESERIES_STACKED,
     GRAPH_CAPACITIES,
@@ -13,7 +18,6 @@ from dashboard.models import (
     GRAPH_LOAD_DURATION,
     GRAPH_SANKEY,
 )
-from dashboard.helpers import KPI_PARAMETERS
 from projects.models import ENERGY_VECTOR, Project
 
 
@@ -44,7 +48,7 @@ class ReportItemForm(ModelForm):
 
 
 class TimeseriesGraphForm(forms.Form):
-    vector = forms.ChoiceField(
+    energy_vector = forms.ChoiceField(
         label=_("Energy vector"), choices=ENERGY_VECTOR, initial=ENERGY_VECTOR[1][0]
     )
     y = forms.MultipleChoiceField(

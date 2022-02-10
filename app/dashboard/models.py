@@ -314,6 +314,7 @@ class ReportItem(models.Model):
             self.parameters = json.dumps(parameter_dict)
     def fetch_parameters_values(self):
         parameters = json.loads(self.parameters)
+        # TODO : adjust for other report types
         if self.report_type == GRAPH_TIMESERIES:
             y_variables = parameters.get("y", None)
             if y_variables is not None:

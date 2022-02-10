@@ -242,6 +242,7 @@ class KPIFinder():
 
 
 # TODO have this in a csv structure to also create the doc and tool tips
+
 GRAPH_TIMESERIES = "timeseries"
 GRAPH_TIMESERIES_STACKED = "timeseries_stacked"
 GRAPH_CAPACITIES = "capacities"

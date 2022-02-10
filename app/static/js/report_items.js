@@ -70,3 +70,16 @@ function nester(el, n) {
     }
     return el;
 }
+// TODO write functions for other report types
+function addTimeseries(){};
+
+const graph_type_mapping={
+    timeseries: addTimeseries
+}
+// # GRAPH_TIMESERIES = "timeseries"
+// # GRAPH_TIMESERIES_STACKED = "timeseries_stacked"
+// # GRAPH_CAPACITIES = "capacities"
+// # GRAPH_BAR = "bar"
+// # GRAPH_PIE = "pie"
+// # GRAPH_LOAD_DURATION = "load_duration"
+// # GRAPH_SANKEY = "sankey"

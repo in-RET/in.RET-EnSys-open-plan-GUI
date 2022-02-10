@@ -737,8 +737,8 @@ function scenario_visualize_stacked_optimized_capacities(scen_id){
             data: formData,
             processData: false,  // tells jQuery not to treat the data
             contentType: false,   // tells jQuery not to define contentType
-            success: function (jsonRes) {
-
+            success: function (jsonRes) { // verknüpft mit ReportItem.render_json (Klasse in Models)
+                console.log(jsonRes)
                 // TODO recieve the graph data and call the function to plot it
 
                 reportItemTitle = '';
@@ -748,7 +748,7 @@ function scenario_visualize_stacked_optimized_capacities(scen_id){
                 // as we want to leave the door open to add other reportItem objects such as table, text, etc...
                 const graphId = addReportItemGraphToDOM(jsonRes);
                 // TODO use the graph ID to plot timeseries
-
+                graph_type_mapping[jsonRes.report_type](jsonRes.parameters)
             },
             error: function (err) {
                 var jsonRes = err.responseJSON;

@@ -261,6 +261,53 @@ REPORT_TYPES = (
     (GRAPH_SANKEY, _("Sankey diagram")),
 )
 
+
+def single_timeseries_to_json(value=None, unit="", label="", asset_type=""):
+    """format the information about a single timeseries in a specific JSON"""
+    if value is None:
+        value = []
+    return {"value": value, "unit": unit, "label": label, "asset_type": asset_type}
+
+
+def simulation_timeseries_to_json(
+    scenario_name="", scenario_id="", scenario_timeseries=None, scenario_timestamps=""
+):
+    """format the information about several timeseries within a scenario in a specific JSON"""
+    if scenario_timeseries is None:
+        scenario_timeseries = []
+    return {
+        "scenario_name": scenario_name,
+        "scenario_id": scenario_id,
+        "timeseries": scenario_timeseries,
+        "timestamps": scenario_timestamps,
+    }
+
+
+def report_item_render_to_json(
+    report_item_id="", data=None, title="", report_item_type=""
+):
+    """format the information about a report item instance in a specific JSON"""
+    if data is None:
+        data = []
+    return {
+        "id": report_item_id,
+        "data": data,
+        "title": title,
+        "type": report_item_type,
+    }
+
+
+# To visualize the json structure of the output of the render_json() method of the ReportItem class
+GRAPH_PARAMETERS_RENDERED_JSON = {
+    GRAPH_TIMESERIES: report_item_render_to_json(
+        data=[
+            simulation_timeseries_to_json(
+                scenario_timeseries=[single_timeseries_to_json()]
+            )
+        ]
+    ),
+}
+
 # Used to proof the text sent back by the html form before saving it to the database
 GRAPH_PARAMETERS_SCHEMAS = {
     GRAPH_TIMESERIES: {

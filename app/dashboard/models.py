@@ -16,6 +16,9 @@ from dashboard.helpers import (
     GRAPH_LOAD_DURATION,
     GRAPH_SANKEY,
     GRAPH_PARAMETERS_SCHEMAS,
+    single_timeseries_to_json,
+    simulation_timeseries_to_json,
+    report_item_render_to_json,
 )
 
 from projects.models import Simulation
@@ -227,11 +230,12 @@ class AssetsResults(models.Model):
             asset_results = self.__available_timeseries.get(asset_name)
 
         if "flow" in asset_results:
-            answer = {
-                "value": asset_results["flow"]["value"],
-                "unit": asset_results["flow"]["unit"],
-                "label": asset_name,
-            }
+            answer = single_timeseries_to_json(
+                value=asset_results["flow"]["value"],
+                unit=asset_results["flow"]["unit"],
+                label=asset_name,
+                asset_type=asset_results["type_oemof"],
+            )
         else:
             answer = None
         return answer
@@ -332,24 +336,26 @@ class ReportItem(models.Model):
                                 assets_results_obj.single_asset_timeseries(y_var)
                             )
                     simulations_results.append(
-                        {
-                            "scenario_name": simulation.scenario.name,
-                            "scenario_id": simulation.scenario.id,
-                            "traces": y_values,
-                            "timestamps": simulation.scenario.get_timestamps(),
-                        }
+                        simulation_timeseries_to_json(
+                            scenario_name=simulation.scenario.name,
+                            scenario_id=simulation.scenario.id,
+                            scenario_timeseries=y_values,
+                            scenatio_timestamps=simulation.scenario.get_timestamps(),
+                        )
                     )
                 return simulations_results
 
+
     @property
     def render_json(self):
+        return report_item_render_to_json(
+            report_item_id=f"reportItem{self.project_id}-{self.id}",
+            data=self.fetch_parameters_values(),
+            title=self.title,
+            report_item_type=self.report_type
+        )
 
-        return {
-            "graph_id": f"reportItem{self.project_id}-{self.id}",
-            "parameters": self.fetch_parameters_values(),
-            "title": self.title,
-            "report_type": self.report_type
-        }
+
 
 def get_project_reportitems(project):
     """Given a project, return the ReportItem instances linked to that project"""

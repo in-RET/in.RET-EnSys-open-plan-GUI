@@ -289,12 +289,16 @@ def report_item_render_to_json(
     """format the information about a report item instance in a specific JSON"""
     if data is None:
         data = []
-    return {
+    answer = {
         "id": report_item_id,
         "data": data,
         "title": title,
         "type": report_item_type,
     }
+    if report_item_type == GRAPH_TIMESERIES:
+        answer["x_label"] = _("Time")
+        answer["y_label"] = _("Energie")
+    return answer
 
 
 # To visualize the json structure of the output of the render_json() method of the ReportItem class

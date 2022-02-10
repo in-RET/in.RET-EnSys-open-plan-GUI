@@ -340,7 +340,7 @@ class ReportItem(models.Model):
                             scenario_name=simulation.scenario.name,
                             scenario_id=simulation.scenario.id,
                             scenario_timeseries=y_values,
-                            scenatio_timestamps=simulation.scenario.get_timestamps(),
+                            scenario_timestamps=simulation.scenario.get_timestamps(),
                         )
                     )
                 return simulations_results

@@ -11,7 +11,7 @@ from django.views.decorators.http import require_http_methods
 from jsonview.decorators import json_view
 from projects.models import Project, Scenario, Simulation
 from projects.services import excuses_design_under_development
-from dashboard.models import ReportItem
+from dashboard.models import ReportItem, get_project_reportitems
 from dashboard.forms import ReportItemForm, TimeseriesGraphForm, graph_parameters_form_factory
 from django.utils.translation import ugettext_lazy as _
 from django.utils.safestring import mark_safe
@@ -155,10 +155,11 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
             scen_id = user_scenarios.first().id
             request.session["selected_scenarios"] = [str(scen_id)]
 
-
+    report_items_data = [ri.render_json for ri in get_project_reportitems(project)]
 
     if scen_id is None:
-        context = {"project_list": user_projects, 'proj_id': proj_id, "scenario_list": user_scenarios, "kpi_list": KPI_PARAMETERS, "table_styles": TABLES}
+
+        context = {"project_list": user_projects, 'proj_id': proj_id, "scenario_list": user_scenarios, "kpi_list": KPI_PARAMETERS, "table_styles": TABLES, "report_items_data": report_items_data}
         default_scen_id = request.session.get("selected_scenarios", [])
         if len(default_scen_id) > 0:
             context["scen_id"] = default_scen_id[0]
@@ -181,7 +182,7 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
             kpi_scalar_values_dict = json.loads(kpi_scalar_results_obj.scalar_values)
 
             scalar_kpis_json = kpi_scalars_list(kpi_scalar_values_dict, KPI_SCALAR_UNITS, KPI_SCALAR_TOOLTIPS)
-            answer = render(request, 'scenario/scenario_results_page.html', {'scen_id': scen_id, 'scalar_kpis': scalar_kpis_json, 'proj_id': proj_id, "project_list": user_projects, "scenario_list": user_scenarios, "kpi_list": KPI_PARAMETERS, "table_styles": TABLES})
+            answer = render(request, 'scenario/scenario_results_page.html', {'scen_id': scen_id, 'scalar_kpis': scalar_kpis_json, 'proj_id': proj_id, "project_list": user_projects, "scenario_list": user_scenarios, "report_items_data": report_items_data, "kpi_list": KPI_PARAMETERS, "table_styles": TABLES})
 
         else:
             # redirect to the page where the simulation is started, or results fetched again

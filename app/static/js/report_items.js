@@ -107,3 +107,16 @@ const graph_type_mapping={
 // # GRAPH_PIE = "pie"
 // # GRAPH_LOAD_DURATION = "load_duration"
 // # GRAPH_SANKEY = "sankey"
+
+
+var existingReportItemsData = JSON.parse(document.getElementById('existingReportItemsData').textContent);
+existingReportItemsData.forEach(reportItem => {
+    var graphId = addReportItemGraphToDOM(reportItem);
+    if(reportItem.type in graph_type_mapping){
+        graph_type_mapping[reportItem.type](graphId, reportItem);
+    }
+    else{
+        console.log("the report type '" + reportItem.type + "' is not yet supported, sorry");
+    }
+
+});

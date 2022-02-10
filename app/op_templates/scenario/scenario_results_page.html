@@ -388,6 +388,7 @@ const urlNotImplemented = `{% url 'not_implemented' %}?url={{ request.get_full_p
 const urlCopyReportItem = "#";
 const urlDeleteReportItem = "#";
 </script>
+{{ report_items_data|json_script:"existingReportItemsData" }}
 <script src="{% static 'js/report_items.js' %}"></script>
 <script>
 

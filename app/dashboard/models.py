@@ -347,6 +347,7 @@ class ReportItem(models.Model):
             "graph_id": f"reportItem{self.project_id}-{self.id}",
             "parameters": self.fetch_parameters_values(),
             "title": self.title,
+            "report_type": self.report_type
         }
 
 def get_project_reportitems(project):

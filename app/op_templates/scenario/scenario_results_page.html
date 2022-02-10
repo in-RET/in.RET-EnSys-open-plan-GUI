@@ -381,6 +381,13 @@
 
 <script>
 
+const urlNotImplemented = `{% url 'not_implemented' %}?url={{ request.get_full_path }}`;
+const urlCopyReportItem = "#";
+const urlDeleteReportItem = "#";
+</script>
+<script src="{% static 'js/report_items.js' %}"></script>
+<script>
+
     $(document).ready(function () {
         // add search field to the kpi info modal
         $('#kpiTable').DataTable();
@@ -737,6 +744,11 @@ function scenario_visualize_stacked_optimized_capacities(scen_id){
                 reportItemTitle = '';
                 reportItemScenarios = [];
                 createReportItemModal.hide();
+                // TODO check jsonRes.report_type if it is in a mapping which has the different graph names as key and the corresponding function as values
+                // as we want to leave the door open to add other reportItem objects such as table, text, etc...
+                const graphId = addReportItemGraphToDOM(jsonRes);
+                // TODO use the graph ID to plot timeseries
+
             },
             error: function (err) {
                 var jsonRes = err.responseJSON;

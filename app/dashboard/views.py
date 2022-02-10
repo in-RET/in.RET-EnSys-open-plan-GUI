@@ -195,10 +195,10 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
 @login_required
 @json_view
 @require_http_methods(["POST"])
-def report_create_graph(request, proj_id):
+def report_create_item(request, proj_id):
     """This ajax view is triggered by clicking on "create" in the form to add a report item"""
 
-    if request.POST:
+    if request.is_ajax():
         qs = request.POST
         report_form = ReportItemForm(qs, proj_id=proj_id)
         answer_context = {"report_form": report_form.as_table(), "report_type": qs.get("report_type")}
@@ -225,7 +225,22 @@ def report_create_graph(request, proj_id):
         answer = JsonResponse({"error": "This url is only for post calls"}, status=405, content_type='application/json')
     return answer
 
+@login_required
+@json_view
+@require_http_methods(["POST"])
+def report_delete_item(request, proj_id):
+    """This ajax view is triggered by clicking on "delete" in the report item top right menu options"""
+    #import pdb; pdb.set_trace()
+    if request.is_ajax():
+        qs = request.POST
+        report_item_id = qs.get("report_item_id")
+        ri = get_object_or_404(ReportItem, id=decode_report_item_id(report_item_id))
+        ri.delete()
 
+        answer = JsonResponse({"reportItemId": report_item_id}, status=200, content_type='application/json')
+    else:
+        answer = JsonResponse({"error": "This url is only for ajax calls"}, status=405, content_type='application/json')
+    return answer
 
 
 @login_required

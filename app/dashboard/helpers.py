@@ -301,6 +301,11 @@ def report_item_render_to_json(
     return answer
 
 
+def decode_report_item_id(report_id):
+    """Provided with a DOM report item id return the report_item id in the database"""
+    return int(report_id.replace("reportItem", "").split("-")[1])
+
+
 # To visualize the json structure of the output of the render_json() method of the ReportItem class
 GRAPH_PARAMETERS_RENDERED_JSON = {
     GRAPH_TIMESERIES: report_item_render_to_json(

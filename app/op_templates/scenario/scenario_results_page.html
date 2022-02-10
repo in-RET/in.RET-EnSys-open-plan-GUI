@@ -71,7 +71,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form method="POST" enctype="multipart/form-data" ajax-post-url="{% url 'report_create_graph' proj_id %}" graph-parameter-url="{% url 'ajax_get_graph_parameters_form' proj_id %}">
+                <form method="POST" enctype="multipart/form-data" ajax-post-url="{% url 'report_create_item' proj_id %}" graph-parameter-url="{% url 'ajax_get_graph_parameters_form' proj_id %}">
                     {% csrf_token %}
                 </form>
             </div>
@@ -144,6 +144,14 @@
                 </div>
             </div>
             {% if scenario_list %}
+            <div class="row dashboard__create">
+                <div class="col">
+                  <button class="btn btn--medium" onclick="javascript:showCreateReportItemModal(event)">
+                    <span class="icon icon-add"></span>
+                    Create graph
+                  </button>
+                </div>
+            </div>
             <div class="row">
                 <div class="col col-md-12">
                     <div class="chart">
@@ -369,7 +377,9 @@
                 </div>
             </div>
             {# TODO: make button or add kpi/scalar matrix results to downloadable excel sheet #}
-            <a type="button" class="btn btn-info" href="{% url 'download_timeseries_results' scen_id %}">{% translate "Download Timeseries" %}</a>
+            {% if scen_id %}
+                <a type="button" class="btn btn-info" href="{% url 'download_timeseries_results' scen_id %}">{% translate "Download Timeseries" %}</a>
+            {% endif %}
             {% endif %}
         </div>
     </section>
@@ -386,7 +396,28 @@
 <script>
 const urlNotImplemented = `{% url 'not_implemented' %}?url={{ request.get_full_path }}`;
 const urlCopyReportItem = "#";
-const urlDeleteReportItem = "#";
+const urlDeleteReportItem = `{% url 'report_delete_item' proj_id %}`;
+
+
+const deleteReportItem = (event) => {
+    //submit the form to delete a report item
+    const reportItemId = event.target.getAttribute("data-report-item-id");
+    if(confirm("Are you sure ? This action cannot be undone")){
+        $.ajax({
+            headers: {'X-CSRFToken': `{{ csrf_token }}` },
+            type: "POST",
+            url: urlDeleteReportItem,
+            data: {report_item_id: reportItemId},
+            success: function (jsonRes) {
+                document.getElementById(reportItemId).remove();
+            },
+            error: function (err) {
+                console.log(err);
+            },
+        })
+    }
+};
+
 </script>
 {{ report_items_data|json_script:"existingReportItemsData" }}
 <script src="{% static 'js/report_items.js' %}"></script>

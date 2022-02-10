@@ -5,7 +5,7 @@ function addReportItemGraphToDOM(parameters, reportDOMId="report_items"){
     const graphId = parameters.id + "_plot";
 
     // generate html elements of a graph area
-    var newReportItemDOM = ml("div", { id: parameters.graph_id, class: "chart", style: "height: fit-content;"}, [
+    var newReportItemDOM = ml("div", { id: parameters.id, class: "chart", style: "height: fit-content;"}, [
             ml("div", { class: "chart__header"}, [
                 ml("div", {}, [
                     ml("span", { class: "title"}, parameters.title)
@@ -18,7 +18,7 @@ function addReportItemGraphToDOM(parameters, reportDOMId="report_items"){
                         ml("li", { class: "dropdown-item"}, ml("a", {href: urlNotImplemented}, "Export as .xls")),
                         ml("li", { class: "dropdown-item"}, ml("a", {href: urlNotImplemented}, "Export as .pdf")),
                         ml("li", { class: "dropdown-item"}, ml("a", {href: urlCopyReportItem}, "Copy item")),
-                        ml("li", { class: "dropdown-item"}, ml("a", {href: urlDeleteReportItem}, "Delete item")),
+                        ml("li", { class: "dropdown-item"}, ml("button", {onclick: deleteReportItem, "data-report-item-id": parameters.id }, "Delete item")),
                     ]),
                 ]),
             ]),
@@ -32,6 +32,8 @@ function addReportItemGraphToDOM(parameters, reportDOMId="report_items"){
     return graphId
 
 };
+
+
 
 // credits: https://idiallo.com/javascript/create-dom-elements-faster
 function ml(tagName, props, nest) {

@@ -2,7 +2,7 @@ function addReportItemGraphToDOM(parameters, reportDOMId="report_items"){
 
 // todo: use DOMsanitize to counter XSS
 
-    const graphID = parameters.graph_id + "_plot";
+    const graphId = parameters.id + "_plot";
 
     // generate html elements of a graph area
     var newReportItemDOM = ml("div", { id: parameters.graph_id, class: "chart", style: "height: fit-content;"}, [
@@ -22,14 +22,14 @@ function addReportItemGraphToDOM(parameters, reportDOMId="report_items"){
                     ]),
                 ]),
             ]),
-            ml("div", { class: "chart__plot"}, ml("div", {id: graphID}, [])),
+            ml("div", { class: "chart__plot"}, ml("div", {id: graphId}, [])),
         ]
     );
 
     // append the graph to the DOM
     document.getElementById(reportDOMId).appendChild(newReportItemDOM);
 
-    return graphID
+    return graphId
 
 };
 
@@ -70,11 +70,35 @@ function nester(el, n) {
     }
     return el;
 }
-// TODO write functions for other report types
-function addTimeseries(){};
 
+
+function addTimeseriesGraph(graphId, parameters){
+    // prepare traces in ploty format
+    var data = []
+    parameters.data.forEach(scenario => {
+        scenario.timeseries.forEach(timeseries => {
+            // todo provide a function to format the name of the timeseries
+            data.push({x: scenario.timestamps, y: timeseries.value, name:scenario.scenario_name + timeseries.label + timeseries.unit, type: 'scatter', line: {shape: 'hv'},})
+        });
+    });
+    // prepare graph layout in plotly format
+    const layout= {
+        title: parameters.title,
+        xaxis:{
+            title: parameters.x_label,
+        },
+        yaxis:{
+            title: parameters.y_label,
+        }
+    }
+    // create plot
+    Plotly.newPlot(graphId, data, layout);
+};
+
+
+// TODO write functions for other report types
 const graph_type_mapping={
-    timeseries: addTimeseries
+    timeseries: addTimeseriesGraph
 }
 // # GRAPH_TIMESERIES = "timeseries"
 // # GRAPH_TIMESERIES_STACKED = "timeseries_stacked"

@@ -379,7 +379,9 @@
 
 {% block end_body_scripts %}
 
-<script>
+
+
+
 
 const urlNotImplemented = `{% url 'not_implemented' %}?url={{ request.get_full_path }}`;
 const urlCopyReportItem = "#";
@@ -747,8 +749,12 @@ function scenario_visualize_stacked_optimized_capacities(scen_id){
                 // TODO check jsonRes.report_type if it is in a mapping which has the different graph names as key and the corresponding function as values
                 // as we want to leave the door open to add other reportItem objects such as table, text, etc...
                 const graphId = addReportItemGraphToDOM(jsonRes);
-                // TODO use the graph ID to plot timeseries
-                graph_type_mapping[jsonRes.report_type](jsonRes.parameters)
+                if(jsonRes.type in graph_type_mapping){
+                    graph_type_mapping[jsonRes.type](graphId, jsonRes);
+                }
+                else{
+                    console.log("the report type '" + jsonRes.type + "' is not yet supported, sorry");
+                }
             },
             error: function (err) {
                 var jsonRes = err.responseJSON;

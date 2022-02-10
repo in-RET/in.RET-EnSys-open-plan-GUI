@@ -48,7 +48,7 @@ class ReportItemForm(ModelForm):
 
 
 class TimeseriesGraphForm(forms.Form):
-    energy_vector = forms.ChoiceField(
+    energy_vector = forms.MultipleChoiceField(
         label=_("Energy vector"), choices=ENERGY_VECTOR, initial=ENERGY_VECTOR[1][0]
     )
     y = forms.MultipleChoiceField(

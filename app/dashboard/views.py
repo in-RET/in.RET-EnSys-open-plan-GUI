@@ -267,10 +267,13 @@ def ajax_get_graph_parameters_form(request, proj_id):
 @login_required
 @json_view
 @require_http_methods(["GET"])
-def update_selected_scenarios(request, scen_id):
+def update_selected_scenarios(request, proj_id, scen_id):
+
     if request.is_ajax():
-        selected_scenario = request.session.get("selected_scenarios", [])     #array with scenario id's ['1','5','10']
         status_code = 200
+        selected_scenarios_per_project = request.session.get("selected_scenarios", {})
+        selected_scenario = selected_scenarios_per_project.get(str(proj_id), [])
+
         if scen_id in selected_scenario:
             if len(selected_scenario) > 1:
                 selected_scenario.pop(selected_scenario.index(scen_id))
@@ -283,9 +286,8 @@ def update_selected_scenarios(request, scen_id):
             # selected_scenario.append(scen_id)
             selected_scenario = [scen_id]
             msg = _(f"Scenario {scen_id} was selected")
-            # TODO maybe store the data in the session
-
-        request.session["selected_scenarios"] = selected_scenario
+        selected_scenarios_per_project[proj_id] = selected_scenario
+        request.session["selected_scenarios"] = selected_scenarios_per_project
         answer = JsonResponse({"success": msg}, status=status_code, content_type='application/json')
     else:
         answer = JsonResponse({"error": "This url is only for AJAX calls"}, status=405, content_type='application/json')
@@ -295,11 +297,12 @@ def update_selected_scenarios(request, scen_id):
 @login_required
 @json_view
 @require_http_methods(["GET"])
-def request_kpi_table(request, table_style=None):
+def request_kpi_table(request, proj_id=None, table_style=None):
 
     # TODO fetch selected scenarios values here
-    selected_scenario = request.session.get("selected_scenarios", [])
-    scen_id = int(selected_scenario[0])  # TODO: fetch multiple scenarios results
+    selected_scenarios_per_project = request.session.get("selected_scenarios", {})
+    selected_scenarios = selected_scenarios_per_project.get(str(proj_id), [])
+    scen_id = int(selected_scenarios[0])  # TODO: fetch multiple scenarios results
     scenario = get_object_or_404(Scenario, pk=scen_id)
 
     kpi_scalar_results_obj = KPIScalarResults.objects.get(simulation=scenario.simulation)

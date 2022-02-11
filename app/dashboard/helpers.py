@@ -1,4 +1,5 @@
 import os
+import copy
 import csv
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.utils.translation import ugettext_lazy as _
@@ -225,20 +226,71 @@ def get_nested_value(dct, keys):
     return answer
 
 
-class KPIFinder():
+class KPIFinder:
     """Helper to access a kpi value in a nested dict only providing the kpi name"""
-    def __init__(self, results_dct):
+
+    def __init__(self, *args, results_dct=None, kpi_info_dict=None, **kwargs):
+        if results_dct is None:
+            results_dct = {}
         self.results_dct = results_dct
         self.kpi_mapping = nested_dict_crawler(self.results_dct)
+        self.kpi_info_dict = copy.deepcopy(kpi_info_dict)
+
+    def __iter__(self):
+        return self.kpi_info_dict.__iter__()
+
+    def __next__(self):
+        return self.kpi_info_dict.__next__()
 
     def get(self, kpi_name):
         return dict_keyword_mapper(self.results_dct, self.kpi_mapping, kpi_name)
 
     def get_value(self, kpi_name):
-        return dict_keyword_mapper(self.results_dct, self.kpi_mapping, kpi_name)['value']
+        return dict_keyword_mapper(self.results_dct, self.kpi_mapping, kpi_name)[
+            "value"
+        ]
 
     def get_unit(self, kpi_name):
-        return dict_keyword_mapper(self.results_dct, self.kpi_mapping, kpi_name)['unit']
+        return dict_keyword_mapper(self.results_dct, self.kpi_mapping, kpi_name)["unit"]
+
+    def get_doc_unit(self, param_name):
+        if isinstance(param_name, list):
+            answer = []
+            for p_name in param_name:
+                answer.append(self.get_doc_unit(p_name))
+        else:
+            if param_name in self.kpi_info_dict:
+                answer = self.kpi_info_dict[param_name]["unit"]
+            else:
+                answer = None
+        return answer
+
+    def get_doc_verbose(self, param_name):
+        if isinstance(param_name, list):
+            answer = []
+            for p_name in param_name:
+                answer.append(self.get_doc_verbose(p_name))
+        else:
+            if param_name in self.kpi_info_dict:
+                answer = self.kpi_info_dict[param_name]["verbose"]
+            else:
+                answer = None
+        return answer
+
+    def get_doc_definition(self, param_name):
+        if isinstance(param_name, list):
+            answer = []
+            for p_name in param_name:
+                answer.append(self.get_doc_definition(p_name))
+        else:
+            if param_name in self.kpi_info_dict:
+                answer = self.kpi_info_dict[param_name]["verbose"]
+            else:
+                answer = None
+        return answer
+
+
+KPI_helper = KPIFinder(kpi_info_dict=KPI_PARAMETERS)
 
 
 # TODO have this in a csv structure to also create the doc and tool tips

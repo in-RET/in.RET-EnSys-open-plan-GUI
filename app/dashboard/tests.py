@@ -84,7 +84,7 @@ class TestKPIFinder(TestCase):
             b=dict(b1=dict(b11=11, b12=dict(unit="kWh", value=12))),
             c=dict(b1=dict(b11=11)),
         )
-        self.kpis = KPIFinder(self.result_dct)
+        self.kpis = KPIFinder(results_dct=self.result_dct)
 
     def test_kpi_finder_finds_get(self):
 

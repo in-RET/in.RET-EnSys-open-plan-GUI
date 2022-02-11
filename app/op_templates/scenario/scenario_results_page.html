@@ -438,7 +438,7 @@ const deleteReportItem = (event) => {
 
 function update_kpi_table_style(target){
     $.ajax({
-        url: "{% url 'request_kpi_table' %}" + target.value, // TODO add scenarios in the arguments to provide answers
+        url: "{% url 'request_kpi_table' proj_id=proj_id %}" + target.value, // TODO add scenarios in the arguments to provide answers
         type: "GET",
         success: async (table_data) => {
 
@@ -528,7 +528,7 @@ function update_selected_scenarios(target){
     if(scen_id != null){
 
         $.ajax({
-            url: "{% url 'update_selected_scenarios' %}" + scen_id,
+            url: "{% url 'update_selected_scenarios' proj_id %}" + scen_id,
             type: "GET",
             success: async (data) => {
                 await console.log(data);

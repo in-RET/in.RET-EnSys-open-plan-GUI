@@ -136,10 +136,15 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
     if proj_id is None:
         if scen_id is not None:
             proj_id = Scenario.objects.get(id=scen_id).project.id
+            # make sure the project id is always visible in url
+            answer = HttpResponseRedirect(reverse('scenario_visualize_results', args=[proj_id, scen_id]))
         else:
-            proj_id = request.user.project_set.first().id
-        # make sure the project id is always known
-        answer = scenario_visualize_results(request, proj_id=proj_id, scen_id=scen_id)
+            if request.POST:
+                proj_id = int(request.POST.get("proj_id"))
+            else:
+                proj_id = request.user.project_set.first().id
+            # make sure the project id is always visible in url
+            answer = HttpResponseRedirect(reverse('project_visualize_results', args=[proj_id]))
     else:
         project = get_object_or_404(Project, pk=proj_id)
         if (project.user != request.user) and (request.user not in project.viewers.all()):

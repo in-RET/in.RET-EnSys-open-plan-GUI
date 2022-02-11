@@ -31,3 +31,7 @@ def pdb(element):
 @register.filter
 def get_item(dictionary, key):
     return dictionary.get(key)
+
+@register.filter
+def get_selected_scenarios(request, proj_id):
+    return request.session.get("selected_scenarios", {}).get(str(proj_id))

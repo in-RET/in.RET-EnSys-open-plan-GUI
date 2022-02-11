@@ -107,7 +107,7 @@
                         {% csrf_token %}
                         <select name="proj_id" class="form-select" aria-label="Default select example" onchange="this.form.submit()">
                         {% for project in project_list %}
-                            <option value="{{ project.id }}" {% if forloop.counter == proj_id %} selected {% endif %}> {{ project.name }}  </option>
+                            <option value="{{ project.id }}" {% if project.id == proj_id %} selected {% endif %}> {{ project.name }}  </option>
                         {% endfor %}
                         </select>
                     </form>
@@ -128,7 +128,7 @@
                     <h2>My scenarios</h2>
                     <div class="scenario-select">
                         {% for scenario in scenario_list %}
-                        {% if scenario.id|stringformat:'s' in request.session.selected_scenarios %}
+                        {% if scenario.id|stringformat:'s' in request|get_selected_scenarios:proj_id %}
                             {% setvar "selected" as selected %}
                         {% else%}
                             {% setvar "" as selected %}

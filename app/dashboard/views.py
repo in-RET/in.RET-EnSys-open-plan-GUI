@@ -131,64 +131,63 @@ def scenario_request_results(request, scen_id):
 @require_http_methods(["POST", "GET"])
 def scenario_visualize_results(request, proj_id=None, scen_id=None):
 
-    excuses_design_under_development(request)
-
     user_projects = request.user.project_set.all()
 
-    if request.POST:
-        proj_id = int(request.POST.get("proj_id"))
-        request.session["selected_scenarios"] = []
-
     if proj_id is None:
-        proj_id = request.user.project_set.first().id
-
-    project = get_object_or_404(Project, pk=proj_id)
-    if (project.user != request.user) and (request.user not in project.viewers.all()):
-        raise PermissionDenied
-
-    user_scenarios = project.get_scenarios_with_results()
-
-    if user_scenarios.exists() is False:
-        pass
+        if scen_id is not None:
+            proj_id = Scenario.objects.get(id=scen_id).project.id
+        else:
+            proj_id = request.user.project_set.first().id
+        # make sure the project id is always known
+        answer = scenario_visualize_results(request, proj_id=proj_id, scen_id=scen_id)
     else:
-        if len(request.session.get("selected_scenarios", [])) == 0:
-            scen_id = user_scenarios.first().id
-            request.session["selected_scenarios"] = [str(scen_id)]
-
-    report_items_data = [ri.render_json for ri in get_project_reportitems(project)]
-
-    if scen_id is None:
-
-        context = {"project_list": user_projects, 'proj_id': proj_id, "scenario_list": user_scenarios, "kpi_list": KPI_PARAMETERS, "table_styles": TABLES, "report_items_data": report_items_data}
-        default_scen_id = request.session.get("selected_scenarios", [])
-        if len(default_scen_id) > 0:
-            context["scen_id"] = default_scen_id[0]
-        answer = render(request, 'scenario/scenario_results_page.html', context)
-    else:
-
-
-        scenario = get_object_or_404(Scenario, pk=scen_id)
-        # TODO: change this when multi-scenario selection is allowed
-        request.session["selected_scenarios"] = [str(scenario.id)]
-        proj_id = scenario.project.id
-
-        if (scenario.project.user != request.user) and (request.user not in scenario.project.viewers.all()):
+        project = get_object_or_404(Project, pk=proj_id)
+        if (project.user != request.user) and (request.user not in project.viewers.all()):
             raise PermissionDenied
 
-        qs = Simulation.objects.filter(scenario=scenario)
+        selected_scenarios_per_project = request.session.get("selected_scenarios", {})
+        selected_scenarios = selected_scenarios_per_project.get(str(proj_id), [])
 
-        if qs.exists():
-            kpi_scalar_results_obj = KPIScalarResults.objects.get(simulation=scenario.simulation)
-            kpi_scalar_values_dict = json.loads(kpi_scalar_results_obj.scalar_values)
+        user_scenarios = project.get_scenarios_with_results()
 
-            scalar_kpis_json = kpi_scalars_list(kpi_scalar_values_dict, KPI_SCALAR_UNITS, KPI_SCALAR_TOOLTIPS)
-            answer = render(request, 'scenario/scenario_results_page.html', {'scen_id': scen_id, 'scalar_kpis': scalar_kpis_json, 'proj_id': proj_id, "project_list": user_projects, "scenario_list": user_scenarios, "report_items_data": report_items_data, "kpi_list": KPI_PARAMETERS, "table_styles": TABLES})
-
+        if user_scenarios.exists() is False:
+            # There are no scenarios with results yet for this project
+            answer = render(request, 'scenario/scenario_results_page.html', {"project_list": user_projects, 'proj_id': proj_id, "scenario_list": [], "kpi_list": KPI_PARAMETERS, "table_styles": TABLES, "report_items_data": []})
         else:
-            # redirect to the page where the simulation is started, or results fetched again
-            messages.error(request,
-                           _("Your scenario was never simulated, the results are still pending or there is an error in the simulation. Please click on 'Run simulation', 'Update results' or 'Check status' button "))
-            answer = HttpResponseRedirect(reverse('scenario_review', args=[proj_id, scen_id]))
+            if scen_id is None:
+                if len(selected_scenarios) == 0:
+                    scen_id = user_scenarios.first().id
+                    selected_scenarios_per_project[str(proj_id)] = [str(scen_id)]
+                    request.session["selected_scenarios"] = selected_scenarios_per_project
+                else:
+                    # TODO here allow more than one scenario to be selected
+                    scen_id = int(selected_scenarios[0])
+            else:
+                selected_scenarios_per_project[str(proj_id)] = [str(scen_id)]
+                request.session["selected_scenarios"] = selected_scenarios_per_project
+
+            report_items_data = [ri.render_json for ri in get_project_reportitems(project)]
+
+            scenario = get_object_or_404(Scenario, pk=scen_id)
+            # TODO: change this when multi-scenario selection is allowed
+
+            if (scenario.project.user != request.user) and (request.user not in scenario.project.viewers.all()):
+                raise PermissionDenied
+
+            qs = Simulation.objects.filter(scenario=scenario)
+
+            if qs.exists():
+                kpi_scalar_results_obj = KPIScalarResults.objects.get(simulation=scenario.simulation)
+                kpi_scalar_values_dict = json.loads(kpi_scalar_results_obj.scalar_values)
+
+                scalar_kpis_json = kpi_scalars_list(kpi_scalar_values_dict, KPI_SCALAR_UNITS, KPI_SCALAR_TOOLTIPS)
+                answer = render(request, 'scenario/scenario_results_page.html', {'scen_id': scen_id, 'scalar_kpis': scalar_kpis_json, 'proj_id': proj_id, "project_list": user_projects, "scenario_list": user_scenarios, "report_items_data": report_items_data, "kpi_list": KPI_PARAMETERS, "table_styles": TABLES})
+
+            else:
+                # redirect to the page where the simulation is started, or results fetched again
+                messages.error(request,
+                               _("Your scenario was never simulated, the results are still pending or there is an error in the simulation. Please click on 'Run simulation', 'Update results' or 'Check status' button "))
+                answer = HttpResponseRedirect(reverse('scenario_review', args=[proj_id, scen_id]))
 
     return answer
 

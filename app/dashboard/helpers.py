@@ -86,6 +86,21 @@ def storage_asset_to_list(assets_results_json):
                     assets_results_json['energy_storage'].append(subasset)
 
 
+def update_selected_scenarios_in_cache(request, proj_id, scen_id):
+    """Update the cache which contains the selected scenarios per project"""
+    proj_id = str(proj_id)
+    scen_id = str(scen_id)
+    selected_scenarios_per_project = request.session.get("selected_scenarios", {})
+    selected_scenarios = selected_scenarios_per_project.get(proj_id, [])
+
+    if scen_id not in selected_scenarios:
+        # TODO: uncomment following and delete the line after when multi-scenario selection is allowed
+        # selected_scenario.append(scen_id)
+        selected_scenarios = [scen_id]
+    selected_scenarios_per_project[proj_id] = selected_scenarios
+    request.session["selected_scenarios"] = selected_scenarios_per_project
+
+
 def kpi_scalars_list(kpi_scalar_values_dict, KPI_SCALAR_UNITS, KPI_SCALAR_TOOLTIPS):
     return (
         [

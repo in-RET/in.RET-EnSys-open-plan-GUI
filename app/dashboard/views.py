@@ -127,10 +127,10 @@ def scenario_request_results(request, scen_id):
         return JsonResponse({"Error": "Could not retrieve timeseries data."}, status=404,
                             content_type='application/json', safe=False)
 
+
 @login_required
 @require_http_methods(["POST", "GET"])
 def scenario_visualize_results(request, proj_id=None, scen_id=None):
-
     user_projects = request.user.project_set.all()
 
     if proj_id is None:
@@ -162,30 +162,27 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
             if scen_id is None:
                 if len(selected_scenarios) == 0:
                     scen_id = user_scenarios.first().id
-                    selected_scenarios_per_project[str(proj_id)] = [str(scen_id)]
-                    request.session["selected_scenarios"] = selected_scenarios_per_project
                 else:
                     # TODO here allow more than one scenario to be selected
                     scen_id = int(selected_scenarios[0])
-            else:
-                selected_scenarios_per_project[str(proj_id)] = [str(scen_id)]
-                request.session["selected_scenarios"] = selected_scenarios_per_project
 
             report_items_data = [ri.render_json for ri in get_project_reportitems(project)]
 
-            scenario = get_object_or_404(Scenario, pk=scen_id)
+            scenario = get_object_or_404(Scenario, id=scen_id)
             # TODO: change this when multi-scenario selection is allowed
 
             if (scenario.project.user != request.user) and (request.user not in scenario.project.viewers.all()):
                 raise PermissionDenied
 
             qs = Simulation.objects.filter(scenario=scenario)
-
-            if qs.exists():
+            if qs.exists() and scenario in user_scenarios:
                 kpi_scalar_results_obj = KPIScalarResults.objects.get(simulation=scenario.simulation)
                 kpi_scalar_values_dict = json.loads(kpi_scalar_results_obj.scalar_values)
 
                 scalar_kpis_json = kpi_scalars_list(kpi_scalar_values_dict, KPI_SCALAR_UNITS, KPI_SCALAR_TOOLTIPS)
+
+                update_selected_scenarios_in_cache(request, proj_id, scen_id)
+
                 answer = render(request, 'scenario/scenario_results_page.html', {'scen_id': scen_id, 'scalar_kpis': scalar_kpis_json, 'proj_id': proj_id, "project_list": user_projects, "scenario_list": user_scenarios, "report_items_data": report_items_data, "kpi_list": KPI_PARAMETERS, "table_styles": TABLES})
 
             else:
@@ -234,7 +231,6 @@ def report_create_item(request, proj_id):
 @require_http_methods(["POST"])
 def report_delete_item(request, proj_id):
     """This ajax view is triggered by clicking on "delete" in the report item top right menu options"""
-    #import pdb; pdb.set_trace()
     if request.is_ajax():
         qs = request.POST
         report_item_id = qs.get("report_item_id")
@@ -272,7 +268,8 @@ def ajax_get_graph_parameters_form(request, proj_id):
 @json_view
 @require_http_methods(["GET"])
 def update_selected_scenarios(request, proj_id, scen_id):
-
+    proj_id = str(proj_id)
+    scen_id = str(scen_id)
     if request.is_ajax():
         status_code = 200
         selected_scenarios_per_project = request.session.get("selected_scenarios", {})

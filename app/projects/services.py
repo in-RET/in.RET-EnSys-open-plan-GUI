@@ -10,7 +10,14 @@ from projects.models import Simulation
 from projects.requests import fetch_mvs_simulation_status
 from projects.constants import PENDING
 from concurrent.futures import ThreadPoolExecutor
-from exchangelib import Account, Credentials, Mailbox, Message, EWSTimeZone, Configuration
+from exchangelib import (
+    Account,
+    Credentials,
+    Mailbox,
+    Message,
+    EWSTimeZone,
+    Configuration,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -30,6 +37,7 @@ Those functions require Django-Q cluster to run along with Django Server.
 To achieve this `python manage.py qcluster` command needs to be executed.
 
 """
+
 
 def check_simulation_objects(**kwargs):
     pending_simulations = Simulation.objects.filter(status=PENDING)
@@ -53,7 +61,7 @@ def create_or_delete_simulation_scheduler(**kwargs):
     ----------
     **kwargs : dict
         Possible future keyword arguments.
-    
+
     Returns
     -------
     bool :
@@ -63,7 +71,9 @@ def create_or_delete_simulation_scheduler(**kwargs):
     mvs_token = kwargs.get("mvs_token", "")
 
     if Schedule.objects.count() == 0:
-        logger.info(f"No Scheduler found. Creating a new Scheduler to check Simulation {mvs_token}.")
+        logger.info(
+            f"No Scheduler found. Creating a new Scheduler to check Simulation {mvs_token}."
+        )
         schedule = Schedule.objects.create(
             name=f"djangoQ_Scheduler-{mvs_token}",
             func="projects.services.check_simulation_objects",
@@ -73,7 +83,9 @@ def create_or_delete_simulation_scheduler(**kwargs):
             # kwargs={'test_arg': 1, 'test_arg2': "test"}
         )
         if schedule.id:
-            logger.info(f"New Scheduler Created to track simulation {mvs_token} objects status.")
+            logger.info(
+                f"New Scheduler Created to track simulation {mvs_token} objects status."
+            )
             return True
         else:
             logger.debug(f"Scheduler already exists for {mvs_token}. Skipping.")
@@ -81,18 +93,20 @@ def create_or_delete_simulation_scheduler(**kwargs):
 
 
 def send_feedback_email(subject, body):
-    tz = EWSTimeZone('Europe/Copenhagen')
+    tz = EWSTimeZone("Europe/Copenhagen")
     try:
         credentials = Credentials(EXCHANGE_ACCOUNT, EXCHANGE_PW)
 
         config = Configuration(server=EXCHANGE_SERVER, credentials=credentials)
 
         account = Account(
-            EXCHANGE_EMAIL, credentials=credentials, autodiscover=False, default_timezone=tz, config=config
+            EXCHANGE_EMAIL,
+            credentials=credentials,
+            autodiscover=False,
+            default_timezone=tz,
+            config=config,
         )
-        recipients = [
-            Mailbox(email_address=recipient) for recipient in RECIPIENTS
-        ]
+        recipients = [Mailbox(email_address=recipient) for recipient in RECIPIENTS]
         mail = Message(
             account=account,
             folder=account.sent,
@@ -102,7 +116,9 @@ def send_feedback_email(subject, body):
         )
         mail.send_and_save()
     except Exception as ex:
-        logger.warning(f"Couldn't send feedback email. Exception raised: {traceback.format_exc()}.")
+        logger.warning(
+            f"Couldn't send feedback email. Exception raised: {traceback.format_exc()}."
+        )
         raise ex
 
 

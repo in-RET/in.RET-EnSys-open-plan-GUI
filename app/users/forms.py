@@ -11,13 +11,15 @@ class CustomUserCreationForm(UserCreationForm):
     email = forms.CharField(
         required=True,
         widget=forms.TextInput(
-            attrs={"placeholder": "name@example.com",}
+            attrs={
+                "placeholder": "name@example.com",
+            }
         ),
     )
 
     class Meta:
         model = CustomUser
-        fields = ('email', 'first_name', 'last_name', 'username')
+        fields = ("email", "first_name", "last_name", "username")
 
 
 class CustomUserChangeForm(UserChangeForm):
@@ -25,5 +27,4 @@ class CustomUserChangeForm(UserChangeForm):
 
     class Meta:
         model = CustomUser
-        fields = ('email', 'first_name', 'last_name', 'username')
-
+        fields = ("email", "first_name", "last_name", "username")

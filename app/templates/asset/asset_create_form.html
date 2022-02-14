@@ -1,3 +1,4 @@
+{% load i18n %}
 {% load crispy_forms_tags %}
 
 <form method="post" action="">
@@ -10,14 +11,27 @@
       {% for error in field.errors %}
       <p class="help-block">{{ error }}</p>
       {% endfor %}
-      {% if field.name == "input_timeseries" and input_timeseries_data %}
-      <div>
-        <a data-toggle="collapse" href="#input_timeseries_data">uploaded data</a>
-      </div>
-      <div id="input_timeseries_data" class="collapse">
-        <textarea>{{input_timeseries_data}}</textarea>
-      </div>
+
+      {% if field.name == "input_timeseries" %}
+        <div id="timeseries_trace"></div>
+
+        {% if input_timeseries_timestamps %}
+          <div id="input_timeseries_timestamps" style="display:none;">
+            <textarea>{{ input_timeseries_timestamps }}</textarea>
+          </div>
+        {% endif %}
+
       {% endif %}
+      {% if field.name == "input_timeseries" and input_timeseries_data %}
+        <div>
+          <a data-bs-toggle="collapse" href="#input_timeseries_data">{% translate "uploaded data" %}</a>
+        </div>
+        <div id="input_timeseries_data" class="collapse">
+          <textarea>{{input_timeseries_data}}</textarea>
+        </div>
+
+      {% endif %}
+
     </div>
     {% endfor %}
   </div>

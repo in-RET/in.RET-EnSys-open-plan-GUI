@@ -1,4 +1,5 @@
 from django import template
+
 register = template.Library()
 
 
@@ -10,7 +11,7 @@ def setvar(val=None):
 @register.filter
 def getfield(value, arg):
     """Gets an attribute of an object dynamically from a string name"""
-    #import pdb; pdb.set_trace()
+    # import pdb; pdb.set_trace()
     if hasattr(value, "fields"):
         fields = getattr(value, "fields")
         if str(arg) in fields:

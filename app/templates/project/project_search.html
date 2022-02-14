@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
-
+{% load custom_filters %}
+{% load crispy_forms_tags %}
 {% load static %}
+{% load i18n %}
+
 {% block head_block %}
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" crossorigin=""
           integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="/>
@@ -13,359 +16,264 @@
     </script>
 {% endblock %}
 
-{% block title %}Projects{% endblock title %}
+{% block title %}{% translate "Projects" %}{% endblock title %}
 
 {% block content %}
-    <!-- <div class="container5"> -->
-    <style>
-        .container {
-            max-width: 73% !important;
-        }
-        .container5{
-            border-radius: 0%;
-            width: 95%;
-            margin:5% auto;
-        }
 
 
-        td#colname {
-            max-width: 100px;
-        }
-
-        @media screen and (max-width: 1900px) {
-            .btn-success {
-                margin-top: 4rem;
-                margin-left: -35rem;
-
-            }
-
-            .btn-danger {
-                margin-top: 4rem;
-                margin-left: -25rem;
-            }
-
-            .btn-info {
-                margin-top: 4rem;
-                margin-left: -15rem;
-
-            }
-
-            .btn-default {
-                margin-top: 4rem;
-                margin-left: -5rem;
-
-            }
-
-            .btn-warning {
-                margin-top: 4rem;
-                margin-left: 3rem;
-
-            }
-
-            #listtitle {
-                margin: 5% auto;
-            }
-
-        }
-
-        /* @media screen and (max-width: 991px) {
-               td#colname, td#colname2, td#colname3 {
-                   max-width: 130px !important;
-                   overflow: hidden;
-                   white-space: nowrap;
-                   text-overflow: ellipsis;
-                   font-size: 90%;
-               }
-           }*/
-
-        @media screen and (max-width: 1199px) and (min-width: 768px) {
-            #list6 {
-                font-size: 10px;
-            }
-
-            #list5 {
-                left: -5%;
-            }
-
-            #box2, #box1 {
-                min-width: 95% !important;
-                right: -4%;
-            }
-        }
-
-        @media screen and (max-width: 904px) {
-            #box2 {
-                min-width: 100% !important;
-            }
-
-            #listtitle {
-                font-size: 85% !important;
-            }
-
-            .mapp {
-                height: 300px !important;
-                border-right: none;
-                border-bottom: 6px solid #967b65;;
-            }
-
-            td#colname, td#colname2, td#colname3{
-                font-size: 80%;
-                max-width: 130px !important;
-                overflow: hidden;
-                white-space: nowrap;
-                text-overflow: ellipsis;
-            }
-
-            td#colname4{
-                font-size: 80%;
-                max-width: 380px !important;
-                overflow: hidden;
-                white-space: nowrap;
-                text-overflow: ellipsis;
-            }
-        }
-
-      
-        div.dropdown-menu{
-            overflow: visible;
-          
-            z-index: 999!important;
-           min-width: 100px;
-           
-        }
-
-        .dropdown-menu a{
-            color: black;
-            padding: 6px 8px;
-            text-decoration: none;
-             display: block;
-             font-size:12px;
-             text-transform:none!important;
-        }
-
-        .table-responsive{
-            overflow: visible !important;
-            border: none;
-        }
-
-        .container5{
-            overflow: auto;
-        }
-
-        @media screen and (min-width:886px){
-            .container5{
-            overflow: hidden;
-            }
-        }
-        #buttonn input{
-            padding:8px 16px;
-            background-color: #1c1c1c;
-            color:#f4d9a4;
-            border:none;
-            border-radius: 2px;
-            font-weight: 600;
-            box-shadow: 1px 1px 5px #1c1c1c57;
-        }
-
-        .btn{
-            background-color: rgb(255, 255, 255);
-            color:#414141;
-            font-size: 10px;
-        }
-      .btn:hover{
-        box-shadow:3px 3px 5px #1c1c1c2d
-      }
-      a.dropdown-item:hover,  input:hover{
-         /* background-color: rgba(139, 138, 139, 0.164);*/
-         cursor:pointer;
-         color:rgba(139, 138, 139, 0.699);
-      }
-
-      .btn-group.open .dropdown-toggle{
-          box-shadow: none;
-      }
-      #buttonn input:hover{
-          box-shadow: 3px 3px 5px #1c1c1c94;
-      }
-
-      input{
-          padding:6px 8px;
-      }
-
-    </style>
-    <div class="backg">
-        <div id="project_map" class="mapback"></div>
-        <br>
-        <div class="row">
-            <div class="col-sm-10" id="createproj">
-                <div class="input-panel">
-                    <a href="{% url 'project_create' %}" class="btn btn-primary btn-lg" id="button55"
-                       role="button"><span class="glyphicon glyphicon-plus-sign"></span> Create New
-                        Project</a>
-                </div>
+<!-- Modal -->
+<div class="modal fade modal--gui" id="uploadScenarioModal" tabindex="-1" role="dialog" aria-labelledby="uploadScenarioModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="uploadScenarioModalLabel">{% translate "Scenario upload" %}</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
-
-            <div class="col-sm-1"></div>
+            <div class="modal-body">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ scenario_upload_form|crispy }}
+                    <input id="uploadScenarioBtn" type="submit" style="display:none;">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate "Close" %}</button>
+                <button class="btn btn--medium" onclick="uploadScenario(event)">{% translate "Upload" %}</button>
+            </div>
         </div>
-        <br><br> <br><br><br><br><br><br>
-        <div class="container5">
+    </div>
+</div>
 
-            <div class="row">
-                <div class="col-sm-1"></div>
-                <div class="col-sm-10" id="box1">
-                    <div class="panel panel-default" id="box2">
-                        <br>
-                        <div class="panel-heading"><h3 class="panel-title" id="listtitle"><strong>Project List </strong>
-                        </h3></div>
-                        <div class="panel-body" id="list5">
-                            <div class="table-responsive">
-                                <table class="table table-striped">
-                                    <thead class="thead-dark">
-                                    <tr>
-                                        <th>#ID</th>
-                                        <th>Project Name</th>
-                                        <th>Date Created</th>
-                                        <th>Members</th>
-                                        <th>Country</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
+    <main>
+        <section class="header">
+            <div>
+                <div class="header__left"></div>
+                <h1 class="header__title">{% translate "My Projects" %}</h1>
+                <div class="header__back"></div>
+            </div>
+        </section>
 
-                                    {% for project in project_list %}
-                                        <tr id="list6">
-                                            <th scope="row">{{ forloop.counter }}</th>
-                                            <td id="colname"><a href="{% url 'scenario_search' project.pk %}">{{ project.name }}</a></td>
-                                            <td id="colname2">{{ project.date_created }}</td>
-                                            <td id="colname3">{% if project.viewers.count == 0 %}
-                                                Only You
-                                                {% else %}
-                                                <a {% if project.user == request.user %} 
-                                                    onclick="showMembers(event, `{% url 'project_members_list' project.pk %}`, `{% url 'project_revoke_access' project.pk %}`)" 
-                                                    {% endif %}>
-                                                    {{ project.viewers.count }} and You</a>
-                                                    {% endif %}
-                                            </td>
-                                         
-                                            <td id="colname4">{{ project.country }}
-                                                </td>
-                                                <td>
+        {% for project in project_list %}
 
-                                                
-                                                    <form style="float: left;" class="form" id="buttonn"
-                                                          action="{% url 'scenario_search' project.pk %}"
-                                                          method="GET">
-                                                        <input class="" type="submit"
-                                                               value="Open"/>&emsp;
-                                                    </form>
-                                                   </td>
-
-                                            <td>
-                                                <div class="dropdown">
-                                            <div class="btn-group" dropdown>
-                                                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                    <!--<span class="glyphicon glyphicon-cog"></span>&nbsp;--><!--<span class="caret" style=" transform: rotate(-90deg);"></span>-->
-                                                    <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
-
-                                                </button>
-                                                
-                                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                    <a class="dropdown-item" href="{% url 'project_detail' project.pk %}">&nbsp;&nbsp;Show</a>
-                                                    {% if project.user == request.user %}
-                                                    <a class="dropdown-item" href="{% url 'project_update' project.pk %}">&nbsp;&nbsp;Edit</a>
-                                                    
-                                                    <a class="dropdown-item">
-                                                        <form style="float: left;" 
-                                                        action="{% url 'project_delete' project.pk %}"
-                                                        method="POST">
-                                                      {% csrf_token %}
-                                                      <input type="submit" style="background: transparent; border:none;"
-                                                             value="Delete"
-                                                             onclick="return confirm('Are you sure you want to delete?' + '\n' +'This will also delete all related project data.')"/>
-                                                             &emsp; </form></a>
-
-                                                    <a class="dropdown-item" onSubmit="shareProject(event, `{% url 'project_share' project.pk %}`)">
-                                                        <form style="float: left;" class="" style="background:transparent;"
-                                                        onSubmit="shareProject(event, `{% url 'project_share' project.pk %}`)">
-                                                      <input type="submit" style="background: transparent; border:none;" value="Share"/>&emsp;</form></a>
-                                                    {% endif %}
-                                                </div>
-                                            </div>
-                                        </div>
-                                            </td>
-                                          <!-- <td>
-
-                                                <div class="buttons">
-                                                    <form style="float: left;" class="form"
-                                                          action="{% url 'scenario_search' project.pk %}"
-                                                          method="GET">
-                                                        <input class="btn btn-sm btn-success" type="submit"
-                                                               value="Open"/>&emsp;
-                                                    </form>
-                                                    <form style="float: left;" class="form"
-                                                          action="{% url 'project_detail' project.pk %}"
-                                                          method="GET">
-                                                        <input class="btn btn-sm btn-info" type="submit" value="Show"/>&emsp;
-                                                    </form>
-                                                    {% if project.user == request.user %}
-                                                    <form style="float: left;" class="form"
-                                                          action="{% url 'project_update' project.pk %}"
-                                                          method="GET">
-                                                        <input class="btn btn-sm btn-default" type="submit"
-                                                               value="Edit"/>&emsp;
-                                                    </form>
-                                                    <form style="float: left;" class="form"
-                                                          action="{% url 'project_delete' project.pk %}"
-                                                          method="POST">
-                                                        {% csrf_token %}
-                                                        <input class="btn btn-sm btn-danger" type="submit"
-                                                               value="Delete"
-                                                               onclick="return confirm('Are you sure you want to delete?' + '\n' +
-                             'This will also delete all related project data.')"/>
-                                                    </form>
-                                                    <form style="float: left;" class="form"
-                                                          onSubmit="shareProject(event, `{% url 'project_share' project.pk %}`)">
-                                                        <input class="btn btn-sm btn-warning" id="shaare" type="submit"
-                                                               value="Share"/>&emsp;
-                                                    </form>
-                                                    {% endif %}
-                                                </div>
-                                            </td>-->
-                                        </tr>
-                                    {% endfor %}
-                                    </tbody>
-                                </table>
+            <section class="project" id="project-{{ project.id }}">
+                <div>
+                    <div class="project__top">
+                        <h2 class="name">
+                            {{ project.name }}
+                        </h2>
+                        <a href="{% url 'not_implemented' %}?url={{ request.get_full_path }}" class="location">
+                            <span class="icon-pin" aria-hidden="true"></span>
+                            {{ project.country }}
+                        </a>
+                    </div>
+                    <div class="project__details">
+                        <div class="details">
+                            <div class="detail">
+                                <span class="detail__property">{% translate "Created" %}</span>
+                                <span class="detail__value">{{ project.date_created }}</span>
                             </div>
+                            <!--<div class="detail">
+                                <span class="detail__property">Interest rate</span>
+                                <span class="detail__value">{{ project.economic_data.currency }}</span>
+                            </div>-->
+                            <div class="detail">
+                                <span class="detail__property">{% translate "Lifetime" %}</span>
+                                <span class="detail__value">{{ project.economic_data.duration }} {% translate "years" %}</span>
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <a class="btn btn--action btn--hollow action" href="{% url 'project_visualize_results' proj_id=project.id %}">
+                                <span class="icon icon-results" aria-hidden="true"></span>
+                                {% translate "Results" %}
+                            </a>
+                            <a class="btn btn--action action" href="{% url 'project_update' project.pk %}">
+                                <span class="icon icon-edit" aria-hidden="true"></span>
+                                {% translate "Edit" %}
+                            </a>
+                            <form action="{% url 'project_duplicate' project.pk %}"
+                                  method="POST">
+                                {% csrf_token %}
+                                <!-- TODO change the ugly inline style-->
+                                <button style="margin-top:0.25rem;" class="btn btn--action action" type="submit" value="Duplicate">
+                                    <span class="icon icon-duplicate" aria-hidden="true"></span>
+                                    {% translate "Duplicate" %}
+                                </button>
+                            </form>
+                            <form action="{% url 'project_delete' project.pk %}"
+                                  method="POST">
+                                {% csrf_token %}
+                                <!-- TODO change the ugly inline style-->
+                                <button style="margin-top:0.25rem;" class="btn btn--action action" type="submit" value="Delete" onclick="return confirm('Are you sure you want to delete?' + '\n' +'This will also delete all related project data.')">
+                                    <span class="icon icon-delete" aria-hidden="true"></span>
+                                    {% translate "Delete" %}
+                                </button>
+
+                            </form>
+
                         </div>
                     </div>
 
-                </div>
+                    <!--
+                    return render(request, 'scenario/scenario_search.html',
+                    {'comment_list': project.comment_set.all(),
+                    'scenarios_list': project.scenario_set.all(),
+                    'project': project,
+                    'show_comments':show_comments
+                    })-->
 
-                <div class="col-sm-2">
+
+                    <div class="project__scenarios">
+                        <div class="toggle" class="js-toggle-scenario">
+                            <button class="btn btn--action" type="button" data-bs-toggle="collapse" data-bs-target="#collapseScenarios{{ project.id }}" aria-expanded="false" aria-controls="collapseScenarios{{ project.id }}">
+                                <span class="icon-i_arrow_down icon icon--small js-toggle-scenario-icon" aria-hidden="true"></span>
+                                <span class="js-toggle-scenario-name">{% translate "Show scenarios" %}</span>
+                            </button>
+                        </div>
+                        <div class="collapse" id="collapseScenarios{{ project.id }}">
+
+                                <div class="card card-body">
+                                    <ul class="list-group">
+
+                                        {% for scenario in project|scenario_list %}
+                                        <form>
+                                            {% csrf_token %}
+                                        <li class="list-group-item">
+                                            <div class="details">
+                                                <input class="form-check-input project-{{ project.id }}" id="project{{ project.id }}scenario-{{ scenario.id }}" type="checkbox" value="{{ scenario.id }}" aria-label="">
+                                                <label class="form-check-label" for="project{{ project.id }}scenario-{{ scenario.id }}">
+                                                    <a class= "form-check-label" href="{% url 'scenario_steps_edit' proj_id=project.id scen_id=scenario.id step_id=1 %}"> {{ scenario }} </a>
+                                                </label>
+                                                <!--<div class="detail">
+                                                    <span class="detail__property">{% translate "Created" %}</span>
+                                                    <span class="detail__value">{{ project.date_created }}</span>
+                                                </div>-->
+                                            </div>
+                                            <div class="actions">
+                                                <a class="btn btn--action results" href="{% url 'scenario_visualize_results' scenario.id %}">
+                                                    <span class="icon icon-results" aria-hidden="true"></span>
+                                                    {% translate "Results" %}
+                                                </a>
+                                                <a class="btn btn--action action" href="{% url 'scenario_steps_edit' proj_id=project.id scen_id=scenario.id step_id=1 %}"> <!-- "scenario-creation-1.html" in B design -->
+                                                    <span class="icon icon-edit" aria-hidden="true"></span>
+                                                </a>
+                                                <a class="btn btn--action action" href="{% url 'scenario_duplicate' scenario.id %}">
+                                                    <span class="icon icon-duplicate" aria-hidden="true"></span>
+                                                </a>
+                                                <button class="btn btn--action action" type="submit" formaction="{% url 'scenario_delete' scenario.id %}" formmethod="post">
+                                                    <span class="icon icon-delete" aria-hidden="true"></span>
+                                                </button>
+
+                                            </div>
+                                        </li>
+                                        </form>
+                                        {% empty %}
+                                            {% translate "There are no scenarios" %}
+                                        {% endfor %}
+
+
+                                    </ul>
+                                </div>
+                                <form id="exportScenarios-project-{{ project.id }}" action = "{% url 'scenario_export' project.id %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="scenario_ids">
+                                </form>
+                                <button class="btn btn--action action export" type="button" onclick="javascript:export_btn_clicked({{ project.id }})">
+                                    <span class="icon icon-export" aria-hidden="true"></span>
+                                    {% translate "Export selected" %}
+                                </button>
+
+                        </div>
+                        <div class="add-scenario">
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle" type="button" id="dropdownCreateScenario{{ project.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="icon icon-add" aria-hidden="true"></span>
+                                    {% translate "Create scenario" %}
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownCreateScenario{{ project.id }}">
+
+                                    {% if project.user == request.user %}
+                                        <li><a class="dropdown-item" href="{% url 'scenario_steps' project.id %}">{% translate "New scenario" %}</a></li>
+                                        <li><a class="dropdown-item" onclick="showUploadScenario(event, `{% url 'scenario_upload' project.id %}`)">{% translate "From file" %}</a></li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+
+                        </div>
+                    </div>
                 </div>
+            </section>
+
+
+
+
+        {% empty %}
+            <section class="projects-empty">
+                <div>
+                    <div class="projects-empty__img">
+                        <img src="{% static '/assets/illustrations/empty_folder.svg' %}" alt="Empty folder">
+                    </div>
+                    <div class="projects-empty__text">
+                        {% translate "There are no projects yet" %}
+                    </div>
+                </div>
+            </section>
+
+        {% endfor %}
+
+        <section class="projects-new">
+            <div class="dropdown">
+                <button class="btn btn--medium btn--transparent btn--icon dropdown-toggle" type="button" id="newProjectButton" data-bs-toggle="dropdown" aria-expanded="false">
+                    {% translate "Create project" %}
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="newProjectButton">
+                    <li><a class="dropdown-item" href="{% url 'project_create' %}">{% translate "Empty project" %}</a></li>
+                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">{% translate "From use case" %}</a></li>
+                </ul>
             </div>
-        </div>
+        </section>
 
-    </div>
 
-    <br>
-    <br>
+    </main>
 
 {% endblock content %}
 
 
 {% block end_body_scripts %}
+
+
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
 <script>
-    const streets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+
+    const satellite = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+        attribution: '<a href="http://www.intracom-telecom.com/">Intracom Telecom S.A.</a>',
+        maxZoom: 8,
+        minZoom: 2,
+        id: 'mapbox/satellite-streets-v11',
+        tileSize: 512,
+        zoomOffset: -1,
+        accessToken: 'pk.eyJ1IjoidmFsa2FsYWlzIiwiYSI6ImNrZGhpZ29peTFnMjIycG5ybWR3aG4yeHIifQ.L4y4PQjkIdO1c7pvzOr2kw',
+    });
+
+    const streets = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+        attribution: '<a href="http://www.intracom-telecom.com/">Intracom Telecom S.A.</a>',
+        maxZoom: 12,
+        minZoom: 2,
+        id: 'mapbox/streets-v11',
+        tileSize: 512,
+        zoomOffset: -1,
+        accessToken: 'pk.eyJ1IjoidmFsa2FsYWlzIiwiYSI6ImNrZGhpZ29peTFnMjIycG5ybWR3aG4yeHIifQ.L4y4PQjkIdO1c7pvzOr2kw',
     });
 
     const baseMaps = {
+        "<span style='font-family:Century Gothic; font-size:12px;'>Sattelite View</span>": satellite,
         "<span style='font-family:Century Gothic; font-size:12px;'>Street View</span>": streets
     };
 
-    gridMap = L.map('project_map', {layers: [streets], scrollWheelZoom: false}).setView([38, 23.5], 5);
+    gridMap = L.map('project_map', {layers: [streets, satellite], scrollWheelZoom: false}).setView([38, 23.5], 5);
     L.control.layers(baseMaps).addTo(gridMap);
     markerGroup = new L.featureGroup().addTo(gridMap);
 
@@ -387,6 +295,24 @@
         }
     });
 </script>
+
+<script>
+    var uploadScenarioModalDOM = document.getElementById("uploadScenarioModal");
+    var uploadScenarioModal = new bootstrap.Modal(uploadScenarioModalDOM);
+    var uploadScenarioButton = document.getElementById("uploadScenarioBtn");
+
+    function showUploadScenario(event, url){
+        // update the url linked to the form
+        uploadScenarioModalDOM.querySelector('.modal-body form').setAttribute("action",url);
+        uploadScenarioModal.show()
+    }
+
+    function uploadScenario(event){
+        //simulate click on the form here
+        uploadScenarioButton.click()
+    }
+</script>
+
 
 <script>
     function shareProject (e, projectShareUrl) {
@@ -506,5 +432,25 @@
             dropdownMenu.hide();
         });
     })();
+</script>
+
+<script>
+
+
+    function export_btn_clicked(project_id){
+        // collect the ids of the scenarios checked by the user under one project
+        var scenario_ids=[];
+        var cb = $('.form-check-input.project-'+project_id);
+        const cb_checked = cb.map((i, obj) => {
+            if(obj.checked === true){
+                scenario_ids.push(obj.value)
+            }
+        });
+        // assign scenario_ids to the input field within the export form and submit the form
+        var exportForm = document.getElementById("exportScenarios-project-"+project_id);
+        exportForm.querySelector("input[name='scenario_ids']").value = JSON.stringify(scenario_ids);
+        exportForm.submit()
+    };
+
 </script>
 {% endblock end_body_scripts %}

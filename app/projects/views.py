@@ -18,21 +18,39 @@ from users.models import CustomUser
 from django.db.models import Q
 from epa.settings import MVS_GET_URL, MVS_LP_FILE_URL
 from .forms import *
-from .requests import mvs_simulation_request, mvs_simulation_check_status, get_mvs_simulation_results
+from .requests import (
+    mvs_simulation_request,
+    mvs_simulation_check_status,
+    get_mvs_simulation_results,
+)
 from .models import *
-from .scenario_topology_helpers import handle_storage_unit_form_post, handle_bus_form_post, handle_asset_form_post, load_scenario_topology_from_db, NodeObject, \
-    update_deleted_objects_from_database, duplicate_scenario_objects, duplicate_scenario_connections, get_topology_json, load_scenario_from_dict
+from .scenario_topology_helpers import (
+    handle_storage_unit_form_post,
+    handle_bus_form_post,
+    handle_asset_form_post,
+    load_scenario_topology_from_db,
+    NodeObject,
+    update_deleted_objects_from_database,
+    duplicate_scenario_objects,
+    duplicate_scenario_connections,
+    get_topology_json,
+    load_scenario_from_dict,
+)
 from .constants import DONE, ERROR, MODIFIED
-from .services import create_or_delete_simulation_scheduler, excuses_design_under_development, send_feedback_email
+from .services import (
+    create_or_delete_simulation_scheduler,
+    excuses_design_under_development,
+    send_feedback_email,
+)
 import traceback
-logger = logging.getLogger(__name__)
 
+logger = logging.getLogger(__name__)
 
 
 @require_http_methods(["GET"])
 def not_implemented(request):
     """Function returns a message"""
-    redirect_name = request.GET.get('url')
+    redirect_name = request.GET.get("url")
     excuses_design_under_development(request, link=True)
 
     return redirect(redirect_name)
@@ -41,10 +59,9 @@ def not_implemented(request):
 @require_http_methods(["GET"])
 def home(request):
     if request.user.is_authenticated:
-        return HttpResponseRedirect(reverse('project_search'))
+        return HttpResponseRedirect(reverse("project_search"))
     else:
         return render(request, "index.html")
-
 
 
 @login_required
@@ -77,10 +94,11 @@ def scenario_upload(request, proj_id):
 
         load_scenario_from_dict(scen, project=project, user=request.user)
 
-    return HttpResponseRedirect(reverse('project_search'))
+    return HttpResponseRedirect(reverse("project_search"))
 
 
 # region Project
+
 
 @login_required
 @require_http_methods(["GET", "POST"])
@@ -90,7 +108,11 @@ def user_feedback(request):
         if form.is_valid():
             feedback = form.save(commit=False)
             try:
-                feedback.rating = [key.split('-')[-1] for key in request.POST.keys() if key.startswith('rating')][0]
+                feedback.rating = [
+                    key.split("-")[-1]
+                    for key in request.POST.keys()
+                    if key.startswith("rating")
+                ][0]
             except:
                 feedback.rating = None
             feedback.save()
@@ -101,8 +123,8 @@ def user_feedback(request):
                 messages.success(request, f"Thank you for your feedback.")
             except Exception as e:
                 messages.success(request, e)
-            return HttpResponseRedirect(reverse('project_search'))
-    return render(request, 'feedback.html', {'form':form})
+            return HttpResponseRedirect(reverse("project_search"))
+    return render(request, "feedback.html", {"form": form})
 
 
 @login_required
@@ -110,18 +132,20 @@ def user_feedback(request):
 @require_http_methods(["GET"])
 def project_members_list(request, proj_id):
     project = get_object_or_404(Project, pk=proj_id)
-    
+
     if project.user != request.user:
-        return JsonResponse({"status": "error", "message": "Project does not belong to you."},
-                            status=403, content_type='application/json')
-    
-    viewers = project.viewers.values_list('email',flat=True)
+        return JsonResponse(
+            {"status": "error", "message": "Project does not belong to you."},
+            status=403,
+            content_type="application/json",
+        )
+
+    viewers = project.viewers.values_list("email", flat=True)
     return JsonResponse(
-        {
-            "status": "success", 
-            "viewers": list(viewers)
-        },
-        status=201, content_type='application/json')
+        {"status": "success", "viewers": list(viewers)},
+        status=201,
+        content_type="application/json",
+    )
 
 
 @login_required
@@ -129,19 +153,24 @@ def project_members_list(request, proj_id):
 @require_http_methods(["POST"])
 def project_share(request, proj_id):
     project = get_object_or_404(Project, pk=proj_id)
-    
+
     if project.user != request.user:
-        return JsonResponse({"status": "error", "message": "Project does not belong to you."},
-                            status=403, content_type='application/json')
-    viewers = CustomUser.objects.filter(email=json.loads(request.body)['userEmail'])
+        return JsonResponse(
+            {"status": "error", "message": "Project does not belong to you."},
+            status=403,
+            content_type="application/json",
+        )
+    viewers = CustomUser.objects.filter(email=json.loads(request.body)["userEmail"])
     if viewers.count() > 0 and project.user not in viewers:
         project.viewers.add(viewers.first())
     return JsonResponse(
         {
-            "status": "success", 
-            "message": "If a user exists with that email address, they will be able to view the project."
+            "status": "success",
+            "message": "If a user exists with that email address, they will be able to view the project.",
         },
-        status=201, content_type='application/json')
+        status=201,
+        content_type="application/json",
+    )
 
 
 @login_required
@@ -149,11 +178,16 @@ def project_share(request, proj_id):
 @require_http_methods(["POST"])
 def project_revoke_access(request, proj_id):
     project = get_object_or_404(Project, pk=proj_id)
-    
+
     if project.user != request.user:
-        return JsonResponse({"status": "error", "message": "Project does not belong to you."},
-                            status=403, content_type='application/json')
-    viewer = CustomUser.objects.filter(email=json.loads(request.body)['userEmail']).first()
+        return JsonResponse(
+            {"status": "error", "message": "Project does not belong to you."},
+            status=403,
+            content_type="application/json",
+        )
+    viewer = CustomUser.objects.filter(
+        email=json.loads(request.body)["userEmail"]
+    ).first()
     if viewer and project.user != viewer:
         project.viewers.remove(viewer)
         msg = "The selected user will not be able to view the project any more."
@@ -162,18 +196,17 @@ def project_revoke_access(request, proj_id):
         msg = "Could not remove the user from your project. Please contact a moderator."
         status_code = 422
     return JsonResponse(
-        {
-            "status": "success", 
-            "message": msg
-        },
-        status=status_code, content_type='application/json')
+        {"status": "success", "message": msg},
+        status=status_code,
+        content_type="application/json",
+    )
 
 
 @login_required
 @require_http_methods(["GET"])
 def project_detail(request, proj_id):
     project = get_object_or_404(Project, pk=proj_id)
-    
+
     if (project.user != request.user) and (request.user not in project.viewers.all()):
         raise PermissionDenied
 
@@ -181,8 +214,11 @@ def project_detail(request, proj_id):
     project_form = ProjectDetailForm(None, instance=project)
     economic_data_form = EconomicDataDetailForm(None, instance=project.economic_data)
 
-    return render(request, 'project/project_detail.html',
-                  {'project_form': project_form, 'economic_data_form': economic_data_form})
+    return render(
+        request,
+        "project/project_detail.html",
+        {"project_form": project_form, "economic_data_form": economic_data_form},
+    )
 
 
 @login_required
@@ -193,25 +229,25 @@ def project_create(request):
         if form.is_valid():
             logger.info(f"Creating new project with economic data.")
             economic_data = EconomicData.objects.create(
-                duration = form.cleaned_data['duration'],
-                currency = form.cleaned_data['currency'],
-                discount = form.cleaned_data['discount'],
-                tax = form.cleaned_data['tax']
+                duration=form.cleaned_data["duration"],
+                currency=form.cleaned_data["currency"],
+                discount=form.cleaned_data["discount"],
+                tax=form.cleaned_data["tax"],
             )
 
             project = Project.objects.create(
-                name = form.cleaned_data['name'],
-                description = form.cleaned_data['description'],
-                country = form.cleaned_data['country'],
-                longitude = form.cleaned_data['longitude'],
-                latitude = form.cleaned_data['latitude'],
-                user = request.user,
-                economic_data = economic_data
+                name=form.cleaned_data["name"],
+                description=form.cleaned_data["description"],
+                country=form.cleaned_data["country"],
+                longitude=form.cleaned_data["longitude"],
+                latitude=form.cleaned_data["latitude"],
+                user=request.user,
+                economic_data=economic_data,
             )
-            return HttpResponseRedirect(reverse('project_search', args=[project.id]))
+            return HttpResponseRedirect(reverse("project_search", args=[project.id]))
     else:
         form = ProjectCreateForm()
-    return render(request, 'project/project_create.html', {'form': form})
+    return render(request, "project/project_create.html", {"form": form})
 
 
 @login_required
@@ -224,18 +260,27 @@ def project_update(request, proj_id):
         # return HttpResponseForbidden()
 
     project_form = ProjectUpdateForm(request.POST or None, instance=project)
-    economic_data_form = EconomicDataUpdateForm(request.POST or None, instance=project.economic_data)
+    economic_data_form = EconomicDataUpdateForm(
+        request.POST or None, instance=project.economic_data
+    )
 
-    if request.method == "POST" and project_form.is_valid() and economic_data_form.is_valid():
+    if (
+        request.method == "POST"
+        and project_form.is_valid()
+        and economic_data_form.is_valid()
+    ):
         logger.info(f"Updating project with economic data...")
         project_form.save()
         economic_data_form.save()
         # Save was successful, so send message
-        messages.success(request, 'Project Info updated successfully!')
-        return HttpResponseRedirect(reverse('project_search'))
+        messages.success(request, "Project Info updated successfully!")
+        return HttpResponseRedirect(reverse("project_search"))
 
-    return render(request, 'project/project_update.html',
-                  {'project_form': project_form, 'economic_data_form': economic_data_form})
+    return render(
+        request,
+        "project/project_update.html",
+        {"project_form": project_form, "economic_data_form": economic_data_form},
+    )
 
 
 @login_required
@@ -248,10 +293,9 @@ def project_delete(request, proj_id):
 
     if request.POST:
         project.delete()
-        messages.success(request, 'Project successfully deleted!')
+        messages.success(request, "Project successfully deleted!")
 
-    return HttpResponseRedirect(reverse('project_search', args=[proj_id]))
-
+    return HttpResponseRedirect(reverse("project_search", args=[proj_id]))
 
 
 @login_required
@@ -259,18 +303,27 @@ def project_delete(request, proj_id):
 def project_search(request, proj_id=None):
     # project_list = Project.objects.filter(user=request.user)
     # shared_project_list = Project.objects.filter(viewers=request.user)
-    combined_projects_list = Project.objects.filter(Q(user=request.user) | Q(viewers=request.user)).distinct()
+    combined_projects_list = Project.objects.filter(
+        Q(user=request.user) | Q(viewers=request.user)
+    ).distinct()
 
     scenario_upload_form = UploadFileForm()
 
-    return render(request, 'project/project_search.html',
-                  {'project_list': combined_projects_list, "proj_id": proj_id , "scenario_upload_form": scenario_upload_form})
+    return render(
+        request,
+        "project/project_search.html",
+        {
+            "project_list": combined_projects_list,
+            "proj_id": proj_id,
+            "scenario_upload_form": scenario_upload_form,
+        },
+    )
 
 
 @login_required
 @require_http_methods(["POST", "GET"])
 def project_duplicate(request, proj_id):
-    """ duplicates the selected project but none of its associated scenarios """
+    """duplicates the selected project but none of its associated scenarios"""
     project = get_object_or_404(Project, pk=proj_id)
 
     # duplicate the project
@@ -279,19 +332,18 @@ def project_duplicate(request, proj_id):
     economic_data = project.economic_data
     economic_data.pk = None
     economic_data.save()
-    #economic_data = project.economic_data.save()
+    # economic_data = project.economic_data.save()
     project.economic_data = economic_data
     project.save()
 
-
-    return HttpResponseRedirect(reverse('project_search', args=[project.id]))
-
+    return HttpResponseRedirect(reverse("project_search", args=[project.id]))
 
 
 # endregion Project
 
 
 # region Comment
+
 
 @login_required
 @require_http_methods(["GET", "POST"])
@@ -302,16 +354,16 @@ def comment_create(request, proj_id):
         form = CommentForm(request.POST)
         if form.is_valid():
             Comment.objects.create(
-                name = form.cleaned_data['name'],
-                body = form.cleaned_data['body'],
-                project = project
+                name=form.cleaned_data["name"],
+                body=form.cleaned_data["body"],
+                project=project,
             )
-            return HttpResponseRedirect(reverse('scenario_search', args=[proj_id, 1]))
+            return HttpResponseRedirect(reverse("scenario_search", args=[proj_id, 1]))
 
-    else: # GET
+    else:  # GET
         form = CommentForm()
 
-    return render(request, 'comment/comment_create.html', {'form': form})
+    return render(request, "comment/comment_create.html", {"form": form})
 
 
 @login_required
@@ -321,18 +373,20 @@ def comment_update(request, com_id):
 
     if comment.project.user != request.user:
         raise PermissionDenied
-    
+
     if request.POST:
         form = CommentForm(request.POST)
         if form.is_valid():
-            comment.name = form.cleaned_data['name']
-            comment.body = form.cleaned_data['body']
+            comment.name = form.cleaned_data["name"]
+            comment.body = form.cleaned_data["body"]
             comment.save()
-            return HttpResponseRedirect(reverse('scenario_search', args=[comment.project.id, 1]))
-    else: # GET
+            return HttpResponseRedirect(
+                reverse("scenario_search", args=[comment.project.id, 1])
+            )
+    else:  # GET
         form = CommentForm(instance=comment)
 
-    return render(request, 'comment/comment_update.html', {'form': form})
+    return render(request, "comment/comment_update.html", {"form": form})
 
 
 @login_required
@@ -345,13 +399,17 @@ def comment_delete(request, com_id):
 
     if request.POST:
         comment.delete()
-        messages.success(request, 'Comment successfully deleted!')
-        return HttpResponseRedirect(reverse('scenario_search', args=[comment.project.id, 1]))
+        messages.success(request, "Comment successfully deleted!")
+        return HttpResponseRedirect(
+            reverse("scenario_search", args=[comment.project.id, 1])
+        )
+
 
 # endregion Comment
 
 
 # region Scenario
+
 
 @login_required
 @require_http_methods(["GET"])
@@ -368,20 +426,25 @@ def scenario_search(request, proj_id, show_comments=0):
     Returns: A rendered html template.
     """
     project = get_object_or_404(Project, pk=proj_id)
-    return render(request, 'scenario/scenario_search.html',
-                  {'comment_list': project.comment_set.all(),
-                   'scenarios_list': project.scenario_set.all(),
-                   'project': project,
-                   'show_comments':show_comments
-                   })
+    return render(
+        request,
+        "scenario/scenario_search.html",
+        {
+            "comment_list": project.comment_set.all(),
+            "scenarios_list": project.scenario_set.all(),
+            "project": project,
+            "show_comments": show_comments,
+        },
+    )
 
 
 STEP_LIST = [
     _("Scenario Setup"),
     _("Energy system design"),
     _("Constraints"),
-    _("Simulation")
+    _("Simulation"),
 ]
+
 
 @login_required
 @require_http_methods(["GET", "POST"])
@@ -392,7 +455,9 @@ def scenario_create_parameters(request, proj_id, scen_id=None, step_id=1, max_st
     # all projects which the user is able to select (the one the user created)
     user_projects = request.user.project_set.all()
 
-    form = ScenarioCreateForm(initial={'project': project}, project_queryset=user_projects)
+    form = ScenarioCreateForm(
+        initial={"project": project}, project_queryset=user_projects
+    )
     if scen_id == "None":
         scen_id = None
 
@@ -400,10 +465,14 @@ def scenario_create_parameters(request, proj_id, scen_id=None, step_id=1, max_st
         if scen_id is not None:
             scenario = get_object_or_404(Scenario, pk=scen_id)
 
-            if (scenario.project.user != request.user) and (request.user not in scenario.project.viewers.all()):
+            if (scenario.project.user != request.user) and (
+                request.user not in scenario.project.viewers.all()
+            ):
                 raise PermissionDenied
 
-            form = ScenarioUpdateForm(None, instance=scenario, project_queryset=user_projects)
+            form = ScenarioUpdateForm(
+                None, instance=scenario, project_queryset=user_projects
+            )
 
             # if a simulation object linked to this scenario exists, all steps have been already fullfilled
             qs_sim = Simulation.objects.filter(scenario=scenario)
@@ -417,8 +486,16 @@ def scenario_create_parameters(request, proj_id, scen_id=None, step_id=1, max_st
 
         answer = render(
             request,
-            f'scenario/scenario_step{step_id}.html',
-            {'form': form, 'proj_id': proj_id, 'proj_name': project.name, 'scen_id': scen_id, 'step_id': step_id, "step_list": STEP_LIST, "max_step": max_step}
+            f"scenario/scenario_step{step_id}.html",
+            {
+                "form": form,
+                "proj_id": proj_id,
+                "proj_name": project.name,
+                "scen_id": scen_id,
+                "step_id": step_id,
+                "step_list": STEP_LIST,
+                "max_step": max_step,
+            },
         )
 
     elif request.method == "POST":
@@ -442,9 +519,12 @@ def scenario_create_parameters(request, proj_id, scen_id=None, step_id=1, max_st
             # update the project associated to the scenario
             proj_id = scenario.project.id
             scenario.save()
-            answer = HttpResponseRedirect(reverse('scenario_create_topology', args=[proj_id, scenario.id]))
+            answer = HttpResponseRedirect(
+                reverse("scenario_create_topology", args=[proj_id, scenario.id])
+            )
 
     return answer
+
 
 @login_required
 @require_http_methods(["GET", "POST"])
@@ -488,11 +568,9 @@ def scenario_create_topology(request, proj_id, scen_id, step_id=2, max_step=3):
             "h2_demand": _("H2 Demand"),
             "heat_demand": _("Heat Demand"),
         },
-        "bus": {"bus": _("Bus")}
+        "bus": {"bus": _("Bus")},
     }
     group_names = {group: _(group) for group in components.keys()}
-
-
 
     # TODO: if the scenario exists, load it, otherwise default form
 
@@ -525,20 +603,22 @@ def scenario_create_topology(request, proj_id, scen_id, step_id=2, max_step=3):
 
         # this is a dict with keys "busses", "assets" and "links"
         topology_data_list = load_scenario_topology_from_db(scen_id)
-        return render(request, f'scenario/scenario_step{step_id}.html',
-                      {
-                          'scenario': scenario,
-                          'scen_id': scen_id,
-                          'proj_id': scenario.project.id,
-                          'proj_name': scenario.project.name,
-                          'topology_data_list': json.dumps(topology_data_list),
-                          'step_id': step_id,
-                          "step_list": STEP_LIST,
-                          "max_step": max_step,
-                          "components": components,
-                          "group_names": group_names,
-                      })
-
+        return render(
+            request,
+            f"scenario/scenario_step{step_id}.html",
+            {
+                "scenario": scenario,
+                "scen_id": scen_id,
+                "proj_id": scenario.project.id,
+                "proj_name": scenario.project.name,
+                "topology_data_list": json.dumps(topology_data_list),
+                "step_id": step_id,
+                "step_list": STEP_LIST,
+                "max_step": max_step,
+                "components": components,
+                "group_names": group_names,
+            },
+        )
 
 
 @login_required
@@ -567,7 +647,9 @@ def scenario_create_constraints(request, proj_id, scen_id, step_id=3, max_step=4
 
     scenario = get_object_or_404(Scenario, pk=scen_id)
 
-    if (scenario.project.user != request.user) and (request.user not in scenario.project.viewers.all()):
+    if (scenario.project.user != request.user) and (
+        request.user not in scenario.project.viewers.all()
+    ):
         raise PermissionDenied
 
     qs_sim = Simulation.objects.filter(scenario=scenario)
@@ -581,31 +663,38 @@ def scenario_create_constraints(request, proj_id, scen_id, step_id=3, max_step=4
         # prepare the forms for each constraint
         unbound_forms = {}
         for constraint_type, constraint_form in constraints_forms.items():
-            #check whether the constraint is already associated to the scenario
+            # check whether the constraint is already associated to the scenario
             qs = constraints_models[constraint_type].objects.filter(scenario=scenario)
             if qs.exists():
-                unbound_forms[constraint_type] = constraint_form(prefix=constraint_type, instance=qs[0])
+                unbound_forms[constraint_type] = constraint_form(
+                    prefix=constraint_type, instance=qs[0]
+                )
             else:
                 unbound_forms[constraint_type] = constraint_form(prefix=constraint_type)
-        return render(request, f'scenario/scenario_step{step_id}.html',
-                      {
-                          'scenario': scenario,
-                          'scen_id': scen_id,
-                          'proj_id': scenario.project.id,
-                          'proj_name': scenario.project.name,
-                          'step_id': step_id,
-                          "step_list": STEP_LIST,
-                          "max_step": max_step,
-                          "forms": unbound_forms,
-                          "forms_labels": constraints_labels
-                      })
+        return render(
+            request,
+            f"scenario/scenario_step{step_id}.html",
+            {
+                "scenario": scenario,
+                "scen_id": scen_id,
+                "proj_id": scenario.project.id,
+                "proj_name": scenario.project.name,
+                "step_id": step_id,
+                "step_list": STEP_LIST,
+                "max_step": max_step,
+                "forms": unbound_forms,
+                "forms_labels": constraints_labels,
+            },
+        )
     elif request.method == "POST":
         for constraint_type, form_model in constraints_forms.items():
             form = form_model(request.POST, prefix=constraint_type)
 
             if form.is_valid():
-                #check whether the constraint is already associated to the scenario
-                qs = constraints_models[constraint_type].objects.filter(scenario=scenario)
+                # check whether the constraint is already associated to the scenario
+                qs = constraints_models[constraint_type].objects.filter(
+                    scenario=scenario
+                )
                 if qs.exists():
                     if len(qs) == 1:
                         constraint_instance = qs[0]
@@ -624,7 +713,8 @@ def scenario_create_constraints(request, proj_id, scen_id, step_id=3, max_step=4
 
                 constraint_instance.save()
 
-        return HttpResponseRedirect(reverse('scenario_review', args=[proj_id, scen_id]))
+        return HttpResponseRedirect(reverse("scenario_review", args=[proj_id, scen_id]))
+
 
 @login_required
 @require_http_methods(["GET", "POST"])
@@ -633,19 +723,19 @@ def scenario_review(request, proj_id, scen_id, step_id=4, max_step=5):
     excuses_design_under_development(request)
     scenario = get_object_or_404(Scenario, pk=scen_id)
 
-    if (scenario.project.user != request.user) and (request.user not in scenario.project.viewers.all()):
+    if (scenario.project.user != request.user) and (
+        request.user not in scenario.project.viewers.all()
+    ):
         raise PermissionDenied
 
     if request.method == "GET":
 
-
-
         context = {
-            'scenario': scenario,
-            'scen_id': scen_id,
-            'proj_id': scenario.project.id,
-            'proj_name': scenario.project.name,
-            'step_id': step_id,
+            "scenario": scenario,
+            "scen_id": scen_id,
+            "proj_id": scenario.project.id,
+            "proj_name": scenario.project.name,
+            "step_id": step_id,
             "step_list": STEP_LIST,
             "max_step": max_step,
             "MVS_GET_URL": MVS_GET_URL,
@@ -658,20 +748,18 @@ def scenario_review(request, proj_id, scen_id, step_id=4, max_step=5):
             simulation = qs.first()
             context.update(
                 {
-                    'simulation_status': simulation.status,
-                    'secondsElapsed': simulation.elapsed_seconds,
-                    'rating': simulation.user_rating,
-                    "mvs_token": simulation.mvs_token
+                    "simulation_status": simulation.status,
+                    "secondsElapsed": simulation.elapsed_seconds,
+                    "rating": simulation.user_rating,
+                    "mvs_token": simulation.mvs_token,
                 }
             )
             if simulation.status == ERROR:
-                context.update(
-                    {'simulation_error_msg': simulation.errors}
-                )
+                context.update({"simulation_error_msg": simulation.errors})
         else:
             print("no simulation existing")
 
-        return render(request, f'scenario/scenario_step{step_id}.html', context)
+        return render(request, f"scenario/scenario_step{step_id}.html", context)
 
 
 SCENARIOS_STEPS = [
@@ -681,43 +769,51 @@ SCENARIOS_STEPS = [
     scenario_review,
 ]
 
+
 @login_required
 @require_http_methods(["GET"])
 def scenario_steps(request, proj_id, step_id=None, scen_id=None):
     if request.method == "GET":
         if step_id is None:
-            return HttpResponseRedirect(reverse('scenario_steps', args=[proj_id, 1]))
+            return HttpResponseRedirect(reverse("scenario_steps", args=[proj_id, 1]))
 
-        return SCENARIOS_STEPS[step_id-1](request, proj_id, scen_id, step_id)
+        return SCENARIOS_STEPS[step_id - 1](request, proj_id, scen_id, step_id)
 
 
 # TODO delete this useless code here
 @login_required
 @require_http_methods(["GET"])
 def scenario_view(request, scen_id, step_id):
-    """Scenario View. GET request only. """
+    """Scenario View. GET request only."""
     scenario = get_object_or_404(Scenario, pk=scen_id)
 
-    if (scenario.project.user != request.user) and (request.user not in scenario.project.viewers.all()):
+    if (scenario.project.user != request.user) and (
+        request.user not in scenario.project.viewers.all()
+    ):
         raise PermissionDenied
 
-    return HttpResponseRedirect(reverse('project_search', args=[scenario.project.id]))
+    return HttpResponseRedirect(reverse("project_search", args=[scenario.project.id]))
 
 
 # TODO delete this useless code here
 @login_required
 @require_http_methods(["GET"])
 def scenario_update(request, scen_id, step_id):
-    """Scenario Update View. POST request only. """
+    """Scenario Update View. POST request only."""
     scenario = get_object_or_404(Scenario, pk=scen_id)
     if scenario.project.user != request.user:
         raise PermissionDenied
     if request.POST:
         form = ScenarioUpdateForm(request.POST)
         if form.is_valid():
-            [setattr(scenario, name, value) for name, value in form.cleaned_data.items()]
+            [
+                setattr(scenario, name, value)
+                for name, value in form.cleaned_data.items()
+            ]
             scenario.save(update_fields=form.cleaned_data.keys())
-            return HttpResponseRedirect(reverse('project_search', args=[scenario.project.id]))
+            return HttpResponseRedirect(
+                reverse("project_search", args=[scenario.project.id])
+            )
     else:
         raise Http404("An error occurred while updating the Scenario.")
 
@@ -725,7 +821,7 @@ def scenario_update(request, scen_id, step_id):
 @login_required
 @require_http_methods(["GET"])
 def scenario_duplicate(request, scen_id):
-    """ duplicates the selected scenario and all of its associated components (topology data included) """
+    """duplicates the selected scenario and all of its associated components (topology data included)"""
     scenario = get_object_or_404(Scenario, pk=scen_id)
 
     if scenario.project.user != request.user:
@@ -743,17 +839,21 @@ def scenario_duplicate(request, scen_id):
     scenario.save()
     # from now on we are working with the duplicated scenario, not the original
     old2new_asset_ids_map = duplicate_scenario_objects(asset_list, scenario)
-    old2new_bus_ids_map = duplicate_scenario_objects(bus_list, scenario, old2new_asset_ids_map)
-    duplicate_scenario_connections(connections_list, scenario, old2new_asset_ids_map, old2new_bus_ids_map)
+    old2new_bus_ids_map = duplicate_scenario_objects(
+        bus_list, scenario, old2new_asset_ids_map
+    )
+    duplicate_scenario_connections(
+        connections_list, scenario, old2new_asset_ids_map, old2new_bus_ids_map
+    )
     # duplicate_scenario_objects(simulation_list, scenario)
 
-    return HttpResponseRedirect(reverse('project_search', args=[scenario.project.id]))
+    return HttpResponseRedirect(reverse("project_search", args=[scenario.project.id]))
 
 
 @login_required
 @require_http_methods(["POST"])
 def scenario_export(request, proj_id):
-    response = HttpResponseRedirect(reverse('project_search', args=[proj_id]))
+    response = HttpResponseRedirect(reverse("project_search", args=[proj_id]))
 
     # get the selected scenarios under the project view and export them into a file
     scenario_ids = request.POST.get("scenario_ids")
@@ -763,38 +863,38 @@ def scenario_export(request, proj_id):
         for scen_id in scenario_ids:
             scenario = get_object_or_404(Scenario, pk=int(scen_id))
             scenario_data.append(scenario.export(bind_project_data=True))
-        response = HttpResponse(json.dumps(scenario_data), content_type="application/json")
-        response['Content-Disposition'] = 'attachment; filename=scenario.json'
+        response = HttpResponse(
+            json.dumps(scenario_data), content_type="application/json"
+        )
+        response["Content-Disposition"] = "attachment; filename=scenario.json"
     return response
 
     return {"success": False}
+
 
 @login_required
 @require_http_methods(["POST"])
 def scenario_delete(request, scen_id):
     scenario = get_object_or_404(Scenario, pk=scen_id)
     if scenario.project.user != request.user:
-        logger.warning(f"Unauthorized user tried to delete project scenario with db id = {scen_id}.")
+        logger.warning(
+            f"Unauthorized user tried to delete project scenario with db id = {scen_id}."
+        )
         raise PermissionDenied
     if request.POST:
         scenario.delete()
-        messages.success(request, 'scenario successfully deleted!')
-        return HttpResponseRedirect(reverse('project_search', args=[scenario.project.id]))
+        messages.success(request, "scenario successfully deleted!")
+        return HttpResponseRedirect(
+            reverse("project_search", args=[scenario.project.id])
+        )
 
 
-# class LoadScenarioFromFileView(BSModalCreateView):
-#     template_name = 'scenario/load_scenario_from_file.html'
-#     form_class = LoadScenarioFromFileForm
-#     success_message = 'Success: Scenario Uploaded.'
-
-#     def get_success_url(self):
-#         proj_id = self.kwargs['proj_id']
-#         return reverse_lazy('scenario_search', args=[proj_id])
 
 # endregion Scenario
 
 
 # region Asset
+
 
 @login_required
 @require_http_methods(["GET"])
@@ -809,83 +909,99 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
             bus_list = Bus.objects.filter(scenario=scenario)
             n_bus = len(bus_list)
             default_name = f"{asset_type_name}-{n_bus}"
-            form = BusForm(asset_type=asset_type_name, initial={'name':default_name})
-        return render(request, 'asset/asset_create_form.html', {'form': form})
+            form = BusForm(asset_type=asset_type_name, initial={"name": default_name})
+        return render(request, "asset/asset_create_form.html", {"form": form})
     elif asset_type_name in ["bess", "h2ess", "gess", "hess"]:
         if asset_uuid:
             existing_ess_asset = get_object_or_404(Asset, unique_id=asset_uuid)
-            ess_asset_children = Asset.objects.filter(parent_asset=existing_ess_asset.id)
-            ess_capacity_asset = ess_asset_children.get(asset_type__asset_type="capacity")
-            ess_charging_power_asset = ess_asset_children.get(asset_type__asset_type="charging_power")
-            ess_discharging_power_asset = ess_asset_children.get(asset_type__asset_type="discharging_power")
+            ess_asset_children = Asset.objects.filter(
+                parent_asset=existing_ess_asset.id
+            )
+            ess_capacity_asset = ess_asset_children.get(
+                asset_type__asset_type="capacity"
+            )
+            ess_charging_power_asset = ess_asset_children.get(
+                asset_type__asset_type="charging_power"
+            )
+            ess_discharging_power_asset = ess_asset_children.get(
+                asset_type__asset_type="discharging_power"
+            )
             # also get all child assets
             form = StorageForm(
-                asset_type=asset_type_name, 
+                asset_type=asset_type_name,
                 initial={
-                'name': existing_ess_asset.name,
-                # charging power
-                'chp_installed_capacity': ess_charging_power_asset.installed_capacity,
-                'chp_age_installed': ess_charging_power_asset.age_installed,
-                'chp_capex_fix': ess_charging_power_asset.capex_fix,
-                'chp_capex_var': ess_charging_power_asset.capex_var,
-                'chp_opex_fix': ess_charging_power_asset.opex_fix,
-                'chp_opex_var': ess_charging_power_asset.opex_var,
-                'chp_lifetime': ess_charging_power_asset.lifetime,
-                'chp_crate': ess_charging_power_asset.crate,
-                'chp_efficiency': ess_charging_power_asset.efficiency,
-                'chp_dispatchable': ess_charging_power_asset.dispatchable,
-                # discharging power
-                'dchp_installed_capacity': ess_discharging_power_asset.installed_capacity,
-                'dchp_age_installed': ess_discharging_power_asset.age_installed,
-                'dchp_capex_fix': ess_discharging_power_asset.capex_fix,
-                'dchp_capex_var': ess_discharging_power_asset.capex_var,
-                'dchp_opex_fix': ess_discharging_power_asset.opex_fix,
-                'dchp_opex_var': ess_discharging_power_asset.opex_var,
-                'dchp_lifetime': ess_discharging_power_asset.lifetime,
-                'dchp_crate': ess_discharging_power_asset.crate,
-                'dchp_efficiency': ess_discharging_power_asset.efficiency,
-                'dchp_dispatchable': ess_discharging_power_asset.dispatchable,
-                # capacity
-                'cp_installed_capacity': ess_capacity_asset.installed_capacity,
-                'cp_age_installed': ess_capacity_asset.age_installed,
-                'cp_capex_fix': ess_capacity_asset.capex_fix,
-                'cp_capex_var': ess_capacity_asset.capex_var,
-                'cp_opex_fix': ess_capacity_asset.opex_fix,
-                'cp_opex_var': ess_capacity_asset.opex_var,
-                'cp_lifetime': ess_capacity_asset.lifetime,
-                'cp_crate': ess_capacity_asset.crate,
-                'cp_efficiency': ess_capacity_asset.efficiency,
-                'cp_dispatchable': ess_capacity_asset.dispatchable,
-                'cp_optimize_cap': ess_capacity_asset.optimize_cap,
-                'cp_soc_max': ess_capacity_asset.soc_max,
-                'cp_soc_min':ess_capacity_asset.soc_min 
-                }
+                    "name": existing_ess_asset.name,
+                    # charging power
+                    "chp_installed_capacity": ess_charging_power_asset.installed_capacity,
+                    "chp_age_installed": ess_charging_power_asset.age_installed,
+                    "chp_capex_fix": ess_charging_power_asset.capex_fix,
+                    "chp_capex_var": ess_charging_power_asset.capex_var,
+                    "chp_opex_fix": ess_charging_power_asset.opex_fix,
+                    "chp_opex_var": ess_charging_power_asset.opex_var,
+                    "chp_lifetime": ess_charging_power_asset.lifetime,
+                    "chp_crate": ess_charging_power_asset.crate,
+                    "chp_efficiency": ess_charging_power_asset.efficiency,
+                    "chp_dispatchable": ess_charging_power_asset.dispatchable,
+                    # discharging power
+                    "dchp_installed_capacity": ess_discharging_power_asset.installed_capacity,
+                    "dchp_age_installed": ess_discharging_power_asset.age_installed,
+                    "dchp_capex_fix": ess_discharging_power_asset.capex_fix,
+                    "dchp_capex_var": ess_discharging_power_asset.capex_var,
+                    "dchp_opex_fix": ess_discharging_power_asset.opex_fix,
+                    "dchp_opex_var": ess_discharging_power_asset.opex_var,
+                    "dchp_lifetime": ess_discharging_power_asset.lifetime,
+                    "dchp_crate": ess_discharging_power_asset.crate,
+                    "dchp_efficiency": ess_discharging_power_asset.efficiency,
+                    "dchp_dispatchable": ess_discharging_power_asset.dispatchable,
+                    # capacity
+                    "cp_installed_capacity": ess_capacity_asset.installed_capacity,
+                    "cp_age_installed": ess_capacity_asset.age_installed,
+                    "cp_capex_fix": ess_capacity_asset.capex_fix,
+                    "cp_capex_var": ess_capacity_asset.capex_var,
+                    "cp_opex_fix": ess_capacity_asset.opex_fix,
+                    "cp_opex_var": ess_capacity_asset.opex_var,
+                    "cp_lifetime": ess_capacity_asset.lifetime,
+                    "cp_crate": ess_capacity_asset.crate,
+                    "cp_efficiency": ess_capacity_asset.efficiency,
+                    "cp_dispatchable": ess_capacity_asset.dispatchable,
+                    "cp_optimize_cap": ess_capacity_asset.optimize_cap,
+                    "cp_soc_max": ess_capacity_asset.soc_max,
+                    "cp_soc_min": ess_capacity_asset.soc_min,
+                },
             )
         else:
             form = StorageForm(asset_type=asset_type_name)
-        return render(request, 'asset/storage_asset_create_form.html', {'form': form})
-    else: # all other assets
-
-
+        return render(request, "asset/storage_asset_create_form.html", {"form": form})
+    else:  # all other assets
 
         if asset_uuid:
             existing_asset = get_object_or_404(Asset, unique_id=asset_uuid)
             form = AssetCreateForm(asset_type=asset_type_name, instance=existing_asset)
-            input_timeseries_data=existing_asset.input_timeseries if existing_asset.input_timeseries else ''
+            input_timeseries_data = (
+                existing_asset.input_timeseries
+                if existing_asset.input_timeseries
+                else ""
+            )
         else:
-            asset_list = Asset.objects.filter(asset_type__asset_type=asset_type_name, scenario=scenario)
+            asset_list = Asset.objects.filter(
+                asset_type__asset_type=asset_type_name, scenario=scenario
+            )
             n_asset = len(asset_list)
             default_name = f"{asset_type_name}-{n_asset}"
-            form = AssetCreateForm(asset_type=asset_type_name, initial={'name':default_name})
-            input_timeseries_data= ''
+            form = AssetCreateForm(
+                asset_type=asset_type_name, initial={"name": default_name}
+            )
+            input_timeseries_data = ""
 
         context = {
-            'form': form,
-            'input_timeseries_data': input_timeseries_data,
-            'input_timeseries_timestamps': json.dumps(scenario.get_timestamps(json_format=True))
+            "form": form,
+            "input_timeseries_data": input_timeseries_data,
+            "input_timeseries_timestamps": json.dumps(
+                scenario.get_timestamps(json_format=True)
+            ),
         }
 
-        return render(request, 'asset/asset_create_form.html', context)
+        return render(request, "asset/asset_create_form.html", context)
 
 
 @login_required
@@ -894,8 +1010,10 @@ def asset_create_or_update(request, scen_id=0, asset_type_name="", asset_uuid=No
     if asset_type_name == "bus":
         return handle_bus_form_post(request, scen_id, asset_type_name, asset_uuid)
     elif asset_type_name in ["bess", "h2ess", "gess", "hess"]:
-        return handle_storage_unit_form_post(request, scen_id, asset_type_name, asset_uuid)
-    else: # all assets
+        return handle_storage_unit_form_post(
+            request, scen_id, asset_type_name, asset_uuid
+        )
+    else:  # all assets
         return handle_asset_form_post(request, scen_id, asset_type_name, asset_uuid)
 
 
@@ -904,58 +1022,73 @@ def asset_create_or_update(request, scen_id=0, asset_type_name="", asset_uuid=No
 
 # region MVS JSON Related
 
+
 @json_view
 @login_required
 @require_http_methods(["GET"])
 def view_mvs_data_input(request, scen_id=0):
     if scen_id == 0:
-        return JsonResponse({"status": "error", "error": "No scenario id provided"},
-                            status=500, content_type='application/json')
+        return JsonResponse(
+            {"status": "error", "error": "No scenario id provided"},
+            status=500,
+            content_type="application/json",
+        )
     # Load scenario
     scenario = Scenario.objects.get(pk=scen_id)
 
     if scenario.project.user != request.user:
-        logger.warning(f"Unauthorized user tried to delete project scenario with db id = {scen_id}.")
+        logger.warning(
+            f"Unauthorized user tried to delete project scenario with db id = {scen_id}."
+        )
         raise PermissionDenied
-
 
     try:
         data_clean = get_topology_json(scenario)
         print(data_clean)
     except Exception as e:
 
-        logger.error(f"Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {traceback.format_exc()}.")
-        return JsonResponse({"error":f"Scenario Serialization ERROR! Thrown Exception: {e}."},
-                            status=500, content_type='application/json')
+        logger.error(
+            f"Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {traceback.format_exc()}."
+        )
+        return JsonResponse(
+            {"error": f"Scenario Serialization ERROR! Thrown Exception: {e}."},
+            status=500,
+            content_type="application/json",
+        )
 
-    return JsonResponse(data_clean, status=200, content_type='application/json')
+    return JsonResponse(data_clean, status=200, content_type="application/json")
 
 
 # End-point to send MVS simulation request
-#@json_view
+# @json_view
 @login_required
 @require_http_methods(["GET", "POST"])
 def request_mvs_simulation(request, scen_id=0):
     if scen_id == 0:
-        answer = JsonResponse({"status": "error", "error": "No scenario id provided"},
-                            status=500, content_type='application/json')
+        answer = JsonResponse(
+            {"status": "error", "error": "No scenario id provided"},
+            status=500,
+            content_type="application/json",
+        )
     # Load scenario
     scenario = Scenario.objects.get(pk=scen_id)
     try:
         data_clean = get_topology_json(scenario)
-        #err = 1/0
+        # err = 1/0
     except Exception as e:
         error_msg = f"Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {e}."
         logger.error(error_msg)
         messages.error(request, error_msg)
-        answer = JsonResponse({"error":f"Scenario Serialization ERROR! Thrown Exception: {e}."},
-                         status=500, content_type='application/json')
+        answer = JsonResponse(
+            {"error": f"Scenario Serialization ERROR! Thrown Exception: {e}."},
+            status=500,
+            content_type="application/json",
+        )
 
     if request.method == "POST":
         output_lp_file = request.POST.get("output_lp_file", None)
         if output_lp_file == "on":
             data_clean["simulation_settings"]["output_lp_file"] = "true"
-
 
     # Make simulation request to MVS
     results = mvs_simulation_request(data_clean)
@@ -965,8 +1098,11 @@ def request_mvs_simulation(request, scen_id=0):
         logger.error(error_msg)
         messages.error(request, error_msg)
         # TODO redirect to prefilled feedback form / bug form
-        answer = JsonResponse({"status": "error", "error": error_msg},
-                            status=407, content_type='application/json')
+        answer = JsonResponse(
+            {"status": "error", "error": error_msg},
+            status=407,
+            content_type="application/json",
+        )
     else:
 
         # delete existing simulation
@@ -974,21 +1110,25 @@ def request_mvs_simulation(request, scen_id=0):
         # Create empty Simulation model object
         simulation = Simulation(start_date=datetime.now(), scenario_id=scen_id)
 
-        simulation.mvs_token = results['id'] if results['id'] else None
+        simulation.mvs_token = results["id"] if results["id"] else None
 
-        if 'status' in results.keys() and (results['status'] == DONE or results['status'] == ERROR):
-            simulation.status = results['status']
-            simulation.results = results['results']
+        if "status" in results.keys() and (
+            results["status"] == DONE or results["status"] == ERROR
+        ):
+            simulation.status = results["status"]
+            simulation.results = results["results"]
             simulation.end_date = datetime.now()
-        else: # PENDING
-            simulation.status = results['status']
+        else:  # PENDING
+            simulation.status = results["status"]
             # create a task which will update simulation status
             create_or_delete_simulation_scheduler(mvs_token=simulation.mvs_token)
 
         simulation.elapsed_seconds = (datetime.now() - simulation.start_date).seconds
         simulation.save()
 
-        answer = HttpResponseRedirect(reverse('scenario_review', args=[scenario.project.id, scen_id]))
+        answer = HttpResponseRedirect(
+            reverse("scenario_review", args=[scenario.project.id, scen_id])
+        )
 
     return answer
 
@@ -998,12 +1138,20 @@ def request_mvs_simulation(request, scen_id=0):
 @require_http_methods(["POST"])
 def update_simulation_rating(request):
     try:
-        simulation = Simulation.objects.filter(scenario_id=request.POST['scen_id']).first()
-        simulation.user_rating = request.POST['user_rating']
+        simulation = Simulation.objects.filter(
+            scenario_id=request.POST["scen_id"]
+        ).first()
+        simulation.user_rating = request.POST["user_rating"]
         simulation.save()
-        return JsonResponse({'success': True}, status=200, content_type='application/json')
+        return JsonResponse(
+            {"success": True}, status=200, content_type="application/json"
+        )
     except Exception as e:
-        return JsonResponse({'success': False, 'cause': str(e)}, status=200, content_type='application/json')
+        return JsonResponse(
+            {"success": False, "cause": str(e)},
+            status=200,
+            content_type="application/json",
+        )
 
 
 @json_view
@@ -1012,7 +1160,11 @@ def update_simulation_rating(request):
 def check_simulation_status(request, scen_id):
     scenario = get_object_or_404(Scenario, pk=scen_id)
     if scenario.simulation:
-        return JsonResponse(mvs_simulation_check_status(scenario.simulation.mvs_token), status=200, content_type='application/json')
+        return JsonResponse(
+            mvs_simulation_check_status(scenario.simulation.mvs_token),
+            status=200,
+            content_type="application/json",
+        )
 
 
 @login_required
@@ -1024,6 +1176,7 @@ def update_simulation_results(request, proj_id, scen_id):
 
     get_mvs_simulation_results(simulation)
 
-    return HttpResponseRedirect(reverse('scenario_review', args=[proj_id, scen_id]))
+    return HttpResponseRedirect(reverse("scenario_review", args=[proj_id, scen_id]))
+
 
 # endregion MVS JSON Related

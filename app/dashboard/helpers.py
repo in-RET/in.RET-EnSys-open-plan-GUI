@@ -9,21 +9,26 @@ from django.conf import settings as django_settings
 
 #### CONSTANTS ####
 
-sectors = ['Electricity', 'Heat', 'Gas', 'H2']
+sectors = ["Electricity", "Heat", "Gas", "H2"]
 
 KPIS = {}
 MANAGEMENT_CAT = "management"
 ECONOMIC_CAT = "economic"
 TECHNICAL_CAT = "technical"
 ENVIRONEMENTAL_CAT = "environemental"
-TABLES = {MANAGEMENT_CAT: {}, ECONOMIC_CAT: {}, TECHNICAL_CAT: {}, ENVIRONEMENTAL_CAT: {}}
+TABLES = {
+    MANAGEMENT_CAT: {},
+    ECONOMIC_CAT: {},
+    TECHNICAL_CAT: {},
+    ENVIRONEMENTAL_CAT: {},
+}
 EMPTY_SUBCAT = "none"
 
 KPI_PARAMETERS = {}
 
 if os.path.exists(staticfiles_storage.path("MVS_kpis_list.csv")) is True:
     with open(staticfiles_storage.path("MVS_kpis_list.csv")) as csvfile:
-        csvreader = csv.reader(csvfile, delimiter=',', quotechar='"')
+        csvreader = csv.reader(csvfile, delimiter=",", quotechar='"')
         for i, row in enumerate(csvreader):
             if i == 0:
                 hdr = row
@@ -56,10 +61,10 @@ if os.path.exists(staticfiles_storage.path("MVS_kpis_list.csv")) is True:
                             )
 
     with open(staticfiles_storage.path("MVS_kpis_list.csv")) as csvfile:
-        csvreader = csv.reader(csvfile, delimiter=',', quotechar='"')
+        csvreader = csv.reader(csvfile, delimiter=",", quotechar='"')
         for i, row in enumerate(csvreader):
             if i == 0:
-                hdr = [el.replace(' ', '_').replace(':', '').lower() for el in row]
+                hdr = [el.replace(" ", "_").replace(":", "").lower() for el in row]
                 print(hdr)
                 label_idx = hdr.index("label")
                 cat_idx = hdr.index("category")
@@ -67,7 +72,10 @@ if os.path.exists(staticfiles_storage.path("MVS_kpis_list.csv")) is True:
                 label = row[label_idx]
                 category = row[cat_idx]
                 if category != "files":
-                    KPI_PARAMETERS[label] = {k: _(v) if k == "verbose" or k == "definition" else v for k, v in zip(hdr, row)}
+                    KPI_PARAMETERS[label] = {
+                        k: _(v) if k == "verbose" or k == "definition" else v
+                        for k, v in zip(hdr, row)
+                    }
 
 
 #### FUNCTIONS ####
@@ -76,16 +84,16 @@ if os.path.exists(staticfiles_storage.path("MVS_kpis_list.csv")) is True:
 def storage_asset_to_list(assets_results_json):
     """
     bring all storage subassets one level up to show their flows.
-    restructure the main json dict to contain storage 
+    restructure the main json dict to contain storage
     'charging power','discharging power' and 'capacity' in the same level as storage.
     """
-    if 'energy_storage' in assets_results_json.keys():
-        for storage_asset in assets_results_json['energy_storage']:
+    if "energy_storage" in assets_results_json.keys():
+        for storage_asset in assets_results_json["energy_storage"]:
             for subasset in storage_asset.values():
-                if isinstance(subasset, dict) and 'flow' in subasset.keys():
-                    subasset['energy_vector'] = storage_asset['energy_vector']
-                    subasset['label'] = storage_asset['label']+subasset['label']
-                    assets_results_json['energy_storage'].append(subasset)
+                if isinstance(subasset, dict) and "flow" in subasset.keys():
+                    subasset["energy_vector"] = storage_asset["energy_vector"]
+                    subasset["label"] = storage_asset["label"] + subasset["label"]
+                    assets_results_json["energy_storage"].append(subasset)
 
 
 def update_selected_scenarios_in_cache(request, proj_id, scen_id):
@@ -104,25 +112,24 @@ def update_selected_scenarios_in_cache(request, proj_id, scen_id):
 
 
 def kpi_scalars_list(kpi_scalar_values_dict, KPI_SCALAR_UNITS, KPI_SCALAR_TOOLTIPS):
-    return (
-        [
-            {
-                'kpi': key.replace('_',' '),
-                'value': round(val, 3) if 'currency/kWh' in KPI_SCALAR_UNITS[key] else round(val,2),
-                'unit': KPI_SCALAR_UNITS[key],
-                'tooltip': KPI_SCALAR_TOOLTIPS[key]
-            }
-            if key in KPI_SCALAR_UNITS.keys()
-            else 
-            {
-                'kpi': key.replace('_',' '),
-                'value': round(val, 3),
-                'unit': 'N/A',
-                'tooltip': ''
-            }
-            for key, val in kpi_scalar_values_dict.items()
-        ]
-    )
+    return [
+        {
+            "kpi": key.replace("_", " "),
+            "value": round(val, 3)
+            if "currency/kWh" in KPI_SCALAR_UNITS[key]
+            else round(val, 2),
+            "unit": KPI_SCALAR_UNITS[key],
+            "tooltip": KPI_SCALAR_TOOLTIPS[key],
+        }
+        if key in KPI_SCALAR_UNITS.keys()
+        else {
+            "kpi": key.replace("_", " "),
+            "value": round(val, 3),
+            "unit": "N/A",
+            "tooltip": "",
+        }
+        for key, val in kpi_scalar_values_dict.items()
+    ]
 
 
 def round_only_numbers(input, decimal_place):
@@ -156,7 +163,7 @@ def nested_dict_crawler(dct, path=None, path_dct=None):
                 "b11": [("b", "b1", "b11")],
                 "b121": [("b", "b1", "b12", "b121")],
             }
-            """
+    """
     if path is None:
         path = []
     if path_dct is None:
@@ -165,7 +172,7 @@ def nested_dict_crawler(dct, path=None, path_dct=None):
     for key, value in dct.items():
         path.append(key)
         if isinstance(value, dict):
-            if 'value' in value.keys() and 'unit' in value.keys():
+            if "value" in value.keys() and "unit" in value.keys():
                 if path[-1] in path_dct:
                     path_dct[path[-1]].append(tuple(path))
                 else:
@@ -181,32 +188,32 @@ def nested_dict_crawler(dct, path=None, path_dct=None):
     return path_dct
 
 
-def dict_keyword_mapper(results_dct,kw_dct, kw):
+def dict_keyword_mapper(results_dct, kw_dct, kw):
     r"""Get a list of key paths from nested dict structure
-            Parameters
-            ----------
-            results_dct: dict
-                the (potentially nested) dict from which we want to get a value
-            kw_dct: dict
-                keyword dictionary of results_dct that contains a list of paths to a key assigned to the respective key
-            kw: string
-                keyword from which we want the value within results_dct without knowing the path to it
-            Returns
-            -------
-            List of key paths within the nested dictionary structure, each key path is itself a list.
-            Example
-            -------
-            >>> dct = dict(a=dict(a1=1, a2=2),b=dict(b1=dict(b11=11,b12=dict(b121=121))))
-            >>> dict_keyword_mapper(dct, nested_dict_crawler(dct), 'b121')
-            121
-            """
+    Parameters
+    ----------
+    results_dct: dict
+        the (potentially nested) dict from which we want to get a value
+    kw_dct: dict
+        keyword dictionary of results_dct that contains a list of paths to a key assigned to the respective key
+    kw: string
+        keyword from which we want the value within results_dct without knowing the path to it
+    Returns
+    -------
+    List of key paths within the nested dictionary structure, each key path is itself a list.
+    Example
+    -------
+    >>> dct = dict(a=dict(a1=1, a2=2),b=dict(b1=dict(b11=11,b12=dict(b121=121))))
+    >>> dict_keyword_mapper(dct, nested_dict_crawler(dct), 'b121')
+    121
+    """
     if kw in kw_dct:
         if len(kw_dct[kw]) == 1:
             return get_nested_value(results_dct, kw_dct[kw][0])
         else:
             return kw_dct[kw]
     else:
-        return f'No key found for {kw}'
+        return f"No key found for {kw}"
 
 
 def get_nested_value(dct, keys):

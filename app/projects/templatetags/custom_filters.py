@@ -18,3 +18,20 @@ def convert_seconds_to_intuitive_string(value):
 
     except Exception as e:
         return str(e)
+
+@register.filter(name='scenario_list')
+def get_scenario_list_from_project(project):
+    return project.scenario_set.all()
+
+@register.filter
+def pdb(element):
+    import pdb; pdb.set_trace()
+    return element
+
+@register.filter
+def get_item(dictionary, key):
+    return dictionary.get(key)
+
+@register.filter
+def get_selected_scenarios(request, proj_id):
+    return request.session.get("selected_scenarios", {}).get(str(proj_id))

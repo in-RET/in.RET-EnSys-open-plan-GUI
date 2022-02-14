@@ -1,6 +1,6 @@
 import uuid
 from django.shortcuts import get_object_or_404
-from projects.models import Bus, AssetType, Scenario, ConnectionLink, Asset
+from projects.models import Bus, AssetType, Scenario, ConnectionLink, Asset, Project, EconomicData
 import json
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 from projects.forms import AssetCreateForm, BusForm, StorageForm
@@ -155,7 +155,7 @@ def db_bus_nodes_to_list(scen_id):
 
 def db_asset_nodes_to_list(scen_id):
     all_db_assets = Asset.objects.filter(scenario_id=scen_id)
-    # dont return children assets
+    # dont return children assets (i.e. for storage assets)
     no_storage_children_assets = all_db_assets.filter(parent_asset_id=None)
     asset_nodes_list = list()
     for db_asset in no_storage_children_assets:
@@ -188,29 +188,7 @@ def db_connection_links_to_list(scen_id):
 # endregion db_nodes_to_js
 
 
-def update_deleted_objects_from_database(scenario_id, topo_node_list):
-    # Delete Database Scenario Related Objects which are not in the topology before inserting or updating data.
-    all_scenario_assets = Asset.objects.filter(scenario_id=scenario_id)
-    # dont include storage unit children assets
-    scenario_assets_ids_excluding_storage_children = all_scenario_assets.filter(parent_asset=None).values_list('id', flat=True)
-    all_scenario_busses_ids = Bus.objects.filter(scenario_id=scenario_id).values_list('id', flat=True)
-    topology_asset_ids = list()
-    topology_busses_ids = list()
-    for node in topo_node_list:
-        if node.name != 'bus' and node.db_obj_id:
-            topology_asset_ids.append(node.db_obj_id)
-        elif node.name == 'bus' and node.db_obj_id:
-            topology_busses_ids.append(node.db_obj_id)
 
-    for asset_id in scenario_assets_ids_excluding_storage_children:
-        if asset_id not in topology_asset_ids:
-            logger.debug(f"Asset {asset_id} not in topology of scenario {scenario_id}. Deleting!!")
-            Asset.objects.filter(id=asset_id).delete()
-
-    for bus_id in all_scenario_busses_ids:
-        if bus_id not in topology_busses_ids:
-            logger.debug(f"Asset {bus_id} not in topology of scenario {scenario_id}. Deleting!!")
-            Bus.objects.filter(id=bus_id).delete()
 
 
 # region Scenario Duplicate
@@ -260,11 +238,58 @@ def duplicate_scenario_connections(connections_list, scenario, asset_map, bus_ma
 # endregion
 
 
+def load_scenario_from_dict(model_data, project=None, user=None):
+    """
+    """
+    assets = model_data.pop("assets")
+    busses = model_data.pop("busses")
+
+    if project is None:
+        if "project" in model_data:
+            project_data = model_data.pop("project")
+            # TODO create project first here
+            project_data["user"] = user
+            economic_data = EconomicData(**project["economic_data"])
+            economic_data.save()
+            project = Project(**project)
+            project.save()
+        else:
+            raise ValueError("Project of a scenario cannot be None")
+    else:
+        if "project" in model_data:
+            project_data = model_data.pop("project")
+
+    scenario = Scenario(**model_data)
+    scenario.project = project
+    scenario.save()
+
+    for asset_data in assets:
+        asset_type = asset_data.pop("asset_info")
+        asset_data["asset_type"] = AssetType.objects.get(asset_type=asset_type["asset_type"])
+        asset = Asset(**asset_data)
+        asset.scenario = scenario
+        asset.save()
+
+    for bus_data in busses:
+        bus_inputs = bus_data.pop("inputs")
+        bus_outputs = bus_data.pop("outputs")
+        bus = Bus(**bus_data)
+        bus.scenario = scenario
+        bus.save()
+        for link_data in bus_inputs + bus_outputs:
+            asset_name = link_data.pop("asset")
+            new_connection = ConnectionLink(**link_data)
+            new_connection.scenario = scenario
+            new_connection.bus = bus
+            new_connection.asset = scenario.asset_set.get(name=asset_name)
+            new_connection.save()
+
+
 class NodeObject:
     def __init__(self, node_data=None):
         self.name = node_data['name']  # asset type name : e.g. bus, pv_plant, etc
         self.data = node_data['data']  # name: eg. demand_01, parent_asset_id, unique_id
-        self.db_obj_id = NodeObject.uuid_2_db_id(node_data)
+        self.db_obj_id = self.uuid_2_db_id(node_data)
         self.group_id = (node_data['data']['parent_asset_id'] if 'parent_asset_id' in node_data['data'] else None)
         self.node_obj_type = 'bus' if self.name == 'bus' else 'asset'
         self.inputs = node_data['inputs']
@@ -272,36 +297,49 @@ class NodeObject:
         self.pos_x = node_data['pos_x']
         self.pos_y = node_data['pos_y']
 
+    def __str__(self):
+        return "\n".join(["name: " + self.name, "db_id: "+ str(self.db_obj_id), "group_id: " + str(self.group_id), "node type: " + str(self.node_obj_type)])
+
     @staticmethod
     def uuid_2_db_id(data):
         if 'db_id' in data and data['db_id']:
-            if type(data['db_id'])==int:
+            if isinstance(data['db_id'], int):
                 return data['db_id']
-            elif type(data['db_id'])==str:
+            elif isinstance(data['db_id'], str):
                 asset = Asset.objects.filter(unique_id=data['db_id']).first()
                 return asset.id if asset else None
             else:
                 return None
         else:
             return None
-        
-    def update_asset_coordinates(self):
-        try:
-            if self.name == "bus":
-                node = get_object_or_404(Bus, pk=self.db_obj_id)
-            else:
-                node = get_object_or_404(Asset, pk=self.db_obj_id)
-            # logger.debug(f"before: {node.name} - {self.data['name']} | {node.pos_x}, {node.pos_y}.")
-            node.pos_x = self.pos_x
-            node.pos_y = self.pos_y
-            node.save()
-            # logger.debug(f"after: {node.name} - {self.data['name']} | {node.pos_x}, {node.pos_y}.")
-        except Exception as ex:
-            logger.error(f"Failed to update positioning for node {self.name} of type: {self.node_obj_type}. \n Exception raised: {ex}")
 
-        
+
+    def create_connection_links(self, scen_id):
+        """Create ConnectionLink from the node object (asset or bus) to all of its outputs"""
+        for port_key, connections_list in self.outputs.items():
+            for output_connection in connections_list:
+                # node_obj is a bus connecting to asset(s)
+                if self.node_obj_type == 'bus' and isinstance(output_connection['node'], str): # i.e. unique_id
+                    ConnectionLink.objects.create(
+                        bus=get_object_or_404(Bus, pk=self.db_obj_id),
+                        asset=get_object_or_404(Asset, unique_id=output_connection['node']),
+                        flow_direction='B2A',
+                        bus_connection_port=port_key,
+                        scenario=get_object_or_404(Scenario, pk=scen_id)
+                    )
+                # node_obj is an asset connecting to bus(ses)
+                elif self.node_obj_type != 'bus' and isinstance(output_connection['node'], int):
+                    ConnectionLink.objects.create(
+                        bus=get_object_or_404(Bus, pk=output_connection['node']),
+                        asset=get_object_or_404(Asset, pk=self.db_obj_id),
+                        flow_direction='A2B',
+                        bus_connection_port=output_connection['output'],
+                        scenario=get_object_or_404(Scenario, pk=scen_id)
+                    )
+        logger.debug(f"Nodes interconnection links for {self.name} '{self.data['name']}' were created successfully in scenario: {scen_id}.")
 
     def assign_asset_to_proper_group(self, node_to_db_mapping):
+        """Seems to be unused here"""
         try:
             if self.node_obj_type == "asset":
                 asset = get_object_or_404(Asset, pk=self.db_obj_id)
@@ -319,26 +357,45 @@ class NodeObject:
             return {"success": True, "obj_type": self.node_obj_type}
 
 
-def create_node_interconnection_links(node_obj, scen_id):
-    for port_key, connections_list in node_obj.outputs.items():
-        for output_connection in connections_list:
-            if node_obj.name == 'bus' and type(output_connection['node']) == str: # i.e. unique_id
-                ConnectionLink.objects.create(
-                    bus=get_object_or_404(Bus, pk=node_obj.db_obj_id),
-                    asset=get_object_or_404(Asset, unique_id=output_connection['node']),
-                    flow_direction='B2A',
-                    bus_connection_port=port_key,
-                    scenario=get_object_or_404(Scenario, pk=scen_id)
-                )
-            elif node_obj.name != 'bus' and type(output_connection['node']) == int:
-                ConnectionLink.objects.create(
-                    bus=get_object_or_404(Bus, pk=output_connection['node']),
-                    asset=get_object_or_404(Asset, pk=node_obj.db_obj_id),
-                    flow_direction='A2B',
-                    bus_connection_port=output_connection['output'],
-                    scenario=get_object_or_404(Scenario, pk=scen_id)
-                )
-    logger.debug(f"Nodes interconnection links were created successfully in scenario: {scen_id}.")
+def update_deleted_objects_from_database(scenario_id, topo_node_list):
+    """Delete Database Scenario Related Objects which are not in the topology before inserting or updating data."""
+    all_scenario_assets = Asset.objects.filter(scenario_id=scenario_id)
+    # dont include storage unit children assets
+    scenario_assets_ids_excluding_storage_children = all_scenario_assets.filter(parent_asset=None).values_list('id', flat=True)
+    all_scenario_busses_ids = Bus.objects.filter(scenario_id=scenario_id).values_list('id', flat=True)
+
+    # lists the DB ids of the assets and busses coming from the topology
+    topology_asset_ids = list()
+    topology_busses_ids = list()
+    # TODO fix this complicated logic with duplicate od DB with NodeObject ...
+    asset_node_positions = {}
+    bus_node_positions = {}
+    for node in topo_node_list:
+        if node.name != 'bus' and node.db_obj_id:
+            topology_asset_ids.append(node.db_obj_id)
+            asset_node_positions[node.db_obj_id] = dict(pos_x=node.pos_x, pos_y=node.pos_y)
+        elif node.name == 'bus' and node.db_obj_id:
+            topology_busses_ids.append(node.db_obj_id)
+            bus_node_positions[node.db_obj_id] = dict(pos_x=node.pos_x, pos_y=node.pos_y)
+
+    # deletes asset or bus which DB id is not in the topology anymore (was removed by user)
+    for asset_id in scenario_assets_ids_excluding_storage_children:
+
+        qs = Asset.objects.filter(id=asset_id)
+        if asset_id not in topology_asset_ids:
+            logger.debug(f"Deleting asset {asset_id} of scenario {scenario_id} which was removed from the topology by the user.")
+            qs.delete()
+        else:
+            qs.update(**asset_node_positions[asset_id])
+
+    for bus_id in all_scenario_busses_ids:
+
+        qs = Bus.objects.filter(id=bus_id)
+        if bus_id not in topology_busses_ids:
+            logger.debug(f"Deleting bus {bus_id} of scenario {scenario_id} which was removed from the topology by the user.")
+            qs.delete()
+        else:
+            qs.update(**bus_node_positions[bus_id])
 
 
 def create_ESS_objects(all_ess_assets_node_list, scen_id):
@@ -376,5 +433,13 @@ def remove_empty_elements(d):
 def get_topology_json(scenario_to_convert):
     mvs_request_dto = convert_to_dto(scenario_to_convert)
     dumped_data = json.loads(json.dumps(mvs_request_dto.__dict__, default=lambda o: o.__dict__))
+
+    # format the constraints in MVS format directly, thus avoiding the need to maintain MVS-EPA
+    # parser in multi-vector-simulator package
+    constraint_dict = {}
+    for constraint in dumped_data["constraints"]:
+        constraint_dict[constraint["label"]] = constraint["value"]
+    dumped_data["constraints"] = constraint_dict
+
     # Remove None values
     return remove_empty_elements(dumped_data)

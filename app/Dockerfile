@@ -19,6 +19,11 @@ WORKDIR ${APP_ROOT}
 
 ADD . ${APP_ROOT}
 
+COPY ./djangoq_setup.sh /djangoq_setup.sh
+RUN chmod +x /djangoq_setup.sh
+
 RUN adduser appUser -D -h ${APP_ROOT} -s /bin/sh \
     && chown -R appUser ${APP_ROOT}
 USER appUser
+
+CMD ["python", "manage.py", "collectstatic"]

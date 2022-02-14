@@ -19,15 +19,16 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings as django_settings
 
 PARAMETERS = {}
-with open(staticfiles_storage.path("MVS_parameters_list.csv")) as csvfile:
-    csvreader = csv.reader(csvfile, delimiter=',', quotechar='"')
-    for i, row in enumerate(csvreader):
-        if i == 0:
-            hdr = row
-            label_idx = hdr.index("label")
-        else:
-            label = row[label_idx]
-            PARAMETERS[label] = {k: v for k, v in zip(hdr, row)}
+if os.path.exists(staticfiles_storage.path("MVS_parameters_list.csv")) is True:
+    with open(staticfiles_storage.path("MVS_parameters_list.csv")) as csvfile:
+        csvreader = csv.reader(csvfile, delimiter=',', quotechar='"')
+        for i, row in enumerate(csvreader):
+            if i == 0:
+                hdr = row
+                label_idx = hdr.index("label")
+            else:
+                label = row[label_idx]
+                PARAMETERS[label] = {k: v for k, v in zip(hdr, row)}
 
 def gettext_variables(some_string, lang="de"):
     """Save some expressions to be translated to a temporary file

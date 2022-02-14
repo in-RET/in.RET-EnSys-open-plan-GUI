@@ -19,53 +19,55 @@ ENVIRONEMENTAL_CAT = "environemental"
 TABLES = {MANAGEMENT_CAT: {}, ECONOMIC_CAT: {}, TECHNICAL_CAT: {}, ENVIRONEMENTAL_CAT: {}}
 EMPTY_SUBCAT = "none"
 
-with open(staticfiles_storage.path("MVS_kpis_list.csv")) as csvfile:
-    csvreader = csv.reader(csvfile, delimiter=',', quotechar='"')
-    for i, row in enumerate(csvreader):
-        if i == 0:
-            hdr = row
-            label_idx = hdr.index("label")
-            verbose_idx = hdr.index("verbose")
-            unit_idx = hdr.index(":Unit:")
-            cat_idx = hdr.index("category")
-            subcat_idx = hdr.index("subcategory")
-        else:
-            label = row[label_idx]
-            verbose = row[verbose_idx]
-            unit = row[unit_idx]
-            KPIS[label] = {k: v for k, v in zip(hdr, row)}
-
-            cat = row[cat_idx]
-            subcat = row[subcat_idx]
-            if subcat == MANAGEMENT_CAT:
-                # reverse the category and the subcategory for this special table (management is not a parameter type, whereas all other table are also parameter types)
-                subcat = cat
-                cat = MANAGEMENT_CAT
-
-            if subcat != EMPTY_SUBCAT:
-                if cat in TABLES:
-                    if subcat not in TABLES[cat]:
-                        TABLES[cat][subcat] = []
-                    if label not in TABLES[cat][subcat]:
-                        # the _() make the text translatable if it is mentionned in the django.po file
-                        TABLES[cat][subcat].append(
-                            {"name": _(verbose), "id": label, "unit": _(unit)}
-                        )
-
 KPI_PARAMETERS = {}
-with open(staticfiles_storage.path("MVS_kpis_list.csv")) as csvfile:
-    csvreader = csv.reader(csvfile, delimiter=',', quotechar='"')
-    for i, row in enumerate(csvreader):
-        if i == 0:
-            hdr = [el.replace(' ', '_').replace(':', '').lower() for el in row]
-            print(hdr)
-            label_idx = hdr.index("label")
-            cat_idx = hdr.index("category")
-        else:
-            label = row[label_idx]
-            category = row[cat_idx]
-            if category != "files":
-                KPI_PARAMETERS[label] = {k: _(v) if k == "verbose" or k == "definition" else v for k, v in zip(hdr, row)}
+
+if os.path.exists(staticfiles_storage.path("MVS_kpis_list.csv")) is True:
+    with open(staticfiles_storage.path("MVS_kpis_list.csv")) as csvfile:
+        csvreader = csv.reader(csvfile, delimiter=',', quotechar='"')
+        for i, row in enumerate(csvreader):
+            if i == 0:
+                hdr = row
+                label_idx = hdr.index("label")
+                verbose_idx = hdr.index("verbose")
+                unit_idx = hdr.index(":Unit:")
+                cat_idx = hdr.index("category")
+                subcat_idx = hdr.index("subcategory")
+            else:
+                label = row[label_idx]
+                verbose = row[verbose_idx]
+                unit = row[unit_idx]
+                KPIS[label] = {k: v for k, v in zip(hdr, row)}
+
+                cat = row[cat_idx]
+                subcat = row[subcat_idx]
+                if subcat == MANAGEMENT_CAT:
+                    # reverse the category and the subcategory for this special table (management is not a parameter type, whereas all other table are also parameter types)
+                    subcat = cat
+                    cat = MANAGEMENT_CAT
+
+                if subcat != EMPTY_SUBCAT:
+                    if cat in TABLES:
+                        if subcat not in TABLES[cat]:
+                            TABLES[cat][subcat] = []
+                        if label not in TABLES[cat][subcat]:
+                            # the _() make the text translatable if it is mentionned in the django.po file
+                            TABLES[cat][subcat].append(
+                                {"name": _(verbose), "id": label, "unit": _(unit)}
+                            )
+
+    with open(staticfiles_storage.path("MVS_kpis_list.csv")) as csvfile:
+        csvreader = csv.reader(csvfile, delimiter=',', quotechar='"')
+        for i, row in enumerate(csvreader):
+            if i == 0:
+                hdr = [el.replace(' ', '_').replace(':', '').lower() for el in row]
+                print(hdr)
+                label_idx = hdr.index("label")
+                cat_idx = hdr.index("category")
+            else:
+                label = row[label_idx]
+                category = row[cat_idx]
+                if category != "files":
+                    KPI_PARAMETERS[label] = {k: _(v) if k == "verbose" or k == "definition" else v for k, v in zip(hdr, row)}
 
 
 #### FUNCTIONS ####

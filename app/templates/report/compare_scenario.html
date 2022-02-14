@@ -1,0 +1,61 @@
+{% extends 'scenario/scenario_results_page.html' %}
+{% load static %}
+{% load custom_filters %}
+{% load custom_template_tags %}
+{% load i18n %}
+
+
+{% block title %}{% translate "Compare Scenarios" %}{% endblock title %}
+
+
+{% block dashboard %}
+
+    <section class="dashboard">
+        <div>
+            <div class="row">
+                <div class="dashboard__scenarios">
+                    <h2>My scenarios</h2>
+                    <div class="scenario-select">
+                        {% for scenario in scenario_list %}
+                        {% if scenario.id|stringformat:'s' in request|get_selected_scenarios:proj_id %}
+                            {% setvar "selected" as selected %}
+                        {% else%}
+                            {% setvar "" as selected %}
+                        {% endif %}
+                            <button id="scenario-{{ proj_id }}-{{ scenario.id}}" class="scenario-select__item {{ selected }}" onclick="update_selected_scenarios(this)">
+                                {{ scenario.name }}
+                            </button>
+                        {% empty %}
+                            {% translate "You have no scenario with completed simulation, please run simulations to display results" %}
+                        {% endfor %}
+
+                    </div>
+                </div>
+            </div>
+            {% if scenario_list %}
+            <div class="row dashboard__create">
+                <div class="col">
+                  <button class="btn btn--medium" onclick="javascript:showCreateReportItemModal(event)">
+                    <span class="icon icon-add"></span>
+                    Create graph
+                  </button>
+                </div>
+            </div>
+            <div> HERE WILL BE THE COMPARE SPECIFIC GRAPHS DISPLAYED</div>
+            {# TODO: make button or add kpi/scalar matrix results to downloadable excel sheet #}
+            {% if scen_id %}
+                <a type="button" class="btn btn-info" href="{% url 'download_timeseries_results' scen_id %}">{% translate "Download Timeseries" %}</a>
+            {% endif %}
+            {% endif %}
+        </div>
+    </section>
+
+{% endblock dashboard %}
+
+
+{% block results_end_body_scripts %}
+<script>
+
+document.getElementById('compare-scenario-link').classList.add('active');
+</script>
+{% endblock results_end_body_scripts %}

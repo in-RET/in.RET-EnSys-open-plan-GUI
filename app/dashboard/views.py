@@ -1,4 +1,5 @@
 from django.core.exceptions import PermissionDenied
+from django.db.models import Count
 from django.http.response import Http404, HttpResponse
 from dashboard.helpers import *
 from dashboard.models import (
@@ -185,7 +186,7 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
                 reverse("project_visualize_results", args=[proj_id])
             )
     else:
-        project = get_object_or_404(Project, pk=proj_id)
+        project = get_object_or_404(Project, id=proj_id)
         if (project.user != request.user) and (
             request.user not in project.viewers.all()
         ):
@@ -200,7 +201,7 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
             # There are no scenarios with results yet for this project
             answer = render(
                 request,
-                "scenario/scenario_results_page.html",
+                "report/single_scenario.html",
                 {
                     "project_list": user_projects,
                     "proj_id": proj_id,
@@ -247,7 +248,7 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
 
                 answer = render(
                     request,
-                    "scenario/scenario_results_page.html",
+                    "report/single_scenario.html",
                     {
                         "scen_id": scen_id,
                         "scalar_kpis": scalar_kpis_json,
@@ -273,6 +274,67 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
                 )
 
     return answer
+
+
+@login_required
+@require_http_methods(["POST", "GET"])
+def project_compare_results(request, proj_id):
+    user_projects = request.user.project_set.all()
+
+    project = get_object_or_404(Project, id=proj_id)
+    if (project.user != request.user) and (request.user not in project.viewers.all()):
+        raise PermissionDenied
+
+    user_scenarios = project.get_scenarios_with_results()
+    report_items_data = [
+        ri.render_json
+        for ri in get_project_reportitems(project)
+        .annotate(c=Count("simulations"))
+        .filter(c__gt=1)
+    ]
+    return render(
+        request,
+        "report/compare_scenario.html",
+        {
+            "proj_id": proj_id,
+            "project_list": user_projects,
+            "scenario_list": user_scenarios,
+            "report_items_data": report_items_data,
+            "kpi_list": KPI_PARAMETERS,
+            "table_styles": TABLES,
+        },
+    )
+
+
+@login_required
+@require_http_methods(["POST", "GET"])
+def project_sensitivity_analysis(request, proj_id):
+    user_projects = request.user.project_set.all()
+
+    project = get_object_or_404(Project, id=proj_id)
+    if (project.user != request.user) and (request.user not in project.viewers.all()):
+        raise PermissionDenied
+
+    user_scenarios = project.get_scenarios_with_results()
+    # TODO filter the reportItems linked to a sensitivity analysis
+    report_items_data = [
+        ri.render_json
+        for ri in get_project_reportitems(project)
+        .annotate(c=Count("simulations"))
+        .filter(c__gt=1)
+    ]
+    return render(
+        request,
+        "report/sensitivity_analysis.html",
+        {
+            "proj_id": proj_id,
+            "project_list": user_projects,
+            "scenario_list": user_scenarios,
+            "report_items_data": report_items_data,
+            "kpi_list": KPI_PARAMETERS,
+            "table_styles": TABLES,
+        },
+    )
 
 
 @login_required
@@ -369,6 +431,7 @@ def ajax_get_graph_parameters_form(request, proj_id):
         initial_values["scenarios"] = [
             int(s) for s in json.loads(request.POST.get("selected_scenarios"))
         ]
+        # TODO add a parameter reportitem_id to the function, default to None and load the values from the db if it exits, then also changes the initial of the graph parameters form
 
         report_item_form = ReportItemForm(initial=initial_values, proj_id=proj_id)
 

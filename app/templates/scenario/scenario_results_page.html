@@ -121,6 +121,25 @@
             </div>
         </div>
     </section>
+
+
+<!-- insert tabs here -->
+    <ul class="nav nav-pills" id="results-analysis-links">
+  <li class="nav-item">
+      <a class="nav-link" id="single-scenario-link" href="{% url 'project_visualize_results' proj_id %}">Single scenarios</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="compare-scenario-link" href="{% url 'project_compare_results' proj_id %}">Compare scenarios</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="sensitivity-analysis-link" href="{% url 'project_sensitivity_analysis' proj_id %}">Sensitivity Analysis</a>
+  </li>
+</ul>
+
+
+
+{% block dashboard %}
+
     <section class="dashboard">
         <div>
             <div class="row">
@@ -288,6 +307,7 @@
                     </div>
                 </div>
             </div>-->
+
             <div class="row">
                 <div class="col" id="report_items">
 
@@ -383,6 +403,8 @@
             {% endif %}
         </div>
     </section>
+
+{% endblock dashboard %}
 </main>
 {% endblock content %}
 
@@ -798,7 +820,11 @@ function scenario_visualize_stacked_optimized_capacities(scen_id){
                 }, //err => {alert("Modal form JS Error: " + err);console.log(err);}
         })
     }
+
+document.querySelectorAll("#results-analysis-links a").forEach(el => {el.classList.remove("active")});
 </script>
 
+{% block results_end_body_scripts %}
+{% endblock results_end_body_scripts %}
 
 {% endblock end_body_scripts %}

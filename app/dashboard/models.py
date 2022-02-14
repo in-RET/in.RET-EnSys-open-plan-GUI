@@ -28,14 +28,14 @@ logger = logging.getLogger(__name__)
 KPI_COSTS_TOOLTIPS = {
     "Replacement_costs_during_project_lifetime": "Costs for replacement of assets which occur over the project lifetime.",
     "annuity_om": "Annuity of the operation, maintenance and dispatch costs of the energy system, ie. Ballpoint number of the annual expenses for system operation.",
-    "annuity_total": "Annuity of the net present costs (NPC) of the energy system.", 
+    "annuity_total": "Annuity of the net present costs (NPC) of the energy system.",
     "costs_cost_om": "Costs for fix annual operation and maintenance costs over the whole project lifetime, that do not depend on the assets dispatch but solely on installed capacity.",
     "costs_dispatch": "Dispatch costs over the whole project lifetime including all expenditures that depend on the dispatch of assets, ie. fuel costs, electricity consumption from the external grid, costs for operation and maintainance that depend on the thoughput of an asset.",
     "costs_investment_over_lifetime": "Investment costs over the whole project lifetime, including all replacement costs.",
     "costs_om_total": "Costs for annual operation and maintenance costs as well as dispatch of all assets of the energy system, for the whole project duration.",
     "costs_total": "Net present costs of the system for the whole project duration, includes all operation, maintainance and dispatch costs as well as the investment costs (including replacements).",
     "costs_upfront_in_year_zero": "The costs which will have to be paid upfront when project begin, ie. In year 0.",
-    "levelized_cost_of_energy_of_asset": "Cost per kWh thoughput though an asset, based on the assets costs during the project lifetime as well as the total thoughput though the asset in the project lifetime. For generation assets, equivalent to the levelized cost of generation."
+    "levelized_cost_of_energy_of_asset": "Cost per kWh thoughput though an asset, based on the assets costs during the project lifetime as well as the total thoughput though the asset in the project lifetime. For generation assets, equivalent to the levelized cost of generation.",
 }
 
 KPI_COSTS_UNITS = {
@@ -48,7 +48,7 @@ KPI_COSTS_UNITS = {
     "costs_om_total": "currency/annum",
     "costs_total": "currency",
     "costs_upfront_in_year_zero": "currency",
-    "levelized_cost_of_energy_of_asset": "currency/kWh", 
+    "levelized_cost_of_energy_of_asset": "currency/kWh",
 }
 
 KPI_SCALAR_UNITS = {
@@ -84,7 +84,7 @@ KPI_SCALAR_UNITS = {
     "costs_investment_over_lifetime": "currency",
     "costs_om_total": "currency",
     "costs_total": "currency",
-    "costs_upfront_in_year_zero": "currency"
+    "costs_upfront_in_year_zero": "currency",
 }
 
 KPI_SCALAR_TOOLTIPS = {
@@ -120,7 +120,7 @@ KPI_SCALAR_TOOLTIPS = {
     "costs_investment_over_lifetime": "Investment costs over the whole project lifetime, including all replacement costs.",
     "costs_om_total": "Costs for annual operation and maintenance costs as well as dispatch of all assets of the energy system, for the whole project duration.",
     "costs_total": "Net present costs of the system for the whole project duration, includes all operation, maintainance and dispatch costs as well as the investment costs (including replacements).",
-    "costs_upfront_in_year_zero": "The costs which will have to be paid upfront when project begin, ie. In year 0."
+    "costs_upfront_in_year_zero": "The costs which will have to be paid upfront when project begin, ie. In year 0.",
 }
 
 # TODO have this in a csv structure to also create the doc and tool tips
@@ -141,6 +141,7 @@ REPORT_TYPES = (
     (GRAPH_LOAD_DURATION, _("Load duration curve")),
     (GRAPH_SANKEY, _("Sankey diagram")),
 )
+
 
 class KPIScalarResults(models.Model):
     scalar_values = models.TextField()  # to store the scalars dict
@@ -240,6 +241,7 @@ class AssetsResults(models.Model):
             answer = None
         return answer
 
+
 # # TODO change the form from this model to adapt the choices depending on single scenario/compare scenario or sensitivity
 class ReportItem(models.Model):
     title = models.CharField(max_length=120, default="", blank=True)
@@ -316,6 +318,7 @@ class ReportItem(models.Model):
     def safely_assign_parameters(self, parameter_dict):
         if self.proof_parameters_follow_schema(parameter_dict) is True:
             self.parameters = json.dumps(parameter_dict)
+
     def fetch_parameters_values(self):
         parameters = json.loads(self.parameters)
         # TODO : adjust for other report types
@@ -345,16 +348,14 @@ class ReportItem(models.Model):
                     )
                 return simulations_results
 
-
     @property
     def render_json(self):
         return report_item_render_to_json(
             report_item_id=f"reportItem{self.project_id}-{self.id}",
             data=self.fetch_parameters_values(),
             title=self.title,
-            report_item_type=self.report_type
+            report_item_type=self.report_type,
         )
-
 
 
 def get_project_reportitems(project):

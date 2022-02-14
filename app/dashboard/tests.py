@@ -6,7 +6,7 @@ from django.test import TestCase
 # from django.urls import reverse
 from .helpers import dict_keyword_mapper, nested_dict_crawler, KPIFinder
 
-#class SimulationServiceTest(TestCase):
+# class SimulationServiceTest(TestCase):
 #    fixtures = ['fixtures/benchmarks_fixture.json',]
 #
 #     @classmethod

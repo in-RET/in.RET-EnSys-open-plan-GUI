@@ -56,11 +56,17 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+FILE_UPLOAD_HANDLERS = [
+    "django.core.files.uploadhandler.MemoryFileUploadHandler",
+    "django.core.files.uploadhandler.TemporaryFileUploadHandler"
 ]
 
 ROOT_URLCONF = 'epa.urls'
@@ -70,7 +76,7 @@ FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'op_templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -94,7 +100,7 @@ DATABASES = {
     # ELAND dockerized mysql container
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'epa-app-db',
+        'NAME': 'open_plan-app-db',
         'USER': 'root',
         'PASSWORD': '4kFDg@G@*G,#)Fa',
         'HOST': 'db',
@@ -132,6 +138,13 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
+LOCALE_PATHS = (os.path.join(BASE_DIR, 'locale'), )
+
+LANGUAGES = [
+    ('de', 'German'),
+    ('en', 'English'),
+]
+
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
@@ -147,7 +160,7 @@ AUTH_USER_MODEL = 'users.CustomUser'
 
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'project_search'
-LOGOUT_REDIRECT_URL = 'login'
+LOGOUT_REDIRECT_URL = 'home'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
@@ -174,12 +187,15 @@ PROXY_CONFIG = ({
     "https://": PROXY_ADDRESS_LINK,
 }) if USE_PROXY else ({})
 
-MVS_API_HOST=os.getenv('MVS_API_HOST', 'https://mvs-eland.rl-institut.de')
-MVS_POST_URL = f"{MVS_API_HOST}/sendjson/"
+MVS_API_HOST = os.getenv('MVS_API_HOST', 'https://mvs-eland.rl-institut.de')
+MVS_POST_URL = f"{MVS_API_HOST}/sendjson/openplan"
 MVS_GET_URL = f"{MVS_API_HOST}/check/"
+MVS_LP_FILE_URL = f"{MVS_API_HOST}/get_lp_file/"
 
 # Allow iframes to show in page
 X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+import sys
 
 LOGGING = {
     'version': 1,
@@ -203,11 +219,16 @@ LOGGING = {
             'filename': 'django_epa_warning.log',
             'formatter': 'dtlnm'
         },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'stream': sys.stdout,
+        }
     },
     'loggers': {
         '': {
-            'handlers': ['info_file', 'warnings_file'],
-            'level': 'INFO',
+            'handlers': ['info_file', 'warnings_file', 'console'],
+            'level': 'DEBUG',
             'propagate': True,
         },
     },

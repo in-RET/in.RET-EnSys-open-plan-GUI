@@ -1,0 +1,802 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% load custom_template_tags %}
+{% load i18n %}
+
+{% block head_block %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables.net-bs/1.10.23/dataTables.bootstrap.min.css" integrity="sha512-Z+BWkkwxMpBhQthPeqw2UbG1tamgkRHi1UaYyZ8mTnjt04iXqeVx/Wu4CYzPOn3E+x663DIV+SiAuKDHbTg6FQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link href="https://unpkg.com/bootstrap-table@1.19.1/dist/bootstrap-table.min.css" rel="stylesheet">
+{% endblock head_block %}
+
+{% block start_body_scripts %}
+
+<script src="https://unpkg.com/bootstrap-table@1.19.1/dist/bootstrap-table.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.58.5/plotly.min.js" integrity="sha512-7wMLZxKDFvReIWPUzBfcEKsuOriDUEcWkV2bNHV2/tQUmoZj2eLpkQOF7nBbtwVG8WrSl5rTN87cqnS7ZelhzQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tippy.js/2.5.4/tippy.all.min.js" integrity="sha512-9LKXH8DIeFSdiDIWQSOJNZuwLynJNm4x/1eBRpPfRJsEXZWJL+aoH+JNDglF3DcCoQYVBHqXo8sVHOLveoaN0A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables.net/1.10.23/jquery.dataTables.min.js" integrity="sha512-coE8Qg+5Eb8e0xSXkdSJYln78NclTBgX6rducQWvi3NZooVaR1GVcVA5fRPVetzSqh9CEBv7hzwuQsZLLC0e8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+{% endblock start_body_scripts %}
+
+{% block title %}{% translate "Results" %}{% endblock title %}
+
+{% block content %}
+
+
+
+<div class="modal fade modal--dashboard" id="KPIModal" tabindex="-1" aria-labelledby="KPIModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="KPIModalLabel">{% translate "KPI Overview" %}</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table" id="kpiTable">
+                    <thead>
+                    <tr>
+                        <th scope="col">{% translate "Name" %}</th>
+                        <th scope="col">{% translate "Unit" %}</th>
+                        <th scope="col">{% translate "Definition" %}</th>
+                        <th scope="col"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for kpi_id, kpi in kpi_list.items %}
+                    <tr>
+                        <td scope="row">{% translate kpi.verbose %}</td>
+                        <td>{% translate kpi.unit %}</td>
+                        <td>{% translate kpi.definition %}</td>
+                        <td><button class="btn btn--small btn--transparent">+ {% translate "Add to results" %}</button></td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn--medium" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade modal--dashboard" id="createReportItemModal" tabindex="-1" role="dialog" aria-labelledby="createReportItemModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createReportItemModalLabel">{% translate "Add a new report item" %}</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" enctype="multipart/form-data" ajax-post-url="{% url 'report_create_item' proj_id %}" graph-parameter-url="{% url 'ajax_get_graph_parameters_form' proj_id %}">
+                    {% csrf_token %}
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate "Close" %}</button>
+                <button class="btn btn--medium" onclick="createReportItem(event)">{% translate "Create" %}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<main>
+    <section class="header">
+        <div>
+            <div class="header__left"></div>
+            <h1 class="header__title">{% translate "Simulation results" %}</h1>
+            <div class="header__back">
+                <a href="{% url 'project_search' %}">{% translate "My projects" %}</a>
+            </div>
+        </div>
+    </section>
+    <section class="header-results">
+            <button id="reportBtn" class="view" onclick="javascript:showCreateReportItemModal(event)">
+                                    Add graph
+            </button>
+        <div>
+            <div class="header-results__scenario">
+                <div class="project-title">
+                    {% translate "Project" %}
+                </div>
+                <div class="project-name">
+                    <form action="{% url 'scenario_visualize_results' %}" method="POST">
+                        {% csrf_token %}
+                        <select name="proj_id" class="form-select" aria-label="Default select example" onchange="this.form.submit()">
+                        {% for project in project_list %}
+                            <option value="{{ project.id }}" {% if project.id == proj_id %} selected {% endif %}> {{ project.name }}  </option>
+                        {% endfor %}
+                        </select>
+                    </form>
+                </div>
+            </div>
+            <div class="header-results__export">
+                <button class="btn btn--small" type="submit">
+                    <span class="icon icon-export"></span>
+                    {% translate "Export results" %}
+                </button>
+            </div>
+        </div>
+    </section>
+    <section class="dashboard">
+        <div>
+            <div class="row">
+                <div class="dashboard__scenarios">
+                    <h2>My scenarios</h2>
+                    <div class="scenario-select">
+                        {% for scenario in scenario_list %}
+                        {% if scenario.id|stringformat:'s' in request|get_selected_scenarios:proj_id %}
+                            {% setvar "selected" as selected %}
+                        {% else%}
+                            {% setvar "" as selected %}
+                        {% endif %}
+                            <button id="scenario-{{ proj_id }}-{{ scenario.id}}" class="scenario-select__item {{ selected }}" onclick="update_selected_scenarios(this)">
+                                {{ scenario.name }}
+                            </button>
+                        {% empty %}
+                            {% translate "You have no scenario with completed simulation, please run simulations to display results" %}
+                        {% endfor %}
+
+                    </div>
+                </div>
+            </div>
+            {% if scenario_list %}
+            <div class="row dashboard__create">
+                <div class="col">
+                  <button class="btn btn--medium" onclick="javascript:showCreateReportItemModal(event)">
+                    <span class="icon icon-add"></span>
+                    Create graph
+                  </button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col col-md-12">
+                    <div class="chart">
+                        <div class="chart__header">
+                            <div style="display: flex;gap: 10px;align-items: center;">
+                                <span class="title">Choose KPI table display</span>
+                                <span><select id="kpi-table-style" name="kpi-table-style" class="form-select" aria-label="Default select example" onchange="update_kpi_table_style(this)">
+                                    {% for style in table_styles %}
+                                    <option value="{{ style }}"> {{ style }}  </option>
+                                    {% endfor %}
+                                </select></span>
+                                <span class="view" data-bs-toggle="modal" data-bs-target="#KPIModal">
+                                    <span class="icon icon-i_arrow_right"></span> View KPIs
+                                </span>
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuKPI" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="icon icon-more"></span>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuKPI">
+                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as .xls</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as PDF</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="chart__plot">
+                            <table class="table" id="selectedKPITable"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                <!--<div class="col col-md-4">
+                    <div class="chart chart--small">
+                        <div class="chart__header">
+                            <div>
+                                <span class="title">Emission Costs</span>
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="icon icon-more"></span>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as .xls</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as PDF</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="chart__content">
+                            <div class="item item--best">
+                                <div class="item__name">
+                                    Scenario name 5
+                                </div>
+                                <div class="item__value">
+                                    500.000 EUR
+                                </div>
+                            </div>
+                            <div class="item item--worst">
+                                <div class="item__name">
+                                    Scenario name 10
+                                </div>
+                                <div class="item__value">
+                                    1.000.000 EUR
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart chart--small">
+                        <div class="chart__header">
+                            <div>
+                                <span class="title">Investment Costs</span>
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="icon icon-more"></span>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
+                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as .xls</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as PDF</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="chart__content">
+                            <div class="item item--best">
+                                <div class="item__name">
+                                    Scenario name 5
+                                </div>
+                                <div class="item__value">
+                                    500.000 EUR
+                                </div>
+                            </div>
+                            <div class="item item--worst">
+                                <div class="item__name">
+                                    Scenario name 10
+                                </div>
+                                <div class="item__value">
+                                    1.000.000 EUR
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart chart--small">
+                        <div class="chart__header">
+                            <div>
+                                <span class="title">Emission Costs</span>
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuButton3" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="icon icon-more"></span>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton3">
+                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as .xls</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as PDF</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="chart__content">
+                            <div class="item item--best">
+                                <div class="item__name">
+                                    Scenario name 5
+                                </div>
+                                <div class="item__value">
+                                    500.000 EUR
+                                </div>
+                            </div>
+                            <div class="item item--worst">
+                                <div class="item__name">
+                                    Scenario name 10
+                                </div>
+                                <div class="item__value">
+                                    1.000.000 EUR
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>-->
+            <div class="row">
+                <div class="col" id="report_items">
+
+
+                    <div class="chart" style="height: fit-content;">
+                        <div class="chart__header">
+                            <div>
+                                <span class="title">All time series</span>
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuTS" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="icon icon-more"></span>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuTS">
+                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as .xls</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as PDF</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="chart__plot">
+                            <div id="all_timeseries"></div>
+                        </div>
+                    </div>
+
+
+                    <div class="chart" style="height: fit-content;">
+                        <div class="chart__header">
+                            <div>
+                                <span class="title">Stacked time series by sector</span>
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuTS" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="icon icon-more"></span>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuTS">
+                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as .xls</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as PDF</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="chart__plot">
+                            <div id="stacked_timeseries"></div>
+                        </div>
+                    </div>
+
+
+                    <div class="chart" style="height: fit-content;">
+                        <div class="chart__header">
+                            <div>
+                                <span class="title">Aggregated total flow over project period</span>
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuTS" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="icon icon-more"></span>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuTS">
+                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as .xls</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as PDF</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="chart__plot">
+                            <div id="stacked_total_flow"></div>
+                        </div>
+                    </div>
+
+
+                    <div class="chart" style="height: fit-content;">
+                        <div class="chart__header">
+                            <div>
+                                <span class="title">Installed and optimized capacities</span>
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuTS" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="icon icon-more"></span>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuTS">
+                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as .xls</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as PDF</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="chart__plot">
+                            <div id="capacities"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {# TODO: make button or add kpi/scalar matrix results to downloadable excel sheet #}
+            {% if scen_id %}
+                <a type="button" class="btn btn-info" href="{% url 'download_timeseries_results' scen_id %}">{% translate "Download Timeseries" %}</a>
+            {% endif %}
+            {% endif %}
+        </div>
+    </section>
+</main>
+{% endblock content %}
+
+
+{% block end_body_scripts %}
+
+
+
+
+
+<script>
+const urlNotImplemented = `{% url 'not_implemented' %}?url={{ request.get_full_path }}`;
+const urlCopyReportItem = "#";
+const urlDeleteReportItem = `{% url 'report_delete_item' proj_id %}`;
+
+
+const deleteReportItem = (event) => {
+    //submit the form to delete a report item
+    const reportItemId = event.target.getAttribute("data-report-item-id");
+    if(confirm("Are you sure ? This action cannot be undone")){
+        $.ajax({
+            headers: {'X-CSRFToken': `{{ csrf_token }}` },
+            type: "POST",
+            url: urlDeleteReportItem,
+            data: {report_item_id: reportItemId},
+            success: function (jsonRes) {
+                document.getElementById(reportItemId).remove();
+            },
+            error: function (err) {
+                console.log(err);
+            },
+        })
+    }
+};
+
+</script>
+{{ report_items_data|json_script:"existingReportItemsData" }}
+<script src="{% static 'js/report_items.js' %}"></script>
+<script>
+
+    $(document).ready(function () {
+        // add search field to the kpi info modal
+        $('#kpiTable').DataTable();
+        // update the kpi table
+        update_kpi_table_style(document.getElementById("kpi-table-style"));
+        const scen_id = "{{ scen_id }}"
+        scenario_visualize_timeseries(scen_id);
+        scenario_visualize_stacked_timeseries(scen_id);
+        scenario_visualize_stacked_total_flow(scen_id);
+        scenario_visualize_stacked_capacities(scen_id);
+        scenario_visualize_stacked_optimized_capacities(scen_id);
+    });
+
+function update_kpi_table_style(target){
+    $.ajax({
+        url: "{% url 'request_kpi_table' proj_id=proj_id %}" + target.value, // TODO add scenarios in the arguments to provide answers
+        type: "GET",
+        success: async (table_data) => {
+
+        const parentDiv = document.getElementById("selectedKPITable");
+        parentDiv.innerHTML = "";
+
+
+        /* create KPI table headers */
+        const tableHead = document.createElement('thead');
+        const table_headers = ["Indicator", "Scen1 Value"]; // todo add dynamically more scenarios here
+        const table_length = table_headers.length;
+        const tableHeadContent = document.createElement('tr');
+        table_headers.map(hdr =>
+            {
+                var tableHdr = document.createElement('th');
+                tableHdr.innerHTML = hdr;
+                tableHeadContent.appendChild(tableHdr);
+            }
+        );
+        tableHead.appendChild(tableHeadContent)
+        parentDiv.appendChild(tableHead);
+
+
+        for(subBody in table_data) {
+            var tableBody = document.createElement('tbody');
+            tableBody.id = subBody;
+            /* add subtable title */
+            const tableSubSectionTitleRow = document.createElement('tr');
+            var tableSubSectionTitle = document.createElement('th');
+            tableSubSectionTitle.innerHTML = subBody;
+            tableSubSectionTitleRow.appendChild(tableSubSectionTitle);
+            for(i=0;i<table_length-1;++i){
+                tableSubSectionTitleRow.appendChild(document.createElement('td'));
+            }
+
+            tableBody.appendChild(tableSubSectionTitle);
+
+            /* add subtable lines for each parameter */
+            // (param should be a json object) with keys name (type str), unit type (str) and scen_values
+            table_data[subBody].map(param =>{
+                var tableSubSectionParamRow = document.createElement('tr');
+                var cell = tableSubSectionParamRow.insertCell(0);
+                cell.innerHTML = `{% blocktranslate %}` + param.name +`{% endblocktranslate %}`;
+                //cell.append(" just to see");
+                // todo for loop over scenario values
+                for(i=0;i<param.scen_values.length;++i){
+                    cell = tableSubSectionParamRow.insertCell(1 + i);
+                    cell.innerHTML = param.scen_values[i] +" " + param.unit
+                };
+                tableBody.appendChild(tableSubSectionParamRow);
+            });
+
+
+            parentDiv.appendChild(tableBody);
+        }
+
+
+        },
+        error: function (xhr, errmsg) {
+            console.log("backend_error!")
+            //Show the error message
+            $('#message-div').html("<div class='alert-error'>" +
+                "<strong>Success: </strong> We have encountered an error: " + errmsg + "</div>");
+        }
+    });
+
+};
+
+/* loop over scenario selection buttons and return the ids of the selected ones */
+function fetchSelectedScenarios(){
+    var selectedScenarios = [];
+    $(".scenario-select__item").map((i, item) => {
+        if(item.classList.contains("selected")){
+            selectedScenarios.push(item.id.split("-")[2])
+        }
+    });
+    return selectedScenarios
+};
+
+function update_selected_scenarios(target){
+    const proj_id = target.id.split("-")[1];
+    const scen_id = target.id.split("-")[2];
+
+
+
+    // call the list and the success should then call other function which collect the data in the session's cache and plot it(session cache should use mvs tokens to know if a simulation was updated or not)
+    if(scen_id != null){
+
+        $.ajax({
+            url: "{% url 'update_selected_scenarios' proj_id %}" + scen_id,
+            type: "GET",
+            success: async (data) => {
+                await console.log(data);
+                // TODO: remove next line when multi-scenario selection is allowed
+                $(".scenario-select__item").map((i, item) => {item.classList.remove("selected");});
+                target.classList.add("selected"); // TODO change "add" to "toggle" when multi-scenario selection is allowed
+                //TODO: call functions which update graphs and so from here
+
+                /* Update the kpi table */
+                update_kpi_table_style(document.getElementById("kpi-table-style"));
+
+                scenario_visualize_timeseries(scen_id);
+                scenario_visualize_stacked_timeseries(scen_id);
+                scenario_visualize_stacked_total_flow(scen_id);
+                scenario_visualize_stacked_capacities(scen_id);
+                scenario_visualize_stacked_optimized_capacities(scen_id);
+
+            },
+            error: function (xhr, errmsg) {
+                if (xhr.status != 405){
+                    console.log("backend_error!")
+                    //Show the error message
+                    $('#message-div').html("<div class='alert-error'>" +
+                        "<strong>Success: </strong> We have encountered an error: " + errmsg + "</div>");
+                }
+            }
+        });
+    }
+}
+
+function scenario_visualize_timeseries(scen_id){
+ $.ajax({
+            url: "{% url 'scenario_visualize_timeseries' %}" + scen_id,
+            type: "GET",
+            success: async (dataList) => {
+                await drawScatterPLot(dataList);
+            },
+            error: function (xhr, errmsg) {
+                console.log("backend_error!")
+                //Show the error message
+                $('#message-div').html("<div class='alert-error'>" +
+                    "<strong>Success: </strong> We have encountered an error: " + errmsg + "</div>");
+            }
+        });
+};
+
+function scenario_visualize_stacked_timeseries(scen_id){
+ $.ajax({
+            url: "{% url 'scenario_visualize_stacked_timeseries'%}" +  scen_id,
+            type: "GET",
+            success: async (data) => {
+                await data.map(dataObj => drawstackedScatterPlot(dataObj));
+            },
+            error: function (xhr, errmsg) {
+                console.log("backend_error!")
+                //Show the error message
+                $('#message-div').html("<div class='alert-error'>" +
+                    "<strong>Success: </strong> We have encountered an error: " + errmsg + "</div>");
+            }
+        });
+};
+
+
+function scenario_visualize_stacked_total_flow(scen_id){
+ $.ajax({
+            url: "{% url 'scenario_visualize_stacked_total_flow' %}" + scen_id,
+            type: "GET",
+            success: async (data) => {
+                await drawstackedBarChart(data);
+            },
+            error: function (xhr, errmsg) {
+                console.log("backend_error!")
+                //Show the error message
+                $('#message-div').html("<div class='alert-error'>" +
+                    "<strong>Success: </strong> We have encountered an error: " + errmsg + "</div>");
+            }
+        });
+};
+
+function scenario_visualize_stacked_capacities(scen_id){
+ $.ajax({
+            url: "{% url 'scenario_visualize_stacked_capacities' %}" + scen_id,
+            type: "GET",
+            success: async (data) => {
+                await drawstackedBarChart(data);
+            },
+            error: function (xhr, errmsg) {
+                console.log("backend_error!")
+                //Show the error message
+                $('#message-div').html("<div class='alert-error'>" +
+                    "<strong>Success: </strong> We have encountered an error: " + errmsg + "</div>");
+            }
+        });
+};
+
+function scenario_visualize_stacked_optimized_capacities(scen_id){
+ $.ajax({
+            url: "{% url 'scenario_visualize_stacked_optimized_capacities' %}" + scen_id,
+            type: "GET",
+            success: async (data) => {
+                await drawstackedBarChart(data);
+            },
+            error: function (xhr, errmsg) {
+                console.log("backend_error!")
+                //Show the error message
+                $('#message-div').html("<div class='alert-error'>" +
+                    "<strong>Success: </strong> We have encountered an error: " + errmsg + "</div>");
+            }
+        });
+};
+
+    function drawScatterPLot(dataList) {
+        const data= dataList[0].values;
+        const layout= {
+            title: dataList[0].title,
+            yaxis:{
+                title: dataList[0].yaxistitle,
+            }
+        }
+        Plotly.newPlot(dataList[0].div, data, layout);
+
+    }
+
+    function drawstackedScatterPlot(dataList) {
+        const data = dataList.values;
+        if(data.length >0){
+            const parentDiv = document.getElementById(dataList.div);
+            const newGraph = document.createElement('div');
+            newGraph.id = "scatter" + dataList.commodity.replaceAll(' ', '');
+            parentDiv.appendChild(newGraph);
+            const layout = {
+                title: dataList.commodity,
+                showlegend: true,
+                paper_bgcolor: "transparent",
+                yaxis:{
+                    title: dataList.yaxistitle,
+                }
+            }
+            Plotly.newPlot(newGraph.id, data, layout);
+        }
+    }
+
+    function drawstackedBarChart(dataList) {
+
+        const data = dataList[0].values;
+        const title = dataList[0].title;
+        const parentDiv = document.getElementById(dataList[0].div);
+        const newGraph = document.createElement('div');
+        newGraph.id = "bar" + title.replaceAll(' ', '');
+        parentDiv.appendChild(newGraph);
+        const layout = {
+            title: title,
+            barmode: 'stack',
+            yaxis:{
+                title: dataList[0].yaxistitle,
+                categoryorder:'category ascending'
+            }
+        }
+        Plotly.newPlot(newGraph.id, data, layout);
+    }
+
+</script>
+
+
+<script>
+
+    /** Add a new report item **/
+
+    var createReportItemModalDOM = document.getElementById("createReportItemModal");
+    var createReportItemModal = new bootstrap.Modal(createReportItemModalDOM);
+    var createReportItemForm = createReportItemModalDOM.querySelector("form");
+    var reportItemTitleDOM = createReportItemForm.querySelector('input[id="id_title"]');
+    var reportItemTitle = ''
+    var reportItemScenariosDOM = createReportItemForm.querySelector('input[id="id_scenarios"]');
+    var reportItemScenarios = [];
+
+    var urlForm = createReportItemForm.getAttribute("graph-parameter-url");
+    function updateReportItemParametersForm(graphType){
+        // Passes the existing text of the title to the form initials
+        reportItemTitleDOM = createReportItemForm.querySelector('input[id="id_title"]');
+        if(reportItemTitleDOM){
+            reportItemTitle = reportItemTitleDOM.value
+        }
+        // Passes the preselected scenarios to the form initials
+        reportItemScenariosDOM = createReportItemForm.querySelector('select[id="id_scenarios"]');
+        if(reportItemScenariosDOM){
+            reportItemScenarios = [];
+            Array.from(reportItemScenariosDOM.querySelectorAll('option:checked')).forEach(item => {
+                reportItemScenarios.push(item.value);
+            });
+        }
+        else{
+            reportItemScenarios = fetchSelectedScenarios();
+        }
+        $.ajax({
+            url: urlForm,
+            type: "POST",
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            data: {
+              'title': reportItemTitle,
+              'report_type': graphType,
+              'selected_scenarios': JSON.stringify(reportItemScenarios)
+            },
+            success: function (formData) {
+               // find and keep the csrf token of the form
+               var csrfToken = createReportItemForm.querySelector('input[name="csrfmiddlewaretoken"]');
+
+               // update the report item graph
+               createReportItemForm.innerHTML = csrfToken.outerHTML + formData;
+
+               // (re)link the changing of report_item type combobox to loading new parameters form
+               // the name of the id is linked with the name of the attribute of ReportItem model in dashboard/models.py
+               $("#id_report_type").change(function (event) {
+                    var reportItemType = $(this).val();
+                    updateReportItemParametersForm(reportItemType)
+               })
+               $("#id_scenarios").change(function (event) {
+                    var reportItemType = $("#id_report_type").val();
+                    updateReportItemParametersForm(reportItemType)
+               })
+            }
+        });
+    };
+
+    function showCreateReportItemModal(event){
+        updateReportItemParametersForm("timeseries")
+        createReportItemModal.show()
+    }
+
+    const createReportItem = (event) => {
+        //submit the form to create a new report item
+
+        // get the data of the form
+        const createReportUrl = createReportItemForm.getAttribute("ajax-post-url");
+
+        const formData = new FormData(createReportItemForm);
+        $.ajax({
+            headers: {'X-CSRFToken': `{{ csrf_token }}` },
+            type: "POST",
+            url: createReportUrl,
+            data: formData,
+            processData: false,  // tells jQuery not to treat the data
+            contentType: false,   // tells jQuery not to define contentType
+            success: function (jsonRes) { // verknüpft mit ReportItem.render_json (Klasse in Models)
+                console.log(jsonRes)
+                // TODO recieve the graph data and call the function to plot it
+
+                reportItemTitle = '';
+                reportItemScenarios = [];
+                createReportItemModal.hide();
+                // TODO check jsonRes.report_type if it is in a mapping which has the different graph names as key and the corresponding function as values
+                // as we want to leave the door open to add other reportItem objects such as table, text, etc...
+                const graphId = addReportItemGraphToDOM(jsonRes);
+                if(jsonRes.type in graph_type_mapping){
+                    graph_type_mapping[jsonRes.type](graphId, jsonRes);
+                }
+                else{
+                    console.log("the report type '" + jsonRes.type + "' is not yet supported, sorry");
+                }
+            },
+            error: function (err) {
+                var jsonRes = err.responseJSON;
+                createReportItemForm.innerHTML = jsonRes.report_form;
+                updateReportItemParametersForm(jsonRes.report_type)
+                }, //err => {alert("Modal form JS Error: " + err);console.log(err);}
+        })
+    }
+</script>
+
+
+{% endblock end_body_scripts %}

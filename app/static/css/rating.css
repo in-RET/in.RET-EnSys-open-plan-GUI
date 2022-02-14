@@ -1,3 +1,15 @@
+.panel-title{
+  margin-top: 3rem;
+}
+
+.feedbackimg{
+  width:110px;
+  height: auto;
+  object-fit: cover;
+  margin-left:-5%;
+ filter: grayscale(10%);
+}
+
 .rating {
     display: flex;
     width: 100%;

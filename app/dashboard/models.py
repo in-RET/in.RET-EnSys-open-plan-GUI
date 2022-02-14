@@ -1,5 +1,29 @@
+import copy
+import json
+import jsonschema
+import traceback
+import logging
+
+from django.utils.translation import ugettext_lazy as _
 from django.db import models
+from dashboard.helpers import (
+    KPI_PARAMETERS,
+    GRAPH_TIMESERIES,
+    GRAPH_TIMESERIES_STACKED,
+    GRAPH_CAPACITIES,
+    GRAPH_BAR,
+    GRAPH_PIE,
+    GRAPH_LOAD_DURATION,
+    GRAPH_SANKEY,
+    GRAPH_PARAMETERS_SCHEMAS,
+    single_timeseries_to_json,
+    simulation_timeseries_to_json,
+    report_item_render_to_json,
+)
+
 from projects.models import Simulation
+
+logger = logging.getLogger(__name__)
 
 KPI_COSTS_TOOLTIPS = {
     "Replacement_costs_during_project_lifetime": "Costs for replacement of assets which occur over the project lifetime.",
@@ -99,6 +123,24 @@ KPI_SCALAR_TOOLTIPS = {
     "costs_upfront_in_year_zero": "The costs which will have to be paid upfront when project begin, ie. In year 0."
 }
 
+# TODO have this in a csv structure to also create the doc and tool tips
+GRAPH_TIMESERIES = "timeseries"
+GRAPH_TIMESERIES_STACKED = "timeseries_stacked"
+GRAPH_CAPACITIES = "capacities"
+GRAPH_BAR = "bar"
+GRAPH_PIE = "pie"
+GRAPH_LOAD_DURATION = "load_duration"
+GRAPH_SANKEY = "sankey"
+
+REPORT_TYPES = (
+    (GRAPH_TIMESERIES, _("Timeseries graph")),
+    (GRAPH_TIMESERIES_STACKED, _("Stacked timeseries graph")),
+    (GRAPH_CAPACITIES, _("Installed and optimized capacities")),
+    (GRAPH_BAR, _("Bar chart")),
+    (GRAPH_PIE, _("Pie chart")),
+    (GRAPH_LOAD_DURATION, _("Load duration curve")),
+    (GRAPH_SANKEY, _("Sankey diagram")),
+)
 
 class KPIScalarResults(models.Model):
     scalar_values = models.TextField()  # to store the scalars dict
@@ -113,3 +155,214 @@ class KPICostsMatrixResults(models.Model):
 class AssetsResults(models.Model):
     assets_list = models.TextField()  # to store the assets list
     simulation = models.ForeignKey(Simulation, on_delete=models.CASCADE)
+    __asset_names = None
+    __available_timeseries = None
+    __asset_categories = None
+
+    @property
+    def assets_dict(self):
+        try:
+            answer = json.loads(self.assets_list)
+        except json.decoder.JSONDecodeError:
+            answer = {}
+        return answer
+
+    @property
+    def asset_names(self):
+        if self.__asset_names is None:
+            self.__asset_names = []
+            asset_dict = self.assets_dict
+            for category in asset_dict:
+                for asset in asset_dict[category]:
+                    self.__asset_names.append(asset["label"])
+        return self.__asset_names
+
+    @property
+    def available_timeseries(self):
+        """Returns a dict which keys are asset labels and values are asset results only for timeseries asset
+
+        An asset is deemed a timeseries when its results contain the key "flow"
+        """
+        if self.__available_timeseries is None:
+            self.__available_timeseries = {}
+            asset_dict = self.assets_dict
+            for category in asset_dict:
+                for asset in asset_dict[category]:
+                    if "flow" in asset and "_consumption_period" not in asset["label"]:
+                        asset["category"] = category
+                        self.__available_timeseries[asset["label"]] = asset
+        return self.__available_timeseries
+
+    @property
+    def asset_categories(self):
+        if self.__asset_categories is None:
+            self.__asset_categories = tuple(self.assets_dict.keys())
+        return self.__asset_categories
+
+    def single_asset_results(self, asset_name, asset_category=None):
+        """Provided the name of an asset, return the results linked to this asset"""
+        asset_dict = self.assets_dict
+        answer = None
+        if asset_category is not None:
+            categories = [asset_category]
+        else:
+            categories = self.__asset_categories
+
+        for category in categories:
+            for asset in asset_dict[category]:
+                if asset_name == asset["label"]:
+                    if answer is None:
+                        answer = asset
+                        answer["category"] = category
+                        break
+                    else:
+                        raise ValueError(
+                            f"Asset named {asset_name} appears twice in simulations results, this should not be possible"
+                        )
+        return answer
+
+    def single_asset_timeseries(self, asset_name, asset_category=None):
+        """Provided the user name of the asset, return the timeseries linked to this asset"""
+        if self.__available_timeseries is None:
+            asset_results = self.single_asset_results(asset_name, asset_category)
+
+        else:
+            asset_results = self.__available_timeseries.get(asset_name)
+
+        if "flow" in asset_results:
+            answer = single_timeseries_to_json(
+                value=asset_results["flow"]["value"],
+                unit=asset_results["flow"]["unit"],
+                label=asset_name,
+                asset_type=asset_results["type_oemof"],
+            )
+        else:
+            answer = None
+        return answer
+
+# # TODO change the form from this model to adapt the choices depending on single scenario/compare scenario or sensitivity
+class ReportItem(models.Model):
+    title = models.CharField(max_length=120, default="", blank=True)
+    report_type = models.CharField(max_length=50, choices=REPORT_TYPES)
+    simulations = models.ManyToManyField(Simulation)
+    parameters = models.TextField(
+        default="", blank=True
+    )  # to store the parameter lists
+    initial_simulations = None
+
+    def __init__(self, *args, **kwargs):
+        if "simulations" in kwargs:
+            self.initial_simulations = kwargs.pop("simulations")
+            self.initial_simulations = self.__parse_simulation_list(
+                self.initial_simulations
+            )
+        super().__init__(*args, **kwargs)
+
+    #
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.initial_simulations is not None:
+            self.simulations.add(*self.initial_simulations)
+
+    def update_simulations(self, list_simulation):
+        list_simulation = self.__parse_simulation_list(list_simulation)
+        if list_simulation:
+            self.simulations.clear()
+            self.simulations.add(*list_simulation)
+
+    def __parse_simulation_list(self, simulation_list):
+        if not isinstance(simulation_list, list):
+            simulation_list = [simulation_list]
+
+        if len(simulation_list) > 0:
+            if isinstance(simulation_list[0], int):
+                simulation_list = [
+                    s for s in Simulation.objects.filter(id__in=simulation_list)
+                ]
+        return simulation_list
+
+    @property
+    def parameters_dict(self):
+        try:
+            answer = json.loads(self.parameters)
+        except json.decoder.JSONDecodeError:
+            answer = {}
+        return answer
+
+    @property
+    def project_id(self):
+        return (
+            self.simulations.all()
+            .values_list("scenario__project", flat=True)
+            .distinct()
+            .get()
+        )
+
+    def proof_parameters_follow_schema(self, parameter_dict=None):
+        if parameter_dict is None:
+            parameter_dict = self.parameters_dict
+
+        jschema = GRAPH_PARAMETERS_SCHEMAS[self.report_type]
+        try:
+            jsonschema.validate(parameter_dict, jschema)
+            answer = True
+        except jsonschema.exceptions.ValidationError:
+            answer = False
+            logger.warning(
+                f"jsonschema validation error! Report item: {self.id} ({self.title}). Thrown Exception: {traceback.format_exc()}."
+            )
+        return answer
+
+    def safely_assign_parameters(self, parameter_dict):
+        if self.proof_parameters_follow_schema(parameter_dict) is True:
+            self.parameters = json.dumps(parameter_dict)
+    def fetch_parameters_values(self):
+        parameters = json.loads(self.parameters)
+        # TODO : adjust for other report types
+        if self.report_type == GRAPH_TIMESERIES:
+            y_variables = parameters.get("y", None)
+            if y_variables is not None:
+                simulations_results = []
+
+                for simulation in self.simulations.all():
+                    y_values = []
+                    assets_results_obj = AssetsResults.objects.get(
+                        simulation=simulation
+                    )
+                    asset_timeseries = assets_results_obj.available_timeseries
+                    for y_var in y_variables:
+                        if y_var in asset_timeseries:
+                            y_values.append(
+                                assets_results_obj.single_asset_timeseries(y_var)
+                            )
+                    simulations_results.append(
+                        simulation_timeseries_to_json(
+                            scenario_name=simulation.scenario.name,
+                            scenario_id=simulation.scenario.id,
+                            scenario_timeseries=y_values,
+                            scenario_timestamps=simulation.scenario.get_timestamps(),
+                        )
+                    )
+                return simulations_results
+
+
+    @property
+    def render_json(self):
+        return report_item_render_to_json(
+            report_item_id=f"reportItem{self.project_id}-{self.id}",
+            data=self.fetch_parameters_values(),
+            title=self.title,
+            report_item_type=self.report_type
+        )
+
+
+
+def get_project_reportitems(project):
+    """Given a project, return the ReportItem instances linked to that project"""
+    qs = (
+        project.scenario_set.filter(simulation__isnull=False)
+        .filter(simulation__reportitem__isnull=False)
+        .values_list("simulation__reportitem", flat=True)
+        .distinct()
+    )
+    return ReportItem.objects.filter(id__in=[ri for ri in qs])

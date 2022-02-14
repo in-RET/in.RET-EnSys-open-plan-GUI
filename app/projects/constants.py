@@ -253,6 +253,8 @@ TRUE_FALSE_CHOICES = (
     (False, 'No')
 )
 
+BOOL_CHOICES = ((True, "Yes"), (False, "No"))
+
 FLOW_DIRECTION = (
     ('B2A', 'Bus_to_Asset'),
     ('A2B', 'Asset_to_Bus'),
@@ -344,20 +346,31 @@ ASSET_TYPE = (
     ('hess', 'hess'),
 )
 
+RENEWABLE_ASSETS = (
+    "electrolyzer",
+    "heat_pump",
+    "pv_plant",
+    "wind_plant",
+    "biogas_plant",
+    "geothermal_conversion",
+    "solar_thermal_plant",
+)
 BUS_TYPE = (
     ('bus_electricity', 'bus_electricity'),
     ('bus_heat', 'bus_heat'),
     ('bus_gas', 'bus_gas'),
 )
 
-DONE="DONE"
-PENDING="PENDING"
-ERROR="ERROR"
+DONE = "DONE"
+PENDING = "PENDING"
+ERROR = "ERROR"
+MODIFIED = "MODIFIED"
 
 SIMULATION_STATUS = (
     (ERROR, ERROR),
     (DONE, DONE),
     (PENDING, PENDING),
+    (MODIFIED, MODIFIED),
 )
 
 USER_RATING = (
@@ -367,3 +380,41 @@ USER_RATING = (
     (4, '4'),
     (5, '5'),
 )
+
+MAP_EPA_MVS = {
+    'economic_data': 'economic_data',
+    'energy_providers': 'energyProviders',
+    'energy_busses': 'energyBusses',
+    'energy_consumption': 'energyConsumption',
+    'energy_conversion': 'energyConversion',
+    'energy_production': 'energyProduction',
+    'energy_storage': 'energyStorage',
+    'project_data': 'project_data',
+    'input_bus_name': 'inflow_direction',
+    'output_bus_name': 'outflow_direction',
+    'simulation_settings': 'simulation_settings',
+    'energy_vector': 'energyVector',
+    'installed_capacity': 'installedCap',
+    'capacity': 'storage capacity',
+    'input_power': 'input power',
+    'output_power': 'output power',
+    'optimize_capacity': 'optimizeCap',
+    'maximum_capacity': 'maximumCap',
+    'input_timeseries': 'timeseries',
+    'constraints': 'constraints',
+    'renewable_asset': 'renewableAsset',
+    'kpi': 'kpi',
+    'fixcost': 'fixcost',
+    'time_step': 'timestep',
+    'data': 'value',
+    'replacement_costs_during_project_lifetime': 'replacement_costs_during_project_lifetime',
+    'specific_replacement_costs_of_installed_capacity': 'specific_replacement_costs_of_installed_capacity',
+    'specific_replacement_costs_of_optimized_capacity': 'specific_replacement_costs_of_optimized_capacity',
+    'asset_type': 'type_asset',
+    "capex_fix": "development_costs",
+    "capex_var": "specific_costs",
+    "opex_fix": "specific_costs_om",
+    "opex_var": "dispatch_price",
+    "discount": "discount_factor",
+    "duration": "project_duration"
+}

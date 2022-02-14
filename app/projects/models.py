@@ -4,8 +4,11 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.conf import settings
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
+from datetime import timedelta
+from django.forms.models import model_to_dict
+from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
-from .constants import ASSET_CATEGORY, ASSET_TYPE, COUNTRY, CURRENCY, ENERGY_VECTOR, FLOW_DIRECTION, MVS_TYPE, SIMULATION_STATUS, TRUE_FALSE_CHOICES, USER_RATING
+from .constants import ASSET_CATEGORY, ASSET_TYPE, COUNTRY, CURRENCY, ENERGY_VECTOR, FLOW_DIRECTION, MVS_TYPE, SIMULATION_STATUS, TRUE_FALSE_CHOICES, BOOL_CHOICES, USER_RATING
 
 
 
@@ -41,6 +44,14 @@ class Project(models.Model):
     def __str__(self):
         return self.name
 
+    def get_scenarios_with_results(self):
+        return self.scenario_set.filter(simulation__isnull=False).filter(simulation__results__isnull=False)
+
+    def export(self, scenarios_data=[]):
+        dm = model_to_dict(self, exclude=["id", "user", "viewers"])
+        dm["economic_data"] = model_to_dict(self.economic_data, exclude=["id"])
+        return dm
+
 
 class Comment(models.Model):
     name = models.CharField(max_length=60)
@@ -66,15 +77,81 @@ class Scenario(models.Model):
     def __str__(self):
         return self.name
 
+    def get_timestamps(self, json_format=False):
+        answer = []
+
+        n_occurence_per_day = int((24 * 60)/self.time_step)
+
+        for i in range(self.evaluated_period):
+            for j in range(n_occurence_per_day):
+                iter_date = self.start_date + timedelta(days=i+1, minutes=self.time_step * (j + 1))
+                if json_format is True:
+                    iter_date = iter_date.isoformat().replace("T"," ")
+                answer.append(iter_date)
+        return answer
+
+    def get_currency(self):
+        return self.project.economic_data.currency
+
+    def export(self, bind_project_data=False):
+        """
+        Parameters
+        ----------
+        bind_project_data : bool
+            when True, the project data is saved along the scenario data
+            Default: False.
+        ...
+        Returns
+        -------
+        A dict with the parameters describing a scenario model
+        """
+        dm = model_to_dict(self, exclude=["id"])
+        dm["start_date"] = str(dm["start_date"])
+        if bind_project_data is True:
+            dm["project"] = self.project.export()
+        else:
+            dm.pop("project")
+
+        energy_model_assets = self.asset_set.all()
+        dm["assets"] = []
+        for asset in energy_model_assets:
+            dm["assets"].append(asset.export())
+
+        clinks = self.connectionlink_set.all()
+        bus_ids = list(set(clinks.values_list("bus", flat=True)))
+        busses = []
+        for bus_id in bus_ids:
+            bus = Bus.objects.get(id=bus_id)
+            bus_data = model_to_dict(bus, exclude=["id", "parent_asset", "scenario"])
+            bus_data["inputs"] = []
+            bus_data["outputs"] = []
+            for connection in bus.connectionlink_set.all():
+                if connection.flow_direction == "A2B":
+                    bus_data["inputs"].append(connection.export())
+                elif connection.flow_direction == "B2A":
+                    bus_data["outputs"].append(connection.export())
+            busses.append(bus_data)
+        dm["busses"] = busses
+        return dm
+
 
 class AssetType(models.Model):
     asset_type = models.CharField(max_length=30, choices=ASSET_TYPE, null=False, unique=True)
     asset_category = models.CharField(max_length=30, choices=ASSET_CATEGORY)
     energy_vector = models.CharField(max_length=20, choices=ENERGY_VECTOR)
     mvs_type = models.CharField(max_length=20, choices=MVS_TYPE)
+    # TODO Could be listCharField ...
     asset_fields = models.TextField(null=True)
     unit = models.CharField(max_length=30, null=True)
 
+    def export(self):
+        """
+        Returns
+        -------
+        A dict with the parameters describing an asset type model
+        """
+        dm = model_to_dict(self, exclude=["id"])
+        return dm
 
 class TopologyNode(models.Model):
     name = models.CharField(max_length=60, null=False, blank=False)
@@ -125,9 +202,38 @@ class Asset(TopologyNode):
     def fields(self):
         return [f.name for f in self._meta.fields + self._meta.many_to_many]
 
+    @property
+    def timestamps(self):
+        return self.scenario.get_timestamps()
+
+    @property
+    def input_timeseries_values(self):
+        if self.is_input_timeseries_empty() is False:
+            answer = json.loads(self.input_timeseries)
+        else:
+            answer = []
+        return answer
+
+    def export(self):
+        """
+        Returns
+        -------
+        A dict with the parameters describing an asset model
+        """
+
+        fields = self.asset_type.asset_fields.replace("[", "").replace("]", "").split(",")
+        fields += ["name", "pos_x", "pos_y"]
+        dm = model_to_dict(self, fields=fields)
+        dm["asset_info"] = self.asset_type.export()
+        return dm
+
+    def is_input_timeseries_empty(self):
+        return self.input_timeseries == ''
 
 class Bus(TopologyNode):
+    # TODO name field?
     type = models.CharField(max_length=20, choices=ENERGY_VECTOR)
+    # TODO now these parameters are useless ...
     input_ports = models.IntegerField(null=False, default=1)
     output_ports = models.IntegerField(null=False, default=1)
 
@@ -139,6 +245,42 @@ class ConnectionLink(models.Model):
     flow_direction = models.CharField(max_length=15, choices=FLOW_DIRECTION, null=False)
     scenario = models.ForeignKey(Scenario, on_delete=models.CASCADE, null=False)
 
+    def export(self):
+        """
+        Returns
+        -------
+        A dict with the parameters describing a connectionlink model
+        """
+        dm = model_to_dict(self, exclude=["id", "scenario", "bus"])
+        dm["asset"] = self.asset.name
+        return dm
+
+class Constraint(models.Model):
+    scenario = models.ForeignKey(Scenario, on_delete=models.CASCADE, null=False)
+    activated = models.BooleanField(null=True, blank=False, choices=BOOL_CHOICES, default=False)
+
+    class Meta:
+        abstract = True
+
+class MinRenewableConstraint(Constraint):
+    value = models.FloatField(null=False, blank=False, validators=[MinValueValidator(0.0), MaxValueValidator(1.0)], default=0.2)
+    unit = models.CharField(max_length=6, default='factor', editable=False)
+    name = models.CharField(max_length=30, default='minimal_renewable_factor', editable=False)
+
+class MaxEmissionConstraint(Constraint):
+    value = models.FloatField(null=False, blank=False, validators=[MinValueValidator(0.0)], default=0.0)
+    unit = models.CharField(max_length=9, default='kgCO2eq/a', editable=False)
+    name = models.CharField(max_length=30, default='maximum_emissions', editable=False)
+
+class MinDOAConstraint(Constraint):
+    value = models.FloatField(null=False, blank=False, validators=[MinValueValidator(0.0), MaxValueValidator(1.0)], default=0.3)
+    unit = models.CharField(max_length=6, default='factor', editable=False)
+    name = models.CharField(max_length=30, default='minimal_degree_of_autonomy', editable=False)
+
+class NZEConstraint(Constraint):
+    value = models.BooleanField(null=True, blank=False, choices=BOOL_CHOICES, default=False)
+    unit = models.CharField(max_length=4, default='bool', editable=False)
+    name = models.CharField(max_length=30, default='net_zero_energy', editable=False)
 
 class ScenarioFile(models.Model):
     title = models.CharField(max_length=50)

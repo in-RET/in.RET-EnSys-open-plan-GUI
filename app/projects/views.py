@@ -889,14 +889,6 @@ def scenario_delete(request, scen_id):
         )
 
 
-# class LoadScenarioFromFileView(BSModalCreateView):
-#     template_name = 'scenario/load_scenario_from_file.html'
-#     form_class = LoadScenarioFromFileForm
-#     success_message = 'Success: Scenario Uploaded.'
-
-#     def get_success_url(self):
-#         proj_id = self.kwargs['proj_id']
-#         return reverse_lazy('scenario_search', args=[proj_id])
 
 # endregion Scenario
 

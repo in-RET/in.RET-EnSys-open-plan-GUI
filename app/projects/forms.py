@@ -507,10 +507,7 @@ class BusForm(OpenPlanModelForm):
                 },
             ),
         }
-        labels = {
-            "name": _("Name"),
-            "type": _("Energy carrier"),
-        }
+        labels = {"name": _("Name"), "type": _("Energy carrier")}
 
 
 def parse_csv_timeseries(file_str):

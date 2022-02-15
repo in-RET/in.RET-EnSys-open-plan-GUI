@@ -9,12 +9,7 @@ from .models import CustomUser
 class CustomUserCreationForm(UserCreationForm):
 
     email = forms.CharField(
-        required=True,
-        widget=forms.TextInput(
-            attrs={
-                "placeholder": "name@example.com",
-            }
-        ),
+        required=True, widget=forms.TextInput(attrs={"placeholder": "name@example.com"})
     )
 
     class Meta:

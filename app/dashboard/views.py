@@ -983,11 +983,7 @@ def download_timeseries_results(request, scen_id):
         output = BytesIO()
         workbook = xlsxwriter.Workbook(output)
         merge_format = workbook.add_format(
-            {
-                "bold": True,
-                "align": "center",
-                "valign": "vcenter",
-            }
+            {"bold": True, "align": "center", "valign": "vcenter"}
         )
 
         KEY1, KEY2, KEY3, KEY4 = (

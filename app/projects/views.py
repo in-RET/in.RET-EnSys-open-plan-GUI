@@ -889,7 +889,6 @@ def scenario_delete(request, scen_id):
         )
 
 
-
 # endregion Scenario
 
 

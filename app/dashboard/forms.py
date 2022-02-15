@@ -2,10 +2,7 @@ from crispy_forms.helper import FormHelper
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.forms import ModelForm
-from dashboard.models import (
-    ReportItem,
-    AssetsResults,
-)
+from dashboard.models import ReportItem, AssetsResults
 
 
 from dashboard.helpers import (
@@ -51,10 +48,7 @@ class TimeseriesGraphForm(forms.Form):
     energy_vector = forms.MultipleChoiceField(
         label=_("Energy vector"), choices=ENERGY_VECTOR, initial=ENERGY_VECTOR[1][0]
     )
-    y = forms.MultipleChoiceField(
-        label=_("Timeseries variable(s)"),
-        choices=tuple(),
-    )
+    y = forms.MultipleChoiceField(label=_("Timeseries variable(s)"), choices=tuple())
 
     def __init__(self, *args, **kwargs):
         scen_ids = kwargs.pop("scenario_ids", None)

@@ -260,10 +260,7 @@ TRUE_FALSE_CHOICES = ((None, "Choose"), (True, "Yes"), (False, "No"))
 
 BOOL_CHOICES = ((True, "Yes"), (False, "No"))
 
-FLOW_DIRECTION = (
-    ("B2A", "Bus_to_Asset"),
-    ("A2B", "Asset_to_Bus"),
-)
+FLOW_DIRECTION = (("B2A", "Bus_to_Asset"), ("A2B", "Asset_to_Bus"))
 
 ENERGY_VECTOR = (
     ("", "Choose..."),
@@ -378,13 +375,7 @@ SIMULATION_STATUS = (
     (MODIFIED, MODIFIED),
 )
 
-USER_RATING = (
-    (1, "1"),
-    (2, "2"),
-    (3, "3"),
-    (4, "4"),
-    (5, "5"),
-)
+USER_RATING = ((1, "1"), (2, "2"), (3, "3"), (4, "4"), (5, "5"))
 
 MAP_EPA_MVS = {
     "economic_data": "economic_data",

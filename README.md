@@ -8,14 +8,14 @@ This code is based from previous open-source work done building a user interface
 
 ## Basic structure
 
-This repository contains the code for the user interface. The simulations are performed by [multi-vector-simulator](https://github.com/rl-institut/multi-vector-simulator) on a dedicated server (see this [repository](https://github.com/rl-institut/mvs_eland_api/tree/open_plan/simulation-server) for the time being, in the future the code will be hosted on [open-plan-tool/simulation-server](https://github.com/open-plan-tool/simulation-server) repository). Once a simulation is over the results are sent back to the user interface were one can analyse them.
+This repository contains the code for the user interface. The simulations are performed by [multi-vector-simulator](https://github.com/rl-institut/multi-vector-simulator) on a dedicated server (see the [open-plan-tool/simulation-server](https://github.com/open-plan-tool/simulation-server) repository). Once a simulation is over the results are sent back to the user interface were one can analyse them.
 
 
 # Getting Started
 
 ## Deploy using Docker Compose - use of MVS web API
 The following commands should get everything up and running, utilzing the web based version of the MVS API.
-1. `git clone --single-branch --branch main https://github.com/open-plan-tool/epa-renamed.git`
+1. `git clone --single-branch --branch main https://github.com/open-plan-tool/gui.git`
 2. cd inside the created folder
 4. `docker-compose up -d --build`
 5. `docker-compose exec app sh setup.sh` (this will also load a default testUser account with sample scenario).

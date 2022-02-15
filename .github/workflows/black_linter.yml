@@ -1,8 +1,12 @@
 name: Linter
 
-on: push
-  paths-ignore:
-  - 'README.md'
+on: 
+  push:
+      paths-ignore:
+      - 'README.md'
+  pull_request:
+    branches: 
+      -main
 
 jobs:
   build:

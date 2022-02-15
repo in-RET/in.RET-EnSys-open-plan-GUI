@@ -390,7 +390,7 @@ GRAPH_PARAMETERS_RENDERED_JSON = {
                 scenario_timeseries=[single_timeseries_to_json()]
             )
         ]
-    ),
+    )
 }
 
 # Used to proof the text sent back by the html form before saving it to the database

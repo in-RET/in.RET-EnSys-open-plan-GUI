@@ -84,9 +84,9 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-            ],
+            ]
         },
-    },
+    }
 ]
 
 WSGI_APPLICATION = "epa.wsgi.application"
@@ -121,17 +121,11 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
     },
-    {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
-    },
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
 # Internationalization
@@ -141,10 +135,7 @@ LANGUAGE_CODE = "en-us"
 
 LOCALE_PATHS = (os.path.join(BASE_DIR, "locale"),)
 
-LANGUAGES = [
-    ("de", "German"),
-    ("en", "English"),
-]
+LANGUAGES = [("de", "German"), ("en", "English")]
 
 TIME_ZONE = "UTC"
 
@@ -184,12 +175,7 @@ MESSAGE_TAGS = {
 USE_PROXY = ast.literal_eval(os.getenv("USE_PROXY", "True"))
 PROXY_ADDRESS_LINK = os.getenv("PROXY_ADDRESS", "http://proxy:port")
 PROXY_CONFIG = (
-    (
-        {
-            "http://": PROXY_ADDRESS_LINK,
-            "https://": PROXY_ADDRESS_LINK,
-        }
-    )
+    ({"http://": PROXY_ADDRESS_LINK, "https://": PROXY_ADDRESS_LINK})
     if USE_PROXY
     else ({})
 )
@@ -237,7 +223,7 @@ LOGGING = {
             "handlers": ["info_file", "warnings_file", "console"],
             "level": "DEBUG",
             "propagate": True,
-        },
+        }
     },
 }
 

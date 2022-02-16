@@ -361,9 +361,15 @@ class ReportItem(models.Model):
                     asset_timeseries = assets_results_obj.available_timeseries
                     for y_var in y_variables:
                         if y_var in asset_timeseries:
-                            y_values.append(
-                                assets_results_obj.single_asset_timeseries(y_var)
+                            single_ts_json = assets_results_obj.single_asset_timeseries(
+                                y_var
                             )
+                            single_ts_json["fill"] = (
+                                "none"
+                                if single_ts_json["asset_type"] == "sink"
+                                else "tonexty"
+                            )
+                            y_values.append(single_ts_json)
                     simulations_results.append(
                         simulation_timeseries_to_json(
                             scenario_name=simulation.scenario.name,

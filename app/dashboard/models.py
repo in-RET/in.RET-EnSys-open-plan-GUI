@@ -348,6 +348,32 @@ class ReportItem(models.Model):
                     )
                 return simulations_results
 
+        if self.report_type == GRAPH_TIMESERIES_STACKED:
+            y_variables = parameters.get("y", None)
+            if y_variables is not None:
+                simulations_results = []
+
+                for simulation in self.simulations.all():
+                    y_values = []
+                    assets_results_obj = AssetsResults.objects.get(
+                        simulation=simulation
+                    )
+                    asset_timeseries = assets_results_obj.available_timeseries
+                    for y_var in y_variables:
+                        if y_var in asset_timeseries:
+                            y_values.append(
+                                assets_results_obj.single_asset_timeseries(y_var)
+                            )
+                    simulations_results.append(
+                        simulation_timeseries_to_json(
+                            scenario_name=simulation.scenario.name,
+                            scenario_id=simulation.scenario.id,
+                            scenario_timeseries=y_values,
+                            scenario_timestamps=simulation.scenario.get_timestamps(),
+                        )
+                    )
+                return simulations_results
+
     @property
     def render_json(self):
         return report_item_render_to_json(

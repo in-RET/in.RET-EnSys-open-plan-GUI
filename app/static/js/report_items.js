@@ -80,7 +80,12 @@ function addTimeseriesGraph(graphId, parameters){
     parameters.data.forEach(scenario => {
         scenario.timeseries.forEach(timeseries => {
             // todo provide a function to format the name of the timeseries
-            data.push({x: scenario.timestamps, y: timeseries.value, name:scenario.scenario_name + timeseries.label + timeseries.unit, type: 'scatter', line: {shape: 'hv'},})
+            data.push({x: scenario.timestamps,
+                y: timeseries.value,
+                name:scenario.scenario_name + timeseries.label + timeseries.unit,
+                type: 'scatter',
+                line: {shape: 'hv'},
+            })
         });
     });
     // prepare graph layout in plotly format
@@ -104,7 +109,15 @@ function addStackedTimeseriesGraph(graphId, parameters){
     parameters.data.forEach(scenario => {
         scenario.timeseries.forEach(timeseries => {
             // todo provide a function to format the name of the timeseries
-            data.push({x: scenario.timestamps, y: timeseries.value, name:scenario.scenario_name + timeseries.label + timeseries.unit, type: 'scatter', line: {shape: 'hv'},})
+            console.log(timeseries.fill)
+            data.push({x: scenario.timestamps,
+                y: timeseries.value,
+                name:scenario.scenario_name + timeseries.label + timeseries.unit,
+                type: 'scatter',
+                line: {shape: 'hv'},
+                stackgroup: timeseries.asset_type,
+                fill: timeseries.fill
+            })
         });
     });
     // prepare graph layout in plotly format

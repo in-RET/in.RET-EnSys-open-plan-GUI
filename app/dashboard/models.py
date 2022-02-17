@@ -348,6 +348,38 @@ class ReportItem(models.Model):
                     )
                 return simulations_results
 
+        if self.report_type == GRAPH_TIMESERIES_STACKED:
+            y_variables = parameters.get("y", None)
+            if y_variables is not None:
+                simulations_results = []
+
+                for simulation in self.simulations.all():
+                    y_values = []
+                    assets_results_obj = AssetsResults.objects.get(
+                        simulation=simulation
+                    )
+                    asset_timeseries = assets_results_obj.available_timeseries
+                    for y_var in y_variables:
+                        if y_var in asset_timeseries:
+                            single_ts_json = assets_results_obj.single_asset_timeseries(
+                                y_var
+                            )
+                            single_ts_json["fill"] = (
+                                "none"
+                                if single_ts_json["asset_type"] == "sink"
+                                else "tonexty"
+                            )
+                            y_values.append(single_ts_json)
+                    simulations_results.append(
+                        simulation_timeseries_to_json(
+                            scenario_name=simulation.scenario.name,
+                            scenario_id=simulation.scenario.id,
+                            scenario_timeseries=y_values,
+                            scenario_timestamps=simulation.scenario.get_timestamps(),
+                        )
+                    )
+                return simulations_results
+
     @property
     def render_json(self):
         return report_item_render_to_json(

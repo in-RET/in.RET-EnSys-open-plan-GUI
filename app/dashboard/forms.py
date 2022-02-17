@@ -71,7 +71,7 @@ class TimeseriesGraphForm(forms.Form):
 
 
 class StackedTimeseriesGraphForm(forms.Form):
-    energy_vector = forms.MultipleChoiceField(
+    energy_vector = forms.ChoiceField(
         label=_("Energy vector"), choices=ENERGY_VECTOR, initial=ENERGY_VECTOR[1][0]
     )
     y = forms.MultipleChoiceField(label=_("Timeseries variable(s)"), choices=tuple())

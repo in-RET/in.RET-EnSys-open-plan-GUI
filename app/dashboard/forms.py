@@ -70,11 +70,38 @@ class TimeseriesGraphForm(forms.Form):
             self.fields["y"].choices = tuple(choices)
 
 
+class StackedTimeseriesGraphForm(forms.Form):
+    energy_vector = forms.ChoiceField(
+        label=_("Energy vector"), choices=ENERGY_VECTOR, initial=ENERGY_VECTOR[1][0]
+    )
+    y = forms.MultipleChoiceField(label=_("Timeseries variable(s)"), choices=tuple())
+
+    def __init__(self, *args, **kwargs):
+        scen_ids = kwargs.pop("scenario_ids", None)
+        super().__init__(*args, **kwargs)
+
+        if scen_ids is not None:
+            # list available assets parameters for each simulations
+            assets_results_across_simulations = AssetsResults.objects.filter(
+                simulation__scenario__id__in=scen_ids
+            )
+            choices = None
+            for assets_results in assets_results_across_simulations:
+                new_choices = [(n, n) for n in assets_results.available_timeseries]
+                if choices is None:
+                    choices = set(new_choices)
+                else:
+                    choices = choices.intersection(new_choices)
+
+            self.fields["y"].choices = tuple(choices)
+
+
 def graph_parameters_form_factory(report_type, *args, **kwargs):
     """Linked to dashboard/models.py:ReportItem.fetch_parameters_values"""
     if report_type == GRAPH_TIMESERIES:
         answer = TimeseriesGraphForm(*args, **kwargs)
-    # GRAPH_TIMESERIES_STACKED,
+    if report_type == GRAPH_TIMESERIES_STACKED:
+        answer = StackedTimeseriesGraphForm(*args, **kwargs)
     # GRAPH_CAPACITIES,
     # GRAPH_BAR,
     # GRAPH_PIE,

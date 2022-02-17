@@ -374,6 +374,10 @@ def report_item_render_to_json(
     if report_item_type == GRAPH_TIMESERIES:
         answer["x_label"] = _("Time")
         answer["y_label"] = _("Energie")
+
+    if report_item_type == GRAPH_TIMESERIES_STACKED:
+        answer["x_label"] = _("Time")
+        answer["y_label"] = _("Energie")
     return answer
 
 
@@ -414,7 +418,20 @@ GRAPH_PARAMETERS_SCHEMAS = {
         },
         "additionalProperties": False,
     },
-    GRAPH_TIMESERIES_STACKED: {},
+    GRAPH_TIMESERIES_STACKED: {
+        "type": "object",
+        "required": ["y", "energy_vector"],
+        "properties": {
+            "y": {
+                "oneOf": [
+                    {"type": "string"},
+                    {"type": "array", "items": {"type": "string"}},
+                ]
+            },
+            "energy_vector": {"type": "string"},
+        },
+        "additionalProperties": False,
+    },
     GRAPH_CAPACITIES: {},
     GRAPH_BAR: {},
     GRAPH_PIE: {},

@@ -428,9 +428,7 @@ GRAPH_PARAMETERS_SCHEMAS = {
                     {"type": "array", "items": {"type": "string"}},
                 ]
             },
-            "energy_vector": {
-                "type": "string"
-            },
+            "energy_vector": {"type": "string"},
         },
         "additionalProperties": False,
     },

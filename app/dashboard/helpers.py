@@ -429,10 +429,7 @@ GRAPH_PARAMETERS_SCHEMAS = {
                 ]
             },
             "energy_vector": {
-                "oneOf": [
-                    {"type": "string"},
-                    {"type": "array", "items": {"type": "string"}},
-                ]
+                "type": "string"
             },
         },
         "additionalProperties": False,

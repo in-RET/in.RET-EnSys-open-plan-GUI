@@ -47,15 +47,15 @@ insert into projects_assettype(asset_type, energy_vector, asset_category, mvs_ty
 
 -- Production
 insert into projects_assettype(asset_type, energy_vector, asset_category, mvs_type, asset_fields, unit) values
-('pv_plant','Electricity', 'energy_production', 'source', '[name,age_installed,installed_capacity,capex_fix,capex_var,opex_fix,opex_var,lifetime,optimize_cap, renewable_asset, input_timeseries]', 'kWh' );
+('pv_plant','Electricity', 'energy_production', 'source', '[name,age_installed,installed_capacity,capex_fix,capex_var,opex_fix,opex_var,lifetime,optimize_cap,renewable_asset,input_timeseries]', 'kWh' );
 insert into projects_assettype(asset_type, energy_vector, asset_category, mvs_type, asset_fields, unit) values
-('wind_plant','Electricity', 'energy_production', 'source', '[name,age_installed,installed_capacity,capex_fix,capex_var,opex_fix,opex_var,lifetime,optimize_cap, renewable_asset, input_timeseries]', 'kWh' );
+('wind_plant','Electricity', 'energy_production', 'source', '[name,age_installed,installed_capacity,capex_fix,capex_var,opex_fix,opex_var,lifetime,optimize_cap,renewable_asset,input_timeseries]', 'kWh' );
 insert into projects_assettype(asset_type, energy_vector, asset_category, mvs_type, asset_fields, unit) values
-('biogas_plant','Gas', 'energy_production', 'source', '[name,age_installed,installed_capacity,capex_fix,capex_var,opex_fix,opex_var,lifetime,optimize_cap, renewable_asset, input_timeseries]', null );
+('biogas_plant','Gas', 'energy_production', 'source', '[name,age_installed,installed_capacity,capex_fix,capex_var,opex_fix,opex_var,lifetime,optimize_cap,renewable_asset,input_timeseries]', null );
 insert into projects_assettype(asset_type, energy_vector, asset_category, mvs_type, asset_fields, unit) values
-('geothermal_conversion','Electricity', 'energy_production', 'source', '[name,age_installed,installed_capacity,capex_fix,capex_var,opex_fix,opex_var,lifetime,optimize_cap, renewable_asset, input_timeseries]', 'kWh' );
+('geothermal_conversion','Electricity', 'energy_production', 'source', '[name,age_installed,installed_capacity,capex_fix,capex_var,opex_fix,opex_var,lifetime,optimize_cap,renewable_asset,input_timeseries]', 'kWh' );
 insert into projects_assettype(asset_type, energy_vector, asset_category, mvs_type, asset_fields, unit) values
-('solar_thermal_plant','Heat', 'energy_production', 'source', '[name,age_installed,installed_capacity,capex_fix,capex_var,opex_fix,opex_var,lifetime,optimize_cap, renewable_asset, input_timeseries]', null );
+('solar_thermal_plant','Heat', 'energy_production', 'source', '[name,age_installed,installed_capacity,capex_fix,capex_var,opex_fix,opex_var,lifetime,optimize_cap,renewable_asset,input_timeseries]', null );
 
 -- Battery Energy Storage System
 insert into projects_assettype(asset_type, energy_vector, asset_category, mvs_type, asset_fields, unit) values

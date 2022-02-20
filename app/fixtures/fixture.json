@@ -241,7 +241,7 @@
         "asset_category": "energy_production",
         "energy_vector": "Electricity",
         "mvs_type": "source",
-        "asset_fields": "[name,age_installed,installed_capacity,capex_fix,capex_var,opex_fix,opex_var,lifetime,optimize_cap, renewable_asset, input_timeseries]",
+        "asset_fields": "[name,age_installed,installed_capacity,capex_fix,capex_var,opex_fix,opex_var,lifetime,optimize_cap,renewable_asset,input_timeseries]",
         "unit": "kWh"
     }
 },
@@ -253,7 +253,7 @@
         "asset_category": "energy_production",
         "energy_vector": "Electricity",
         "mvs_type": "source",
-        "asset_fields": "[name,age_installed,installed_capacity,capex_fix,capex_var,opex_fix,opex_var,lifetime,optimize_cap, renewable_asset, input_timeseries]",
+        "asset_fields": "[name,age_installed,installed_capacity,capex_fix,capex_var,opex_fix,opex_var,lifetime,optimize_cap,renewable_asset,input_timeseries]",
         "unit": "kWh"
     }
 },
@@ -265,7 +265,7 @@
         "asset_category": "energy_production",
         "energy_vector": "Gas",
         "mvs_type": "source",
-        "asset_fields": "[name,age_installed,installed_capacity,capex_fix,capex_var,opex_fix,opex_var,lifetime,optimize_cap, renewable_asset, input_timeseries]",
+        "asset_fields": "[name,age_installed,installed_capacity,capex_fix,capex_var,opex_fix,opex_var,lifetime,optimize_cap,renewable_asset,input_timeseries]",
         "unit": null
     }
 },
@@ -277,7 +277,7 @@
         "asset_category": "energy_production",
         "energy_vector": "Electricity",
         "mvs_type": "source",
-        "asset_fields": "[name,age_installed,installed_capacity,capex_fix,capex_var,opex_fix,opex_var,lifetime,optimize_cap, renewable_asset, input_timeseries]",
+        "asset_fields": "[name,age_installed,installed_capacity,capex_fix,capex_var,opex_fix,opex_var,lifetime,optimize_cap,renewable_asset,input_timeseries]",
         "unit": "kWh"
     }
 },
@@ -289,7 +289,7 @@
         "asset_category": "energy_production",
         "energy_vector": "Heat",
         "mvs_type": "source",
-        "asset_fields": "[name,age_installed,installed_capacity,capex_fix,capex_var,opex_fix,opex_var,lifetime,optimize_cap, renewable_asset, input_timeseries]",
+        "asset_fields": "[name,age_installed,installed_capacity,capex_fix,capex_var,opex_fix,opex_var,lifetime,optimize_cap,renewable_asset,input_timeseries]",
         "unit": null
     }
 },

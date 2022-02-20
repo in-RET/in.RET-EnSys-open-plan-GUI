@@ -38,6 +38,7 @@ from dashboard.models import (
     get_project_sensitivity_analysis_graphs,
     REPORT_GRAPHS,
 )
+from projects.scenario_topology_helpers import load_scenario_topology_from_db
 from dashboard.forms import (
     ReportItemForm,
     TimeseriesGraphForm,
@@ -278,6 +279,8 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
 
                 update_selected_scenarios_in_cache(request, proj_id, scen_id)
 
+                topology_data_list = load_scenario_topology_from_db(scen_id)
+
                 answer = render(
                     request,
                     "report/single_scenario.html",
@@ -290,6 +293,7 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
                         "report_items_data": report_items_data,
                         "kpi_list": KPI_PARAMETERS,
                         "table_styles": TABLES,
+                        "topology_data_list": json.dumps(topology_data_list),
                     },
                 )
 

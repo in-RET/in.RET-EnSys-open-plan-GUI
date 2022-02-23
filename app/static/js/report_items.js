@@ -109,7 +109,6 @@ function addStackedTimeseriesGraph(graphId, parameters){
     parameters.data.forEach(scenario => {
         scenario.timeseries.forEach(timeseries => {
             // todo provide a function to format the name of the timeseries
-            console.log(timeseries.fill)
             data.push({x: scenario.timestamps,
                 y: timeseries.value,
                 name:scenario.scenario_name + timeseries.label + timeseries.unit,

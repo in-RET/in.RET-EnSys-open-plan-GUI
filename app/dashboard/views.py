@@ -821,28 +821,29 @@ def scenario_visualize_stacked_optimized_capacities(request, scen_id):
         kpi_scalar_matrix = results_dict["kpi"]["scalar_matrix"]
         assets_results_obj = AssetsResults.objects.get(simulation=scenario.simulation)
         assets_results_json = json.loads(assets_results_obj.assets_list)
-        asset_optimizeCap = dict()
+        asset_optimizeCap = []
         for asset, asset_list in assets_results_json.items():
             for asset_obj in asset_list:
-                asset_optimizeCap[asset_obj["label"]] = asset_obj["optimize_capacity"][
-                    "value"
-                ]
+                if asset_obj["optimize_capacity"]["value"]:
+                    asset_optimizeCap.append(asset_obj["label"])
+
 
         results_json = [
             {
                 "values": [
                     {
                         "x": ["Optimierte Kapazität"],
-                        "y": [asset_parameters["optimizedAddCap"]],
+                        "y": [kpi_scalar_matrix[asset]["optimizedAddCap"]],
                         "name": asset.replace("_", " ").upper()
                         + " in "
-                        + asset_parameters["unit"]
-                        if asset_parameters["unit"] != "?"
+                        + kpi_scalar_matrix[asset]["unit"]
+                        if kpi_scalar_matrix[asset]["unit"] != "?"
                         else asset.replace("_", " ").upper() + " in kW",
                         "type": "bar",
                     }
-                    for asset, asset_parameters in kpi_scalar_matrix.items()
-                    if asset_optimizeCap[asset] is True
+
+                    for asset in asset_optimizeCap
+                    if "consumption_period" not in asset
                 ],
                 "title": "Optimierte Kapazität",
                 "yaxistitle": "Leistung",

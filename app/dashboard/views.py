@@ -827,7 +827,6 @@ def scenario_visualize_stacked_optimized_capacities(request, scen_id):
                 if asset_obj["optimize_capacity"]["value"]:
                     asset_optimizeCap.append(asset_obj["label"])
 
-
         results_json = [
             {
                 "values": [
@@ -841,7 +840,6 @@ def scenario_visualize_stacked_optimized_capacities(request, scen_id):
                         else asset.replace("_", " ").upper() + " in kW",
                         "type": "bar",
                     }
-
                     for asset in asset_optimizeCap
                     if "consumption_period" not in asset
                 ],

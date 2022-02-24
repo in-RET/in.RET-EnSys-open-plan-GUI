@@ -53,10 +53,13 @@
                         </form>
                     {% endif %}
                 </div>
+                <div class="row">
+
+                    <a class="btn btn--medium" href="{% url 'sensitivity_analysis_create' scen_id %}" >{% translate "Perform a sensitivity analysis" %}</a>
+                </div>
             {% else %}
                 <div class="row">{% translate "You can now click on 'Run simulation' button" %}</div>
             {% endif %}
-
         </div>
     </section>
 

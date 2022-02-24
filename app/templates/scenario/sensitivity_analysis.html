@@ -1,0 +1,63 @@
+{% extends 'scenario/scenario_progression.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load custom_filters %}
+{% load i18n %}
+
+{% block head_block %}
+<style>
+.highlight {
+  background-color: blue;
+}
+</style>
+{% endblock head_block %}
+
+<!-- WRITE HTML CODE WITHIN THESE block content TAGS -->
+{% block progression_content %}
+
+
+
+<main>
+
+    <section class="dashboard">
+        <div>
+
+            {% if simulation_status %}
+
+            {% else %}
+                <div class="row">{% translate "There is no simulation_status" %}</div>
+            {% endif %}
+                <div class="row">
+                    <form id="sensitivity_analysis_create" method="POST" action="{% url 'sensitivity_analysis_run' scen_id %}">
+                        {% csrf_token %}
+                        {{ sa_form|crispy }}
+                    <button type="submit" id="submit_constraints_btn">{% translate "Run sensitivity analysis" %}</button>
+                    </form>
+                </div>
+        </div>
+    </section>
+
+
+</main>
+
+
+
+{% endblock progression_content %}
+
+
+{% block end_body_scripts %}
+<script>
+
+</script>
+
+{% endblock end_body_scripts %}
+
+{% block footer %}
+<div class="step-footer">
+
+    <div>
+        <a class="btn btn--medium btn--hollow btn--previous" href="{% url 'scenario_steps_edit' proj_id scen_id 4 %}" aria-disabled="true">{% translate "Previous" %}</a>
+
+    </div>
+</div>
+{% endblock footer %}

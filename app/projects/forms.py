@@ -23,6 +23,8 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from projects.models import *
 from projects.constants import MAP_EPA_MVS, RENEWABLE_ASSETS
 
+from dashboard.helpers import KPI_PARAMETERS_ASSETS
+
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings as django_settings
 
@@ -36,7 +38,11 @@ if os.path.exists(staticfiles_storage.path("MVS_parameters_list.csv")) is True:
                 label_idx = hdr.index("label")
             else:
                 label = row[label_idx]
-                PARAMETERS[label] = {k: v for k, v in zip(hdr, row)}
+                PARAMETERS[label] = {}
+                for k, v in zip(hdr, row):
+                    if k == "sensitivity_analysis":
+                        v = bool(int(v))
+                    PARAMETERS[label][k] = v
 
 
 def gettext_variables(some_string, lang="de"):
@@ -71,7 +77,7 @@ def set_parameter_info(param_name, field, parameters=PARAMETERS):
     verbose = None
     default_value = None
     if param_name in PARAMETERS:
-        help_text = PARAMETERS[param_name][":Definition:"]
+        help_text = PARAMETERS[param_name][":Definition_Short:"]
         unit = PARAMETERS[param_name][":Unit:"]
         verbose = PARAMETERS[param_name]["verbose"]
         default_value = PARAMETERS[param_name][":Default:"]
@@ -479,6 +485,54 @@ class NZEConstraintForm(OpenPlanModelForm):
     class Meta:
         model = NZEConstraint
         exclude = ["scenario", "value"]
+
+
+class SensitivityAnalysisForm(ModelForm):
+    output_parameters_names = forms.MultipleChoiceField(
+        choices=[
+            (v, _(KPI_PARAMETERS_ASSETS[v]["verbose"])) for v in KPI_PARAMETERS_ASSETS
+        ]
+    )
+
+    class Meta:
+        model = SensitivityAnalysis
+        fields = [
+            "variable_name",
+            "variable_min",
+            "variable_max",
+            "variable_step",
+            "variable_reference",
+            "output_parameters_names",
+        ]
+
+    def __init__(self, *args, **kwargs):
+        scen_id = kwargs.pop("scen_id", None)
+        super().__init__(*args, **kwargs)
+
+        forbidden_parameters_for_sa = ("name", "input_timeseries")
+
+        if scen_id is not None:
+            scenario = Scenario.objects.get(id=scen_id)
+            asset_parameters = []
+            for asset in scenario.asset_set.all():
+                asset_parameters += [
+                    (f"{asset.name}.{p}", _(p) + f" ({asset.name})")
+                    for p in asset.visible_fields
+                    if p not in forbidden_parameters_for_sa
+                ]
+            self.fields["variable_name"] = forms.ChoiceField(choices=asset_parameters)
+            # self.fields["output_parameters_names"] = forms.MultipleChoiceField(choices = [(v, _(KPI_PARAMETERS_ASSETS[v]["verbose"])) for v in KPI_PARAMETERS_ASSETS])
+            # TODO restrict possible parameters here
+            self.fields["output_parameters_names"].choices = [
+                (v, _(KPI_PARAMETERS_ASSETS[v]["verbose"]))
+                for v in KPI_PARAMETERS_ASSETS
+            ]
+
+    def clean_output_parameters_names(self):
+        """method which gets called upon form validation"""
+        data = self.cleaned_data["output_parameters_names"]
+        data_js = json.dumps(data)
+        return data_js
 
 
 class BusForm(OpenPlanModelForm):

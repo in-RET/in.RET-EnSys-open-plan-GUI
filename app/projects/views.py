@@ -16,7 +16,7 @@ from crispy_forms.templatetags import crispy_forms_filters
 from datetime import datetime
 from users.models import CustomUser
 from django.db.models import Q
-from epa.settings import MVS_GET_URL, MVS_LP_FILE_URL
+from epa.settings import MVS_GET_URL, MVS_LP_FILE_URL, MVS_SA_GET_URL
 from .forms import *
 from .requests import (
     mvs_simulation_request,
@@ -906,6 +906,7 @@ def sensitivity_analysis_create(request, scen_id, sa_id=None, step_id=5):
             sa_item = get_object_or_404(SensitivityAnalysis, id=sa_id)
             sa_form = SensitivityAnalysisForm(scen_id=scen_id, instance=sa_item)
         else:
+            sa_item = None
             sa_form = SensitivityAnalysisForm(
                 scen_id=scen_id,
             )
@@ -921,7 +922,9 @@ def sensitivity_analysis_create(request, scen_id, sa_id=None, step_id=5):
                 "step_id": step_id,
                 "step_list": STEP_LIST + [_("Sensitivity analysis")],
                 "max_step": 5,
+                "MVS_SA_GET_URL": MVS_SA_GET_URL,
                 "sa_form": sa_form,
+                "sa_item": sa_item,
             },
         )
 
@@ -982,7 +985,7 @@ def sensitivity_analysis_create(request, scen_id, sa_id=None, step_id=5):
                 # create_or_delete_simulation_scheduler(mvs_token=sa_item.mvs_token)
 
             sa_item.elapsed_seconds = (datetime.now() - sa_item.start_date).seconds
-
+            sa_item.save()
             answer = HttpResponseRedirect(
                 reverse("sensitivity_analysis_review", args=[scen_id, sa_item.id])
             )

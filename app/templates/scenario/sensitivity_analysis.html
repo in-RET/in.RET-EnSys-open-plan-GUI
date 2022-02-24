@@ -22,11 +22,19 @@
     <section class="dashboard">
         <div>
 
-            {% if simulation_status %}
+            {% if sa_item %}
+                <div class="row">
+
+                    {% if sa_item.status != "MODIFIED" %}
+                    The simulation <a href="{{ MVS_SA_GET_URL }}{{ sa_item.mvs_token }}">{{ sa_item.mvs_token }}</a> has been started, its status is <span>{{ sa_item.status }}</span>
+                    {% else %}
+                    The parameters of the scenario linked to the simulation <a href="{{ MVS_GET_URL }}{{ mvs_token }}">{{ mvs_token }}</a> have been changed, you can rerun the simulation to update the results, please note that existing results will be erased only if the simulation does not have errors
+                    {% endif %}
+                </div>
+
 
             {% else %}
                 <div class="row">{% translate "There is no simulation_status" %}</div>
-            {% endif %}
                 <div class="row">
                     <form id="sensitivity_analysis_create" method="POST" action="{% url 'sensitivity_analysis_run' scen_id %}">
                         {% csrf_token %}
@@ -34,6 +42,8 @@
                     <button type="submit" id="submit_constraints_btn">{% translate "Run sensitivity analysis" %}</button>
                     </form>
                 </div>
+            {% endif %}
+
         </div>
     </section>
 

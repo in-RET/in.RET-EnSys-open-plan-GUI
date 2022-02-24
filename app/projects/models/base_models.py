@@ -1,7 +1,5 @@
 import uuid
 import json
-from django.core.validators import MinValueValidator, MaxValueValidator
-from django.utils.timezone import now
 from django.conf import settings
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -435,10 +433,3 @@ class AbstractSimulation(models.Model):
 
     class Meta:
         abstract = True
-
-
-class Simulation(AbstractSimulation):
-    scenario = models.OneToOneField(Scenario, on_delete=models.CASCADE, null=False)
-    user_rating = models.PositiveSmallIntegerField(
-        null=True, choices=USER_RATING, default=None
-    )

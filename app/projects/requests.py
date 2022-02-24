@@ -3,7 +3,7 @@ import httpx as requests
 import json
 
 # from requests.exceptions import HTTPError
-from epa.settings import PROXY_CONFIG, MVS_POST_URL, MVS_GET_URL
+from epa.settings import PROXY_CONFIG, MVS_POST_URL, MVS_GET_URL, MVS_SA_POST_URL
 from dashboard.models import AssetsResults, KPICostsMatrixResults, KPIScalarResults
 from projects.constants import DONE, PENDING, ERROR
 import logging
@@ -149,3 +149,30 @@ def parse_mvs_results(simulation, response_results):
             assets_list=json.dumps(data_subdict), simulation=simulation
         )
     return response_results
+
+
+def mvs_sensitivity_analysis_request(data: dict):
+
+    headers = {"content-type": "application/json"}
+    payload = json.dumps(data)
+
+    try:
+        response = requests.post(
+            MVS_SA_POST_URL,
+            data=payload,
+            headers=headers,
+            proxies=PROXY_CONFIG,
+            verify=False,
+        )
+
+        # If the response was successful, no Exception will be raised
+        response.raise_for_status()
+    except requests.HTTPError as http_err:
+        logger.error(f"HTTP error occurred: {http_err}")
+        return None
+    except Exception as err:
+        logger.error(f"Other error occurred: {err}")
+        return None
+    else:
+        logger.info("The simulation was sent successfully to MVS API.")
+        return json.loads(response.text)

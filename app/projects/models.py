@@ -421,15 +421,24 @@ class ScenarioFile(models.Model):
     file = models.FileField(upload_to="tempFiles/", null=True, blank=True)
 
 
-class Simulation(models.Model):
+class AbstractSimulation(models.Model):
+
     start_date = models.DateTimeField(auto_now_add=True, null=False)
     end_date = models.DateTimeField(null=True)
     elapsed_seconds = models.FloatField(null=True)
     mvs_token = models.CharField(max_length=200, null=True)
-    status = models.CharField(max_length=20, choices=SIMULATION_STATUS, null=False)
+    status = models.CharField(
+        max_length=20, choices=SIMULATION_STATUS, null=False, default=PENDING
+    )
+    results = models.TextField(null=True, max_length=30e6)
+    errors = models.TextField(null=True)
+
+    class Meta:
+        abstract = True
+
+
+class Simulation(AbstractSimulation):
     scenario = models.OneToOneField(Scenario, on_delete=models.CASCADE, null=False)
     user_rating = models.PositiveSmallIntegerField(
         null=True, choices=USER_RATING, default=None
     )
-    results = models.TextField(null=True, max_length=30e6)
-    errors = models.TextField(null=True)

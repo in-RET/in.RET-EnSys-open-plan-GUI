@@ -138,6 +138,27 @@ urlpatterns = [
         update_simulation_results,
         name="update_simulation_results",
     ),
+    # Sensitivity analysis
+    path(
+        "scenario/<int:scen_id>/sensitivity-analysis/create",
+        sensitivity_analysis_create,
+        name="sensitivity_analysis_create",
+    ),
+    path(
+        "scenario/<int:scen_id>/sensitivity-analysis/<int:sa_id>",
+        sensitivity_analysis_create,
+        name="sensitivity_analysis_review",
+    ),
+    path(
+        "scenario/<int:scen_id>/sensitivity-analysis/run",
+        sensitivity_analysis_create,
+        name="sensitivity_analysis_run",
+    ),
+    path(
+        "scenario/<int:scen_id>/sensitivity-analysis/error",
+        sensitivity_analysis_create,
+        name="sensitivity_analysis_error",
+    ),
     # User Feedback
     path("user_feedback", user_feedback, name="user_feedback"),
 ]

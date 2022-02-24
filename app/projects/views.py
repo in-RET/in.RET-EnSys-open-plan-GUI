@@ -33,9 +33,9 @@ from .scenario_topology_helpers import (
     update_deleted_objects_from_database,
     duplicate_scenario_objects,
     duplicate_scenario_connections,
-    get_topology_json,
     load_scenario_from_dict,
 )
+from projects.helpers import format_scenario_for_mvs
 from .constants import DONE, ERROR, MODIFIED
 from .services import (
     create_or_delete_simulation_scheduler,
@@ -1042,8 +1042,7 @@ def view_mvs_data_input(request, scen_id=0):
         raise PermissionDenied
 
     try:
-        data_clean = get_topology_json(scenario)
-        print(data_clean)
+        data_clean = format_scenario_for_mvs(scenario)
     except Exception as e:
 
         logger.error(
@@ -1072,7 +1071,7 @@ def request_mvs_simulation(request, scen_id=0):
     # Load scenario
     scenario = Scenario.objects.get(pk=scen_id)
     try:
-        data_clean = get_topology_json(scenario)
+        data_clean = format_scenario_for_mvs(scenario)
         # err = 1/0
     except Exception as e:
         error_msg = f"Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {e}."

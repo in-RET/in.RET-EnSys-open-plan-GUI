@@ -22,6 +22,7 @@ from .requests import (
     mvs_simulation_request,
     mvs_simulation_check_status,
     get_mvs_simulation_results,
+    mvs_sensitivity_analysis_request,
 )
 from .models import *
 from .scenario_topology_helpers import (
@@ -328,7 +329,6 @@ def project_duplicate(request, proj_id):
 
     # duplicate the project
     project.pk = None
-    print(project.economic_data.pk)
     economic_data = project.economic_data
     economic_data.pk = None
     economic_data.save()
@@ -491,6 +491,7 @@ def scenario_create_parameters(request, proj_id, scen_id=None, step_id=1, max_st
                 "form": form,
                 "proj_id": proj_id,
                 "proj_name": project.name,
+                "scenario": scenario,
                 "scen_id": scen_id,
                 "step_id": step_id,
                 "step_list": STEP_LIST,
@@ -890,6 +891,103 @@ def scenario_delete(request, scen_id):
 
 
 # endregion Scenario
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def sensitivity_analysis_create(request, scen_id, sa_id=None, step_id=5):
+    excuses_design_under_development(request)
+    scenario = get_object_or_404(Scenario, id=scen_id)
+    if scenario.project.user != request.user:
+        raise PermissionDenied
+
+    if request.method == "GET":
+        if sa_id is not None:
+            sa_item = get_object_or_404(SensitivityAnalysis, id=sa_id)
+            sa_form = SensitivityAnalysisForm(scen_id=scen_id, instance=sa_item)
+        else:
+            sa_form = SensitivityAnalysisForm(
+                scen_id=scen_id,
+            )
+
+        answer = render(
+            request,
+            "scenario/sensitivity_analysis.html",
+            {
+                "proj_id": scenario.project.id,
+                "proj_name": scenario.project.name,
+                "scenario": scenario,
+                "scen_id": scen_id,
+                "step_id": step_id,
+                "step_list": STEP_LIST + [_("Sensitivity analysis")],
+                "max_step": 5,
+                "sa_form": sa_form,
+            },
+        )
+
+    if request.method == "POST":
+        qs = request.POST
+        sa_form = SensitivityAnalysisForm(qs)
+
+        if sa_form.is_valid():
+            sa_item = sa_form.save(commit=False)
+            # TODO if the reference value is not the same as in the current scenario, duplicate the scenario and bind the duplicate to sa_item
+            # TODO check if the scenario is already bound to a SA
+            sa_item.set_reference_scenario(scenario)
+            try:
+                data_clean = format_scenario_for_mvs(scenario)
+            except Exception as e:
+                error_msg = f"Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {e}."
+                logger.error(error_msg)
+                messages.error(request, error_msg)
+                answer = JsonResponse(
+                    {"error": f"Scenario Serialization ERROR! Thrown Exception: {e}."},
+                    status=500,
+                    content_type="application/json",
+                )
+
+            sa_item.save()
+
+            # Add the information about the sensitivity analysis to the json
+            data_clean.update(sa_item.payload)
+            # Make simulation request to MVS
+            results = mvs_sensitivity_analysis_request(data_clean)
+
+        if results is None:
+            error_msg = "Could not communicate with the simulation server."
+            logger.error(error_msg)
+            messages.error(request, error_msg)
+            # TODO redirect to prefilled feedback form / bug form
+            answer = JsonResponse(
+                {"status": "error", "error": error_msg},
+                status=407,
+                content_type="application/json",
+            )
+        else:
+            sa_item.mvs_token = results["id"] if results["id"] else None
+
+            if "status" in results.keys() and (
+                results["status"] == DONE or results["status"] == ERROR
+            ):
+                sa_item.status = results["status"]
+                sa_item.results = results["results"]
+                # Simulation.objects.filter(scenario_id=scen_id).delete()
+                # TODO the reference scenario should have its simulation replaced by this one if successful, this can be done via the mvs_token of the simulation
+
+                sa_item.end_date = datetime.now()
+            else:  # PENDING
+                sa_item.status = results["status"]
+                # create a task which will update simulation status
+                # TODO check it does the right thing with sensitivity analysis
+                # create_or_delete_simulation_scheduler(mvs_token=sa_item.mvs_token)
+
+            sa_item.elapsed_seconds = (datetime.now() - sa_item.start_date).seconds
+
+            answer = HttpResponseRedirect(
+                reverse("sensitivity_analysis_review", args=[scen_id, sa_item.id])
+            )
+
+    return answer
 
 
 # region Asset

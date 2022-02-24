@@ -1,6 +1,7 @@
 import uuid
 import json
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.utils.timezone import now
 from django.conf import settings
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -8,7 +9,7 @@ from datetime import timedelta
 from django.forms.models import model_to_dict
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
-from .constants import (
+from projects.constants import (
     ASSET_CATEGORY,
     ASSET_TYPE,
     COUNTRY,
@@ -17,6 +18,7 @@ from .constants import (
     FLOW_DIRECTION,
     MVS_TYPE,
     SIMULATION_STATUS,
+    PENDING,
     TRUE_FALSE_CHOICES,
     BOOL_CHOICES,
     USER_RATING,
@@ -174,6 +176,10 @@ class AssetType(models.Model):
         dm = model_to_dict(self, exclude=["id"])
         return dm
 
+    @property
+    def visible_fields(self):
+        return self.asset_fields.replace("[", "").replace("]", "").split(",")
+
 
 class TopologyNode(models.Model):
     name = models.CharField(max_length=60, null=False, blank=False)
@@ -278,6 +284,28 @@ class Asset(TopologyNode):
     @property
     def fields(self):
         return [f.name for f in self._meta.fields + self._meta.many_to_many]
+
+    @property
+    def visible_fields(self):
+        return self.asset_type.visible_fields
+
+    def has_parameter(self, param_name):
+        return param_name in self.visible_fields
+
+    def parameter_path(self, param_name):
+        # TODO for storage
+        if self.has_parameter(param_name):
+            # TODO if (unit, value) formatting, add "value" at the end
+            if self.asset_type.asset_category == "energy_provider":
+                asset_category = "energy_providers"
+            else:
+                asset_category = self.asset_type.asset_category
+            if param_name == "optimize_cap":
+                param_name = "optimize_capacity"
+            answer = (asset_category, self.name, param_name)
+        else:
+            answer = None
+        return answer
 
     @property
     def timestamps(self):

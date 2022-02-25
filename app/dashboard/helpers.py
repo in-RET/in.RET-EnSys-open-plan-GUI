@@ -386,6 +386,10 @@ def report_item_render_to_json(
     if report_item_type == GRAPH_TIMESERIES_STACKED:
         answer["x_label"] = _("Time")
         answer["y_label"] = _("Energie")
+
+    if report_item_type == GRAPH_CAPACITIES:
+        answer["x_label"] = _("Component")
+        answer["y_label"] = _("Capacity")
     return answer
 
 
@@ -440,7 +444,25 @@ GRAPH_PARAMETERS_SCHEMAS = {
         },
         "additionalProperties": False,
     },
-    GRAPH_CAPACITIES: {},
+    GRAPH_CAPACITIES: {
+        "type": "object",
+        "required": ["y"],
+        "properties": {
+            "y": {
+                "oneOf": [
+                    {"type": "string"},
+                    {"type": "array", "items": {"type": "string"}},
+                ]
+            },
+            "energy_vector": {
+                "oneOf": [
+                    {"type": "string"},
+                    {"type": "array", "items": {"type": "string"}},
+                ]
+            },
+        },
+        "additionalProperties": False,
+    },
     GRAPH_BAR: {},
     GRAPH_PIE: {},
     GRAPH_LOAD_DURATION: {},

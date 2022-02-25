@@ -5,6 +5,7 @@ import traceback
 import logging
 
 from django.utils.translation import ugettext_lazy as _
+from django.shortcuts import get_object_or_404
 from django.db import models
 from dashboard.helpers import (
     KPI_PARAMETERS,
@@ -21,8 +22,8 @@ from dashboard.helpers import (
     report_item_render_to_json,
 )
 
-from projects.models import Simulation
 from projects.constants import MAP_EPA_MVS
+from projects.models import Simulation, Scenario
 
 logger = logging.getLogger(__name__)
 
@@ -398,6 +399,71 @@ class ReportItem(models.Model):
                             scenario_timestamps=simulation.scenario.get_timestamps(),
                         )
                     )
+                return simulations_results
+        # TODO exclude sink components
+        if self.report_type == GRAPH_CAPACITIES:
+            y_variables = parameters.get("y", None)
+            scenario = get_object_or_404(Scenario, pk=self.project_id)
+
+            if y_variables is not None:
+                simulations_results = []
+
+                for simulation in self.simulations.all():
+                    y_values = []
+                    x_values = []
+                    assets_results_obj = AssetsResults.objects.get(
+                        simulation=simulation
+                    )
+                    assets_results_json = assets_results_obj.assets_dict
+
+                    results_dict = json.loads(
+                        Scenario.objects.get(
+                            simulation=scenario.simulation
+                        ).simulation.results
+                    )
+
+                    kpi_scalar_matrix = results_dict["kpi"]["scalar_matrix"]
+
+                    installed_capactiy_dict = {
+                        "capacity": [],
+                        "name": "Installed Capacity",
+                    }
+                    optimized_capacity_dict = {
+                        "capacity": [],
+                        "name": "Optimized Capacity",
+                    }
+
+                    for asset_list in assets_results_json.values():
+                        for asset_obj in asset_list:
+                            if (
+                                "consumption_period" not in asset_obj["label"]
+                                and asset_obj["label"][-3:] != "DSO"
+                            ):
+                                x_values.append(asset_obj["label"])
+                                installed_capactiy_dict["capacity"].append(
+                                    asset_obj["installed_capacity"]["value"]
+                                )
+                                if asset_obj["label"] in kpi_scalar_matrix:
+                                    optimized_capacity_dict["capacity"].append(
+                                        kpi_scalar_matrix[asset_obj["label"]][
+                                            "optimizedAddCap"
+                                        ]
+                                    )
+                                else:
+                                    optimized_capacity_dict["capacity"].append(0)
+
+                    y_values.append(installed_capactiy_dict)
+                    y_values.append(optimized_capacity_dict)
+
+                    simulations_results.append(
+                        simulation_timeseries_to_json(
+                            scenario_name=simulation.scenario.name,
+                            scenario_id=simulation.scenario.id,
+                            scenario_timeseries=y_values,
+                            scenario_timestamps=x_values,
+                        )
+                    )
+
                 return simulations_results
 
     @property

@@ -157,7 +157,7 @@ function addCapacitiyGraph(graphId, parameters){
     // prepare graph layout in plotly format
     const layout= {
         title: parameters.title,
-        // barmode: 'stack',
+        barmode: 'stack',
         xaxis:{
             title: parameters.x_label,
         },

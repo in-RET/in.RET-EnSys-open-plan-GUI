@@ -123,20 +123,10 @@ urlpatterns = [
         name="update_simulation_rating",
     ),
     # path('topology/simulation_status/<int:scen_id>', check_simulation_status, name='check_simulation_status'),
-    re_path(
-        r"^topology/simulation_status/(?P<scen_id>\d+)?$",
-        check_simulation_status,
-        name="check_simulation_status_regex",
-    ),
     path(
-        "topology/simulation_status/<int:scen_id>",
-        check_simulation_status,
-        name="check_simulation_status",
-    ),
-    path(
-        "project/<int:proj_id>/scenario/<int:scen_id>",
-        update_simulation_results,
-        name="update_simulation_results",
+        "simulation/fetch-results/<int:sim_id>",
+        fetch_simulation_results,
+        name="fetch_simulation_results",
     ),
     # Sensitivity analysis
     path(
@@ -158,6 +148,11 @@ urlpatterns = [
         "scenario/<int:scen_id>/sensitivity-analysis/error",
         sensitivity_analysis_create,
         name="sensitivity_analysis_error",
+    ),
+    path(
+        "sensitivity-analysis/fetch-results/<int:sa_id>",
+        fetch_sensitivity_analysis_results,
+        name="fetch_sensitivity_analysis_results",
     ),
     # User Feedback
     path("user_feedback", user_feedback, name="user_feedback"),

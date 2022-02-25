@@ -20,9 +20,9 @@ from epa.settings import MVS_GET_URL, MVS_LP_FILE_URL, MVS_SA_GET_URL
 from .forms import *
 from .requests import (
     mvs_simulation_request,
-    mvs_simulation_check_status,
-    get_mvs_simulation_results,
+    fetch_mvs_simulation_results,
     mvs_sensitivity_analysis_request,
+    fetch_mvs_sa_results,
 )
 from .models import *
 from .scenario_topology_helpers import (
@@ -1255,27 +1255,28 @@ def update_simulation_rating(request):
 
 @json_view
 @login_required
-@require_http_methods(["GET", "POST"])
-def check_simulation_status(request, scen_id):
-    scenario = get_object_or_404(Scenario, pk=scen_id)
-    if scenario.simulation:
-        return JsonResponse(
-            mvs_simulation_check_status(scenario.simulation.mvs_token),
-            status=200,
-            content_type="application/json",
-        )
+@require_http_methods(["GET"])
+def fetch_simulation_results(request, sim_id):
+    simulation = get_object_or_404(Simulation, id=sim_id)
+    are_result_ready = fetch_mvs_simulation_results(simulation)
+    return JsonResponse(
+        dict(areResultReady=are_result_ready),
+        status=200,
+        content_type="application/json",
+    )
 
 
+@json_view
 @login_required
 @require_http_methods(["GET"])
-def update_simulation_results(request, proj_id, scen_id):
-    scenario = get_object_or_404(Scenario, pk=scen_id)
-
-    simulation = scenario.simulation
-
-    get_mvs_simulation_results(simulation)
-
-    return HttpResponseRedirect(reverse("scenario_review", args=[proj_id, scen_id]))
+def fetch_sensitivity_analysis_results(request, sa_id):
+    sa_item = get_object_or_404(SensitivityAnalysis, id=sa_id)
+    are_result_ready = fetch_mvs_sa_results(sa_item)
+    return JsonResponse(
+        dict(areResultReady=are_result_ready),
+        status=200,
+        content_type="application/json",
+    )
 
 
 # endregion MVS JSON Related

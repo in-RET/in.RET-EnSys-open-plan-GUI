@@ -729,7 +729,7 @@ def scenario_visualize_stacked_total_flow(request, scen_id):
                         else asset_obj["label"].replace("_", " ").upper() + " in kWh",
                         "type": "bar",
                     }
-                    for asset, asset_list in assets_results_json.items()
+                    for asset_list in assets_results_json.values()
                     for asset_obj in asset_list
                     if asset_obj["type_oemof"] in ["source", "sink"]
                     if "flow" in asset_obj.keys()
@@ -756,6 +756,7 @@ def scenario_visualize_stacked_total_flow(request, scen_id):
         )
 
 
+# TODO exclude sink components
 def scenario_visualize_stacked_capacities(request, scen_id):
     scenario = get_object_or_404(Scenario, pk=scen_id)
     if (scenario.project.user != request.user) and (
@@ -775,9 +776,9 @@ def scenario_visualize_stacked_capacities(request, scen_id):
                         "y": [asset_obj["installed_capacity"]["value"]],
                         "name": asset_obj["label"].replace("_", " ").upper()
                         + " in "
-                        + asset_obj["flow"]["unit"]
-                        if asset_obj["flow"]["unit"] != "?"
-                        else asset_obj["label"].replace("_", " ").upper() + " in kWh",
+                        + asset_obj["installed_capacity"]["unit"]
+                        if asset_obj["installed_capacity"]["unit"] != "unit"
+                        else asset_obj["label"].replace("_", " ").upper() + " in kW",
                         "type": "bar",
                     }
                     for asset, asset_list in assets_results_json.items()

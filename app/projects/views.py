@@ -749,6 +749,7 @@ def scenario_review(request, proj_id, scen_id, step_id=4, max_step=5):
             simulation = qs.first()
             context.update(
                 {
+                    "sim_id": simulation.id,
                     "simulation_status": simulation.status,
                     "secondsElapsed": simulation.elapsed_seconds,
                     "rating": simulation.user_rating,
@@ -905,8 +906,10 @@ def sensitivity_analysis_create(request, scen_id, sa_id=None, step_id=5):
         if sa_id is not None:
             sa_item = get_object_or_404(SensitivityAnalysis, id=sa_id)
             sa_form = SensitivityAnalysisForm(scen_id=scen_id, instance=sa_item)
+            sa_status = sa_item.status
         else:
             sa_item = None
+            sa_status = None
             sa_form = SensitivityAnalysisForm(
                 scen_id=scen_id,
             )
@@ -924,7 +927,8 @@ def sensitivity_analysis_create(request, scen_id, sa_id=None, step_id=5):
                 "max_step": 5,
                 "MVS_SA_GET_URL": MVS_SA_GET_URL,
                 "sa_form": sa_form,
-                "sa_item": sa_item,
+                "sa_status": sa_status,
+                "sa_id": sa_id,
             },
         )
 

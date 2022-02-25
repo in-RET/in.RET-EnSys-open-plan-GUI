@@ -3,7 +3,13 @@ import httpx as requests
 import json
 
 # from requests.exceptions import HTTPError
-from epa.settings import PROXY_CONFIG, MVS_POST_URL, MVS_GET_URL, MVS_SA_POST_URL
+from epa.settings import (
+    PROXY_CONFIG,
+    MVS_POST_URL,
+    MVS_GET_URL,
+    MVS_SA_POST_URL,
+    MVS_SA_GET_URL,
+)
 from dashboard.models import AssetsResults, KPICostsMatrixResults, KPIScalarResults
 from projects.constants import DONE, PENDING, ERROR
 import logging
@@ -53,7 +59,24 @@ def mvs_simulation_check_status(token):
         return json.loads(response.text)
 
 
-def fetch_mvs_simulation_status(simulation):
+def mvs_sa_check_status(token):
+    try:
+        response = requests.get(
+            MVS_SA_GET_URL + token, proxies=PROXY_CONFIG, verify=False
+        )
+        response.raise_for_status()
+    except requests.HTTPError as http_err:
+        logger.error(f"HTTP error occurred: {http_err}")
+        return None
+    except Exception as err:
+        logger.error(f"Other error occurred: {err}")
+        return None
+    else:
+        logger.info("Success!")
+        return json.loads(response.text)
+
+
+def fetch_mvs_simulation_results(simulation):
     if simulation.status == PENDING:
         response = mvs_simulation_check_status(token=simulation.mvs_token)
         try:
@@ -79,6 +102,36 @@ def fetch_mvs_simulation_status(simulation):
         )
         simulation.save()
 
+    return simulation.status != PENDING
+
+
+def fetch_mvs_sa_results(simulation):
+    if simulation.status == PENDING:
+        response = mvs_sa_check_status(token=simulation.mvs_token)
+        try:
+            simulation.status = response["status"]
+            simulation.errors = (
+                json.dumps(response["results"][ERROR])
+                if simulation.status == ERROR
+                else None
+            )
+            # TODO here fetch the results of the reference scenario in a separate Simulation instance
+            # and parse the
+            simulation.results = (
+                response["results"] if simulation.status == DONE else None
+            )
+            logger.info(f"The simulation {simulation.id} is finished")
+        except:
+            simulation.status = ERROR
+            simulation.results = None
+
+        simulation.elapsed_seconds = (datetime.now() - simulation.start_date).seconds
+        simulation.end_date = (
+            datetime.now() if response["status"] in [ERROR, DONE] else None
+        )
+        simulation.save()
+    return simulation.status != PENDING
+
 
 def get_mvs_simulation_results(simulation):
     # TODO do not repeat if the simulation is not on the server anymore, or if the results are already loaded
@@ -99,7 +152,7 @@ def get_mvs_simulation_results(simulation):
 
         simulation.save()
     else:
-        fetch_mvs_simulation_status(simulation)
+        fetch_mvs_simulation_results(simulation)
 
 
 def parse_mvs_results(simulation, response_results):

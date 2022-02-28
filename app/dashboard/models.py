@@ -123,6 +123,7 @@ KPI_SCALAR_TOOLTIPS = {
     "costs_upfront_in_year_zero": "The costs which will have to be paid upfront when project begin, ie. In year 0.",
 }
 
+
 # TODO have this in a csv structure to also create the doc and tool tips
 GRAPH_TIMESERIES = "timeseries"
 GRAPH_TIMESERIES_STACKED = "timeseries_stacked"
@@ -242,6 +243,17 @@ class AssetsResults(models.Model):
         return answer
 
 
+def parse_manytomany_object_list(object_list, model):
+    """given one occurence or list of model instances or id of model instances returns a list of model instances"""
+    if not isinstance(object_list, list):
+        object_list = [object_list]
+
+    if len(object_list) > 0:
+        if isinstance(object_list[0], int):
+            object_list = [s for s in model.objects.filter(id__in=object_list)]
+    return object_list
+
+
 # # TODO change the form from this model to adapt the choices depending on single scenario/compare scenario or sensitivity
 class ReportItem(models.Model):
     title = models.CharField(max_length=120, default="", blank=True)
@@ -255,7 +267,7 @@ class ReportItem(models.Model):
     def __init__(self, *args, **kwargs):
         if "simulations" in kwargs:
             self.initial_simulations = kwargs.pop("simulations")
-            self.initial_simulations = self.__parse_simulation_list(
+            self.initial_simulations = parse_manytomany_object_list(
                 self.initial_simulations
             )
         super().__init__(*args, **kwargs)
@@ -267,21 +279,10 @@ class ReportItem(models.Model):
             self.simulations.add(*self.initial_simulations)
 
     def update_simulations(self, list_simulation):
-        list_simulation = self.__parse_simulation_list(list_simulation)
+        list_simulation = parse_manytomany_object_list(list_simulation, Simulation)
         if list_simulation:
             self.simulations.clear()
             self.simulations.add(*list_simulation)
-
-    def __parse_simulation_list(self, simulation_list):
-        if not isinstance(simulation_list, list):
-            simulation_list = [simulation_list]
-
-        if len(simulation_list) > 0:
-            if isinstance(simulation_list[0], int):
-                simulation_list = [
-                    s for s in Simulation.objects.filter(id__in=simulation_list)
-                ]
-        return simulation_list
 
     @property
     def parameters_dict(self):

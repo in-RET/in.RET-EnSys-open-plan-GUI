@@ -6,8 +6,8 @@ from django.contrib import messages
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.utils.safestring import mark_safe
-from projects.models import Simulation
-from projects.requests import fetch_mvs_simulation_status
+from projects.models import Simulation, SensitivityAnalysis
+from projects.requests import fetch_mvs_simulation_results
 from projects.constants import PENDING
 from concurrent.futures import ThreadPoolExecutor
 from exchangelib import (
@@ -44,9 +44,11 @@ def check_simulation_objects(**kwargs):
     if pending_simulations.count() == 0:
         logger.debug(f"No pending simulation found. Deleting Scheduler.")
         Schedule.objects.all().delete()
-    # fetch_mvs_simulation_status mostly waits for MVS API to respond, so no ProcessPool is required.
+    # fetch_mvs_simulation_results mostly waits for MVS API to respond, so no ProcessPool is required.
     with ThreadPoolExecutor() as pool:
-        pool.map(fetch_mvs_simulation_status, pending_simulations)
+        pool.map(fetch_mvs_simulation_results, pending_simulations)
+    logger.debug(f"Finished round for checking Simulation objects status.")
+
     logger.debug(f"Finished round for checking Simulation objects status.")
 
 

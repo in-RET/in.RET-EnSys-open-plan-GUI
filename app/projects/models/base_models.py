@@ -85,9 +85,6 @@ class Scenario(models.Model):
     start_date = models.DateTimeField()
     time_step = models.IntegerField(validators=[MinValueValidator(0)])
     capex_fix = models.FloatField(validators=[MinValueValidator(0.0)])
-    capex_var = models.FloatField(validators=[MinValueValidator(0.0)])
-    opex_fix = models.FloatField(validators=[MinValueValidator(0.0)])
-    opex_var = models.FloatField(validators=[MinValueValidator(0.0)])
     evaluated_period = models.IntegerField(validators=[MinValueValidator(0)])
     project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
 

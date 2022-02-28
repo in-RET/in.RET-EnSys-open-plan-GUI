@@ -910,9 +910,7 @@ def sensitivity_analysis_create(request, scen_id, sa_id=None, step_id=5):
         else:
             sa_item = None
             sa_status = None
-            sa_form = SensitivityAnalysisForm(
-                scen_id=scen_id,
-            )
+            sa_form = SensitivityAnalysisForm(scen_id=scen_id)
 
         answer = render(
             request,

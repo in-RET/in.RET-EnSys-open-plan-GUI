@@ -56,10 +56,26 @@ def sensitivity_analysis_payload(
     }
 
 
-SA_MVS_TOKEN_SCHEMA = {
+SA_RESPONSE_SCHEMA = {
     "type": "object",
-    "required": ["ref_sim_id", "sensitivity_analysis_ids"],
+    "required": ["server_info", "mvs_version", "id", "status", "results"],
     "properties": {
+        "server_info": {"type": "string"},
+        "mvs_version": {"type": "string"},
+        "id": {"type": "string"},
+        "status": {"type": "string"},
+        "results": {
+            "type": "object",
+            "required": ["reference_simulation_id", "sensitivity_analysis_steps"],
+            "properties": {
+                "reference_simulation_id": {"type": "string"},
+                "sensitivity_analysis_steps": {
+                    "type": "array",
+                    "items": {"type": "object"},
+                },
+            },
+            "additionalProperties": False,
+        },
         "ref_sim_id": {"type": "string"},
         "sensitivity_analysis_ids": {"type": "array", "items": {"type": "string"}},
     },
@@ -83,7 +99,12 @@ def sa_output_values_schema_generator(output_names):
                     "value": {
                         "oneOf": [
                             {"type": "null"},
-                            {"type": "array", "items": {"type": "number"}},
+                            {
+                                "type": "array",
+                                "items": {
+                                    "anyOf": [{"type": "number"}, {"type": "null"}]
+                                },
+                            },
                         ]
                     },
                     "path": {

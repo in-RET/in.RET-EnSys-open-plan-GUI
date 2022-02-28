@@ -3,7 +3,13 @@ import httpx as requests
 import json
 
 # from requests.exceptions import HTTPError
-from epa.settings import PROXY_CONFIG, MVS_POST_URL, MVS_GET_URL
+from epa.settings import (
+    PROXY_CONFIG,
+    MVS_POST_URL,
+    MVS_GET_URL,
+    MVS_SA_POST_URL,
+    MVS_SA_GET_URL,
+)
 from dashboard.models import AssetsResults, KPICostsMatrixResults, KPIScalarResults
 from projects.constants import DONE, PENDING, ERROR
 import logging
@@ -53,7 +59,24 @@ def mvs_simulation_check_status(token):
         return json.loads(response.text)
 
 
-def fetch_mvs_simulation_status(simulation):
+def mvs_sa_check_status(token):
+    try:
+        response = requests.get(
+            MVS_SA_GET_URL + token, proxies=PROXY_CONFIG, verify=False
+        )
+        response.raise_for_status()
+    except requests.HTTPError as http_err:
+        logger.error(f"HTTP error occurred: {http_err}")
+        return None
+    except Exception as err:
+        logger.error(f"Other error occurred: {err}")
+        return None
+    else:
+        logger.info("Success!")
+        return json.loads(response.text)
+
+
+def fetch_mvs_simulation_results(simulation):
     if simulation.status == PENDING:
         response = mvs_simulation_check_status(token=simulation.mvs_token)
         try:
@@ -79,6 +102,20 @@ def fetch_mvs_simulation_status(simulation):
         )
         simulation.save()
 
+    return simulation.status != PENDING
+
+
+def fetch_mvs_sa_results(simulation):
+    if simulation.status == PENDING:
+        response = mvs_sa_check_status(token=simulation.mvs_token)
+
+        simulation.parse_server_response(response)
+
+        if simulation.status == DONE:
+            logger.info(f"The simulation {simulation.id} is finished")
+
+    return simulation.status != PENDING
+
 
 def get_mvs_simulation_results(simulation):
     # TODO do not repeat if the simulation is not on the server anymore, or if the results are already loaded
@@ -99,7 +136,7 @@ def get_mvs_simulation_results(simulation):
 
         simulation.save()
     else:
-        fetch_mvs_simulation_status(simulation)
+        fetch_mvs_simulation_results(simulation)
 
 
 def parse_mvs_results(simulation, response_results):
@@ -149,3 +186,30 @@ def parse_mvs_results(simulation, response_results):
             assets_list=json.dumps(data_subdict), simulation=simulation
         )
     return response_results
+
+
+def mvs_sensitivity_analysis_request(data: dict):
+
+    headers = {"content-type": "application/json"}
+    payload = json.dumps(data)
+
+    try:
+        response = requests.post(
+            MVS_SA_POST_URL,
+            data=payload,
+            headers=headers,
+            proxies=PROXY_CONFIG,
+            verify=False,
+        )
+
+        # If the response was successful, no Exception will be raised
+        response.raise_for_status()
+    except requests.HTTPError as http_err:
+        logger.error(f"HTTP error occurred: {http_err}")
+        return None
+    except Exception as err:
+        logger.error(f"Other error occurred: {err}")
+        return None
+    else:
+        logger.info("The simulation was sent successfully to MVS API.")
+        return json.loads(response.text)

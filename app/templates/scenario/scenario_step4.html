@@ -39,7 +39,6 @@
 
                 <div class="row">
                     {% if simulation_status == "DONE" %}
-                        <a class="btn btn--medium" style="display:none;" href="{% url 'update_simulation_results' proj_id scen_id %}" >{% translate "Update results" %} </a>
                         <a class="btn btn--medium" href="{% url 'scenario_visualize_results' scen_id %}" >{% translate "Check results dashboard" %} </a>
                     {% elif simulation_status == "ERROR" %}
                         <p>{{ simulation_error_msg }}</p>
@@ -47,16 +46,16 @@
                         <a class="btn btn--medium" href="" >{% translate "Link to send bug report automatically" %} </a>
 
                     {% elif simulation_status == "PENDING" %}
-                        <form method="post" action="{% url 'check_simulation_status' scen_id %}">
-                            {% csrf_token %}
-                            <button class="btn btn--medium" type="submit" > {% translate "Check status" %}</button>
-                        </form>
+                        The simulation <a href="{{ MVS_GET_URL }}{{ mvs_token }}">{{ mvs_token }}</a> has been started, its status is <span>{{ simulation_status }}</span>
                     {% endif %}
+                </div>
+                <div class="row">
+
+                    <a class="btn btn--medium" href="{% url 'sensitivity_analysis_create' scen_id %}" >{% translate "Perform a sensitivity analysis" %}</a>
                 </div>
             {% else %}
                 <div class="row">{% translate "You can now click on 'Run simulation' button" %}</div>
             {% endif %}
-
         </div>
     </section>
 
@@ -69,9 +68,13 @@
 
 
 {% block end_body_scripts %}
+{% if simulation_status == "PENDING" %}
 <script>
-
+    const checkSimulationUrl = `{% url 'fetch_simulation_results' sim_id %}`;
+    console.log(checkSimulationUrl);
 </script>
+<script src="{% static 'js/simulation_requests.js' %}"></script>
+{% endif %}
 
 {% endblock end_body_scripts %}
 

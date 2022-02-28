@@ -16,12 +16,13 @@ from crispy_forms.templatetags import crispy_forms_filters
 from datetime import datetime
 from users.models import CustomUser
 from django.db.models import Q
-from epa.settings import MVS_GET_URL, MVS_LP_FILE_URL
+from epa.settings import MVS_GET_URL, MVS_LP_FILE_URL, MVS_SA_GET_URL
 from .forms import *
 from .requests import (
     mvs_simulation_request,
-    mvs_simulation_check_status,
-    get_mvs_simulation_results,
+    fetch_mvs_simulation_results,
+    mvs_sensitivity_analysis_request,
+    fetch_mvs_sa_results,
 )
 from .models import *
 from .scenario_topology_helpers import (
@@ -33,9 +34,9 @@ from .scenario_topology_helpers import (
     update_deleted_objects_from_database,
     duplicate_scenario_objects,
     duplicate_scenario_connections,
-    get_topology_json,
     load_scenario_from_dict,
 )
+from projects.helpers import format_scenario_for_mvs
 from .constants import DONE, ERROR, MODIFIED
 from .services import (
     create_or_delete_simulation_scheduler,
@@ -328,7 +329,6 @@ def project_duplicate(request, proj_id):
 
     # duplicate the project
     project.pk = None
-    print(project.economic_data.pk)
     economic_data = project.economic_data
     economic_data.pk = None
     economic_data.save()
@@ -491,6 +491,7 @@ def scenario_create_parameters(request, proj_id, scen_id=None, step_id=1, max_st
                 "form": form,
                 "proj_id": proj_id,
                 "proj_name": project.name,
+                "scenario": scenario,
                 "scen_id": scen_id,
                 "step_id": step_id,
                 "step_list": STEP_LIST,
@@ -748,6 +749,7 @@ def scenario_review(request, proj_id, scen_id, step_id=4, max_step=5):
             simulation = qs.first()
             context.update(
                 {
+                    "sim_id": simulation.id,
                     "simulation_status": simulation.status,
                     "secondsElapsed": simulation.elapsed_seconds,
                     "rating": simulation.user_rating,
@@ -890,6 +892,107 @@ def scenario_delete(request, scen_id):
 
 
 # endregion Scenario
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def sensitivity_analysis_create(request, scen_id, sa_id=None, step_id=5):
+    excuses_design_under_development(request)
+    scenario = get_object_or_404(Scenario, id=scen_id)
+    if scenario.project.user != request.user:
+        raise PermissionDenied
+
+    if request.method == "GET":
+        if sa_id is not None:
+            sa_item = get_object_or_404(SensitivityAnalysis, id=sa_id)
+            sa_form = SensitivityAnalysisForm(scen_id=scen_id, instance=sa_item)
+            sa_status = sa_item.status
+        else:
+            sa_item = None
+            sa_status = None
+            sa_form = SensitivityAnalysisForm(scen_id=scen_id)
+
+        answer = render(
+            request,
+            "scenario/sensitivity_analysis.html",
+            {
+                "proj_id": scenario.project.id,
+                "proj_name": scenario.project.name,
+                "scenario": scenario,
+                "scen_id": scen_id,
+                "step_id": step_id,
+                "step_list": STEP_LIST + [_("Sensitivity analysis")],
+                "max_step": 5,
+                "MVS_SA_GET_URL": MVS_SA_GET_URL,
+                "sa_form": sa_form,
+                "sa_status": sa_status,
+                "sa_id": sa_id,
+            },
+        )
+
+    if request.method == "POST":
+        qs = request.POST
+        sa_form = SensitivityAnalysisForm(qs)
+
+        if sa_form.is_valid():
+            sa_item = sa_form.save(commit=False)
+            # TODO if the reference value is not the same as in the current scenario, duplicate the scenario and bind the duplicate to sa_item
+            # TODO check if the scenario is already bound to a SA
+            sa_item.set_reference_scenario(scenario)
+            try:
+                data_clean = format_scenario_for_mvs(scenario)
+            except Exception as e:
+                error_msg = f"Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {e}."
+                logger.error(error_msg)
+                messages.error(request, error_msg)
+                answer = JsonResponse(
+                    {"error": f"Scenario Serialization ERROR! Thrown Exception: {e}."},
+                    status=500,
+                    content_type="application/json",
+                )
+
+            sa_item.save()
+
+            # Add the information about the sensitivity analysis to the json
+            data_clean.update(sa_item.payload)
+            # Make simulation request to MVS
+            results = mvs_sensitivity_analysis_request(data_clean)
+
+        if results is None:
+            error_msg = "Could not communicate with the simulation server."
+            logger.error(error_msg)
+            messages.error(request, error_msg)
+            # TODO redirect to prefilled feedback form / bug form
+            answer = JsonResponse(
+                {"status": "error", "error": error_msg},
+                status=407,
+                content_type="application/json",
+            )
+        else:
+            sa_item.mvs_token = results["id"] if results["id"] else None
+
+            if "status" in results.keys() and (
+                results["status"] == DONE or results["status"] == ERROR
+            ):
+                sa_item.status = results["status"]
+                sa_item.results = results["results"]
+                # Simulation.objects.filter(scenario_id=scen_id).delete()
+                # TODO the reference scenario should have its simulation replaced by this one if successful, this can be done via the mvs_token of the simulation
+
+                sa_item.end_date = datetime.now()
+            else:  # PENDING
+                sa_item.status = results["status"]
+                # create a task which will update simulation status
+                # TODO check it does the right thing with sensitivity analysis
+                # create_or_delete_simulation_scheduler(mvs_token=sa_item.mvs_token)
+
+            sa_item.elapsed_seconds = (datetime.now() - sa_item.start_date).seconds
+            sa_item.save()
+            answer = HttpResponseRedirect(
+                reverse("sensitivity_analysis_review", args=[scen_id, sa_item.id])
+            )
+
+    return answer
 
 
 # region Asset
@@ -1042,8 +1145,7 @@ def view_mvs_data_input(request, scen_id=0):
         raise PermissionDenied
 
     try:
-        data_clean = get_topology_json(scenario)
-        print(data_clean)
+        data_clean = format_scenario_for_mvs(scenario)
     except Exception as e:
 
         logger.error(
@@ -1072,7 +1174,7 @@ def request_mvs_simulation(request, scen_id=0):
     # Load scenario
     scenario = Scenario.objects.get(pk=scen_id)
     try:
-        data_clean = get_topology_json(scenario)
+        data_clean = format_scenario_for_mvs(scenario)
         # err = 1/0
     except Exception as e:
         error_msg = f"Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {e}."
@@ -1155,27 +1257,28 @@ def update_simulation_rating(request):
 
 @json_view
 @login_required
-@require_http_methods(["GET", "POST"])
-def check_simulation_status(request, scen_id):
-    scenario = get_object_or_404(Scenario, pk=scen_id)
-    if scenario.simulation:
-        return JsonResponse(
-            mvs_simulation_check_status(scenario.simulation.mvs_token),
-            status=200,
-            content_type="application/json",
-        )
+@require_http_methods(["GET"])
+def fetch_simulation_results(request, sim_id):
+    simulation = get_object_or_404(Simulation, id=sim_id)
+    are_result_ready = fetch_mvs_simulation_results(simulation)
+    return JsonResponse(
+        dict(areResultReady=are_result_ready),
+        status=200,
+        content_type="application/json",
+    )
 
 
+@json_view
 @login_required
 @require_http_methods(["GET"])
-def update_simulation_results(request, proj_id, scen_id):
-    scenario = get_object_or_404(Scenario, pk=scen_id)
-
-    simulation = scenario.simulation
-
-    get_mvs_simulation_results(simulation)
-
-    return HttpResponseRedirect(reverse("scenario_review", args=[proj_id, scen_id]))
+def fetch_sensitivity_analysis_results(request, sa_id):
+    sa_item = get_object_or_404(SensitivityAnalysis, id=sa_id)
+    are_result_ready = fetch_mvs_sa_results(sa_item)
+    return JsonResponse(
+        dict(areResultReady=are_result_ready),
+        status=200,
+        content_type="application/json",
+    )
 
 
 # endregion MVS JSON Related

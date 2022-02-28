@@ -14,7 +14,6 @@ from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 from projects.forms import AssetCreateForm, BusForm, StorageForm
 
 # region sent db nodes to js
-from projects.dtos import convert_to_dto
 from crispy_forms.templatetags import crispy_forms_filters
 from django.http import JsonResponse
 import logging
@@ -502,38 +501,3 @@ def create_ESS_objects(all_ess_assets_node_list, scen_id):
         if asset.name == "capacity":
             # check if there is a connection link to a bus
             pass
-
-
-# Helper method to clean dict data from empty values
-def remove_empty_elements(d):
-    def empty(x):
-        return x is None or x == {} or x == []
-
-    if not isinstance(d, (dict, list)):
-        return d
-    elif isinstance(d, list):
-        return [v for v in (remove_empty_elements(v) for v in d) if not empty(v)]
-    else:
-        return {
-            k: v
-            for k, v in ((k, remove_empty_elements(v)) for k, v in d.items())
-            if not empty(v)
-        }
-
-
-# Helper to convert Scenario data to MVS importable json
-def get_topology_json(scenario_to_convert):
-    mvs_request_dto = convert_to_dto(scenario_to_convert)
-    dumped_data = json.loads(
-        json.dumps(mvs_request_dto.__dict__, default=lambda o: o.__dict__)
-    )
-
-    # format the constraints in MVS format directly, thus avoiding the need to maintain MVS-EPA
-    # parser in multi-vector-simulator package
-    constraint_dict = {}
-    for constraint in dumped_data["constraints"]:
-        constraint_dict[constraint["label"]] = constraint["value"]
-    dumped_data["constraints"] = constraint_dict
-
-    # Remove None values
-    return remove_empty_elements(dumped_data)

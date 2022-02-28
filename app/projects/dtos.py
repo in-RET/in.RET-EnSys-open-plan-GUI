@@ -4,7 +4,16 @@ from django.db.models import Q
 from numpy.core import long
 from datetime import date, datetime, time
 
-from projects.models import *
+from projects.models import (
+    ConnectionLink,
+    Scenario,
+    Project,
+    EconomicData,
+    Asset,
+    Bus,
+    Constraint,
+    ValueType,
+)
 
 
 class ProjectDataDto:

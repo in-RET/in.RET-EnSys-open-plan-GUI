@@ -5,17 +5,20 @@ import json
 import jsonschema
 import numpy as np
 import logging
+
+logger = logging.getLogger(__name__)
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 from django.utils.translation import gettext_lazy as _
+from datetime import datetime
 
-from projects.constants import USER_RATING
+from projects.constants import USER_RATING, DONE, PENDING, ERROR
 from projects.helpers import (
     sensitivity_analysis_payload,
     SA_OUPUT_NAMES_SCHEMA,
     sa_output_values_schema_generator,
-    SA_MVS_TOKEN_SCHEMA,
+    SA_RESPONSE_SCHEMA,
     format_scenario_for_mvs,
 )
 
@@ -65,12 +68,6 @@ class SensitivityAnalysis(AbstractSimulation):
         self.scenario = scenario
         self.save()
 
-    def collect_simulations_tokens(self, server_response):
-        try:
-            jsonschema.validate(server_response, SA_MVS_TOKEN_SCHEMA)
-        except jsonschema.exceptions.ValidationError:
-            answer = {}
-
     @property
     def variable_range(self):
         return np.arange(
@@ -93,16 +90,58 @@ class SensitivityAnalysis(AbstractSimulation):
     @property
     def output_values(self):
         try:
-            answer = json.loads(self.output_parameters_values)
-            try:
-                jsonschema.validate(
-                    answer, sa_output_values_schema_generator(self.output_names)
-                )
-            except jsonschema.exceptions.ValidationError:
-                answer = {}
+            out_values = json.loads(self.output_parameters_values)
+            answer = {}
+            for in_value, sa_step in zip(self.variable_range, out_values):
+                try:
+                    jsonschema.validate(
+                        sa_step, sa_output_values_schema_generator(self.output_names)
+                    )
+                    answer[in_value] = sa_step
+                except jsonschema.exceptions.ValidationError:
+                    answer[in_value] = None
         except json.decoder.JSONDecodeError:
             answer = {}
         return answer
+
+    def parse_server_response(self, sa_results):
+        try:
+            # make sure the response is formatted as expected
+            jsonschema.validate(sa_results, SA_RESPONSE_SCHEMA)
+            self.status = sa_results["status"]
+            self.errors = (
+                json.dumps(sa_results["results"][ERROR])
+                if self.status == ERROR
+                else None
+            )
+            if self.status == DONE:
+                sa_steps = sa_results["results"]["sensitivity_analysis_steps"]
+                sa_steps_processed = []
+                # make sure that each step is formatted as expected
+                for step_idx, sa_step in enumerate(sa_steps):
+                    try:
+                        jsonschema.validate(
+                            sa_step,
+                            sa_output_values_schema_generator(self.output_names),
+                        )
+                        sa_steps_processed.append(sa_step)
+                    except jsonschema.exceptions.ValidationError as e:
+                        logger.error(
+                            f"Could not parse the results of the sensitivity analysis {self.id} for step {step_idx}"
+                        )
+                        sa_steps_processed.append(None)
+                self.output_parameters_values = json.dumps(sa_steps_processed)
+
+        except jsonschema.exceptions.ValidationError as e:
+            self.status = ERROR
+            self.output_parameters_values = ""
+            self.errors = str(e)
+
+        self.elapsed_seconds = (datetime.now() - self.start_date).seconds
+        self.end_date = (
+            datetime.now() if sa_results["status"] in [ERROR, DONE] else None
+        )
+        self.save()
 
     @property
     def payload(self):

@@ -108,28 +108,12 @@ def fetch_mvs_simulation_results(simulation):
 def fetch_mvs_sa_results(simulation):
     if simulation.status == PENDING:
         response = mvs_sa_check_status(token=simulation.mvs_token)
-        try:
-            simulation.status = response["status"]
-            simulation.errors = (
-                json.dumps(response["results"][ERROR])
-                if simulation.status == ERROR
-                else None
-            )
-            # TODO here fetch the results of the reference scenario in a separate Simulation instance
-            # and parse the
-            simulation.results = (
-                response["results"] if simulation.status == DONE else None
-            )
-            logger.info(f"The simulation {simulation.id} is finished")
-        except:
-            simulation.status = ERROR
-            simulation.results = None
 
-        simulation.elapsed_seconds = (datetime.now() - simulation.start_date).seconds
-        simulation.end_date = (
-            datetime.now() if response["status"] in [ERROR, DONE] else None
-        )
-        simulation.save()
+        simulation.parse_server_response(response)
+
+        if simulation.status == DONE:
+            logger.info(f"The simulation {simulation.id} is finished")
+
     return simulation.status != PENDING
 
 

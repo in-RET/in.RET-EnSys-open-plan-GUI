@@ -1,6 +1,5 @@
 import uuid
 import json
-from django.core.validators import MinValueValidator, MaxValueValidator
 from django.conf import settings
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -8,7 +7,7 @@ from datetime import timedelta
 from django.forms.models import model_to_dict
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
-from .constants import (
+from projects.constants import (
     ASSET_CATEGORY,
     ASSET_TYPE,
     COUNTRY,
@@ -17,6 +16,7 @@ from .constants import (
     FLOW_DIRECTION,
     MVS_TYPE,
     SIMULATION_STATUS,
+    PENDING,
     TRUE_FALSE_CHOICES,
     BOOL_CHOICES,
     USER_RATING,
@@ -174,6 +174,10 @@ class AssetType(models.Model):
         dm = model_to_dict(self, exclude=["id"])
         return dm
 
+    @property
+    def visible_fields(self):
+        return self.asset_fields.replace("[", "").replace("]", "").split(",")
+
 
 class TopologyNode(models.Model):
     name = models.CharField(max_length=60, null=False, blank=False)
@@ -278,6 +282,28 @@ class Asset(TopologyNode):
     @property
     def fields(self):
         return [f.name for f in self._meta.fields + self._meta.many_to_many]
+
+    @property
+    def visible_fields(self):
+        return self.asset_type.visible_fields
+
+    def has_parameter(self, param_name):
+        return param_name in self.visible_fields
+
+    def parameter_path(self, param_name):
+        # TODO for storage
+        if self.has_parameter(param_name):
+            # TODO if (unit, value) formatting, add "value" at the end
+            if self.asset_type.asset_category == "energy_provider":
+                asset_category = "energy_providers"
+            else:
+                asset_category = self.asset_type.asset_category
+            if param_name == "optimize_cap":
+                param_name = "optimize_capacity"
+            answer = (asset_category, self.name, param_name)
+        else:
+            answer = None
+        return answer
 
     @property
     def timestamps(self):
@@ -393,15 +419,17 @@ class ScenarioFile(models.Model):
     file = models.FileField(upload_to="tempFiles/", null=True, blank=True)
 
 
-class Simulation(models.Model):
+class AbstractSimulation(models.Model):
+
     start_date = models.DateTimeField(auto_now_add=True, null=False)
     end_date = models.DateTimeField(null=True)
     elapsed_seconds = models.FloatField(null=True)
     mvs_token = models.CharField(max_length=200, null=True)
-    status = models.CharField(max_length=20, choices=SIMULATION_STATUS, null=False)
-    scenario = models.OneToOneField(Scenario, on_delete=models.CASCADE, null=False)
-    user_rating = models.PositiveSmallIntegerField(
-        null=True, choices=USER_RATING, default=None
+    status = models.CharField(
+        max_length=20, choices=SIMULATION_STATUS, null=False, default=PENDING
     )
     results = models.TextField(null=True, max_length=30e6)
     errors = models.TextField(null=True)
+
+    class Meta:
+        abstract = True

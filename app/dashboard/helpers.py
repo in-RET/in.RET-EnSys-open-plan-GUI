@@ -25,6 +25,7 @@ TABLES = {
 EMPTY_SUBCAT = "none"
 
 KPI_PARAMETERS = {}
+KPI_PARAMETERS_ASSETS = {}
 
 if os.path.exists(staticfiles_storage.path("MVS_kpis_list.csv")) is True:
     with open(staticfiles_storage.path("MVS_kpis_list.csv")) as csvfile:
@@ -65,17 +66,24 @@ if os.path.exists(staticfiles_storage.path("MVS_kpis_list.csv")) is True:
         for i, row in enumerate(csvreader):
             if i == 0:
                 hdr = [el.replace(" ", "_").replace(":", "").lower() for el in row]
-                print(hdr)
                 label_idx = hdr.index("label")
                 cat_idx = hdr.index("category")
+                scope_idx = hdr.index("scope")
             else:
                 label = row[label_idx]
                 category = row[cat_idx]
+                scope = row[scope_idx]
+
                 if category != "files":
                     KPI_PARAMETERS[label] = {
                         k: _(v) if k == "verbose" or k == "definition" else v
                         for k, v in zip(hdr, row)
                     }
+                    if "asset" in scope:
+                        KPI_PARAMETERS_ASSETS[label] = {
+                            k: _(v) if k == "verbose" or k == "definition" else v
+                            for k, v in zip(hdr, row)
+                        }
 
 
 #### FUNCTIONS ####

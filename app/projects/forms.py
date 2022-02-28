@@ -71,6 +71,9 @@ def gettext_variables(some_string, lang="de"):
 
 
 def set_parameter_info(param_name, field, parameters=PARAMETERS):
+    # For the storage unit
+    if param_name.split("_")[0] in ("cp", "dchp", "chp"):
+        param_name = "_".join(param_name.split("_")[1:])
     param_name = MAP_EPA_MVS.get(param_name, param_name)
     help_text = None
     unit = None
@@ -362,33 +365,6 @@ scenario_widgets = {
             ),
         }
     ),
-    "capex_var": forms.NumberInput(
-        attrs={
-            "placeholder": "e.g. 1000€",
-            "min": "0",
-            "data-toggle": "tooltip",
-            "title": _(" Actual CAPEX of the asset, i.e., specific investment costs"),
-        }
-    ),
-    "opex_fix": forms.NumberInput(
-        attrs={
-            "placeholder": "e.g. 0€",
-            "min": "0",
-            "data-toggle": "tooltip",
-            "title": _(
-                "Actual OPEX of the asset, i.e., specific operational and maintenance costs."
-            ),
-        }
-    ),
-    "opex_var": forms.NumberInput(
-        attrs={
-            "placeholder": "e.g. 0.6€/kWh",
-            "min": "0",
-            "step": "0.00001",
-            "data-toggle": "tooltip",
-            "title": _("Variable cost associated with a flow through/from the asset."),
-        }
-    ),
 }
 
 scenario_labels = {
@@ -398,9 +374,6 @@ scenario_labels = {
     "time_step": _("Time Step"),
     "start_date": _("Start Date"),
     "capex_fix": _("Development costs"),
-    "capex_var": _("Specific costs"),
-    "opex_fix": _("Specific OM costs"),
-    "opex_var": _("Dispatch price"),
 }
 
 scenario_field_order = [
@@ -410,9 +383,6 @@ scenario_field_order = [
     "time_step",
     "start_date",
     "capex_fix",
-    "capex_var",
-    "opex_fix",
-    "opex_var",
 ]
 
 

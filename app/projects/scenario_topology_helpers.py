@@ -52,13 +52,13 @@ def handle_storage_unit_form_post(
     request, scen_id=0, asset_type_name="", asset_uuid=None
 ):
     form = StorageForm(request.POST, request.FILES, asset_type=asset_type_name)
-    scenario = get_object_or_404(Scenario, pk=scen_id)
+    scenario = get_object_or_404(Scenario, id=scen_id)
     if form.is_valid():
         try:
             # First delete all existing associated storage assets from the db
             if asset_uuid:
                 existing_asset = get_object_or_404(Asset, unique_id=asset_uuid)
-                existing_asset.delete()  # deletes also automatically all chidren using models.CASCADE
+                existing_asset.delete()  # deletes also automatically all children using models.CASCADE
 
             # Create the ESS Parent Asset
             ess_asset = Asset.objects.create(

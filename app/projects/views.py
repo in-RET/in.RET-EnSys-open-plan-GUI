@@ -463,7 +463,7 @@ def scenario_create_parameters(request, proj_id, scen_id=None, step_id=1, max_st
 
     if request.method == "GET":
         if scen_id is not None:
-            scenario = get_object_or_404(Scenario, pk=scen_id)
+            scenario = get_object_or_404(Scenario, id=scen_id)
 
             if (scenario.project.user != request.user) and (
                 request.user not in scenario.project.viewers.all()
@@ -483,7 +483,8 @@ def scenario_create_parameters(request, proj_id, scen_id=None, step_id=1, max_st
                 qs_topo = ConnectionLink.objects.filter(scenario_id=scen_id)
                 if qs_topo.exists():
                     max_step = 3
-
+        else:
+            scenario = None
         answer = render(
             request,
             f"scenario/scenario_step{step_id}.html",

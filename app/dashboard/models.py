@@ -22,6 +22,7 @@ from dashboard.helpers import (
 )
 
 from projects.models import Simulation
+from projects.constants import MAP_EPA_MVS
 
 logger = logging.getLogger(__name__)
 
@@ -190,9 +191,27 @@ class AssetsResults(models.Model):
             asset_dict = self.assets_dict
             for category in asset_dict:
                 for asset in asset_dict[category]:
-                    if "flow" in asset and "_consumption_period" not in asset["label"]:
-                        asset["category"] = category
-                        self.__available_timeseries[asset["label"]] = asset
+                    if category == "energy_storage":
+                        for sub_cat in ("input_power", "output_power", "capacity"):
+                            storage_subasset = asset.get(sub_cat)
+                            if storage_subasset is None:
+                                storage_subasset = asset.get(
+                                    MAP_EPA_MVS.get(sub_cat, sub_cat)
+                                )
+                            if storage_subasset is not None:
+                                storage_subasset["category"] = category + "_" + sub_cat
+                                storage_subasset["type_oemof"] = asset["type_oemof"]
+                                self.__available_timeseries[
+                                    asset["label"] + "_" + sub_cat
+                                ] = storage_subasset
+                    else:
+                        if (
+                            "flow" in asset
+                            and "_consumption_period" not in asset["label"]
+                        ):
+                            asset["category"] = category
+                            self.__available_timeseries[asset["label"]] = asset
+
         return self.__available_timeseries
 
     @property

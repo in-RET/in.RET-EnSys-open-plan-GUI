@@ -71,6 +71,9 @@ def gettext_variables(some_string, lang="de"):
 
 
 def set_parameter_info(param_name, field, parameters=PARAMETERS):
+    # For the storage unit
+    if param_name.split("_")[0] in ("cp", "dchp", "chp"):
+        param_name = "_".join(param_name.split("_")[1:])
     param_name = MAP_EPA_MVS.get(param_name, param_name)
     help_text = None
     unit = None

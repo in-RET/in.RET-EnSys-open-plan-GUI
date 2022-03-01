@@ -20,11 +20,15 @@ from projects.models import ENERGY_VECTOR, Project
 
 class ReportItemForm(ModelForm):
 
-    scenarios = forms.MultipleChoiceField(label=_("Scenarios"))
+    scenarios = forms.ChoiceField(label=_("Scenario"))
 
     def __init__(self, *args, **kwargs):
         proj_id = kwargs.pop("proj_id", None)
+        multi_scenario = kwargs.pop("multi_scenario", False)
         super().__init__(*args, **kwargs)
+
+        if multi_scenario is True:
+            self.fields["scenarios"] = forms.MultipleChoiceField(label=_("Scenarios"))
 
         if proj_id is not None:
             project = Project.objects.get(id=proj_id)
@@ -32,9 +36,6 @@ class ReportItemForm(ModelForm):
                 c
                 for c in project.get_scenarios_with_results().values_list("id", "name")
             ]
-
-        # TODO here set multiple choice for scenarios on or off depending on the report_type
-        self.fields["scenarios"].widget.attrs = {"multiple": False}
 
     class Meta:
         model = ReportItem

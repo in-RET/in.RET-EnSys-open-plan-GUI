@@ -37,6 +37,8 @@ import ast
 
 logger = logging.getLogger(__name__)
 
+COMPARE_VIEW = "compare"
+
 
 @login_required
 @json_view
@@ -167,6 +169,7 @@ def scenario_request_results(request, scen_id):
 @login_required
 @require_http_methods(["POST", "GET"])
 def scenario_visualize_results(request, proj_id=None, scen_id=None):
+    request.session[COMPARE_VIEW] = False
     user_projects = request.user.project_set.all()
 
     if proj_id is None:
@@ -279,6 +282,7 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
 @login_required
 @require_http_methods(["POST", "GET"])
 def project_compare_results(request, proj_id):
+    request.session[COMPARE_VIEW] = True
     user_projects = request.user.project_set.all()
 
     project = get_object_or_404(Project, id=proj_id)
@@ -309,6 +313,7 @@ def project_compare_results(request, proj_id):
 @login_required
 @require_http_methods(["POST", "GET"])
 def project_sensitivity_analysis(request, proj_id):
+    request.session[COMPARE_VIEW] = False
     user_projects = request.user.project_set.all()
 
     project = get_object_or_404(Project, id=proj_id)
@@ -345,7 +350,8 @@ def report_create_item(request, proj_id):
 
     if request.is_ajax():
         qs = request.POST
-        report_form = ReportItemForm(qs, proj_id=proj_id)
+        multi_scenario = request.session.get(COMPARE_VIEW, False)
+        report_form = ReportItemForm(qs, proj_id=proj_id, multi_scenario=multi_scenario)
         answer_context = {
             "report_form": report_form.as_table(),
             "report_type": qs.get("report_type"),
@@ -353,7 +359,10 @@ def report_create_item(request, proj_id):
         if report_form.is_valid():
             # scenario selection and graph type are valid
             report_item = report_form.save(commit=False)
-            scen_ids = [int(s) for s in report_form.cleaned_data["scenarios"]]
+            if multi_scenario is True:
+                scen_ids = [int(s) for s in report_form.cleaned_data["scenarios"]]
+            else:
+                scen_ids = [int(report_form.cleaned_data["scenarios"])]
             graph_parameter_form = graph_parameters_form_factory(
                 report_item.report_type, qs, scenario_ids=scen_ids
             )
@@ -431,9 +440,13 @@ def ajax_get_graph_parameters_form(request, proj_id):
         initial_values["scenarios"] = [
             int(s) for s in json.loads(request.POST.get("selected_scenarios"))
         ]
+        multi_scenario = request.session.get(COMPARE_VIEW, False)
+
         # TODO add a parameter reportitem_id to the function, default to None and load the values from the db if it exits, then also changes the initial of the graph parameters form
 
-        report_item_form = ReportItemForm(initial=initial_values, proj_id=proj_id)
+        report_item_form = ReportItemForm(
+            initial=initial_values, proj_id=proj_id, multi_scenario=multi_scenario
+        )
 
         answer = render(
             request,

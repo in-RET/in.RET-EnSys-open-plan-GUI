@@ -391,7 +391,7 @@ class ScenarioCreateForm(OpenPlanModelForm):
 
     class Meta:
         model = Scenario
-        exclude = ["id"]
+        exclude = ["id", "capex_var", "opex_fix", "opex_var"]
         widgets = scenario_widgets
         labels = scenario_labels
 
@@ -411,7 +411,7 @@ class ScenarioUpdateForm(OpenPlanModelForm):
 
     class Meta:
         model = Scenario
-        exclude = ["id"]
+        exclude = ["id", "capex_var", "opex_fix", "opex_var"]
         widgets = scenario_widgets
         labels = scenario_labels
 

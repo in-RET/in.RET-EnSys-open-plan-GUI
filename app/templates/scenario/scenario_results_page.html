@@ -716,6 +716,12 @@ function scenario_visualize_stacked_optimized_capacities(scen_id){
 
 </script>
 
+{% if multiple_scenario_selection %}
+<script> const multipleScenarioSelection = true;  </script>
+{% else %}
+<script>const multipleScenarioSelection = false;</script>
+{% endif %}
+
 
 <script>
 
@@ -754,7 +760,8 @@ function scenario_visualize_stacked_optimized_capacities(scen_id){
             data: {
               'title': reportItemTitle,
               'report_type': graphType,
-              'selected_scenarios': JSON.stringify(reportItemScenarios)
+              'selected_scenarios': JSON.stringify(reportItemScenarios),
+              'multi_scenario': multipleScenarioSelection
             },
             success: function (formData) {
                // find and keep the csrf token of the form

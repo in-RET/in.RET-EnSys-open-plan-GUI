@@ -84,7 +84,21 @@ class Scenario(models.Model):
 
     start_date = models.DateTimeField()
     time_step = models.IntegerField(validators=[MinValueValidator(0)])
-    capex_fix = models.FloatField(validators=[MinValueValidator(0.0)])
+    capex_fix = models.FloatField(
+        validators=[MinValueValidator(0.0)], default=0, blank=True
+    )
+    # The next 3 fields make no sense for a scenario, they are asset fields.
+    # Removing them caused trouble with existing database though, so default values are used instead
+    # related to https://github.com/open-plan-tool/gui/issues/32
+    capex_var = models.FloatField(
+        validators=[MinValueValidator(0.0)], default=0, blank=True
+    )
+    opex_fix = models.FloatField(
+        validators=[MinValueValidator(0.0)], default=0, blank=True
+    )
+    opex_var = models.FloatField(
+        validators=[MinValueValidator(0.0)], default=0, blank=True
+    )
     evaluated_period = models.IntegerField(validators=[MinValueValidator(0)])
     project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
 

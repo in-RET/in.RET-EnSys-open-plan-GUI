@@ -33,20 +33,18 @@
                 </div>
             </div>
             {% if scenario_list %}
-            <div class="row dashboard__create">
-                <div class="col">
-                  <button class="btn btn--medium" onclick="javascript:showCreateReportItemModal(event)">
-                    <span class="icon icon-add"></span>
-                    Create graph
-                  </button>
+                <div class="row dashboard__create">
+                    <div class="col">
+                      <button class="btn btn--medium" onclick="javascript:showCreateReportItemModal(event)">
+                        <span class="icon icon-add"></span>
+                        Create graph
+                      </button>
+                    </div>
                 </div>
+            {% endif %}
+            <div class="row">
+                <div class="col" id="report_items"></div>
             </div>
-            <div> HERE WILL BE THE COMPARE SPECIFIC GRAPHS DISPLAYED</div>
-            {# TODO: make button or add kpi/scalar matrix results to downloadable excel sheet #}
-            {% if scen_id %}
-                <a type="button" class="btn btn-info" href="{% url 'download_timeseries_results' scen_id %}">{% translate "Download Timeseries" %}</a>
-            {% endif %}
-            {% endif %}
         </div>
     </section>
 

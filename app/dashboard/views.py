@@ -336,7 +336,7 @@ def project_sensitivity_analysis(request, proj_id, sa_id=None):
                 proj_id = request.user.project_set.first().id
             # make sure the project id is always visible in url
             answer = HttpResponseRedirect(
-                reverse("project_visualize_results", args=[proj_id])
+                reverse("project_sensitivity_analysis", args=[proj_id])
             )
     else:
 

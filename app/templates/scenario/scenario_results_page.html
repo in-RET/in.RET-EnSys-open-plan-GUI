@@ -111,6 +111,7 @@
 
 
 
+
 <main>
     <section class="header">
         <div>
@@ -122,16 +123,13 @@
         </div>
     </section>
     <section class="header-results">
-            <button id="reportBtn" class="view" onclick="javascript:showCreateReportItemModal(event)">
-                                    Add graph
-            </button>
         <div>
             <div class="header-results__scenario">
                 <div class="project-title">
                     {% translate "Project" %}
                 </div>
                 <div class="project-name">
-                    <form action="{% url 'scenario_visualize_results' %}" method="POST">
+                    <form action="{{ request.get_full_path }}" method="POST">
                         {% csrf_token %}
                         <select name="proj_id" class="form-select" aria-label="Default select example" onchange="this.form.submit()">
                         {% for project in project_list %}

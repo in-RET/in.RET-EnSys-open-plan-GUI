@@ -38,6 +38,11 @@ urlpatterns = [
         name="project_sensitivity_analysis",
     ),
     path(
+        "project/<int:proj_id>/scenario/results/sensitivity-analysis/add-graph",
+        sensitivity_analysis_create_graph,
+        name="sensitivity_analysis_create_graph",
+    ),
+    path(
         "scenario/results/request/<int:scen_id>",
         scenario_request_results,
         name="scenario_request_results",

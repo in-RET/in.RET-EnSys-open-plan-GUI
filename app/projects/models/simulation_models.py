@@ -176,3 +176,14 @@ class SensitivityAnalysis(AbstractSimulation):
             if isinstance(variable_name_path, list):
                 variable_name_path = variable_name_path[0]
         return variable_name_path
+
+
+def get_project_sensitivity_analysis(project):
+    """Given a project, return the ReportItem instances linked to that project"""
+    qs = (
+        project.scenario_set.filter(simulation__isnull=False)
+        .filter(simulation__results__isnull=False)
+        .values_list("sensitivityanalysis", flat=True)
+        .distinct()
+    )
+    return SensitivityAnalysis.objects.filter(id__in=[sa_id for sa_id in qs])

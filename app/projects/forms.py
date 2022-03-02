@@ -467,6 +467,7 @@ class SensitivityAnalysisForm(ModelForm):
     class Meta:
         model = SensitivityAnalysis
         fields = [
+            "name",
             "variable_name",
             "variable_min",
             "variable_max",

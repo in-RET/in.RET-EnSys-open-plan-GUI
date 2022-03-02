@@ -26,7 +26,7 @@
                 <div class="row">
 
                     {% if sa_status != "MODIFIED" %}
-                    The simulation <a href="{{ MVS_SA_GET_URL }}{{ sa_item.mvs_token }}">{{ sa_item.mvs_token }}</a> has been started, its status is <span>{{ sa_status }}</span>
+                    The simulation <a href="{{ MVS_SA_GET_URL }}{{ mvs_token }}">{{ mvs_token }}</a> has been started, its status is <span>{{ sa_status }}</span>
                     {% else %}
                     The parameters of the scenario linked to the simulation <a href="{{ MVS_GET_URL }}{{ mvs_token }}">{{ mvs_token }}</a> have been changed, you can rerun the simulation to update the results, please note that existing results will be erased only if the simulation does not have errors
                     {% endif %}

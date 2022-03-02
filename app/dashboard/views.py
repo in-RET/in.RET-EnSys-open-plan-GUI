@@ -18,7 +18,13 @@ from django.shortcuts import render, get_object_or_404, HttpResponseRedirect
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 from jsonview.decorators import json_view
-from projects.models import Project, Scenario, Simulation
+from projects.models import (
+    Project,
+    Scenario,
+    Simulation,
+    SensitivityAnalysis,
+    get_project_sensitivity_analysis,
+)
 from projects.services import excuses_design_under_development
 from dashboard.models import ReportItem, get_project_reportitems
 from dashboard.forms import (
@@ -312,34 +318,70 @@ def project_compare_results(request, proj_id):
 
 @login_required
 @require_http_methods(["POST", "GET"])
-def project_sensitivity_analysis(request, proj_id):
+def project_sensitivity_analysis(request, proj_id, sa_id=None):
     request.session[COMPARE_VIEW] = False
     user_projects = request.user.project_set.all()
 
-    project = get_object_or_404(Project, id=proj_id)
-    if (project.user != request.user) and (request.user not in project.viewers.all()):
-        raise PermissionDenied
+    if proj_id is None:
+        if sa_id is not None:
+            proj_id = SensitivityAnalysis.objects.get(id=sa_id).scenario.project.id
+            # make sure the project id is always visible in url
+            answer = HttpResponseRedirect(
+                reverse("project_sensitivity_analysis", args=[proj_id, sa_id])
+            )
+        else:
+            if request.POST:
+                proj_id = int(request.POST.get("proj_id"))
+            else:
+                proj_id = request.user.project_set.first().id
+            # make sure the project id is always visible in url
+            answer = HttpResponseRedirect(
+                reverse("project_visualize_results", args=[proj_id])
+            )
+    else:
 
-    user_scenarios = project.get_scenarios_with_results()
-    # TODO filter the reportItems linked to a sensitivity analysis
-    report_items_data = [
-        ri.render_json
-        for ri in get_project_reportitems(project)
-        .annotate(c=Count("simulations"))
-        .filter(c__gt=1)
-    ]
-    return render(
-        request,
-        "report/sensitivity_analysis.html",
-        {
-            "proj_id": proj_id,
-            "project_list": user_projects,
-            "scenario_list": user_scenarios,
-            "report_items_data": report_items_data,
-            "kpi_list": KPI_PARAMETERS,
-            "table_styles": TABLES,
-        },
-    )
+        project = get_object_or_404(Project, id=proj_id)
+        if (project.user != request.user) and (
+            request.user not in project.viewers.all()
+        ):
+            raise PermissionDenied
+
+        user_sa = get_project_sensitivity_analysis(project)
+        if user_sa.exists() is False:
+            # There are no sensitivity analysis with results yet for this project
+            answer = render(
+                request,
+                "report/sensitivity_analysis.html",
+                {
+                    "project_list": user_projects,
+                    "proj_id": proj_id,
+                    "sa_list": [],
+                    "kpi_list": KPI_PARAMETERS,
+                    "table_styles": TABLES,
+                    "report_items_data": [],
+                },
+            )
+        else:
+            if sa_id is None:
+                sa_id = user_sa.first().id
+
+            # TODO filter the reportItems linked to a sensitivity analysis
+
+            report_items_data = [ri.render_json for ri in user_sa]
+            answer = render(
+                request,
+                "report/sensitivity_analysis.html",
+                {
+                    "proj_id": proj_id,
+                    "project_list": user_projects,
+                    "sa_list": user_sa,
+                    "sa_id": sa_id,
+                    "report_items_data": report_items_data,
+                    "kpi_list": KPI_PARAMETERS,
+                    "table_styles": TABLES,
+                },
+            )
+    return answer
 
 
 @login_required

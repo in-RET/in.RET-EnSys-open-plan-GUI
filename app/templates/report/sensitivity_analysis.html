@@ -16,12 +16,24 @@
                 <div class="dashboard__scenarios">
                     <h2>My sensitivity analysis</h2>
                     <div class="scenario-select">
-                        HERE WILL BE THE SENSITIVITY ANALYSIS MADE DISPLAYED
+                        {% for sa in sa_list %}
+                        {% if sa.id|stringformat:'s' in request|get_selected_scenarios:proj_id %}
+                            {% setvar "selected" as selected %}
+                        {% else%}
+                            {% setvar "" as selected %}
+                        {% endif %}
+                            <button id="sa-{{ proj_id }}-{{ sa.id}}" class="scenario-select__item {{ selected }}" onclick="update_selected_sa(this)">
+                                {{ sa.name }}
+                            </button>
+                        {% empty %}
+                            {% translate "You have no sensitivity analysis with completed simulation, please run simulations to display results" %}
+                        {% endfor %}
+
 
                     </div>
                 </div>
             </div>
-            {% if scenario_list %}
+            {% if sa_list %}
             <div class="row dashboard__create">
                 <div class="col">
                   <button class="btn btn--medium" onclick="javascript:showCreateReportItemModal(event)">

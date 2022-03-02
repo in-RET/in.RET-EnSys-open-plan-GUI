@@ -334,6 +334,7 @@ GRAPH_BAR = "bar"
 GRAPH_PIE = "pie"
 GRAPH_LOAD_DURATION = "load_duration"
 GRAPH_SANKEY = "sankey"
+GRAPH_SENSITIVITY_ANALYSIS = "sensitivity_analysis"
 
 REPORT_TYPES = (
     (GRAPH_TIMESERIES, _("Timeseries graph")),

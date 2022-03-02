@@ -36,7 +36,7 @@
             {% if sa_list %}
             <div class="row dashboard__create">
                 <div class="col">
-                  <button class="btn btn--medium" onclick="javascript:showCreateReportItemModal(event)">
+                  <button class="btn btn--medium" onclick="javascript:showCreateSaGraphModal(event)">
                     <span class="icon icon-add"></span>
                     Create graph
                   </button>
@@ -58,5 +58,18 @@
 <script>
 
 document.getElementById('sensitivity-analysis-link').classList.add('active');
+
+
+
+    /** Add a new sensitivity graph **/
+
+    const createSaGraphModalDOM = document.getElementById("createSaGraphModal");
+    const createSaGraphModal = new bootstrap.Modal(createSaGraphModalDOM);
+
+    function showCreateSaGraphModal(event){
+        createSaGraphModal.show()
+    }
+
+
 </script>
 {% endblock results_end_body_scripts %}

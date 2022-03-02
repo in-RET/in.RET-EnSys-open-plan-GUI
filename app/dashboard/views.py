@@ -356,8 +356,6 @@ def project_sensitivity_analysis(request, proj_id, sa_id=None):
                     "project_list": user_projects,
                     "proj_id": proj_id,
                     "sa_list": [],
-                    "kpi_list": KPI_PARAMETERS,
-                    "table_styles": TABLES,
                     "report_items_data": [],
                 },
             )
@@ -366,7 +364,7 @@ def project_sensitivity_analysis(request, proj_id, sa_id=None):
                 sa_id = user_sa.first().id
 
             # TODO filter the reportItems linked to a sensitivity analysis
-
+            sa_graph_form = graph_parameters_form_factory(GRAPH_SENSITIVITY_ANALYSIS)
             report_items_data = [ri.render_json for ri in user_sa]
             answer = render(
                 request,
@@ -377,8 +375,7 @@ def project_sensitivity_analysis(request, proj_id, sa_id=None):
                     "sa_list": user_sa,
                     "sa_id": sa_id,
                     "report_items_data": report_items_data,
-                    "kpi_list": KPI_PARAMETERS,
-                    "table_styles": TABLES,
+                    "sa_graph_form": sa_graph_form,
                 },
             )
     return answer
@@ -442,6 +439,15 @@ def report_create_item(request, proj_id):
             content_type="application/json",
         )
     return answer
+
+
+@login_required
+@json_view
+@require_http_methods(["POST"])
+def sensitivity_analysis_create_graph(request, proj_id):
+    """This ajax view is triggered by clicking on "create" in the form to add a report item"""
+
+    pass
 
 
 @login_required

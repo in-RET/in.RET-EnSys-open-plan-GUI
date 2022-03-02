@@ -2,7 +2,7 @@ from crispy_forms.helper import FormHelper
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.forms import ModelForm
-from dashboard.models import ReportItem, AssetsResults
+from dashboard.models import ReportItem, AssetsResults, SensitivityAnalysisGraph
 
 
 from dashboard.helpers import (
@@ -14,6 +14,7 @@ from dashboard.helpers import (
     GRAPH_PIE,
     GRAPH_LOAD_DURATION,
     GRAPH_SANKEY,
+    GRAPH_SENSITIVITY_ANALYSIS,
 )
 from projects.models import ENERGY_VECTOR, Project
 
@@ -126,6 +127,19 @@ class StackedCapacitiesGraphForm(forms.Form):
             self.fields["y"].choices = tuple(choices)
 
 
+class SensitivityAnalysisGraphForm(ModelForm):
+    class Meta:
+        model = SensitivityAnalysisGraph
+        fields = ["analysis", "title", "y"]
+        labels = [
+            _("Sensitivity analysis"),
+            _("Graph title"),
+            _("Parameter of interest"),
+        ]
+
+    field_order = ["analysis", "title", "y"]
+
+
 def graph_parameters_form_factory(report_type, *args, **kwargs):
     """Linked to dashboard/models.py:ReportItem.fetch_parameters_values"""
     if report_type == GRAPH_TIMESERIES:
@@ -138,4 +152,6 @@ def graph_parameters_form_factory(report_type, *args, **kwargs):
     # GRAPH_PIE,
     # GRAPH_LOAD_DURATION,
     # GRAPH_SANKEY,
+    if report_type == GRAPH_SENSITIVITY_ANALYSIS:
+        answer = SensitivityAnalysisGraphForm(*args, **kwargs)
     return answer

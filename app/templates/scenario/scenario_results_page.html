@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load crispy_forms_tags %}
 {% load custom_filters %}
 {% load custom_template_tags %}
 {% load i18n %}
@@ -82,6 +83,33 @@
         </div>
     </div>
 </div>
+
+<!-- Modal to create sensitivity analysis -->
+<div class="modal fade modal--dashboard" id="createSaGraphModal" tabindex="-1" role="dialog" aria-labelledby="createSaGraphModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createSaGraphModalLabel">{% translate "Add a sensitivity analysisgraph" %}</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{% url 'sensitivity_analysis_create_graph' proj_id %">
+                    {% csrf_token %}
+                    {{ sa_graph_form | crispy}}
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate "Close" %}</button>
+                 <button class="btn btn--medium" onclick="javascript:submitForm(event, modalId='createSaGraphModal')">{% translate "Create" %}</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 <main>
     <section class="header">
@@ -724,6 +752,12 @@ function scenario_visualize_stacked_optimized_capacities(scen_id){
 
 
 <script>
+
+
+    function submitForm(event, modalId=""){
+        const modalDOM = document.getElementById(modalId);
+        modalDOM.querySelector("form").submit();
+    }
 
     /** Add a new report item **/
 

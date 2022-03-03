@@ -394,6 +394,21 @@ def report_item_render_to_json(
     return answer
 
 
+def sensitivity_analysis_graph_render_to_json(
+    sa_id="", data=None, title="", x_label="", y_label=""
+):
+    """format the information about a report item instance in a specific JSON"""
+    answer = report_item_render_to_json(
+        report_item_id=sa_id,
+        data=data,
+        title=title,
+        report_item_type=GRAPH_SENSITIVITY_ANALYSIS,
+    )
+    answer["x_label"] = x_label
+    answer["y_label"] = y_label
+    return answer
+
+
 def decode_report_item_id(report_id):
     """Provided with a DOM report item id return the report_item id in the database"""
     return int(report_id.replace("reportItem", "").split("-")[1])

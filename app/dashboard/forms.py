@@ -113,12 +113,15 @@ class StackedCapacitiesGraphForm(forms.Form):
             )
             choices = None
             for assets_results in assets_results_across_simulations:
-                new_choices = [(n, n) for n in assets_results.available_timeseries]
+                new_choices = [
+                    (n, n)
+                    for n in assets_results.available_timeseries
+                    if assets_results.single_asset_type_oemof(n) != "sink"
+                ]
                 if choices is None:
                     choices = set(new_choices)
                 else:
                     choices = choices.intersection(new_choices)
-
             self.fields["y"].choices = tuple(choices)
 
 

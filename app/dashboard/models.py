@@ -9,6 +9,8 @@ from django.shortcuts import get_object_or_404
 from django.db import models
 from dashboard.helpers import (
     KPI_PARAMETERS,
+    KPI_PARAMETERS_ASSETS,
+    KPI_helper,
     GRAPH_TIMESERIES,
     GRAPH_TIMESERIES_STACKED,
     GRAPH_CAPACITIES,
@@ -22,6 +24,7 @@ from dashboard.helpers import (
     single_timeseries_to_json,
     simulation_timeseries_to_json,
     report_item_render_to_json,
+    sensitivity_analysis_graph_render_to_json,
 )
 
 from projects.models import Simulation, SensitivityAnalysis
@@ -490,4 +493,19 @@ class SensitivityAnalysisGraph(models.Model):
         editable=False,
     )
     analysis = models.ForeignKey(SensitivityAnalysis, on_delete=models.CASCADE)
-    y = models.CharField(max_length=50)
+    y = models.CharField(
+        max_length=50,
+        choices=[
+            (v, _(KPI_PARAMETERS_ASSETS[v]["verbose"])) for v in KPI_PARAMETERS_ASSETS
+        ],
+    )
+
+    @property
+    def render_json(self):
+        return sensitivity_analysis_graph_render_to_json(
+            sa_id=f"saItem{self.analysis.scenario.project.id}-{self.id}",
+            data=self.analysis.graph_data(self.y),
+            title=self.title,
+            x_label=self.analysis.variable_name_verbose,
+            y_label=KPI_helper.get_doc_verbose(self.y),
+        )

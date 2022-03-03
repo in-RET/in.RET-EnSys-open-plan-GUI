@@ -43,6 +43,10 @@
                 </div>
             </div>
             <div> HERE WILL BE THE SENSITIVITY ANALYSIS SPECIFIC GRAPHS DISPLAYED</div>
+            <div class="row">
+                <div class="col" id="report_items">
+                </div>
+            </div>
             {# TODO: make button or add kpi/scalar matrix results to downloadable excel sheet #}
             {% if scen_id %}
                 <a type="button" class="btn btn-info" href="{% url 'download_timeseries_results' scen_id %}">{% translate "Download Timeseries" %}</a>
@@ -69,6 +73,24 @@ document.getElementById('sensitivity-analysis-link').classList.add('active');
     function showCreateSaGraphModal(event){
         createSaGraphModal.show()
     }
+
+
+ $("#id_analysis").change(function () {
+      var saId= $(this).val();  // get the selected country ID from the HTML input
+
+      $.ajax({                       // initialize an AJAX request
+        headers: {'X-CSRFToken': `{{ csrf_token }}` },
+        type: "POST",
+        url: urlSaForm,                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
+        data: {
+          'sa_id': saId       // add the country id to the GET parameters
+        },
+        success: function (data) {   // `data` is the return of the `load_cities` view function
+          console.log(data)
+          $("#id_y").html(data);  // replace the contents of the city input with the data that came from the server
+        }
+      });
+  });
 
 
 </script>

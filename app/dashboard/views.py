@@ -448,7 +448,33 @@ def report_create_item(request, proj_id):
 def sensitivity_analysis_create_graph(request, proj_id):
     """This ajax view is triggered by clicking on "create" in the form to add a report item"""
 
-    pass
+    if request.method == "POST":
+        qs = request.POST
+        import pdb
+
+        pdb.set_trace()
+        graph_parameter_form = graph_parameters_form_factory(
+            GRAPH_SENSITIVITY_ANALYSIS, qs
+        )
+        answer_context = {"graph_parameter_form": graph_parameter_form}
+        if graph_parameter_form.is_valid():
+            sa_graph = graph_parameter_form.save()
+
+            answer = JsonResponse(
+                sa_graph.render_json, status=200, content_type="application/json"
+            )
+        else:
+            # TODO workout the passing of post when there are errors (in crisp format)
+            answer = JsonResponse(
+                answer_context, status=422, content_type="application/json"
+            )
+    else:
+        answer = JsonResponse(
+            {"error": "This url is only for post calls"},
+            status=405,
+            content_type="application/json",
+        )
+    return answer
 
 
 @login_required

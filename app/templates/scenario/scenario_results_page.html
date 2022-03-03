@@ -95,7 +95,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form method="POST" action="{% url 'sensitivity_analysis_create_graph' proj_id %">
+                <form method="POST" action="{% url 'sensitivity_analysis_create_graph' proj_id %}" graph-parameter-url="{% url 'ajax_get_sensitivity_analysis_parameters' %}">
                     {% csrf_token %}
                     {{ sa_graph_form | crispy}}
                 </form>

@@ -43,6 +43,11 @@ urlpatterns = [
         name="sensitivity_analysis_create_graph",
     ),
     path(
+        "ajax/sensitivity-analysis/graph-parameters",
+        ajax_get_sensitivity_analysis_parameters,
+        name="ajax_get_sensitivity_analysis_parameters",
+    ),
+    path(
         "scenario/results/request/<int:scen_id>",
         scenario_request_results,
         name="scenario_request_results",

@@ -423,6 +423,7 @@ def report_create_item(request, proj_id):
                     report_item.render_json, status=200, content_type="application/json"
                 )
             else:
+
                 # TODO workout the passing of post when there are errors (in crisp format)
                 answer = JsonResponse(
                     answer_context, status=422, content_type="application/json"
@@ -514,6 +515,26 @@ def ajax_get_graph_parameters_form(request, proj_id):
             content_type="application/json",
         )
     return answer
+
+
+@login_required
+@require_http_methods(["POST"])
+def ajax_get_sensitivity_analysis_parameters(request):
+    if request.is_ajax():
+        qs = request.POST
+        sa_id = int(qs.get("sa_id"))
+        sa_item = get_object_or_404(SensitivityAnalysis, id=sa_id)
+
+        return render(
+            request,
+            "report/sa_parameters_form.html",
+            context={
+                "output_parameters": [
+                    {"name": p, "verbose": KPI_helper.get_doc_verbose(p)}
+                    for p in sa_item.output_names
+                ]
+            },
+        )
 
 
 @login_required

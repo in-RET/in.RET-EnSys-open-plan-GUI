@@ -104,6 +104,33 @@ class SensitivityAnalysis(AbstractSimulation):
             answer = {}
         return answer
 
+    def graph_data(self, param_name):
+        try:
+            out_values = json.loads(self.output_parameters_values)
+            answer = dict(x=[], y=[])
+            if param_name not in self.output_names:
+                logger.error(
+                    f"The sensitivity analysis output parameter {param_name} is not present in the sensitivity analysis {self.name}"
+                )
+            else:
+                for in_value, sa_step in zip(self.variable_range, out_values):
+                    answer["x"].append(in_value)
+                    try:
+                        jsonschema.validate(
+                            sa_step,
+                            sa_output_values_schema_generator(self.output_names),
+                        )
+
+                        y_val = sa_step[param_name]["value"][0]
+
+                    except jsonschema.exceptions.ValidationError:
+                        y_val = np.nan
+
+                    answer["y"].append(y_val)
+        except json.decoder.JSONDecodeError:
+            answer = {}
+        return answer
+
     def parse_server_response(self, sa_results):
         try:
             # make sure the response is formatted as expected
@@ -151,6 +178,15 @@ class SensitivityAnalysis(AbstractSimulation):
             variable_parameter_ref_val=self.variable_reference,
             output_parameter_names=self.output_names,
         )
+
+    @property
+    def variable_name_verbose(self):
+        if "." in self.variable_name:
+            asset_name, variable_name = self.variable_name.split(".")
+            answer = f"{variable_name} of asset {asset_name}"
+        else:
+            answer = self.variable_name
+        return answer
 
     @property
     def variable_name_path(self):

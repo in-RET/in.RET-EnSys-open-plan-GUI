@@ -243,6 +243,20 @@ class AssetsResults(models.Model):
                         )
         return answer
 
+    def single_asset_type_oemof(self, asset_name, asset_category=None):
+        """Provided the user name of the asset, return the type_oemof linked to this asset"""
+        if self.__available_timeseries is None:
+            asset_results = self.single_asset_results(asset_name, asset_category)
+
+        else:
+            asset_results = self.__available_timeseries.get(asset_name)
+
+        if "type_oemof" in asset_results:
+            answer = asset_results['type_oemof']
+        else:
+            answer = None
+        return answer
+
     def single_asset_timeseries(self, asset_name, asset_category=None):
         """Provided the user name of the asset, return the timeseries linked to this asset"""
         if self.__available_timeseries is None:
@@ -400,7 +414,7 @@ class ReportItem(models.Model):
                         )
                     )
                 return simulations_results
-        # TODO exclude sink components
+
         if self.report_type == GRAPH_CAPACITIES:
             y_variables = parameters.get("y", None)
             scenario = get_object_or_404(Scenario, pk=self.project_id)
@@ -438,6 +452,7 @@ class ReportItem(models.Model):
                             if (
                                 "consumption_period" not in asset_obj["label"]
                                 and asset_obj["label"][-3:] != "DSO"
+                                and asset_obj["type_oemof"] != "sink"
                             ):
                                 x_values.append(asset_obj["label"])
                                 installed_capactiy_dict["capacity"].append(

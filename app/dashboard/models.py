@@ -449,7 +449,13 @@ class ReportItem(models.Model):
                     }
 
                     for y_var in y_variables:
-                        x_values.append(y_var)
+                        x_values.append(
+                            y_var
+                            + " in "
+                            + assets_results_obj.single_asset_results(asset_name=y_var)[
+                                "installed_capacity"
+                            ]["unit"]
+                        )
                         installed_capactiy_dict["capacity"].append(
                             assets_results_obj.single_asset_results(asset_name=y_var)[
                                 "installed_capacity"

@@ -432,9 +432,7 @@ class ReportItem(models.Model):
                     )
 
                     results_dict = json.loads(
-                        Scenario.objects.get(
-                            simulation=scenario.simulation
-                        ).simulation.results
+                        scenario.simulation.results
                     )
 
                     kpi_scalar_matrix = results_dict["kpi"]["scalar_matrix"]

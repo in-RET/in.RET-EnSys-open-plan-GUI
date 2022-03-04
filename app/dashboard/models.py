@@ -228,7 +228,7 @@ class AssetsResults(models.Model):
         if asset_category is not None:
             categories = [asset_category]
         else:
-            categories = self.__asset_categories
+            categories = self.asset_categories
 
         for category in categories:
             for asset in asset_dict[category]:
@@ -252,7 +252,7 @@ class AssetsResults(models.Model):
             asset_results = self.__available_timeseries.get(asset_name)
 
         if "type_oemof" in asset_results:
-            answer = asset_results['type_oemof']
+            answer = asset_results["type_oemof"]
         else:
             answer = None
         return answer
@@ -423,12 +423,13 @@ class ReportItem(models.Model):
                 simulations_results = []
 
                 for simulation in self.simulations.all():
-                    y_values = []
-                    x_values = []
+                    y_values = (
+                        []
+                    )  # stores the capacity, both installed and optimized in seperate dicts, of each individual asset/ component
+                    x_values = []  # stores the label of the corresponding asset
                     assets_results_obj = AssetsResults.objects.get(
                         simulation=simulation
                     )
-                    assets_results_json = assets_results_obj.assets_dict
 
                     results_dict = json.loads(
                         Scenario.objects.get(
@@ -447,25 +448,19 @@ class ReportItem(models.Model):
                         "name": "Optimized Capacity",
                     }
 
-                    for asset_list in assets_results_json.values():
-                        for asset_obj in asset_list:
-                            if (
-                                "consumption_period" not in asset_obj["label"]
-                                and asset_obj["label"][-3:] != "DSO"
-                                and asset_obj["type_oemof"] != "sink"
-                            ):
-                                x_values.append(asset_obj["label"])
-                                installed_capactiy_dict["capacity"].append(
-                                    asset_obj["installed_capacity"]["value"]
-                                )
-                                if asset_obj["label"] in kpi_scalar_matrix:
-                                    optimized_capacity_dict["capacity"].append(
-                                        kpi_scalar_matrix[asset_obj["label"]][
-                                            "optimizedAddCap"
-                                        ]
-                                    )
-                                else:
-                                    optimized_capacity_dict["capacity"].append(0)
+                    for y_var in y_variables:
+                        x_values.append(y_var)
+                        installed_capactiy_dict["capacity"].append(
+                            assets_results_obj.single_asset_results(asset_name=y_var)[
+                                "installed_capacity"
+                            ]["value"]
+                        )
+                        if y_var in kpi_scalar_matrix:
+                            optimized_capacity_dict["capacity"].append(
+                                kpi_scalar_matrix[y_var]["optimizedAddCap"]
+                            )
+                        else:
+                            optimized_capacity_dict["capacity"].append(0)
 
                     y_values.append(installed_capactiy_dict)
                     y_values.append(optimized_capacity_dict)

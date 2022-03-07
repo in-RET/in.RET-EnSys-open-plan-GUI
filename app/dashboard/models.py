@@ -437,7 +437,7 @@ class ReportItem(models.Model):
 
                     kpi_scalar_matrix = results_dict["kpi"]["scalar_matrix"]
 
-                    installed_capactiy_dict = {
+                    installed_capacity_dict = {
                         "capacity": [],
                         "name": "Installed Capacity",
                     }
@@ -454,7 +454,7 @@ class ReportItem(models.Model):
                                 "installed_capacity"
                             ]["unit"]
                         )
-                        installed_capactiy_dict["capacity"].append(
+                        installed_capacity_dict["capacity"].append(
                             assets_results_obj.single_asset_results(asset_name=y_var)[
                                 "installed_capacity"
                             ]["value"]
@@ -466,7 +466,7 @@ class ReportItem(models.Model):
                         else:
                             optimized_capacity_dict["capacity"].append(0)
 
-                    y_values.append(installed_capactiy_dict)
+                    y_values.append(installed_capacity_dict)
                     y_values.append(optimized_capacity_dict)
 
                     simulations_results.append(

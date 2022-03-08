@@ -501,13 +501,24 @@ class SensitivityAnalysisGraph(models.Model):
     )
 
     @property
+    def variable_unit(self):
+        return self.analysis.variable_unit.replace(
+            "currency", self.analysis.scenario.get_currency()
+        )
+
+    @property
+    def y_unit(self):
+        unit = KPI_helper.get_doc_unit(self.y)
+        return unit.replace("currency", self.analysis.scenario.get_currency())
+
+    @property
     def render_json(self):
         return sensitivity_analysis_graph_render_to_json(
             sa_id=f"saItem{self.analysis.scenario.project.id}-{self.id}",
             data=[self.analysis.graph_data(self.y)],
             title=self.title,
-            x_label=self.analysis.variable_name_verbose,
-            y_label=KPI_helper.get_doc_verbose(self.y),
+            x_label=f"{self.analysis.variable_name_verbose} [{self.variable_unit}]",
+            y_label=f"{KPI_helper.get_doc_verbose(self.y)} [{self.y_unit}]",
         )
 
 

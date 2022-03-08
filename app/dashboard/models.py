@@ -5,6 +5,7 @@ import traceback
 import logging
 
 from django.utils.translation import ugettext_lazy as _
+from django.shortcuts import get_object_or_404
 from django.db import models
 from dashboard.helpers import (
     KPI_PARAMETERS,
@@ -21,8 +22,8 @@ from dashboard.helpers import (
     report_item_render_to_json,
 )
 
-from projects.models import Simulation
 from projects.constants import MAP_EPA_MVS
+from projects.models import Simulation, Scenario
 
 logger = logging.getLogger(__name__)
 
@@ -227,7 +228,7 @@ class AssetsResults(models.Model):
         if asset_category is not None:
             categories = [asset_category]
         else:
-            categories = self.__asset_categories
+            categories = self.asset_categories
 
         for category in categories:
             for asset in asset_dict[category]:
@@ -240,6 +241,20 @@ class AssetsResults(models.Model):
                         raise ValueError(
                             f"Asset named {asset_name} appears twice in simulations results, this should not be possible"
                         )
+        return answer
+
+    def single_asset_type_oemof(self, asset_name, asset_category=None):
+        """Provided the user name of the asset, return the type_oemof linked to this asset"""
+        if self.__available_timeseries is None:
+            asset_results = self.single_asset_results(asset_name, asset_category)
+
+        else:
+            asset_results = self.__available_timeseries.get(asset_name)
+
+        if "type_oemof" in asset_results:
+            answer = asset_results["type_oemof"]
+        else:
+            answer = None
         return answer
 
     def single_asset_timeseries(self, asset_name, asset_category=None):
@@ -398,6 +413,69 @@ class ReportItem(models.Model):
                             scenario_timestamps=simulation.scenario.get_timestamps(),
                         )
                     )
+                return simulations_results
+
+        if self.report_type == GRAPH_CAPACITIES:
+            y_variables = parameters.get("y", None)
+            scenario = get_object_or_404(Scenario, pk=self.project_id)
+
+            if y_variables is not None:
+                simulations_results = []
+
+                for simulation in self.simulations.all():
+                    y_values = (
+                        []
+                    )  # stores the capacity, both installed and optimized in seperate dicts, of each individual asset/ component
+                    x_values = []  # stores the label of the corresponding asset
+                    assets_results_obj = AssetsResults.objects.get(
+                        simulation=simulation
+                    )
+
+                    results_dict = json.loads(scenario.simulation.results)
+
+                    kpi_scalar_matrix = results_dict["kpi"]["scalar_matrix"]
+
+                    installed_capacity_dict = {
+                        "capacity": [],
+                        "name": "Installed Capacity",
+                    }
+                    optimized_capacity_dict = {
+                        "capacity": [],
+                        "name": "Optimized Capacity",
+                    }
+
+                    for y_var in y_variables:
+                        x_values.append(
+                            y_var
+                            + " in "
+                            + assets_results_obj.single_asset_results(asset_name=y_var)[
+                                "installed_capacity"
+                            ]["unit"]
+                        )
+                        installed_capacity_dict["capacity"].append(
+                            assets_results_obj.single_asset_results(asset_name=y_var)[
+                                "installed_capacity"
+                            ]["value"]
+                        )
+                        if y_var in kpi_scalar_matrix:
+                            optimized_capacity_dict["capacity"].append(
+                                kpi_scalar_matrix[y_var]["optimizedAddCap"]
+                            )
+                        else:
+                            optimized_capacity_dict["capacity"].append(0)
+
+                    y_values.append(installed_capacity_dict)
+                    y_values.append(optimized_capacity_dict)
+
+                    simulations_results.append(
+                        simulation_timeseries_to_json(
+                            scenario_name=simulation.scenario.name,
+                            scenario_id=simulation.scenario.id,
+                            scenario_timeseries=y_values,
+                            scenario_timestamps=x_values,
+                        )
+                    )
+
                 return simulations_results
 
     @property

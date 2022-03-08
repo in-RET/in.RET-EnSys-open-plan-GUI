@@ -19,30 +19,13 @@ from crispy_forms.layout import (
 from django import forms
 from django.forms import ModelForm
 from django.core.validators import MaxValueValidator, MinValueValidator
-from django.contrib.staticfiles.storage import staticfiles_storage
+from django.utils.translation import ugettext_lazy as _
+from django.conf import settings as django_settings
 from projects.models import *
 from projects.constants import MAP_EPA_MVS, RENEWABLE_ASSETS
 
-from dashboard.helpers import KPI_PARAMETERS_ASSETS
-
-from django.utils.translation import ugettext_lazy as _
-from django.conf import settings as django_settings
-
-PARAMETERS = {}
-if os.path.exists(staticfiles_storage.path("MVS_parameters_list.csv")) is True:
-    with open(staticfiles_storage.path("MVS_parameters_list.csv")) as csvfile:
-        csvreader = csv.reader(csvfile, delimiter=",", quotechar='"')
-        for i, row in enumerate(csvreader):
-            if i == 0:
-                hdr = row
-                label_idx = hdr.index("label")
-            else:
-                label = row[label_idx]
-                PARAMETERS[label] = {}
-                for k, v in zip(hdr, row):
-                    if k == "sensitivity_analysis":
-                        v = bool(int(v))
-                    PARAMETERS[label][k] = v
+from dashboard.helpers import KPI_PARAMETERS_ASSETS, KPIFinder
+from projects.helpers import parameters_helper, PARAMETERS
 
 
 def gettext_variables(some_string, lang="de"):

@@ -20,6 +20,7 @@ from projects.helpers import (
     sa_output_values_schema_generator,
     SA_RESPONSE_SCHEMA,
     format_scenario_for_mvs,
+    parameters_helper,
 )
 
 from dashboard.helpers import nested_dict_crawler
@@ -180,12 +181,21 @@ class SensitivityAnalysis(AbstractSimulation):
         )
 
     @property
+    def variable_unit(self):
+        if "." in self.variable_name:
+            _, var_name = self.variable_name.split(".")
+        else:
+            var_name = self.variable_name
+
+        return parameters_helper.get_doc_unit(var_name)
+
+    @property
     def variable_name_verbose(self):
         if "." in self.variable_name:
             asset_name, variable_name = self.variable_name.split(".")
-            answer = f"{variable_name} of asset {asset_name}"
+            answer = f"{parameters_helper.get_doc_verbose(variable_name)} of asset {asset_name}"
         else:
-            answer = self.variable_name
+            answer = parameters_helper.get_doc_verbose(self.variable_name)
         return answer
 
     @property

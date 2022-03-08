@@ -470,7 +470,10 @@ class SensitivityAnalysisForm(ModelForm):
             asset_parameters = []
             for asset in scenario.asset_set.all():
                 asset_parameters += [
-                    (f"{asset.name}.{p}", _(p) + f" ({asset.name})")
+                    (
+                        f"{asset.name}.{p}",
+                        _(parameters_helper.get_doc_verbose(p)) + f" ({asset.name})",
+                    )
                     for p in asset.visible_fields
                     if p not in forbidden_parameters_for_sa
                 ]

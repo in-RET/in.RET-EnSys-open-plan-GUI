@@ -73,21 +73,23 @@ document.getElementById('sensitivity-analysis-link').classList.add('active');
     function showCreateSaGraphModal(event){
         createSaGraphModal.show()
     }
+    const createSaGraphForm = createSaGraphModalDOM.querySelector("form");
+    const urlSaForm = createSaGraphForm.getAttribute("graph-parameter-url");
 
 
  $("#id_analysis").change(function () {
-      var saId= $(this).val();  // get the selected country ID from the HTML input
+      var saId= $(this).val();
 
-      $.ajax({                       // initialize an AJAX request
+      $.ajax({
         headers: {'X-CSRFToken': `{{ csrf_token }}` },
         type: "POST",
-        url: urlSaForm,                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
+        url: urlSaForm,
         data: {
-          'sa_id': saId       // add the country id to the GET parameters
+          'sa_id': saId
         },
-        success: function (data) {   // `data` is the return of the `load_cities` view function
+        success: function (data) {
           console.log(data)
-          $("#id_y").html(data);  // replace the contents of the city input with the data that came from the server
+          $("#id_y").html(data);
         }
       });
   });

@@ -367,7 +367,9 @@ def project_sensitivity_analysis(request, proj_id, sa_id=None):
             if sa_id is None:
                 sa_id = user_sa.first().id
 
-            sa_graph_form = graph_parameters_form_factory(GRAPH_SENSITIVITY_ANALYSIS)
+            sa_graph_form = graph_parameters_form_factory(
+                GRAPH_SENSITIVITY_ANALYSIS, proj_id=proj_id
+            )
             report_items_data = [
                 ri.render_json
                 for ri in get_project_sensitivity_analysis_graphs(project)
@@ -456,7 +458,7 @@ def sensitivity_analysis_create_graph(request, proj_id):
     if request.method == "POST":
         qs = request.POST
         graph_parameter_form = graph_parameters_form_factory(
-            GRAPH_SENSITIVITY_ANALYSIS, qs
+            GRAPH_SENSITIVITY_ANALYSIS, qs, proj_id=proj_id
         )
         if graph_parameter_form.is_valid():
             sa_graph = graph_parameter_form.save()

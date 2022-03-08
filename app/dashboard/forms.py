@@ -2,7 +2,12 @@ from crispy_forms.helper import FormHelper
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.forms import ModelForm
-from dashboard.models import ReportItem, AssetsResults, SensitivityAnalysisGraph
+from dashboard.models import (
+    ReportItem,
+    AssetsResults,
+    SensitivityAnalysisGraph,
+    get_project_sensitivity_analysis,
+)
 
 
 from dashboard.helpers import (
@@ -128,6 +133,16 @@ class StackedCapacitiesGraphForm(forms.Form):
 
 
 class SensitivityAnalysisGraphForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        proj_id = kwargs.pop("proj_id", None)
+        super().__init__(*args, **kwargs)
+
+        if proj_id is not None:
+            project = Project.objects.get(id=proj_id)
+            self.fields["analysis"].choices = [
+                (sa.id, sa.name) for sa in get_project_sensitivity_analysis(project)
+            ]
+
     class Meta:
         model = SensitivityAnalysisGraph
         fields = ["analysis", "title", "y"]

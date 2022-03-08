@@ -527,7 +527,7 @@ def get_project_sensitivity_analysis(project):
     qs = (
         project.scenario_set.filter(simulation__isnull=False)
         .filter(simulation__results__isnull=False)
-        .filter(sensitivityanalysis__sensitivityanalysisgraph__isnull=False)
+        .filter(sensitivityanalysis__isnull=False)
         .values_list("sensitivityanalysis", flat=True)
         .distinct()
     )

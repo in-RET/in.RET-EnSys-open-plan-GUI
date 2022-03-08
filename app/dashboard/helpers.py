@@ -261,12 +261,20 @@ def get_nested_value(dct, keys):
 class KPIFinder:
     """Helper to access a kpi value in a nested dict only providing the kpi name"""
 
-    def __init__(self, *args, results_dct=None, kpi_info_dict=None, **kwargs):
+    def __init__(
+        self,
+        *args,
+        results_dct=None,
+        param_info_dict=None,
+        unit_header="unit",
+        **kwargs,
+    ):
         if results_dct is None:
             results_dct = {}
         self.results_dct = results_dct
         self.kpi_mapping = nested_dict_crawler(self.results_dct)
-        self.kpi_info_dict = copy.deepcopy(kpi_info_dict)
+        self.kpi_info_dict = copy.deepcopy(param_info_dict)
+        self.unit_hdr = unit_header
 
     def __iter__(self):
         return self.kpi_info_dict.__iter__()
@@ -283,7 +291,9 @@ class KPIFinder:
         ]
 
     def get_unit(self, kpi_name):
-        return dict_keyword_mapper(self.results_dct, self.kpi_mapping, kpi_name)["unit"]
+        return dict_keyword_mapper(self.results_dct, self.kpi_mapping, kpi_name)[
+            self.unit_hdr
+        ]
 
     def get_doc_unit(self, param_name):
         if isinstance(param_name, list):
@@ -292,7 +302,7 @@ class KPIFinder:
                 answer.append(self.get_doc_unit(p_name))
         else:
             if param_name in self.kpi_info_dict:
-                answer = self.kpi_info_dict[param_name]["unit"]
+                answer = self.kpi_info_dict[param_name][self.unit_hdr]
             else:
                 answer = None
         return answer
@@ -305,6 +315,8 @@ class KPIFinder:
         else:
             if param_name in self.kpi_info_dict:
                 answer = self.kpi_info_dict[param_name]["verbose"]
+                if answer == "None":
+                    answer = param_name.replace("_", " ").title()
             else:
                 answer = None
         return answer
@@ -316,13 +328,13 @@ class KPIFinder:
                 answer.append(self.get_doc_definition(p_name))
         else:
             if param_name in self.kpi_info_dict:
-                answer = self.kpi_info_dict[param_name]["verbose"]
+                answer = self.kpi_info_dict[param_name][":Definition:"]
             else:
                 answer = None
         return answer
 
 
-KPI_helper = KPIFinder(kpi_info_dict=KPI_PARAMETERS)
+KPI_helper = KPIFinder(param_info_dict=KPI_PARAMETERS)
 
 
 # TODO have this in a csv structure to also create the doc and tool tips

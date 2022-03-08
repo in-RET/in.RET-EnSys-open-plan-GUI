@@ -20,6 +20,7 @@ from projects.helpers import (
     sa_output_values_schema_generator,
     SA_RESPONSE_SCHEMA,
     format_scenario_for_mvs,
+    parameters_helper,
 )
 
 from dashboard.helpers import nested_dict_crawler
@@ -104,6 +105,33 @@ class SensitivityAnalysis(AbstractSimulation):
             answer = {}
         return answer
 
+    def graph_data(self, param_name):
+        try:
+            out_values = json.loads(self.output_parameters_values)
+            answer = dict(x=[], y=[])
+            if param_name not in self.output_names:
+                logger.error(
+                    f"The sensitivity analysis output parameter {param_name} is not present in the sensitivity analysis {self.name}"
+                )
+            else:
+                for in_value, sa_step in zip(self.variable_range, out_values):
+                    answer["x"].append(in_value)
+                    try:
+                        jsonschema.validate(
+                            sa_step,
+                            sa_output_values_schema_generator(self.output_names),
+                        )
+
+                        y_val = sa_step[param_name]["value"][0]
+
+                    except jsonschema.exceptions.ValidationError:
+                        y_val = np.nan
+
+                    answer["y"].append(y_val)
+        except json.decoder.JSONDecodeError:
+            answer = {}
+        return answer
+
     def parse_server_response(self, sa_results):
         try:
             # make sure the response is formatted as expected
@@ -153,6 +181,24 @@ class SensitivityAnalysis(AbstractSimulation):
         )
 
     @property
+    def variable_unit(self):
+        if "." in self.variable_name:
+            _, var_name = self.variable_name.split(".")
+        else:
+            var_name = self.variable_name
+
+        return parameters_helper.get_doc_unit(var_name)
+
+    @property
+    def variable_name_verbose(self):
+        if "." in self.variable_name:
+            asset_name, variable_name = self.variable_name.split(".")
+            answer = f"{parameters_helper.get_doc_verbose(variable_name)} of asset {asset_name}"
+        else:
+            answer = parameters_helper.get_doc_verbose(self.variable_name)
+        return answer
+
+    @property
     def variable_name_path(self):
         """Provided with a (nested) dict, find the path to the variable_name"""
         if self.nested_dict_pathes is None:
@@ -176,3 +222,14 @@ class SensitivityAnalysis(AbstractSimulation):
             if isinstance(variable_name_path, list):
                 variable_name_path = variable_name_path[0]
         return variable_name_path
+
+
+def get_project_sensitivity_analysis(project):
+    """Given a project, return the ReportItem instances linked to that project"""
+    qs = (
+        project.scenario_set.filter(simulation__isnull=False)
+        .filter(simulation__results__isnull=False)
+        .values_list("sensitivityanalysis", flat=True)
+        .distinct()
+    )
+    return SensitivityAnalysis.objects.filter(id__in=[sa_id for sa_id in qs])

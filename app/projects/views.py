@@ -908,10 +908,16 @@ def sensitivity_analysis_create(request, scen_id, sa_id=None, step_id=5):
             sa_item = get_object_or_404(SensitivityAnalysis, id=sa_id)
             sa_form = SensitivityAnalysisForm(scen_id=scen_id, instance=sa_item)
             sa_status = sa_item.status
+            mvs_token = sa_item.mvs_token
         else:
+            number_existing_sa = scenario.sensitivityanalysis_set.all().count()
             sa_item = None
             sa_status = None
-            sa_form = SensitivityAnalysisForm(scen_id=scen_id)
+            mvs_token = None
+            sa_form = SensitivityAnalysisForm(
+                scen_id=scen_id,
+                initial={"name": f"sensitivity_analysis_{number_existing_sa + 1}"},
+            )
 
         answer = render(
             request,
@@ -928,6 +934,7 @@ def sensitivity_analysis_create(request, scen_id, sa_id=None, step_id=5):
                 "sa_form": sa_form,
                 "sa_status": sa_status,
                 "sa_id": sa_id,
+                "mvs_token": mvs_token,
             },
         )
 
@@ -957,9 +964,9 @@ def sensitivity_analysis_create(request, scen_id, sa_id=None, step_id=5):
             # Add the information about the sensitivity analysis to the json
             data_clean.update(sa_item.payload)
             # Make simulation request to MVS
-            results = mvs_sensitivity_analysis_request(data_clean)
+            response = mvs_sensitivity_analysis_request(data_clean)
 
-        if results is None:
+        if response is None:
             error_msg = "Could not communicate with the simulation server."
             logger.error(error_msg)
             messages.error(request, error_msg)
@@ -970,19 +977,22 @@ def sensitivity_analysis_create(request, scen_id, sa_id=None, step_id=5):
                 content_type="application/json",
             )
         else:
-            sa_item.mvs_token = results["id"] if results["id"] else None
+            sa_item.mvs_token = response["id"] if response["id"] else None
+            # import pdb; pdb.set_trace()
+            # sa_item.parse_server_response(response)
 
-            if "status" in results.keys() and (
-                results["status"] == DONE or results["status"] == ERROR
+            if "status" in response.keys() and (
+                response["status"] == DONE or response["status"] == ERROR
             ):
-                sa_item.status = results["status"]
-                sa_item.results = results["results"]
+                # TODO call method to fetch response here
+                sa_item.status = response["status"]
+                sa_item.response = response["results"]
                 # Simulation.objects.filter(scenario_id=scen_id).delete()
                 # TODO the reference scenario should have its simulation replaced by this one if successful, this can be done via the mvs_token of the simulation
 
                 sa_item.end_date = datetime.now()
             else:  # PENDING
-                sa_item.status = results["status"]
+                sa_item.status = response["status"]
                 # create a task which will update simulation status
                 # TODO check it does the right thing with sensitivity analysis
                 # create_or_delete_simulation_scheduler(mvs_token=sa_item.mvs_token)
@@ -1014,6 +1024,7 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
             default_name = f"{asset_type_name}-{n_bus}"
             form = BusForm(asset_type=asset_type_name, initial={"name": default_name})
         return render(request, "asset/asset_create_form.html", {"form": form})
+
     elif asset_type_name in ["bess", "h2ess", "gess", "hess"]:
         if asset_uuid:
             existing_ess_asset = get_object_or_404(Asset, unique_id=asset_uuid)

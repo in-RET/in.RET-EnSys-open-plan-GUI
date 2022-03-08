@@ -1,0 +1,286 @@
+{% extends 'scenario/scenario_results_page.html' %}
+{% load static %}
+{% load custom_filters %}
+{% load custom_template_tags %}
+{% load i18n %}
+
+
+{% block title %}{% translate "Single Scenarios" %}{% endblock title %}
+
+
+{% block dashboard %}
+
+    <section class="dashboard">
+        <div>
+            <div class="row">
+                <div class="dashboard__scenarios">
+                    <h2>My scenarios</h2>
+                    <div class="scenario-select">
+                        {% for scenario in scenario_list %}
+                        {% if scenario.id|stringformat:'s' in request|get_selected_scenarios:proj_id %}
+                            {% setvar "selected" as selected %}
+                        {% else%}
+                            {% setvar "" as selected %}
+                        {% endif %}
+                            <button id="scenario-{{ proj_id }}-{{ scenario.id}}" class="scenario-select__item {{ selected }}" onclick="update_selected_scenarios(this)">
+                                {{ scenario.name }}
+                            </button>
+                        {% empty %}
+                            {% translate "You have no scenario with completed simulation, please run simulations to display results" %}
+                        {% endfor %}
+
+                    </div>
+                </div>
+            </div>
+            {% if scenario_list %}
+            <div class="row dashboard__create">
+                <div class="col">
+                  <button class="btn btn--medium" onclick="javascript:showCreateReportItemModal(event)">
+                    <span class="icon icon-add"></span>
+                    Create graph
+                  </button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col col-md-12">
+                    <div class="chart">
+                        <div class="chart__header">
+                            <div style="display: flex;gap: 10px;align-items: center;">
+                                <span class="title">Choose KPI table display</span>
+                                <span><select id="kpi-table-style" name="kpi-table-style" class="form-select" aria-label="Default select example" onchange="update_kpi_table_style(this)">
+                                    {% for style in table_styles %}
+                                    <option value="{{ style }}"> {{ style }}  </option>
+                                    {% endfor %}
+                                </select></span>
+                                <span class="view" data-bs-toggle="modal" data-bs-target="#KPIModal">
+                                    <span class="icon icon-i_arrow_right"></span> View KPIs
+                                </span>
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuKPI" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="icon icon-more"></span>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuKPI">
+                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as .xls</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as PDF</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="chart__plot">
+                            <table class="table" id="selectedKPITable"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                <!--<div class="col col-md-4">
+                    <div class="chart chart--small">
+                        <div class="chart__header">
+                            <div>
+                                <span class="title">Emission Costs</span>
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="icon icon-more"></span>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as .xls</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as PDF</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="chart__content">
+                            <div class="item item--best">
+                                <div class="item__name">
+                                    Scenario name 5
+                                </div>
+                                <div class="item__value">
+                                    500.000 EUR
+                                </div>
+                            </div>
+                            <div class="item item--worst">
+                                <div class="item__name">
+                                    Scenario name 10
+                                </div>
+                                <div class="item__value">
+                                    1.000.000 EUR
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart chart--small">
+                        <div class="chart__header">
+                            <div>
+                                <span class="title">Investment Costs</span>
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="icon icon-more"></span>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
+                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as .xls</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as PDF</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="chart__content">
+                            <div class="item item--best">
+                                <div class="item__name">
+                                    Scenario name 5
+                                </div>
+                                <div class="item__value">
+                                    500.000 EUR
+                                </div>
+                            </div>
+                            <div class="item item--worst">
+                                <div class="item__name">
+                                    Scenario name 10
+                                </div>
+                                <div class="item__value">
+                                    1.000.000 EUR
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart chart--small">
+                        <div class="chart__header">
+                            <div>
+                                <span class="title">Emission Costs</span>
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuButton3" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="icon icon-more"></span>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton3">
+                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as .xls</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as PDF</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="chart__content">
+                            <div class="item item--best">
+                                <div class="item__name">
+                                    Scenario name 5
+                                </div>
+                                <div class="item__value">
+                                    500.000 EUR
+                                </div>
+                            </div>
+                            <div class="item item--worst">
+                                <div class="item__name">
+                                    Scenario name 10
+                                </div>
+                                <div class="item__value">
+                                    1.000.000 EUR
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>-->
+
+            <div class="row">
+                <div class="col" id="report_items">
+
+
+                    <div class="chart" style="height: fit-content;">
+                        <div class="chart__header">
+                            <div>
+                                <span class="title">All time series</span>
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuTS" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="icon icon-more"></span>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuTS">
+                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as .xls</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as PDF</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="chart__plot">
+                            <div id="all_timeseries"></div>
+                        </div>
+                    </div>
+
+
+                    <div class="chart" style="height: fit-content;">
+                        <div class="chart__header">
+                            <div>
+                                <span class="title">Stacked time series by sector</span>
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuTS" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="icon icon-more"></span>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuTS">
+                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as .xls</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as PDF</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="chart__plot">
+                            <div id="stacked_timeseries"></div>
+                        </div>
+                    </div>
+
+
+                    <div class="chart" style="height: fit-content;">
+                        <div class="chart__header">
+                            <div>
+                                <span class="title">Aggregated total flow over project period</span>
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuTS" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="icon icon-more"></span>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuTS">
+                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as .xls</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as PDF</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="chart__plot">
+                            <div id="stacked_total_flow"></div>
+                        </div>
+                    </div>
+
+
+                    <div class="chart" style="height: fit-content;">
+                        <div class="chart__header">
+                            <div>
+                                <span class="title">Installed and optimized capacities</span>
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuTS" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="icon icon-more"></span>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuTS">
+                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as .xls</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as PDF</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="chart__plot">
+                            <div id="capacities"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {# TODO: make button or add kpi/scalar matrix results to downloadable excel sheet #}
+            {% if scen_id %}
+                <a type="button" class="btn btn-info" href="{% url 'download_timeseries_results' scen_id %}">{% translate "Download Timeseries" %}</a>
+            {% endif %}
+            {% endif %}
+        </div>
+    </section>
+
+{% endblock dashboard %}
+
+
+{% block results_end_body_scripts %}
+<script>
+
+
+document.getElementById('single-scenario-link').classList.add('active');
+</script>
+{% endblock results_end_body_scripts %}

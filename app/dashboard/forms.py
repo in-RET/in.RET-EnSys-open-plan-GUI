@@ -2,7 +2,12 @@ from crispy_forms.helper import FormHelper
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.forms import ModelForm
-from dashboard.models import ReportItem, AssetsResults
+from dashboard.models import (
+    ReportItem,
+    AssetsResults,
+    SensitivityAnalysisGraph,
+    get_project_sensitivity_analysis,
+)
 
 
 from dashboard.helpers import (
@@ -14,17 +19,22 @@ from dashboard.helpers import (
     GRAPH_PIE,
     GRAPH_LOAD_DURATION,
     GRAPH_SANKEY,
+    GRAPH_SENSITIVITY_ANALYSIS,
 )
 from projects.models import ENERGY_VECTOR, Project
 
 
 class ReportItemForm(ModelForm):
 
-    scenarios = forms.MultipleChoiceField(label=_("Scenarios"))
+    scenarios = forms.ChoiceField(label=_("Scenario"))
 
     def __init__(self, *args, **kwargs):
         proj_id = kwargs.pop("proj_id", None)
+        multi_scenario = kwargs.pop("multi_scenario", False)
         super().__init__(*args, **kwargs)
+
+        if multi_scenario is True:
+            self.fields["scenarios"] = forms.MultipleChoiceField(label=_("Scenarios"))
 
         if proj_id is not None:
             project = Project.objects.get(id=proj_id)
@@ -32,9 +42,6 @@ class ReportItemForm(ModelForm):
                 c
                 for c in project.get_scenarios_with_results().values_list("id", "name")
             ]
-
-        # TODO here set multiple choice for scenarios on or off depending on the report_type
-        self.fields["scenarios"].widget.attrs = {"multiple": False}
 
     class Meta:
         model = ReportItem
@@ -125,6 +132,29 @@ class StackedCapacitiesGraphForm(forms.Form):
             self.fields["y"].choices = tuple(choices)
 
 
+class SensitivityAnalysisGraphForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        proj_id = kwargs.pop("proj_id", None)
+        super().__init__(*args, **kwargs)
+
+        if proj_id is not None:
+            project = Project.objects.get(id=proj_id)
+            self.fields["analysis"].choices = [
+                (sa.id, sa.name) for sa in get_project_sensitivity_analysis(project)
+            ]
+
+    class Meta:
+        model = SensitivityAnalysisGraph
+        fields = ["analysis", "title", "y"]
+        labels = [
+            _("Sensitivity analysis"),
+            _("Graph title"),
+            _("Parameter of interest"),
+        ]
+
+    field_order = ["analysis", "title", "y"]
+
+
 def graph_parameters_form_factory(report_type, *args, **kwargs):
     """Linked to dashboard/models.py:ReportItem.fetch_parameters_values"""
     if report_type == GRAPH_TIMESERIES:
@@ -137,4 +167,6 @@ def graph_parameters_form_factory(report_type, *args, **kwargs):
     # GRAPH_PIE,
     # GRAPH_LOAD_DURATION,
     # GRAPH_SANKEY,
+    if report_type == GRAPH_SENSITIVITY_ANALYSIS:
+        answer = SensitivityAnalysisGraphForm(*args, **kwargs)
     return answer

@@ -1,4 +1,5 @@
 from django.core.exceptions import PermissionDenied
+from django.db.models import Count
 from django.http.response import Http404, HttpResponse
 from dashboard.helpers import *
 from dashboard.models import (
@@ -17,9 +18,20 @@ from django.shortcuts import render, get_object_or_404, HttpResponseRedirect
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 from jsonview.decorators import json_view
-from projects.models import Project, Scenario, Simulation
+from projects.models import (
+    Project,
+    Scenario,
+    Simulation,
+    SensitivityAnalysis,
+    get_project_sensitivity_analysis,
+)
 from projects.services import excuses_design_under_development
-from dashboard.models import ReportItem, get_project_reportitems
+from dashboard.models import (
+    ReportItem,
+    SensitivityAnalysisGraph,
+    get_project_reportitems,
+    get_project_sensitivity_analysis_graphs,
+)
 from dashboard.forms import (
     ReportItemForm,
     TimeseriesGraphForm,
@@ -35,6 +47,8 @@ import logging
 import ast
 
 logger = logging.getLogger(__name__)
+
+COMPARE_VIEW = "compare"
 
 
 @login_required
@@ -166,6 +180,7 @@ def scenario_request_results(request, scen_id):
 @login_required
 @require_http_methods(["POST", "GET"])
 def scenario_visualize_results(request, proj_id=None, scen_id=None):
+    request.session[COMPARE_VIEW] = False
     user_projects = request.user.project_set.all()
 
     if proj_id is None:
@@ -185,7 +200,7 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
                 reverse("project_visualize_results", args=[proj_id])
             )
     else:
-        project = get_object_or_404(Project, pk=proj_id)
+        project = get_object_or_404(Project, id=proj_id)
         if (project.user != request.user) and (
             request.user not in project.viewers.all()
         ):
@@ -200,7 +215,7 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
             # There are no scenarios with results yet for this project
             answer = render(
                 request,
-                "scenario/scenario_results_page.html",
+                "report/single_scenario.html",
                 {
                     "project_list": user_projects,
                     "proj_id": proj_id,
@@ -247,7 +262,7 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
 
                 answer = render(
                     request,
-                    "scenario/scenario_results_page.html",
+                    "report/single_scenario.html",
                     {
                         "scen_id": scen_id,
                         "scalar_kpis": scalar_kpis_json,
@@ -276,6 +291,106 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
 
 
 @login_required
+@require_http_methods(["POST", "GET"])
+def project_compare_results(request, proj_id):
+    request.session[COMPARE_VIEW] = True
+    user_projects = request.user.project_set.all()
+
+    project = get_object_or_404(Project, id=proj_id)
+    if (project.user != request.user) and (request.user not in project.viewers.all()):
+        raise PermissionDenied
+
+    user_scenarios = project.get_scenarios_with_results()
+    report_items_data = [
+        ri.render_json
+        for ri in get_project_reportitems(project)
+        .annotate(c=Count("simulations"))
+        .filter(c__gt=1)
+    ]
+    return render(
+        request,
+        "report/compare_scenario.html",
+        {
+            "proj_id": proj_id,
+            "project_list": user_projects,
+            "scenario_list": user_scenarios,
+            "report_items_data": report_items_data,
+            "kpi_list": KPI_PARAMETERS,
+            "table_styles": TABLES,
+        },
+    )
+
+
+@login_required
+@require_http_methods(["POST", "GET"])
+def project_sensitivity_analysis(request, proj_id, sa_id=None):
+    request.session[COMPARE_VIEW] = False
+    user_projects = request.user.project_set.all()
+
+    if proj_id is None:
+        if sa_id is not None:
+            proj_id = SensitivityAnalysis.objects.get(id=sa_id).scenario.project.id
+            # make sure the project id is always visible in url
+            answer = HttpResponseRedirect(
+                reverse("project_sensitivity_analysis", args=[proj_id, sa_id])
+            )
+        else:
+            if request.POST:
+                proj_id = int(request.POST.get("proj_id"))
+            else:
+                proj_id = request.user.project_set.first().id
+            # make sure the project id is always visible in url
+            answer = HttpResponseRedirect(
+                reverse("project_sensitivity_analysis", args=[proj_id])
+            )
+    else:
+
+        project = get_object_or_404(Project, id=proj_id)
+        if (project.user != request.user) and (
+            request.user not in project.viewers.all()
+        ):
+            raise PermissionDenied
+
+        user_sa = get_project_sensitivity_analysis(project)
+        if user_sa.exists() is False:
+            # There are no sensitivity analysis with results yet for this project
+            answer = render(
+                request,
+                "report/sensitivity_analysis.html",
+                {
+                    "project_list": user_projects,
+                    "proj_id": proj_id,
+                    "sa_list": [],
+                    "report_items_data": [],
+                },
+            )
+        else:
+            if sa_id is None:
+                sa_id = user_sa.first().id
+
+            sa_graph_form = graph_parameters_form_factory(
+                GRAPH_SENSITIVITY_ANALYSIS, proj_id=proj_id
+            )
+            report_items_data = [
+                ri.render_json
+                for ri in get_project_sensitivity_analysis_graphs(project)
+            ]
+            answer = render(
+                request,
+                "report/sensitivity_analysis.html",
+                {
+                    "proj_id": proj_id,
+                    "project_list": user_projects,
+                    "sa_list": user_sa,
+                    "sa_id": sa_id,
+                    "report_items_data": report_items_data,
+                    "sa_graph_form": sa_graph_form,
+                },
+            )
+    return answer
+
+
+@login_required
 @json_view
 @require_http_methods(["POST"])
 def report_create_item(request, proj_id):
@@ -283,7 +398,8 @@ def report_create_item(request, proj_id):
 
     if request.is_ajax():
         qs = request.POST
-        report_form = ReportItemForm(qs, proj_id=proj_id)
+        multi_scenario = request.session.get(COMPARE_VIEW, False)
+        report_form = ReportItemForm(qs, proj_id=proj_id, multi_scenario=multi_scenario)
         answer_context = {
             "report_form": report_form.as_table(),
             "report_type": qs.get("report_type"),
@@ -291,7 +407,10 @@ def report_create_item(request, proj_id):
         if report_form.is_valid():
             # scenario selection and graph type are valid
             report_item = report_form.save(commit=False)
-            scen_ids = [int(s) for s in report_form.cleaned_data["scenarios"]]
+            if multi_scenario is True:
+                scen_ids = [int(s) for s in report_form.cleaned_data["scenarios"]]
+            else:
+                scen_ids = [int(report_form.cleaned_data["scenarios"])]
             graph_parameter_form = graph_parameters_form_factory(
                 report_item.report_type, qs, scenario_ids=scen_ids
             )
@@ -313,6 +432,7 @@ def report_create_item(request, proj_id):
                     report_item.render_json, status=200, content_type="application/json"
                 )
             else:
+
                 # TODO workout the passing of post when there are errors (in crisp format)
                 answer = JsonResponse(
                     answer_context, status=422, content_type="application/json"
@@ -332,6 +452,34 @@ def report_create_item(request, proj_id):
 
 
 @login_required
+@require_http_methods(["POST"])
+def sensitivity_analysis_create_graph(request, proj_id):
+    """This view is triggered by clicking on "create" in the form to add a sensitivity analysis graph"""
+
+    if request.method == "POST":
+        qs = request.POST
+        graph_parameter_form = graph_parameters_form_factory(
+            GRAPH_SENSITIVITY_ANALYSIS, qs, proj_id=proj_id
+        )
+        if graph_parameter_form.is_valid():
+            sa_graph = graph_parameter_form.save()
+
+        # Refresh the sensitivity analysis page with a new graph if the form was valid
+        answer = HttpResponseRedirect(
+            reverse(
+                "project_sensitivity_analysis", args=[proj_id, sa_graph.analysis.id]
+            )
+        )
+    else:
+        answer = JsonResponse(
+            {"error": "This url is only for post calls"},
+            status=405,
+            content_type="application/json",
+        )
+    return answer
+
+
+@login_required
 @json_view
 @require_http_methods(["POST"])
 def report_delete_item(request, proj_id):
@@ -339,7 +487,12 @@ def report_delete_item(request, proj_id):
     if request.is_ajax():
         qs = request.POST
         report_item_id = qs.get("report_item_id")
-        ri = get_object_or_404(ReportItem, id=decode_report_item_id(report_item_id))
+        if "reportItem" in report_item_id:
+            ri = get_object_or_404(ReportItem, id=decode_report_item_id(report_item_id))
+        elif "saItem" in report_item_id:
+            ri = get_object_or_404(
+                SensitivityAnalysisGraph, id=decode_sa_graph_id(report_item_id)
+            )
         ri.delete()
 
         answer = JsonResponse(
@@ -369,8 +522,13 @@ def ajax_get_graph_parameters_form(request, proj_id):
         initial_values["scenarios"] = [
             int(s) for s in json.loads(request.POST.get("selected_scenarios"))
         ]
+        multi_scenario = request.session.get(COMPARE_VIEW, False)
 
-        report_item_form = ReportItemForm(initial=initial_values, proj_id=proj_id)
+        # TODO add a parameter reportitem_id to the function, default to None and load the values from the db if it exits, then also changes the initial of the graph parameters form
+
+        report_item_form = ReportItemForm(
+            initial=initial_values, proj_id=proj_id, multi_scenario=multi_scenario
+        )
 
         answer = render(
             request,
@@ -390,6 +548,26 @@ def ajax_get_graph_parameters_form(request, proj_id):
             content_type="application/json",
         )
     return answer
+
+
+@login_required
+@require_http_methods(["POST"])
+def ajax_get_sensitivity_analysis_parameters(request):
+    if request.is_ajax():
+        qs = request.POST
+        sa_id = int(qs.get("sa_id"))
+        sa_item = get_object_or_404(SensitivityAnalysis, id=sa_id)
+
+        return render(
+            request,
+            "report/sa_parameters_form.html",
+            context={
+                "output_parameters": [
+                    {"name": p, "verbose": KPI_helper.get_doc_verbose(p)}
+                    for p in sa_item.output_names
+                ]
+            },
+        )
 
 
 @login_required

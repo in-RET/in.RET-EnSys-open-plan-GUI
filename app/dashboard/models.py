@@ -9,6 +9,8 @@ from django.shortcuts import get_object_or_404
 from django.db import models
 from dashboard.helpers import (
     KPI_PARAMETERS,
+    KPI_PARAMETERS_ASSETS,
+    KPI_helper,
     GRAPH_TIMESERIES,
     GRAPH_TIMESERIES_STACKED,
     GRAPH_CAPACITIES,
@@ -17,11 +19,15 @@ from dashboard.helpers import (
     GRAPH_LOAD_DURATION,
     GRAPH_SANKEY,
     GRAPH_PARAMETERS_SCHEMAS,
+    GRAPH_SENSITIVITY_ANALYSIS,
+    REPORT_TYPES,
     single_timeseries_to_json,
     simulation_timeseries_to_json,
     report_item_render_to_json,
+    sensitivity_analysis_graph_render_to_json,
 )
 
+from projects.models import Simulation, SensitivityAnalysis
 from projects.constants import MAP_EPA_MVS
 from projects.models import Simulation, Scenario
 
@@ -124,26 +130,6 @@ KPI_SCALAR_TOOLTIPS = {
     "costs_total": "Net present costs of the system for the whole project duration, includes all operation, maintainance and dispatch costs as well as the investment costs (including replacements).",
     "costs_upfront_in_year_zero": "The costs which will have to be paid upfront when project begin, ie. In year 0.",
 }
-
-
-# TODO have this in a csv structure to also create the doc and tool tips
-GRAPH_TIMESERIES = "timeseries"
-GRAPH_TIMESERIES_STACKED = "timeseries_stacked"
-GRAPH_CAPACITIES = "capacities"
-GRAPH_BAR = "bar"
-GRAPH_PIE = "pie"
-GRAPH_LOAD_DURATION = "load_duration"
-GRAPH_SANKEY = "sankey"
-
-REPORT_TYPES = (
-    (GRAPH_TIMESERIES, _("Timeseries graph")),
-    (GRAPH_TIMESERIES_STACKED, _("Stacked timeseries graph")),
-    (GRAPH_CAPACITIES, _("Installed and optimized capacities")),
-    (GRAPH_BAR, _("Bar chart")),
-    (GRAPH_PIE, _("Pie chart")),
-    (GRAPH_LOAD_DURATION, _("Load duration curve")),
-    (GRAPH_SANKEY, _("Sankey diagram")),
-)
 
 
 class KPIScalarResults(models.Model):
@@ -497,3 +483,64 @@ def get_project_reportitems(project):
         .distinct()
     )
     return ReportItem.objects.filter(id__in=[ri for ri in qs])
+
+
+class SensitivityAnalysisGraph(models.Model):
+    title = models.CharField(max_length=120, default="", blank=True)
+    report_type = models.CharField(
+        default=GRAPH_SENSITIVITY_ANALYSIS,
+        max_length=len(GRAPH_SENSITIVITY_ANALYSIS),
+        editable=False,
+    )
+    analysis = models.ForeignKey(SensitivityAnalysis, on_delete=models.CASCADE)
+    y = models.CharField(
+        max_length=50,
+        choices=[
+            (v, _(KPI_PARAMETERS_ASSETS[v]["verbose"])) for v in KPI_PARAMETERS_ASSETS
+        ],
+    )
+
+    @property
+    def variable_unit(self):
+        return self.analysis.variable_unit.replace(
+            "currency", self.analysis.scenario.get_currency()
+        )
+
+    @property
+    def y_unit(self):
+        unit = KPI_helper.get_doc_unit(self.y)
+        return unit.replace("currency", self.analysis.scenario.get_currency())
+
+    @property
+    def render_json(self):
+        return sensitivity_analysis_graph_render_to_json(
+            sa_id=f"saItem{self.analysis.scenario.project.id}-{self.id}",
+            data=[self.analysis.graph_data(self.y)],
+            title=self.title,
+            x_label=f"{self.analysis.variable_name_verbose} [{self.variable_unit}]",
+            y_label=f"{KPI_helper.get_doc_verbose(self.y)} [{self.y_unit}]",
+        )
+
+
+def get_project_sensitivity_analysis(project):
+    """Given a project, return the ReportItem instances linked to that project"""
+    qs = (
+        project.scenario_set.filter(simulation__isnull=False)
+        .filter(simulation__results__isnull=False)
+        .filter(sensitivityanalysis__isnull=False)
+        .values_list("sensitivityanalysis", flat=True)
+        .distinct()
+    )
+    return SensitivityAnalysis.objects.filter(id__in=[sa_id for sa_id in qs])
+
+
+def get_project_sensitivity_analysis_graphs(project):
+    """Given a project, return the ReportItem instances linked to that project"""
+    qs = (
+        project.scenario_set.filter(simulation__isnull=False)
+        .filter(simulation__results__isnull=False)
+        .filter(sensitivityanalysis__sensitivityanalysisgraph__isnull=False)
+        .values_list("sensitivityanalysis__sensitivityanalysisgraph", flat=True)
+        .distinct()
+    )
+    return SensitivityAnalysisGraph.objects.filter(id__in=[sa_id for sa_id in qs])

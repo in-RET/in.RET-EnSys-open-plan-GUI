@@ -158,16 +158,27 @@ function addCapacitiyGraph(graphId, parameters){
     const layout= {
         title: parameters.title,
         barmode: 'stack',
+        showlegend: true
+    }
+    // create plot
+    Plotly.newPlot(graphId, data, layout);
+};
+
+
+function addSensitivityAnalysisGraph(graphId, parameters){
+    // prepare graph layout in plotly format
+    const layout= {
+        title: parameters.title,
         xaxis:{
             title: parameters.x_label,
         },
         yaxis:{
             title: parameters.y_label,
-        },
-        showlegend: true
+        }
     }
     // create plot
-    Plotly.newPlot(graphId, data, layout);
+    console.log(parameters)
+    Plotly.newPlot(graphId, parameters.data, layout);
 };
 
 
@@ -176,7 +187,7 @@ const graph_type_mapping={
     timeseries: addTimeseriesGraph,
     timeseries_stacked: addStackedTimeseriesGraph,
     capacities: addCapacitiyGraph,
-
+    sensitivity_analysis: addSensitivityAnalysisGraph,
 }
 // # GRAPH_TIMESERIES = "timeseries"
 // # GRAPH_TIMESERIES_STACKED = "timeseries_stacked"

@@ -296,7 +296,11 @@ class Asset(TopologyNode):
 
     @property
     def visible_fields(self):
-        return self.asset_type.visible_fields
+        visible_fields = self.asset_type.visible_fields
+        # renaming the model variable might be too dangerous with existing database
+        if "optimize_cap" in visible_fields:
+            visible_fields[visible_fields.index("optimize_cap")] = "optimize_capacity"
+        return visible_fields
 
     def has_parameter(self, param_name):
         return param_name in self.visible_fields
@@ -309,6 +313,7 @@ class Asset(TopologyNode):
                 asset_category = "energy_providers"
             else:
                 asset_category = self.asset_type.asset_category
+            # renaming the model variable might be too dangerous with existing database
             if param_name == "optimize_cap":
                 param_name = "optimize_capacity"
             answer = (asset_category, self.name, param_name)

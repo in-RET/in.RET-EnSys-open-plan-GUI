@@ -1,5 +1,29 @@
 import json
+import os
+import csv
+from django.contrib.staticfiles.storage import staticfiles_storage
 from projects.dtos import convert_to_dto
+from projects.constants import MAP_MVS_EPA
+from dashboard.helpers import KPIFinder
+
+PARAMETERS = {}
+if os.path.exists(staticfiles_storage.path("MVS_parameters_list.csv")) is True:
+    with open(staticfiles_storage.path("MVS_parameters_list.csv")) as csvfile:
+        csvreader = csv.reader(csvfile, delimiter=",", quotechar='"')
+        for i, row in enumerate(csvreader):
+            if i == 0:
+                hdr = row
+                label_idx = hdr.index("label")
+            else:
+                label = row[label_idx]
+                label = MAP_MVS_EPA.get(label, label)
+                PARAMETERS[label] = {}
+                for k, v in zip(hdr, row):
+                    if k == "sensitivity_analysis":
+                        v = bool(int(v))
+                    PARAMETERS[label][k] = v
+
+parameters_helper = KPIFinder(param_info_dict=PARAMETERS, unit_header=":Unit:")
 
 
 # Helper method to clean dict data from empty values

@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load crispy_forms_tags %}
 {% load custom_filters %}
 {% load custom_template_tags %}
 {% load i18n %}
@@ -83,6 +84,34 @@
     </div>
 </div>
 
+<!-- Modal to create sensitivity analysis -->
+<div class="modal fade modal--dashboard" id="createSaGraphModal" tabindex="-1" role="dialog" aria-labelledby="createSaGraphModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createSaGraphModalLabel">{% translate "Add a sensitivity analysisgraph" %}</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{% url 'sensitivity_analysis_create_graph' proj_id %}" graph-parameter-url="{% url 'ajax_get_sensitivity_analysis_parameters' %}">
+                    {% csrf_token %}
+                    {{ sa_graph_form | crispy}}
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate "Close" %}</button>
+                 <button class="btn btn--medium" onclick="javascript:submitForm(event, modalId='createSaGraphModal')">{% translate "Create" %}</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
 <main>
     <section class="header">
         <div>
@@ -94,16 +123,13 @@
         </div>
     </section>
     <section class="header-results">
-            <button id="reportBtn" class="view" onclick="javascript:showCreateReportItemModal(event)">
-                                    Add graph
-            </button>
         <div>
             <div class="header-results__scenario">
                 <div class="project-title">
                     {% translate "Project" %}
                 </div>
                 <div class="project-name">
-                    <form action="{% url 'scenario_visualize_results' %}" method="POST">
+                    <form action="{{ request.get_full_path }}" method="POST">
                         {% csrf_token %}
                         <select name="proj_id" class="form-select" aria-label="Default select example" onchange="this.form.submit()">
                         {% for project in project_list %}
@@ -121,6 +147,25 @@
             </div>
         </div>
     </section>
+
+
+<!-- insert tabs here -->
+    <ul class="nav nav-pills" id="results-analysis-links">
+  <li class="nav-item">
+      <a class="nav-link" id="single-scenario-link" href="{% url 'project_visualize_results' proj_id %}">Single scenarios</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="compare-scenario-link" href="{% url 'project_compare_results' proj_id %}">Compare scenarios</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="sensitivity-analysis-link" href="{% url 'project_sensitivity_analysis' proj_id %}">Sensitivity Analysis</a>
+  </li>
+</ul>
+
+
+
+{% block dashboard %}
+
     <section class="dashboard">
         <div>
             <div class="row">
@@ -288,6 +333,7 @@
                     </div>
                 </div>
             </div>-->
+
             <div class="row">
                 <div class="col" id="report_items">
 
@@ -383,6 +429,8 @@
             {% endif %}
         </div>
     </section>
+
+{% endblock dashboard %}
 </main>
 {% endblock content %}
 
@@ -694,8 +742,20 @@ function scenario_visualize_stacked_optimized_capacities(scen_id){
 
 </script>
 
+{% if multiple_scenario_selection %}
+<script> const multipleScenarioSelection = true;  </script>
+{% else %}
+<script>const multipleScenarioSelection = false;</script>
+{% endif %}
+
 
 <script>
+
+
+    function submitForm(event, modalId=""){
+        const modalDOM = document.getElementById(modalId);
+        modalDOM.querySelector("form").submit();
+    }
 
     /** Add a new report item **/
 
@@ -732,7 +792,8 @@ function scenario_visualize_stacked_optimized_capacities(scen_id){
             data: {
               'title': reportItemTitle,
               'report_type': graphType,
-              'selected_scenarios': JSON.stringify(reportItemScenarios)
+              'selected_scenarios': JSON.stringify(reportItemScenarios),
+              'multi_scenario': multipleScenarioSelection
             },
             success: function (formData) {
                // find and keep the csrf token of the form
@@ -798,7 +859,11 @@ function scenario_visualize_stacked_optimized_capacities(scen_id){
                 }, //err => {alert("Modal form JS Error: " + err);console.log(err);}
         })
     }
+
+document.querySelectorAll("#results-analysis-links a").forEach(el => {el.classList.remove("active")});
 </script>
 
+{% block results_end_body_scripts %}
+{% endblock results_end_body_scripts %}
 
 {% endblock end_body_scripts %}

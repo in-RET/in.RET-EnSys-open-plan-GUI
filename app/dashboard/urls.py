@@ -23,6 +23,31 @@ urlpatterns = [
         name="project_visualize_results",
     ),
     path(
+        "project/<int:proj_id>/scenario/results/compare",
+        project_compare_results,
+        name="project_compare_results",
+    ),
+    path(
+        "project/<int:proj_id>/scenario/results/sensitivity-analysis",
+        project_sensitivity_analysis,
+        name="project_sensitivity_analysis",
+    ),
+    path(
+        "project/<int:proj_id>/scenario/results/sensitivity-analysis/<int:sa_id>",
+        project_sensitivity_analysis,
+        name="project_sensitivity_analysis",
+    ),
+    path(
+        "project/<int:proj_id>/scenario/results/sensitivity-analysis/add-graph",
+        sensitivity_analysis_create_graph,
+        name="sensitivity_analysis_create_graph",
+    ),
+    path(
+        "ajax/sensitivity-analysis/graph-parameters",
+        ajax_get_sensitivity_analysis_parameters,
+        name="ajax_get_sensitivity_analysis_parameters",
+    ),
+    path(
         "scenario/results/request/<int:scen_id>",
         scenario_request_results,
         name="scenario_request_results",

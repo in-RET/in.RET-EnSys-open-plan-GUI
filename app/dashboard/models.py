@@ -509,3 +509,15 @@ class SensitivityAnalysisGraph(models.Model):
             x_label=self.analysis.variable_name_verbose,
             y_label=KPI_helper.get_doc_verbose(self.y),
         )
+
+
+def get_project_sensitivity_analysis_graphs(project):
+    """Given a project, return the ReportItem instances linked to that project"""
+    qs = (
+        project.scenario_set.filter(simulation__isnull=False)
+        .filter(simulation__results__isnull=False)
+        .filter(sensitivityanalysis__sensitivityanalysisgraph__isnull=False)
+        .values_list("sensitivityanalysis__sensitivityanalysisgraph", flat=True)
+        .distinct()
+    )
+    return SensitivityAnalysisGraph.objects.filter(id__in=[sa_id for sa_id in qs])

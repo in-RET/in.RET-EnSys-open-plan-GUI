@@ -910,10 +910,14 @@ def sensitivity_analysis_create(request, scen_id, sa_id=None, step_id=5):
             sa_status = sa_item.status
             mvs_token = sa_item.mvs_token
         else:
+            number_existing_sa = scenario.sensitivityanalysis_set.all().count()
             sa_item = None
             sa_status = None
             mvs_token = None
-            sa_form = SensitivityAnalysisForm(scen_id=scen_id)
+            sa_form = SensitivityAnalysisForm(
+                scen_id=scen_id,
+                initial={"name": f"sensitivity_analysis_{number_existing_sa + 1}"},
+            )
 
         answer = render(
             request,

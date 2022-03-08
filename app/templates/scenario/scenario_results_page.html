@@ -685,7 +685,9 @@ function scenario_visualize_stacked_optimized_capacities(scen_id){
             yaxis:{
                 title: dataList[0].yaxistitle,
                 categoryorder:'category ascending'
-            }
+
+            },
+            showlegend: true
         }
         Plotly.newPlot(newGraph.id, data, layout);
     }

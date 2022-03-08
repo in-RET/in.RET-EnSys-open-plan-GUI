@@ -96,7 +96,8 @@ function addTimeseriesGraph(graphId, parameters){
         },
         yaxis:{
             title: parameters.y_label,
-        }
+        },
+        showlegend: true
     }
     // create plot
     Plotly.newPlot(graphId, data, layout);
@@ -109,7 +110,6 @@ function addStackedTimeseriesGraph(graphId, parameters){
     parameters.data.forEach(scenario => {
         scenario.timeseries.forEach(timeseries => {
             // todo provide a function to format the name of the timeseries
-            console.log(timeseries.fill)
             data.push({x: scenario.timestamps,
                 y: timeseries.value,
                 name:scenario.scenario_name + timeseries.label + timeseries.unit,
@@ -135,11 +135,48 @@ function addStackedTimeseriesGraph(graphId, parameters){
 };
 
 
+function addCapacitiyGraph(graphId, parameters){
+    // prepare traces in ploty format
+    var data = []
+    parameters.data.forEach(scenario => {
+        scenario.timeseries.forEach(timeseries => {
+            // todo provide a function to format the name of the timeseries
+
+            data.push({
+                x: scenario.timestamps,
+                y: timeseries.capacity,
+                name:timeseries.name,
+                type: 'bar',
+                // line: {shape: 'hv'},
+                // stackgroup: timeseries.asset_type,
+                // fill: timeseries.fill
+            })
+        });
+    });
+
+    // prepare graph layout in plotly format
+    const layout= {
+        title: parameters.title,
+        barmode: 'stack',
+        xaxis:{
+            title: parameters.x_label,
+        },
+        yaxis:{
+            title: parameters.y_label,
+        },
+        showlegend: true
+    }
+    // create plot
+    Plotly.newPlot(graphId, data, layout);
+};
+
 
 // TODO write functions for other report types
 const graph_type_mapping={
     timeseries: addTimeseriesGraph,
     timeseries_stacked: addStackedTimeseriesGraph,
+    capacities: addCapacitiyGraph,
+
 }
 // # GRAPH_TIMESERIES = "timeseries"
 // # GRAPH_TIMESERIES_STACKED = "timeseries_stacked"

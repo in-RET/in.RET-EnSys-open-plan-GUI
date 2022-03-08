@@ -26,7 +26,11 @@ from projects.models import (
     get_project_sensitivity_analysis,
 )
 from projects.services import excuses_design_under_development
-from dashboard.models import ReportItem, get_project_reportitems
+from dashboard.models import (
+    ReportItem,
+    get_project_reportitems,
+    get_project_sensitivity_analysis_graphs,
+)
 from dashboard.forms import (
     ReportItemForm,
     TimeseriesGraphForm,
@@ -363,9 +367,11 @@ def project_sensitivity_analysis(request, proj_id, sa_id=None):
             if sa_id is None:
                 sa_id = user_sa.first().id
 
-            # TODO filter the reportItems linked to a sensitivity analysis
             sa_graph_form = graph_parameters_form_factory(GRAPH_SENSITIVITY_ANALYSIS)
-            report_items_data = [ri.render_json for ri in user_sa]
+            report_items_data = [
+                ri.render_json
+                for ri in get_project_sensitivity_analysis_graphs(project)
+            ]
             answer = render(
                 request,
                 "report/sensitivity_analysis.html",

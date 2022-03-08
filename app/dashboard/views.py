@@ -28,6 +28,7 @@ from projects.models import (
 from projects.services import excuses_design_under_development
 from dashboard.models import (
     ReportItem,
+    SensitivityAnalysisGraph,
     get_project_reportitems,
     get_project_sensitivity_analysis_graphs,
 )
@@ -462,12 +463,13 @@ def sensitivity_analysis_create_graph(request, proj_id):
         )
         if graph_parameter_form.is_valid():
             sa_graph = graph_parameter_form.save()
-            # Refresh the sensitivity analysis page with a new graph
-            answer = HttpResponseRedirect(
-                reverse(
-                    "project_sensitivity_analysis", args=[proj_id, sa_graph.analysis.id]
-                )
+
+        # Refresh the sensitivity analysis page with a new graph if the form was valid
+        answer = HttpResponseRedirect(
+            reverse(
+                "project_sensitivity_analysis", args=[proj_id, sa_graph.analysis.id]
             )
+        )
     else:
         answer = JsonResponse(
             {"error": "This url is only for post calls"},
@@ -485,7 +487,12 @@ def report_delete_item(request, proj_id):
     if request.is_ajax():
         qs = request.POST
         report_item_id = qs.get("report_item_id")
-        ri = get_object_or_404(ReportItem, id=decode_report_item_id(report_item_id))
+        if "reportItem" in report_item_id:
+            ri = get_object_or_404(ReportItem, id=decode_report_item_id(report_item_id))
+        elif "saItem" in report_item_id:
+            ri = get_object_or_404(
+                SensitivityAnalysisGraph, id=decode_sa_graph_id(report_item_id)
+            )
         ri.delete()
 
         answer = JsonResponse(

@@ -504,7 +504,7 @@ class SensitivityAnalysisGraph(models.Model):
     def render_json(self):
         return sensitivity_analysis_graph_render_to_json(
             sa_id=f"saItem{self.analysis.scenario.project.id}-{self.id}",
-            data=self.analysis.graph_data(self.y),
+            data=[self.analysis.graph_data(self.y)],
             title=self.title,
             x_label=self.analysis.variable_name_verbose,
             y_label=KPI_helper.get_doc_verbose(self.y),

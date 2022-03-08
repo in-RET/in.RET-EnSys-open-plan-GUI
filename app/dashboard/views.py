@@ -449,30 +449,22 @@ def report_create_item(request, proj_id):
 
 
 @login_required
-@json_view
 @require_http_methods(["POST"])
 def sensitivity_analysis_create_graph(request, proj_id):
-    """This ajax view is triggered by clicking on "create" in the form to add a report item"""
+    """This view is triggered by clicking on "create" in the form to add a sensitivity analysis graph"""
 
     if request.method == "POST":
         qs = request.POST
-        import pdb
-
-        pdb.set_trace()
         graph_parameter_form = graph_parameters_form_factory(
             GRAPH_SENSITIVITY_ANALYSIS, qs
         )
-        answer_context = {"graph_parameter_form": graph_parameter_form}
         if graph_parameter_form.is_valid():
             sa_graph = graph_parameter_form.save()
-
-            answer = JsonResponse(
-                sa_graph.render_json, status=200, content_type="application/json"
-            )
-        else:
-            # TODO workout the passing of post when there are errors (in crisp format)
-            answer = JsonResponse(
-                answer_context, status=422, content_type="application/json"
+            # Refresh the sensitivity analysis page with a new graph
+            answer = HttpResponseRedirect(
+                reverse(
+                    "project_sensitivity_analysis", args=[proj_id, sa_graph.analysis.id]
+                )
             )
     else:
         answer = JsonResponse(

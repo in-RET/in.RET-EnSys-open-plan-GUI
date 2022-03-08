@@ -426,6 +426,11 @@ def decode_report_item_id(report_id):
     return int(report_id.replace("reportItem", "").split("-")[1])
 
 
+def decode_sa_graph_id(report_id):
+    """Provided with a DOM sensitivity analysis graph id return the sa_graph id in the database"""
+    return int(report_id.replace("saItem", "").split("-")[1])
+
+
 # To visualize the json structure of the output of the render_json() method of the ReportItem class
 GRAPH_PARAMETERS_RENDERED_JSON = {
     GRAPH_TIMESERIES: report_item_render_to_json(

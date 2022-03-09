@@ -101,7 +101,7 @@
                                     {% translate "Duplicate" %}
                                 </button>
                             </form>
-                            <form action="{% url 'project_delete' project.pk %}"
+                            <form action="{% url 'project_delete' project.id %}"
                                   method="POST">
                                 {% csrf_token %}
                                 <!-- TODO change the ugly inline style-->

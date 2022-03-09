@@ -287,16 +287,16 @@ def project_update(request, proj_id):
 @login_required
 @require_http_methods(["POST"])
 def project_delete(request, proj_id):
-    project = get_object_or_404(Project, pk=proj_id)
+    project = get_object_or_404(Project, id=proj_id)
 
     if project.user != request.user:
         raise PermissionDenied
 
-    if request.POST:
+    if request.method == "POST":
         project.delete()
         messages.success(request, "Project successfully deleted!")
 
-    return HttpResponseRedirect(reverse("project_search", args=[proj_id]))
+    return HttpResponseRedirect(reverse("project_search"))
 
 
 @login_required
@@ -322,7 +322,7 @@ def project_search(request, proj_id=None):
 
 
 @login_required
-@require_http_methods(["POST", "GET"])
+@require_http_methods(["POST"])
 def project_duplicate(request, proj_id):
     """duplicates the selected project but none of its associated scenarios"""
     project = get_object_or_404(Project, pk=proj_id)

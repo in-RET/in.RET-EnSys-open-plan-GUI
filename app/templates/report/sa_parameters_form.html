@@ -1,0 +1,6 @@
+{% load crispy_forms_tags %}
+{% load static %}
+{% load i18n %}
+{% for param in output_parameters %}
+<option value="{{ param.name }}">{% translate param.verbose %}</option>
+{% endfor %}

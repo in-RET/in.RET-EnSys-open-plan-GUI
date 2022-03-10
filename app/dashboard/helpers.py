@@ -315,10 +315,10 @@ class KPIFinder:
         else:
             if param_name in self.kpi_info_dict:
                 answer = self.kpi_info_dict[param_name]["verbose"]
-                if answer == "None":
-                    answer = param_name.replace("_", " ").title()
             else:
-                answer = None
+                answer = "None"
+            if answer == "None":
+                answer = param_name.replace("_", " ").title()
         return answer
 
     def get_doc_definition(self, param_name):

@@ -124,6 +124,26 @@ class Project(models.Model):
             )
         return (success, message)
 
+    def revoke_access(self, viewer_id=None):
+        success = False
+        viewer = Viewer.objects.get(id=viewer_id)
+        if viewer is not None:
+            if viewer in self.viewers.all():
+                self.viewers.remove(viewer)
+                success = True
+                message = _(
+                    f"The user {viewer.user.email} rights to the project '{self.name}' have been revoked"
+                )
+            else:
+                message = _(
+                    f"The user {viewer.user.email} does not belong to the viewers of the project '{self.name}'"
+                )
+        else:
+            message = _(
+                "The user you selected seems to not be registered in the open_plan tool"
+            )
+        return success, message
+
 
 class Comment(models.Model):
     name = models.CharField(max_length=60)

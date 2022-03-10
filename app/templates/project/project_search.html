@@ -46,6 +46,32 @@
     </div>
 </div>
 
+<!-- Modal -->
+<div class="modal fade modal--gui" id="shareProjectModal" tabindex="-1" role="dialog" aria-labelledby="shareProjectModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="shareProjectModalLabel">{% translate "Share project" %}</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    {{ project_share_form|crispy }}
+                    <button style="display:none;" type="submit" id="shareProjectModalSubmitBtn"></button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate "Close" %}</button>
+                <button class="btn btn--medium" onclick="javascript:submitModalForm(event, modalId='shareProjectModal')">{% translate "Share" %}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
     <main>
         <section class="header">
             <div>
@@ -92,7 +118,7 @@
                                 <span class="icon icon-edit" aria-hidden="true"></span>
                                 {% translate "Edit" %}
                             </a>
-                            <form action="{% url 'project_duplicate' project.pk %}"
+                            <form action="{% url 'project_duplicate' project.id %}"
                                   method="POST">
                                 {% csrf_token %}
                                 <!-- TODO change the ugly inline style-->
@@ -109,8 +135,17 @@
                                     <span class="icon icon-delete" aria-hidden="true"></span>
                                     {% translate "Delete" %}
                                 </button>
-
                             </form>
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle btn--transparent" type="button" id="shareProject-{{ project.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                  <span class="icon icon-more"></span>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="shareProject-{{ project.id }}">
+                                  <li><a class="dropdown-item" onclick="javascript:showModal(event, modalId='shareProjectModal', url=`{% url 'project_share' project.id %}`)">{% translate "Share project" %}</a></li>
+                                  <li><a class="dropdown-item" href="#">{% translate "Unshare project" %}</a></li>
+                                </ul>
+                            </div>
+
 
                         </div>
                     </div>

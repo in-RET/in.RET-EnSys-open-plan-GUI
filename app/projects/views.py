@@ -175,29 +175,21 @@ def project_share(request, proj_id):
 @json_view
 @require_http_methods(["POST"])
 def project_revoke_access(request, proj_id):
-    project = get_object_or_404(Project, pk=proj_id)
+    qs = request.POST
+
+    project = get_object_or_404(Project, id=proj_id)
 
     if project.user != request.user:
-        return JsonResponse(
-            {"status": "error", "message": "Project does not belong to you."},
-            status=403,
-            content_type="application/json",
-        )
-    viewer = CustomUser.objects.filter(
-        email=json.loads(request.body)["userEmail"]
-    ).first()
-    if viewer and project.user != viewer:
-        project.viewers.remove(viewer)
-        msg = "The selected user will not be able to view the project any more."
-        status_code = 204
-    else:
-        msg = "Could not remove the user from your project. Please contact a moderator."
-        status_code = 422
-    return JsonResponse(
-        {"status": "success", "message": msg},
-        status=status_code,
-        content_type="application/json",
-    )
+        raise PermissionDenied
+    form_item = ProjectRevokeForm(qs)
+    if form_item.is_valid():
+        success, message = project.revoke_access(**form_item.cleaned_data)
+        if success is True:
+            messages.success(request, message)
+        else:
+            messages.error(request, message)
+
+    return HttpResponseRedirect(reverse("project_search", args=[proj_id]))
 
 
 @login_required
@@ -306,7 +298,8 @@ def project_search(request, proj_id=None):
     ).distinct()
 
     scenario_upload_form = UploadFileForm()
-
+    project_share_form = ProjectShareForm()
+    project_revoke_form = ProjectRevokeForm()
     return render(
         request,
         "project/project_search.html",
@@ -314,6 +307,8 @@ def project_search(request, proj_id=None):
             "project_list": combined_projects_list,
             "proj_id": proj_id,
             "scenario_upload_form": scenario_upload_form,
+            "project_share_form": project_share_form,
+            "project_revoke_form": project_revoke_form,
         },
     )
 

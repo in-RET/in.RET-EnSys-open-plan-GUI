@@ -75,6 +75,55 @@ class Project(models.Model):
         dm["economic_data"] = model_to_dict(self.economic_data, exclude=["id"])
         return dm
 
+    def add_viewer_if_not_exist(self, email=None, share_rights=""):
+        user = None
+        success = False
+        if email is not None:
+            users = CustomUser.objects.filter(email=email)
+            if users.exists():
+                user = users.first()
+        else:
+            message = _(
+                f"No email address provided to find the user to share the project '{self.name}' with"
+            )
+
+        if user is not None:
+            viewers = Viewer.objects.filter(user=user)
+            if viewers.exists():
+                viewer = viewers.get()
+            else:
+                if user == self.user:
+                    viewer = None
+                    message = _("You cannot share a project with yourself")
+                else:
+                    viewer = Viewer.objects.create(user=user, share_rights=share_rights)
+
+            if viewer not in self.viewers.all() and viewer is not None:
+                self.viewers.add(viewer)
+                success = True
+                message = _(
+                    f"'{email}' belongs to a valid user, they will be able to {share_rights} the project '{self.name}'"
+                )
+            else:
+                if viewer is not None:
+                    if viewer.share_rights != share_rights:
+                        success = True
+                        message = _(
+                            f"The share rights of the user registered under {email} for the project '{self.name}' have been changed from '{viewer.share_rights}' to '{share_rights}'"
+                        )
+                        viewer.share_rights = share_rights
+                        viewer.save()
+                    else:
+                        message = _(
+                            f"The user registered under {email} for the project '{self.name}' already have '{share_rights}' access"
+                        )
+
+        else:
+            message = _(
+                f"We could not find a user registered under the email address you provided: {email}"
+            )
+        return (success, message)
+
 
 class Comment(models.Model):
     name = models.CharField(max_length=60)

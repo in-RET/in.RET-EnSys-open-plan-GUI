@@ -21,7 +21,7 @@ class BasicOperationsTest(TestCase):
 
     def test_delete_project_redirects(self):
         """Make sure we are redirected to project page once deleting a project"""
-        response = self.client.post(reverse("project_delete", args=[1]))
+        response = self.client.post(reverse("project_delete", args=[self.project.id]))
         self.assertRedirects(response, reverse("project_search"))
         response = self.client.get(response.url)
         self.assertEqual(response.status_code, 200)
@@ -29,8 +29,12 @@ class BasicOperationsTest(TestCase):
 
     def test_duplicate_project_redirects(self):
         """Make sure we are redirected to project page once duplicating a project"""
-        response = self.client.post(reverse("project_duplicate", args=[1]))
-        self.assertRedirects(response, reverse("project_search", args=[2]))
+        response = self.client.post(
+            reverse("project_duplicate", args=[self.project.id])
+        )
+        self.assertRedirects(
+            response, reverse("project_search", args=[self.project.id + 1])
+        )
         response = self.client.get(response.url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Project.objects.all().count(), 2)
@@ -77,7 +81,7 @@ class BasicOperationsTest(TestCase):
     def test_add_project_viewer_via_post(self):
         test_email = CustomUser.objects.last().email
         response = self.client.post(
-            reverse("project_share", args=[1]),
+            reverse("project_share", args=[self.project.id]),
             dict(email=test_email, share_rights="read"),
         )
         self.assertRedirects(response, reverse("project_search", args=[1]))

@@ -35,12 +35,12 @@
                 <form method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
                     {{ scenario_upload_form|crispy }}
-                    <input id="uploadScenarioBtn" type="submit" style="display:none;">
+                    <button style="display:none;" type="submit" id="uploadScenarioModalSubmitBtn"></button>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate "Close" %}</button>
-                <button class="btn btn--medium" onclick="uploadScenario(event)">{% translate "Upload" %}</button>
+                <button class="btn btn--medium" onclick="javascript:submitModalForm(event, modalId='uploadScenarioModal')">{% translate "Upload" %}</button>
             </div>
         </div>
     </div>
@@ -195,7 +195,7 @@
 
                                     {% if project.user == request.user %}
                                         <li><a class="dropdown-item" href="{% url 'scenario_steps' project.id %}">{% translate "New scenario" %}</a></li>
-                                        <li><a class="dropdown-item" onclick="showUploadScenario(event, `{% url 'scenario_upload' project.id %}`)">{% translate "From file" %}</a></li>
+                                        <li><a class="dropdown-item" onclick="javascript:showModal(event, modalId='uploadScenarioModal', url=`{% url 'scenario_upload' project.id %}`)">{% translate "From file" %}</a></li>
                                     {% endif %}
                                 </ul>
                             </div>
@@ -296,23 +296,7 @@
     });
 </script>
 
-<script>
-    var uploadScenarioModalDOM = document.getElementById("uploadScenarioModal");
-    var uploadScenarioModal = new bootstrap.Modal(uploadScenarioModalDOM);
-    var uploadScenarioButton = document.getElementById("uploadScenarioBtn");
-
-    function showUploadScenario(event, url){
-        // update the url linked to the form
-        uploadScenarioModalDOM.querySelector('.modal-body form').setAttribute("action",url);
-        uploadScenarioModal.show()
-    }
-
-    function uploadScenario(event){
-        //simulate click on the form here
-        uploadScenarioButton.click()
-    }
-</script>
-
+<script src="{% static 'js/modal_utils.js' %}"></script>
 
 <script>
     function shareProject (e, projectShareUrl) {

@@ -304,6 +304,13 @@ class ProjectShareForm(ModelForm):
         exclude = ["id", "user"]
 
 
+class ProjectRevokeForm(ModelForm):
+
+    class Meta:
+        model = Project
+        fields = ["viewers"]
+
+
 class UploadFileForm(forms.Form):
     name = forms.CharField(label=_("New scenario name"), required=False)
     file = forms.FileField(label=_("Scenario file"))

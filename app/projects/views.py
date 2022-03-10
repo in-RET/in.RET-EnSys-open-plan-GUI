@@ -24,7 +24,7 @@ from .requests import (
     mvs_sensitivity_analysis_request,
     fetch_mvs_sa_results,
 )
-from .models import *
+from projects.models import *
 from .scenario_topology_helpers import (
     handle_storage_unit_form_post,
     handle_bus_form_post,
@@ -150,28 +150,25 @@ def project_members_list(request, proj_id):
 
 
 @login_required
-@json_view
 @require_http_methods(["POST"])
 def project_share(request, proj_id):
-    project = get_object_or_404(Project, pk=proj_id)
+    qs = request.POST
+
+    project = get_object_or_404(Project, id=proj_id)
 
     if project.user != request.user:
-        return JsonResponse(
-            {"status": "error", "message": "Project does not belong to you."},
-            status=403,
-            content_type="application/json",
-        )
-    viewers = CustomUser.objects.filter(email=json.loads(request.body)["userEmail"])
-    if viewers.count() > 0 and project.user not in viewers:
-        project.viewers.add(viewers.first())
-    return JsonResponse(
-        {
-            "status": "success",
-            "message": "If a user exists with that email address, they will be able to view the project.",
-        },
-        status=201,
-        content_type="application/json",
-    )
+        raise PermissionDenied
+
+    form_item = ProjectShareForm(qs)
+
+    if form_item.is_valid():
+        success, message = project.add_viewer_if_not_exist(**form_item.cleaned_data)
+        if success is True:
+            messages.success(request, message)
+        else:
+            messages.error(request, message)
+
+    return HttpResponseRedirect(reverse("project_search", args=[proj_id]))
 
 
 @login_required

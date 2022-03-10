@@ -296,6 +296,14 @@ class ProjectUpdateForm(OpenPlanModelForm):
         exclude = ["date_created", "date_updated", "economic_data", "user", "viewers"]
 
 
+class ProjectShareForm(ModelForm):
+    email = forms.EmailField(label=_("Email address"))
+
+    class Meta:
+        model = Viewer
+        exclude = ["id", "user"]
+
+
 class UploadFileForm(forms.Form):
     name = forms.CharField(label=_("New scenario name"), required=False)
     file = forms.FileField(label=_("Scenario file"))

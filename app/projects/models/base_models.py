@@ -7,6 +7,7 @@ from datetime import timedelta
 from django.forms.models import model_to_dict
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
+from users.models import CustomUser
 from projects.constants import (
     ASSET_CATEGORY,
     ASSET_TYPE,
@@ -40,6 +41,13 @@ class EconomicData(models.Model):
     tax = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(1.0)])
 
 
+class Viewer(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    share_rights = models.CharField(
+        max_length=10, choices=(("edit", _("Edit")), ("read", _("Read")))
+    )
+
+
 class Project(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
@@ -52,9 +60,7 @@ class Project(models.Model):
         EconomicData, on_delete=models.SET_NULL, null=True
     )
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    viewers = models.ManyToManyField(
-        settings.AUTH_USER_MODEL, related_name="viewer_projects"
-    )
+    viewers = models.ManyToManyField(Viewer, related_name="viewer_projects")
 
     def __str__(self):
         return self.name

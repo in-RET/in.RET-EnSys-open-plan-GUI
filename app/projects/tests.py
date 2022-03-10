@@ -88,3 +88,43 @@ class BasicOperationsTest(TestCase):
         response = self.client.get(response.url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(self.project.viewers.filter(user__email=test_email).count(), 1)
+
+    def test_remove_existing_viewer_from_project(self):
+        test_email = CustomUser.objects.last().email
+        # add a viewer
+        success, _ = self.project.add_viewer_if_not_exist(
+            email=test_email, share_rights="edit"
+        )
+        self.assertTrue(success)
+
+        # remove the viewer
+        viewer = self.project.viewers.filter(user__email=test_email).get()
+        success, _ = self.project.revoke_access(viewer_id=viewer.id)
+        self.assertTrue(success)
+
+        self.assertFalse(self.project.viewers.filter(user__email=test_email).exists())
+
+    def test_remove_existing_viewer_from_project_via_post(self):
+        test_email = CustomUser.objects.last().email
+        # add a viewer
+        success, _ = self.project.add_viewer_if_not_exist(
+            email=test_email, share_rights="edit"
+        )
+
+        # remove the viewer
+        viewer = self.project.viewers.filter(user__email=test_email).get()
+        response = self.client.post(
+            reverse("project_revoke_access", args=[self.project.id]),
+            dict(viewer_id=viewer.id),
+        )
+        self.assertRedirects(
+            response, reverse("project_search", args=[self.project.id])
+        )
+        response = self.client.get(response.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.project.viewers.filter(user__email=test_email).count(), 0)
+
+    def test_remove_project_viewer_via_post_raises_permission_error_if_not_project_owner(
+        self
+    ):
+        pass

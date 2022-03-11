@@ -47,6 +47,9 @@ class Viewer(models.Model):
         max_length=10, choices=(("edit", _("Edit")), ("read", _("Read")))
     )
 
+    def __str__(self):
+        return f"{self.user.email} [{self.share_rights}]"
+
 
 class Project(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)

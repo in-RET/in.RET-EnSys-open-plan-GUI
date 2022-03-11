@@ -305,10 +305,26 @@ class ProjectShareForm(ModelForm):
 
 
 class ProjectRevokeForm(ModelForm):
-
     class Meta:
         model = Project
         fields = ["viewers"]
+        widgets = {"viewers": forms.SelectMultiple()}
+        help_texts = {
+            "viewers": _(
+                "Select the user(s) for which you want to revoke access rights "
+            )
+        }
+        labels = {"viewers": _("Users currently having access to the project")}
+
+    def __init__(self, *args, **kwargs):
+        proj_id = kwargs.pop("proj_id", None)
+        super().__init__(*args, **kwargs)
+        self.fields["viewers"].empty_label = _("No users have access to this project")
+        self.fields["viewers"].required = False
+        if proj_id is not None:
+            self.fields["viewers"].queryset = Project.objects.get(
+                id=proj_id
+            ).viewers.all()
 
 
 class UploadFileForm(forms.Form):

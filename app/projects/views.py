@@ -174,14 +174,14 @@ def project_share(request, proj_id):
 @login_required
 @json_view
 @require_http_methods(["POST"])
-def project_revoke_access(request, proj_id):
+def project_revoke_access(request, proj_id=None):
     qs = request.POST
 
     project = get_object_or_404(Project, id=proj_id)
 
     if project.user != request.user:
         raise PermissionDenied
-    form_item = ProjectRevokeForm(qs)
+    form_item = ProjectRevokeForm(qs, proj_id=proj_id)
     if form_item.is_valid():
         success, message = project.revoke_access(**form_item.cleaned_data)
         if success is True:
@@ -190,6 +190,26 @@ def project_revoke_access(request, proj_id):
             messages.error(request, message)
 
     return HttpResponseRedirect(reverse("project_search", args=[proj_id]))
+
+
+@login_required
+@json_view
+@require_http_methods(["POST"])
+def ajax_project_viewers_form(request):
+
+    if request.is_ajax():
+        proj_id = int(request.POST.get("proj_id"))
+        project = get_object_or_404(Project, id=proj_id)
+
+        if project.user != request.user:
+            raise PermissionDenied
+        form_item = ProjectRevokeForm(proj_id=proj_id)
+
+        return render(
+            request,
+            "project/project_viewers_form.html",
+            context={"form_item": form_item},
+        )
 
 
 @login_required
@@ -299,7 +319,7 @@ def project_search(request, proj_id=None):
 
     scenario_upload_form = UploadFileForm()
     project_share_form = ProjectShareForm()
-    project_revoke_form = ProjectRevokeForm()
+    project_revoke_form = ProjectRevokeForm(proj_id=proj_id)
     return render(
         request,
         "project/project_search.html",

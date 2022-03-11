@@ -97,7 +97,7 @@
                                 </button>
                                 <ul class="dropdown-menu" aria-labelledby="shareProject-{{ project.id }}">
                                   <li><a class="dropdown-item" onclick="javascript:showModal(event, modalId='shareProjectModal', attrs={'action': `{% url 'project_share' project.id %}`})">{% translate "Share project" %}</a></li>
-                                  <li><a class="dropdown-item" onclick="javascript:showModal(event, modalId='revokeProjectModal', attrs={'action': `{% url 'project_revoke_access' project.id %}`})">{% translate "Unshare project" %}</a></li>
+                                  <li><a class="dropdown-item" onclick="javascript:showRevokeProjectModal(event, `{{ project.id }}`)">{% translate "Unshare project" %}</a></li>
                                 </ul>
                             </div>
 
@@ -320,6 +320,13 @@
                 html: 'If there is a user with this email, they will be able to see the project.'
             })
             .then(result=>result.value && location.reload())
+
+   function showRevokeProjectModal(event, projId){
+        const modalId = "revokeProjectModal";
+        showModal(
+            event,
+            modalId,
+            {'action': `{% url 'project_revoke_access' %}` + "/" + projId}
         )
         .catch(error =>
             Swal.fire({
@@ -378,7 +385,22 @@
         })
         .catch(error => Swal.showValidationMessage(`Request failed: ${error}`));
     }
+        // Update the form based on how the number of viewers of this project
+        var revokeProjectModalForm = document.getElementById(modalId).querySelector("form");
 
+        $.ajax({
+            headers: {'X-CSRFToken': `{{ csrf_token }}` },
+            type: "POST",
+            url: `{% url 'ajax_project_viewers_form' %}`,
+            data: {
+              'proj_id': projId
+            },
+            success: function (data) {
+            console.log(`<button style="display:none;" type="submit" id="${modalId}SubmitBtn"></button>`);
+              $("#" + modalId).find('.modal-body form').html(data + `<button style="display:none;" type="submit" id="${modalId}SubmitBtn"></button>`);
+            }
+        });
+   }
 </script>
 
 <script>

@@ -21,55 +21,9 @@
 {% block content %}
 
 
-<!-- Modal -->
-<div class="modal fade modal--gui" id="uploadScenarioModal" tabindex="-1" role="dialog" aria-labelledby="uploadScenarioModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="uploadScenarioModalLabel">{% translate "Scenario upload" %}</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form method="POST" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {{ scenario_upload_form|crispy }}
-                    <button style="display:none;" type="submit" id="uploadScenarioModalSubmitBtn"></button>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate "Close" %}</button>
-                <button class="btn btn--medium" onclick="javascript:submitModalForm(event, modalId='uploadScenarioModal')">{% translate "Upload" %}</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal -->
-<div class="modal fade modal--gui" id="shareProjectModal" tabindex="-1" role="dialog" aria-labelledby="shareProjectModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="shareProjectModalLabel">{% translate "Share project" %}</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form method="POST">
-                    {% csrf_token %}
-                    {{ project_share_form|crispy }}
-                    <button style="display:none;" type="submit" id="shareProjectModalSubmitBtn"></button>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate "Close" %}</button>
-                <button class="btn btn--medium" onclick="javascript:submitModalForm(event, modalId='shareProjectModal')">{% translate "Share" %}</button>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- use showModal(event, modalId=, attrs = { list of attributes you want to add to the form tag inside the modal }) to call the modal -->
+{% include "modal_template.html" with id="uploadScenarioModal" modal_style_class="modal--gui" submit_btn_label="Upload" title="Scenario upload" form=scenario_upload_form %}
+{% include "modal_template.html" with id="shareProjectModal" modal_style_class="modal--gui" submit_btn_label="Share" title="Share project" form=project_share_form %}
 
 
     <main>
@@ -141,7 +95,7 @@
                                   <span class="icon icon-more"></span>
                                 </button>
                                 <ul class="dropdown-menu" aria-labelledby="shareProject-{{ project.id }}">
-                                  <li><a class="dropdown-item" onclick="javascript:showModal(event, modalId='shareProjectModal', url=`{% url 'project_share' project.id %}`)">{% translate "Share project" %}</a></li>
+                                  <li><a class="dropdown-item" onclick="javascript:showModal(event, modalId='shareProjectModal', attrs={'action': `{% url 'project_share' project.id %}`})">{% translate "Share project" %}</a></li>
                                   <li><a class="dropdown-item" href="#">{% translate "Unshare project" %}</a></li>
                                 </ul>
                             </div>
@@ -230,7 +184,7 @@
 
                                     {% if project.user == request.user %}
                                         <li><a class="dropdown-item" href="{% url 'scenario_steps' project.id %}">{% translate "New scenario" %}</a></li>
-                                        <li><a class="dropdown-item" onclick="javascript:showModal(event, modalId='uploadScenarioModal', url=`{% url 'scenario_upload' project.id %}`)">{% translate "From file" %}</a></li>
+                                        <li><a class="dropdown-item" onclick="javascript:showModal(event, modalId='uploadScenarioModal', attrs={'action': `{% url 'scenario_upload' project.id %}`, 'enctype': 'multipart/form-data' })">{% translate "From file" %}</a></li>
                                     {% endif %}
                                 </ul>
                             </div>

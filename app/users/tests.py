@@ -4,7 +4,7 @@ from django.test.client import RequestFactory
 from django.urls import reverse
 from users.forms import CustomUserChangeForm, CustomUserCreationForm
 from django.test import TestCase, override_settings
-from .models import CustomUser
+from users.models import CustomUser
 
 # Create your tests here.
 

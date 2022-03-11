@@ -1,4 +1,4 @@
-from .base_models import AbstractSimulation, Scenario
+from projects.models.base_models import AbstractSimulation, Scenario
 
 
 import json

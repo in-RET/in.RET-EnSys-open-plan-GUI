@@ -1,0 +1,16 @@
+    function submitModalForm(event, modalId=""){
+        const submitFormBtn = document.getElementById(modalId + "SubmitBtn");
+        submitFormBtn.click();
+    }
+
+
+    function showModal(event, modalId="", attrs = null){
+        var modalInstance = $("#" + modalId);
+        // update the attributes of the form tag of the modal
+        for (const [key, value] of Object.entries(attrs)) {
+            if(value){
+                modalInstance.find('.modal-body form').attr(key, value)
+            }
+        }
+         modalInstance.modal("show")
+    }

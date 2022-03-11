@@ -25,6 +25,12 @@ urlpatterns = [
         project_revoke_access,
         name="project_revoke_access",
     ),
+    path("project/unshare", project_revoke_access, name="project_revoke_access"),
+    path(
+        "ajax/projects/viewers",
+        ajax_project_viewers_form,
+        name="ajax_project_viewers_form",
+    ),
     # Comment
     path("comment/create/<int:proj_id>", comment_create, name="comment_create"),
     path("comment/update/<int:com_id>", comment_update, name="comment_update"),
@@ -56,7 +62,7 @@ urlpatterns = [
         name="scenario_create_topology",
     ),
     path(
-        "project/<int:proj_id>/scenario/create_constraints>",
+        "project/<int:proj_id>/scenario/create_constraints",
         scenario_create_constraints,
         name="scenario_create_constraints",
     ),

@@ -24,7 +24,7 @@ from .requests import (
     mvs_sensitivity_analysis_request,
     fetch_mvs_sa_results,
 )
-from .models import *
+from projects.models import *
 from .scenario_topology_helpers import (
     handle_storage_unit_form_post,
     handle_bus_form_post,
@@ -150,57 +150,66 @@ def project_members_list(request, proj_id):
 
 
 @login_required
-@json_view
 @require_http_methods(["POST"])
 def project_share(request, proj_id):
-    project = get_object_or_404(Project, pk=proj_id)
+    qs = request.POST
+
+    project = get_object_or_404(Project, id=proj_id)
 
     if project.user != request.user:
-        return JsonResponse(
-            {"status": "error", "message": "Project does not belong to you."},
-            status=403,
-            content_type="application/json",
-        )
-    viewers = CustomUser.objects.filter(email=json.loads(request.body)["userEmail"])
-    if viewers.count() > 0 and project.user not in viewers:
-        project.viewers.add(viewers.first())
-    return JsonResponse(
-        {
-            "status": "success",
-            "message": "If a user exists with that email address, they will be able to view the project.",
-        },
-        status=201,
-        content_type="application/json",
-    )
+        raise PermissionDenied
+
+    form_item = ProjectShareForm(qs)
+
+    if form_item.is_valid():
+        success, message = project.add_viewer_if_not_exist(**form_item.cleaned_data)
+        if success is True:
+            messages.success(request, message)
+        else:
+            messages.error(request, message)
+
+    return HttpResponseRedirect(reverse("project_search", args=[proj_id]))
 
 
 @login_required
 @json_view
 @require_http_methods(["POST"])
-def project_revoke_access(request, proj_id):
-    project = get_object_or_404(Project, pk=proj_id)
+def project_revoke_access(request, proj_id=None):
+    qs = request.POST
+
+    project = get_object_or_404(Project, id=proj_id)
 
     if project.user != request.user:
-        return JsonResponse(
-            {"status": "error", "message": "Project does not belong to you."},
-            status=403,
-            content_type="application/json",
+        raise PermissionDenied
+    form_item = ProjectRevokeForm(qs, proj_id=proj_id)
+    if form_item.is_valid():
+        success, message = project.revoke_access(**form_item.cleaned_data)
+        if success is True:
+            messages.success(request, message)
+        else:
+            messages.error(request, message)
+
+    return HttpResponseRedirect(reverse("project_search", args=[proj_id]))
+
+
+@login_required
+@json_view
+@require_http_methods(["POST"])
+def ajax_project_viewers_form(request):
+
+    if request.is_ajax():
+        proj_id = int(request.POST.get("proj_id"))
+        project = get_object_or_404(Project, id=proj_id)
+
+        if project.user != request.user:
+            raise PermissionDenied
+        form_item = ProjectRevokeForm(proj_id=proj_id)
+
+        return render(
+            request,
+            "project/project_viewers_form.html",
+            context={"form_item": form_item},
         )
-    viewer = CustomUser.objects.filter(
-        email=json.loads(request.body)["userEmail"]
-    ).first()
-    if viewer and project.user != viewer:
-        project.viewers.remove(viewer)
-        msg = "The selected user will not be able to view the project any more."
-        status_code = 204
-    else:
-        msg = "Could not remove the user from your project. Please contact a moderator."
-        status_code = 422
-    return JsonResponse(
-        {"status": "success", "message": msg},
-        status=status_code,
-        content_type="application/json",
-    )
 
 
 @login_required
@@ -287,16 +296,16 @@ def project_update(request, proj_id):
 @login_required
 @require_http_methods(["POST"])
 def project_delete(request, proj_id):
-    project = get_object_or_404(Project, pk=proj_id)
+    project = get_object_or_404(Project, id=proj_id)
 
     if project.user != request.user:
         raise PermissionDenied
 
-    if request.POST:
+    if request.method == "POST":
         project.delete()
         messages.success(request, "Project successfully deleted!")
 
-    return HttpResponseRedirect(reverse("project_search", args=[proj_id]))
+    return HttpResponseRedirect(reverse("project_search"))
 
 
 @login_required
@@ -305,11 +314,12 @@ def project_search(request, proj_id=None):
     # project_list = Project.objects.filter(user=request.user)
     # shared_project_list = Project.objects.filter(viewers=request.user)
     combined_projects_list = Project.objects.filter(
-        Q(user=request.user) | Q(viewers=request.user)
+        Q(user=request.user) | Q(viewers__user=request.user)
     ).distinct()
 
     scenario_upload_form = UploadFileForm()
-
+    project_share_form = ProjectShareForm()
+    project_revoke_form = ProjectRevokeForm(proj_id=proj_id)
     return render(
         request,
         "project/project_search.html",
@@ -317,12 +327,14 @@ def project_search(request, proj_id=None):
             "project_list": combined_projects_list,
             "proj_id": proj_id,
             "scenario_upload_form": scenario_upload_form,
+            "project_share_form": project_share_form,
+            "project_revoke_form": project_revoke_form,
         },
     )
 
 
 @login_required
-@require_http_methods(["POST", "GET"])
+@require_http_methods(["POST"])
 def project_duplicate(request, proj_id):
     """duplicates the selected project but none of its associated scenarios"""
     project = get_object_or_404(Project, pk=proj_id)

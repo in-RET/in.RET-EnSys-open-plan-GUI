@@ -21,30 +21,11 @@
 {% block content %}
 
 
-<!-- Modal -->
-<div class="modal fade modal--gui" id="uploadScenarioModal" tabindex="-1" role="dialog" aria-labelledby="uploadScenarioModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="uploadScenarioModalLabel">{% translate "Scenario upload" %}</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form method="POST" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {{ scenario_upload_form|crispy }}
-                    <input id="uploadScenarioBtn" type="submit" style="display:none;">
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate "Close" %}</button>
-                <button class="btn btn--medium" onclick="uploadScenario(event)">{% translate "Upload" %}</button>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- use showModal(event, modalId=, attrs = { list of attributes you want to add to the form tag inside the modal }) to call the modal -->
+{% include "modal_template.html" with id="uploadScenarioModal" modal_style_class="modal--gui" submit_btn_label="Upload" title="Scenario upload" form=scenario_upload_form %}
+{% include "modal_template.html" with id="shareProjectModal" modal_style_class="modal--gui" submit_btn_label="Share" title="Share project" form=project_share_form %}
+{% include "modal_template.html" with id="revokeProjectModal" modal_style_class="modal--gui" submit_btn_label="Revoke access" title="Manage project access" form=project_revoke_form %}
+
 
     <main>
         <section class="header">
@@ -55,14 +36,27 @@
             </div>
         </section>
 
+        <section class="projects-new">
+            <div class="dropdown">
+                <button class="btn btn--medium btn--transparent btn--icon dropdown-toggle" type="button" id="newProjectButton" data-bs-toggle="dropdown" aria-expanded="false">
+                    {% translate "Create project" %}
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="newProjectButton">
+                    <li><a class="dropdown-item" href="{% url 'project_create' %}">{% translate "Empty project" %}</a></li>
+                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">{% translate "From use case" %}</a></li>
+                </ul>
+            </div>
+        </section>
+
+
         {% for project in project_list %}
 
             <section class="project" id="project-{{ project.id }}">
                 <div>
                     <div class="project__top">
-                        <h2 class="name">
-                            {{ project.name }}
-                        </h2>
+                        <a  href="{% url 'project_update' project.id %}">
+                            <h2 class= "name"> {{ project.name }} </h2>
+                        </a>
                         <a href="{% url 'not_implemented' %}?url={{ request.get_full_path }}" class="location">
                             <span class="icon-pin" aria-hidden="true"></span>
                             {{ project.country }}
@@ -92,7 +86,7 @@
                                 <span class="icon icon-edit" aria-hidden="true"></span>
                                 {% translate "Edit" %}
                             </a>
-                            <form action="{% url 'project_duplicate' project.pk %}"
+                            <form action="{% url 'project_duplicate' project.id %}"
                                   method="POST">
                                 {% csrf_token %}
                                 <!-- TODO change the ugly inline style-->
@@ -101,7 +95,7 @@
                                     {% translate "Duplicate" %}
                                 </button>
                             </form>
-                            <form action="{% url 'project_delete' project.pk %}"
+                            <form action="{% url 'project_delete' project.id %}"
                                   method="POST">
                                 {% csrf_token %}
                                 <!-- TODO change the ugly inline style-->
@@ -109,8 +103,17 @@
                                     <span class="icon icon-delete" aria-hidden="true"></span>
                                     {% translate "Delete" %}
                                 </button>
-
                             </form>
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle btn--transparent" type="button" id="shareProject-{{ project.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                  <span class="icon icon-more"></span>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="shareProject-{{ project.id }}">
+                                  <li><a class="dropdown-item" onclick="javascript:showModal(event, modalId='shareProjectModal', attrs={'action': `{% url 'project_share' project.id %}`})">{% translate "Share project" %}</a></li>
+                                  <li><a class="dropdown-item" onclick="javascript:showRevokeProjectModal(event, `{{ project.id }}`)">{% translate "Unshare project" %}</a></li>
+                                </ul>
+                            </div>
+
 
                         </div>
                     </div>
@@ -195,7 +198,7 @@
 
                                     {% if project.user == request.user %}
                                         <li><a class="dropdown-item" href="{% url 'scenario_steps' project.id %}">{% translate "New scenario" %}</a></li>
-                                        <li><a class="dropdown-item" onclick="showUploadScenario(event, `{% url 'scenario_upload' project.id %}`)">{% translate "From file" %}</a></li>
+                                        <li><a class="dropdown-item" onclick="javascript:showModal(event, modalId='uploadScenarioModal', attrs={'action': `{% url 'scenario_upload' project.id %}`, 'enctype': 'multipart/form-data' })">{% translate "From file" %}</a></li>
                                     {% endif %}
                                 </ul>
                             </div>
@@ -222,17 +225,6 @@
 
         {% endfor %}
 
-        <section class="projects-new">
-            <div class="dropdown">
-                <button class="btn btn--medium btn--transparent btn--icon dropdown-toggle" type="button" id="newProjectButton" data-bs-toggle="dropdown" aria-expanded="false">
-                    {% translate "Create project" %}
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="newProjectButton">
-                    <li><a class="dropdown-item" href="{% url 'project_create' %}">{% translate "Empty project" %}</a></li>
-                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">{% translate "From use case" %}</a></li>
-                </ul>
-            </div>
-        </section>
 
 
     </main>
@@ -296,115 +288,33 @@
     });
 </script>
 
-<script>
-    var uploadScenarioModalDOM = document.getElementById("uploadScenarioModal");
-    var uploadScenarioModal = new bootstrap.Modal(uploadScenarioModalDOM);
-    var uploadScenarioButton = document.getElementById("uploadScenarioBtn");
-
-    function showUploadScenario(event, url){
-        // update the url linked to the form
-        uploadScenarioModalDOM.querySelector('.modal-body form').setAttribute("action",url);
-        uploadScenarioModal.show()
-    }
-
-    function uploadScenario(event){
-        //simulate click on the form here
-        uploadScenarioButton.click()
-    }
-</script>
-
+<script src="{% static 'js/modal_utils.js' %}"></script>
 
 <script>
-    function shareProject (e, projectShareUrl) {
-        e.preventDefault();
-        Swal.fire({
-            title: 'Share the Project',
-            html: "<h5>Provide the email of the user you would like to share your project.</h5>",
-            input: 'email',
-            showLoaderOnConfirm: true,
-            showCancelButton: true,
-            confirmButtonText: 'Share',
-            cancelButtonText: 'Cancel',
-            allowOutsideClick: () => !Swal.isLoading(),
-            preConfirm: (userEmail) => 
-                fetch(projectShareUrl, 
-                {
-                    method: "POST",
-                    headers: {"X-CSRFToken": `{{ csrf_token }}`},
-                    body: JSON.stringify({ userEmail: userEmail })
-                })
-                .then(response => {
-                    if (!response.ok)
-                        throw new Error(response.statusText)
-                    return response.json()
-                })
-                .catch(error => Swal.showValidationMessage(`Request failed: ${error}`)),
-        })
-        .then(result => result.value &&
-            Swal.fire({
-                icon: 'success',
-                html: 'If there is a user with this email, they will be able to see the project.'
-            })
-            .then(result=>result.value && location.reload())
+
+   function showRevokeProjectModal(event, projId){
+        const modalId = "revokeProjectModal";
+        showModal(
+            event,
+            modalId,
+            {'action': `{% url 'project_revoke_access' %}` + "/" + projId}
         )
-        .catch(error =>
-            Swal.fire({
-                icon: 'error',
-                html: 'Could not share project: ' + error
-            })
-        );
-    }
-</script>
+        // Update the form based on how the number of viewers of this project
+        var revokeProjectModalForm = document.getElementById(modalId).querySelector("form");
 
-<script>
-    function showMembers(e, getProjectMembersUrl, revokeAccessUrl) {
-        fetch(getProjectMembersUrl)
-        .then(response => {
-            if (!response.ok)
-                throw new Error(response.statusText)
-            return response.json()
-        })
-        .then(async (json)=> {
-            Swal.fire({
-                title: 'Project Members',
-                html: 
-                    '<ul class="list-group">'+
-                        json.viewers.map(viewer=>
-                            `<li class="list-group-item" email="${viewer}">
-                                <text>${viewer}</text>
-                                <button onclick="removeMember(event,'${revokeAccessUrl}')" type="button" class="close" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </li>`
-                        )+
-                    '</ul>'
-            })
-            .then(result=>result.value && location.reload());
-        })
-        .catch(error => Swal.showValidationMessage(`Request failed: ${error}`))
-    }
-
-
-    function removeMember(ev, revokeAccessUrl) {
-        const listItem = ev.target.closest('li');
-        const userEmail = listItem.querySelector('text').innerText;
-        fetch(revokeAccessUrl, {
-            method: "POST",
-            headers: {"X-CSRFToken": `{{ csrf_token }}`},
-            body: JSON.stringify({ userEmail: userEmail })
-        })
-        .then(response => {
-            if (!response.ok)
-                throw new Error(response.statusText)
-            return response.status
-        })
-        .then(status=>{
-            const ulItem = ev.target.closest('ul');
-            ulItem.removeChild(listItem);
-        })
-        .catch(error => Swal.showValidationMessage(`Request failed: ${error}`));
-    }
-
+        $.ajax({
+            headers: {'X-CSRFToken': `{{ csrf_token }}` },
+            type: "POST",
+            url: `{% url 'ajax_project_viewers_form' %}`,
+            data: {
+              'proj_id': projId
+            },
+            success: function (data) {
+            console.log(`<button style="display:none;" type="submit" id="${modalId}SubmitBtn"></button>`);
+              $("#" + modalId).find('.modal-body form').html(data + `<button style="display:none;" type="submit" id="${modalId}SubmitBtn"></button>`);
+            }
+        });
+   }
 </script>
 
 <script>

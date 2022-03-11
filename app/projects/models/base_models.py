@@ -7,6 +7,8 @@ from datetime import timedelta
 from django.forms.models import model_to_dict
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
+
+from users.models import CustomUser
 from projects.constants import (
     ASSET_CATEGORY,
     ASSET_TYPE,
@@ -40,6 +42,16 @@ class EconomicData(models.Model):
     tax = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(1.0)])
 
 
+class Viewer(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    share_rights = models.CharField(
+        max_length=10, choices=(("edit", _("Edit")), ("read", _("Read")))
+    )
+
+    def __str__(self):
+        return f"{self.user.email} [{self.share_rights}]"
+
+
 class Project(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
@@ -52,9 +64,7 @@ class Project(models.Model):
         EconomicData, on_delete=models.SET_NULL, null=True
     )
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    viewers = models.ManyToManyField(
-        settings.AUTH_USER_MODEL, related_name="viewer_projects"
-    )
+    viewers = models.ManyToManyField(Viewer, related_name="viewer_projects")
 
     def __str__(self):
         return self.name
@@ -68,6 +78,83 @@ class Project(models.Model):
         dm = model_to_dict(self, exclude=["id", "user", "viewers"])
         dm["economic_data"] = model_to_dict(self.economic_data, exclude=["id"])
         return dm
+
+    def add_viewer_if_not_exist(self, email=None, share_rights=""):
+        user = None
+        success = False
+        if email is not None:
+            users = CustomUser.objects.filter(email=email)
+            if users.exists():
+                user = users.first()
+        else:
+            message = _(
+                f"No email address provided to find the user to share the project '{self.name}' with"
+            )
+
+        if user is not None:
+            viewers = Viewer.objects.filter(user=user)
+            if viewers.exists():
+                viewer = viewers.get()
+            else:
+                if user == self.user:
+                    viewer = None
+                    message = _("You cannot share a project with yourself")
+                else:
+                    viewer = Viewer.objects.create(user=user, share_rights=share_rights)
+
+            if viewer not in self.viewers.all() and viewer is not None:
+                self.viewers.add(viewer)
+                success = True
+                message = _(
+                    f"'{email}' belongs to a valid user, they will be able to {share_rights} the project '{self.name}'"
+                )
+            else:
+                if viewer is not None:
+                    if viewer.share_rights != share_rights:
+                        success = True
+                        message = _(
+                            f"The share rights of the user registered under {email} for the project '{self.name}' have been changed from '{viewer.share_rights}' to '{share_rights}'"
+                        )
+                        viewer.share_rights = share_rights
+                        viewer.save()
+                    else:
+                        message = _(
+                            f"The user registered under {email} for the project '{self.name}' already have '{share_rights}' access"
+                        )
+
+        else:
+            message = _(
+                f"We could not find a user registered under the email address you provided: {email}"
+            )
+        return (success, message)
+
+    def revoke_access(self, viewers=None):
+        """Given a queryset of viewers or a list of viewers ids, remove those viewers from projects viewers"""
+        success = False
+        if isinstance(viewers, int):
+            viewers = Viewer.objects.filter(id__in=[viewers])
+        elif isinstance(viewers, list):
+            viewers = Viewer.objects.filter(id__in=viewers)
+
+        if viewers is not None:
+            existing_viewers = viewers.intersection(self.viewers.all())
+            if existing_viewers.exists():
+
+                for viewer_id in existing_viewers.values_list("id", flat=True):
+                    self.viewers.remove(viewer_id)
+                success = True
+                message = _(
+                    f"The user(s) {','.join(existing_viewers.values_list('user__email', flat=True))} rights to the project '{self.name}' have been revoked"
+                )
+            else:
+                message = _(
+                    f"The user(s) {','.join(viewers.values_list('user__email', flat=True))} does not belong to the viewers of the project '{self.name}'"
+                )
+        else:
+            message = _(
+                "The user(s) you selected seems to not be registered in the open_plan tool"
+            )
+        return success, message
 
 
 class Comment(models.Model):

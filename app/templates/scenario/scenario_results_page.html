@@ -61,28 +61,10 @@
     </div>
 </div>
 
-<!-- Modal -->
-<div class="modal fade modal--dashboard" id="createReportItemModal" tabindex="-1" role="dialog" aria-labelledby="createReportItemModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="createReportItemModalLabel">{% translate "Add a new report item" %}</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form method="POST" enctype="multipart/form-data" ajax-post-url="{% url 'report_create_item' proj_id %}" graph-parameter-url="{% url 'ajax_get_graph_parameters_form' proj_id %}">
-                    {% csrf_token %}
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate "Close" %}</button>
-                <button class="btn btn--medium" onclick="createReportItem(event)">{% translate "Create" %}</button>
-            </div>
-        </div>
-    </div>
-</div>
+
+{% include "modal_template.html" with id="createReportItemModal" modal_style_class="modal--dashboard" submit_btn_label="Create" title="Add a new report item" custom_submit_function="createReportItem(event)" %}
+
+{% include "modal_template.html" with id="createSaGraphModal" modal_style_class="modal--dashboard" submit_btn_label="Create" title="Add a new report item" form=sa_graph_form %}
 
 <!-- Modal to create sensitivity analysis -->
 <div class="modal fade modal--dashboard" id="createSaGraphModal" tabindex="-1" role="dialog" aria-labelledby="createSaGraphModalLabel" aria-hidden="true">
@@ -102,7 +84,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate "Close" %}</button>
-                 <button class="btn btn--medium" onclick="javascript:submitForm(event, modalId='createSaGraphModal')">{% translate "Create" %}</button>
+                 <button class="btn btn--medium" onclick="javascript:submitModalForm(event, modalId='createSaGraphModal')">{% translate "Create" %}</button>
 
             </div>
         </div>
@@ -749,13 +731,12 @@ function scenario_visualize_stacked_optimized_capacities(scen_id){
 {% endif %}
 
 
+<script src="{% static 'js/modal_utils.js' %}"></script>
+
 <script>
 
 
-    function submitForm(event, modalId=""){
-        const modalDOM = document.getElementById(modalId);
-        modalDOM.querySelector("form").submit();
-    }
+
 
     /** Add a new report item **/
 
@@ -767,7 +748,7 @@ function scenario_visualize_stacked_optimized_capacities(scen_id){
     var reportItemScenariosDOM = createReportItemForm.querySelector('input[id="id_scenarios"]');
     var reportItemScenarios = [];
 
-    var urlForm = createReportItemForm.getAttribute("graph-parameter-url");
+
     function updateReportItemParametersForm(graphType){
         // Passes the existing text of the title to the form initials
         reportItemTitleDOM = createReportItemForm.querySelector('input[id="id_title"]');
@@ -785,6 +766,9 @@ function scenario_visualize_stacked_optimized_capacities(scen_id){
         else{
             reportItemScenarios = fetchSelectedScenarios();
         }
+
+        var urlForm = createReportItemForm.getAttribute("graph-parameter-url");
+
         $.ajax({
             url: urlForm,
             type: "POST",
@@ -798,6 +782,8 @@ function scenario_visualize_stacked_optimized_capacities(scen_id){
             success: function (formData) {
                // find and keep the csrf token of the form
                var csrfToken = createReportItemForm.querySelector('input[name="csrfmiddlewaretoken"]');
+
+                console.log(formData)
 
                // update the report item graph
                createReportItemForm.innerHTML = csrfToken.outerHTML + formData;
@@ -817,8 +803,18 @@ function scenario_visualize_stacked_optimized_capacities(scen_id){
     };
 
     function showCreateReportItemModal(event){
+        showModal(
+            event,
+            modalId="createReportItemModal",
+            attrs={
+                enctype: "multipart/form-data",
+                "ajax-post-url": `{% url 'report_create_item' proj_id %}`,
+                "graph-parameter-url": `{% url 'ajax_get_graph_parameters_form' proj_id %}`
+            }
+        )
         updateReportItemParametersForm("timeseries")
-        createReportItemModal.show()
+        //createReportItemModal.show()
+
     }
 
     const createReportItem = (event) => {

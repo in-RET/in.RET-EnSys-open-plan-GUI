@@ -1,0 +1,50 @@
+{% load static %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% comment %}
+Here is a list of the parameters one can provide to this template
+
+id:
+    the id of the modal (should be unique to the modal within same html template
+submit_btn_label:
+    the text displayed on the submit button of the modal's form
+title:
+    the text display in the title bar of the modal
+form:
+    a form to be displayed within the modal-body
+modal_style_class:
+    the name of a custom class to add to the main div of the modal
+custom_submit_function: (opt)
+    javascript function call which will be triggered (provided the function is defined somewhere)
+    once the user clicks on the submit button of the modal's form.
+    By default 'submitModalForm' from static/js/modal_utils.js is used
+{% endcomment %}
+
+<div class="modal fade {{ modal_style_class }}" id="{{ id }}" tabindex="-1" role="dialog" aria-labelledby="{{ id }}Label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="{{ id }}Label">{% translate title %}</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" {% if enctype %} enctype="multipart/form-data" {% endif %}>
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <button style="display:none;" type="submit" id="{{ id }}SubmitBtn"></button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate "Close" %}</button>
+                {% if custom_submit_function %}
+                <button class="btn btn--medium" onclick="javascript:{{ custom_submit_function }}">{% translate submit_btn_label %}</button>
+                {% else %}
+                <button class="btn btn--medium" onclick="javascript:submitModalForm(event, modalId='{{ id }}')">{% translate submit_btn_label %}</button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>

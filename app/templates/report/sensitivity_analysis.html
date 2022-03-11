@@ -67,32 +67,38 @@ document.getElementById('sensitivity-analysis-link').classList.add('active');
 
     /** Add a new sensitivity graph **/
 
-    const createSaGraphModalDOM = document.getElementById("createSaGraphModal");
-    const createSaGraphModal = new bootstrap.Modal(createSaGraphModalDOM);
-
     function showCreateSaGraphModal(event){
-        createSaGraphModal.show()
+        showModal(
+            event,
+            modalId="createReportItemModal",
+            attrs={
+                action: `{% url 'sensitivity_analysis_create_graph' proj_id %}`,
+            }
+        )
+
+        //const urlSaForm = document.getElementById("createSaGraphModal").querySelector("form").getAttribute("graph-parameter-url");
+
+        $("#id_analysis").change(function () {
+          var saId= $(this).val();
+
+          $.ajax({
+            headers: {'X-CSRFToken': `{{ csrf_token }}` },
+            type: "POST",
+            url: `{% url 'ajax_get_sensitivity_analysis_parameters' %}`,
+            data: {
+              'sa_id': saId
+            },
+            success: function (data) {
+              console.log(data)
+              $("#id_y").html(data);
+            }
+          });
+        });
+
     }
-    const createSaGraphForm = createSaGraphModalDOM.querySelector("form");
-    const urlSaForm = createSaGraphForm.getAttribute("graph-parameter-url");
 
 
- $("#id_analysis").change(function () {
-      var saId= $(this).val();
 
-      $.ajax({
-        headers: {'X-CSRFToken': `{{ csrf_token }}` },
-        type: "POST",
-        url: urlSaForm,
-        data: {
-          'sa_id': saId
-        },
-        success: function (data) {
-          console.log(data)
-          $("#id_y").html(data);
-        }
-      });
-  });
 
 
 </script>

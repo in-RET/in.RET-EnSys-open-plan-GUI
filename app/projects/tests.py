@@ -98,8 +98,8 @@ class BasicOperationsTest(TestCase):
         self.assertTrue(success)
 
         # remove the viewer
-        viewer = self.project.viewers.filter(user__email=test_email).get()
-        success, _ = self.project.revoke_access(viewer_id=viewer.id)
+        viewer = self.project.viewers.filter(user__email=test_email)
+        success, _ = self.project.revoke_access(viewers=viewer)
         self.assertTrue(success)
 
         self.assertFalse(self.project.viewers.filter(user__email=test_email).exists())
@@ -112,10 +112,12 @@ class BasicOperationsTest(TestCase):
         )
 
         # remove the viewer
-        viewer = self.project.viewers.filter(user__email=test_email).get()
+        viewer = self.project.viewers.filter(user__email=test_email).values_list(
+            "id", flat=True
+        )
         response = self.client.post(
             reverse("project_revoke_access", args=[self.project.id]),
-            dict(viewer_id=viewer.id),
+            dict(viewers=viewer),
         )
         self.assertRedirects(
             response, reverse("project_search", args=[self.project.id])
@@ -128,3 +130,5 @@ class BasicOperationsTest(TestCase):
         self
     ):
         pass
+
+    # user not owner cannot share or revoke share rights

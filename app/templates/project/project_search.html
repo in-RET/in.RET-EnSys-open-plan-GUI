@@ -289,37 +289,6 @@
 <script src="{% static 'js/modal_utils.js' %}"></script>
 
 <script>
-    function shareProject (e, projectShareUrl) {
-        e.preventDefault();
-        Swal.fire({
-            title: 'Share the Project',
-            html: "<h5>Provide the email of the user you would like to share your project.</h5>",
-            input: 'email',
-            showLoaderOnConfirm: true,
-            showCancelButton: true,
-            confirmButtonText: 'Share',
-            cancelButtonText: 'Cancel',
-            allowOutsideClick: () => !Swal.isLoading(),
-            preConfirm: (userEmail) => 
-                fetch(projectShareUrl, 
-                {
-                    method: "POST",
-                    headers: {"X-CSRFToken": `{{ csrf_token }}`},
-                    body: JSON.stringify({ userEmail: userEmail })
-                })
-                .then(response => {
-                    if (!response.ok)
-                        throw new Error(response.statusText)
-                    return response.json()
-                })
-                .catch(error => Swal.showValidationMessage(`Request failed: ${error}`)),
-        })
-        .then(result => result.value &&
-            Swal.fire({
-                icon: 'success',
-                html: 'If there is a user with this email, they will be able to see the project.'
-            })
-            .then(result=>result.value && location.reload())
 
    function showRevokeProjectModal(event, projId){
         const modalId = "revokeProjectModal";
@@ -328,63 +297,6 @@
             modalId,
             {'action': `{% url 'project_revoke_access' %}` + "/" + projId}
         )
-        .catch(error =>
-            Swal.fire({
-                icon: 'error',
-                html: 'Could not share project: ' + error
-            })
-        );
-    }
-</script>
-
-<script>
-    function showMembers(e, getProjectMembersUrl, revokeAccessUrl) {
-        fetch(getProjectMembersUrl)
-        .then(response => {
-            if (!response.ok)
-                throw new Error(response.statusText)
-            return response.json()
-        })
-        .then(async (json)=> {
-            Swal.fire({
-                title: 'Project Members',
-                html: 
-                    '<ul class="list-group">'+
-                        json.viewers.map(viewer=>
-                            `<li class="list-group-item" email="${viewer}">
-                                <text>${viewer}</text>
-                                <button onclick="removeMember(event,'${revokeAccessUrl}')" type="button" class="close" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </li>`
-                        )+
-                    '</ul>'
-            })
-            .then(result=>result.value && location.reload());
-        })
-        .catch(error => Swal.showValidationMessage(`Request failed: ${error}`))
-    }
-
-
-    function removeMember(ev, revokeAccessUrl) {
-        const listItem = ev.target.closest('li');
-        const userEmail = listItem.querySelector('text').innerText;
-        fetch(revokeAccessUrl, {
-            method: "POST",
-            headers: {"X-CSRFToken": `{{ csrf_token }}`},
-            body: JSON.stringify({ userEmail: userEmail })
-        })
-        .then(response => {
-            if (!response.ok)
-                throw new Error(response.statusText)
-            return response.status
-        })
-        .then(status=>{
-            const ulItem = ev.target.closest('ul');
-            ulItem.removeChild(listItem);
-        })
-        .catch(error => Swal.showValidationMessage(`Request failed: ${error}`));
-    }
         // Update the form based on how the number of viewers of this project
         var revokeProjectModalForm = document.getElementById(modalId).querySelector("form");
 

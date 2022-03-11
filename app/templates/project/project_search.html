@@ -24,6 +24,7 @@
 <!-- use showModal(event, modalId=, attrs = { list of attributes you want to add to the form tag inside the modal }) to call the modal -->
 {% include "modal_template.html" with id="uploadScenarioModal" modal_style_class="modal--gui" submit_btn_label="Upload" title="Scenario upload" form=scenario_upload_form %}
 {% include "modal_template.html" with id="shareProjectModal" modal_style_class="modal--gui" submit_btn_label="Share" title="Share project" form=project_share_form %}
+{% include "modal_template.html" with id="revokeProjectModal" modal_style_class="modal--gui" submit_btn_label="Revoke access" title="Manage project access" form=project_revoke_form %}
 
 
     <main>
@@ -96,7 +97,7 @@
                                 </button>
                                 <ul class="dropdown-menu" aria-labelledby="shareProject-{{ project.id }}">
                                   <li><a class="dropdown-item" onclick="javascript:showModal(event, modalId='shareProjectModal', attrs={'action': `{% url 'project_share' project.id %}`})">{% translate "Share project" %}</a></li>
-                                  <li><a class="dropdown-item" href="#">{% translate "Unshare project" %}</a></li>
+                                  <li><a class="dropdown-item" onclick="javascript:showModal(event, modalId='revokeProjectModal', attrs={'action': `{% url 'project_revoke_access' project.id %}`})">{% translate "Unshare project" %}</a></li>
                                 </ul>
                             </div>
 

@@ -62,7 +62,7 @@ urlpatterns = [
         name="scenario_create_topology",
     ),
     path(
-        "project/<int:proj_id>/scenario/create_constraints>",
+        "project/<int:proj_id>/scenario/create_constraints",
         scenario_create_constraints,
         name="scenario_create_constraints",
     ),

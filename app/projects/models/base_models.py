@@ -7,6 +7,7 @@ from datetime import timedelta
 from django.forms.models import model_to_dict
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
+
 from users.models import CustomUser
 from projects.constants import (
     ASSET_CATEGORY,
@@ -127,23 +128,31 @@ class Project(models.Model):
             )
         return (success, message)
 
-    def revoke_access(self, viewer_id=None):
+    def revoke_access(self, viewers=None):
+        """Given a queryset of viewers or a list of viewers ids, remove those viewers from projects viewers"""
         success = False
-        viewer = Viewer.objects.get(id=viewer_id)
-        if viewer is not None:
-            if viewer in self.viewers.all():
-                self.viewers.remove(viewer)
+        if isinstance(viewers, int):
+            viewers = Viewer.objects.filter(id__in=[viewers])
+        elif isinstance(viewers, list):
+            viewers = Viewer.objects.filter(id__in=viewers)
+
+        if viewers is not None:
+            existing_viewers = viewers.intersection(self.viewers.all())
+            if existing_viewers.exists():
+
+                for viewer_id in existing_viewers.values_list("id", flat=True):
+                    self.viewers.remove(viewer_id)
                 success = True
                 message = _(
-                    f"The user {viewer.user.email} rights to the project '{self.name}' have been revoked"
+                    f"The user(s) {','.join(existing_viewers.values_list('user__email', flat=True))} rights to the project '{self.name}' have been revoked"
                 )
             else:
                 message = _(
-                    f"The user {viewer.user.email} does not belong to the viewers of the project '{self.name}'"
+                    f"The user(s) {','.join(viewers.values_list('user__email', flat=True))} does not belong to the viewers of the project '{self.name}'"
                 )
         else:
             message = _(
-                "The user you selected seems to not be registered in the open_plan tool"
+                "The user(s) you selected seems to not be registered in the open_plan tool"
             )
         return success, message
 

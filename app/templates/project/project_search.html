@@ -36,6 +36,19 @@
             </div>
         </section>
 
+        <section class="projects-new">
+            <div class="dropdown">
+                <button class="btn btn--medium btn--transparent btn--icon dropdown-toggle" type="button" id="newProjectButton" data-bs-toggle="dropdown" aria-expanded="false">
+                    {% translate "Create project" %}
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="newProjectButton">
+                    <li><a class="dropdown-item" href="{% url 'project_create' %}">{% translate "Empty project" %}</a></li>
+                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">{% translate "From use case" %}</a></li>
+                </ul>
+            </div>
+        </section>
+
+
         {% for project in project_list %}
 
             <section class="project" id="project-{{ project.id }}">
@@ -212,17 +225,6 @@
 
         {% endfor %}
 
-        <section class="projects-new">
-            <div class="dropdown">
-                <button class="btn btn--medium btn--transparent btn--icon dropdown-toggle" type="button" id="newProjectButton" data-bs-toggle="dropdown" aria-expanded="false">
-                    {% translate "Create project" %}
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="newProjectButton">
-                    <li><a class="dropdown-item" href="{% url 'project_create' %}">{% translate "Empty project" %}</a></li>
-                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">{% translate "From use case" %}</a></li>
-                </ul>
-            </div>
-        </section>
 
 
     </main>

@@ -4,15 +4,13 @@
     }
 
 
-    function showModal(event, modalId="", url=null){
-        // update the url linked to the form
+    function showModal(event, modalId="", attrs = null){
         var modalInstance = $("#" + modalId);
-        console.log(modalInstance);
-        console.log(modalId);
-        console.log(url);
-        if(url){
-            modalInstance.find('.modal-body form').attr("action", url);
+        // update the attributes of the form tag of the modal
+        for (const [key, value] of Object.entries(attrs)) {
+            if(value){
+                modalInstance.find('.modal-body form').attr(key, value)
+            }
         }
-
          modalInstance.modal("show")
     }

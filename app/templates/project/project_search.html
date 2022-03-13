@@ -154,10 +154,31 @@
                                                 </div>-->
                                             </div>
                                             <div class="actions">
-                                                <a class="btn btn--action results" href="{% url 'scenario_visualize_results' scenario.id %}">
-                                                    <span class="icon icon-results" aria-hidden="true"></span>
-                                                    {% translate "Results" %}
-                                                </a>
+                                                {% if scenario.simulation %}
+                                                    {% if scenario.simulation.status == "PENDING"%}
+                                                        <a class="btn btn--action btn--pending" href="{% url 'scenario_review' scenario.project.id scenario.id %}">
+                                                            {% translate "Pending..." %}
+                                                        </a>
+                                                    {% elif scenario.simulation.status == "ERROR"%}
+                                                        <a class="btn btn--action btn--error" href="{% url 'scenario_review' scenario.project.id scenario.id %}">
+                                                            {% translate "Error" %}
+                                                        </a>
+                                                    {% elif scenario.simulation.status == "DONE"%}
+                                                        <a class="btn btn--action results" href="{% url 'scenario_visualize_results' scenario.id %}">
+                                                            <span class="icon icon-results" aria-hidden="true"></span>
+                                                            {% translate "Results" %}
+                                                        </a>
+                                                    {% else %}
+                                                        <a class="btn btn--action btn--disabled" href="{% url 'scenario_steps_edit' proj_id=project.id scen_id=scenario.id step_id=1 %}">
+                                                            {% translate "No simulation" %}
+                                                        </a>
+                                                    {% endif %}
+                                                {% else %}
+                                                    <a class="btn btn--action btn--disabled" href="{% url 'scenario_steps_edit' proj_id=project.id scen_id=scenario.id step_id=1 %}">
+                                                        {% translate "No simulation" %}
+                                                    </a>
+                                                {% endif %}
+
                                                 <a class="btn btn--action action" href="{% url 'scenario_steps_edit' proj_id=project.id scen_id=scenario.id step_id=1 %}"> <!-- "scenario-creation-1.html" in B design -->
                                                     <span class="icon icon-edit" aria-hidden="true"></span>
                                                 </a>

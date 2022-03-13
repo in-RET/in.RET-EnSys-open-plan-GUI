@@ -11,30 +11,36 @@
 {% block content %}
 
     <section class="wizard">
-        <div class="wizard__name">
-            <span class="project">{{ proj_name }}</span>
-            <span class="scenario">Scenario {{ scenario.name }}</span>
-        </div>
-        <div class="wizard__steps">
-            <ul>
-                {% for step in step_list %}
+        <div>
+            <h1 class="wizard__name">
+                <span class="project">{{ proj_name }}</span>
+                <span class="scenario">Scenario {{ scenario.name }}</span>
+            </h1>
+            <div class="wizard__steps">
+                <ul>
+                    {% for step in step_list %}
 
-                <li {% if step_id == forloop.counter %} class="active" {% endif %}>
-                    {% if scen_id %}
-                        {% if forloop.counter < max_step %}
-                            <a href="{% url 'scenario_steps_edit' proj_id scen_id forloop.counter %}" >{% translate step %}</a>
+                    <li {% if step_id == forloop.counter %} class="active" {% endif %}>
+                        {% if scen_id %}
+                            {% if forloop.counter < max_step %}
+                                <a href="{% url 'scenario_steps_edit' proj_id scen_id forloop.counter %}" >{% translate step %}</a>
+                            {% else %}
+                                {% translate step %}
+                            {% endif %}
                         {% else %}
                             {% translate step %}
                         {% endif %}
-                    {% else %}
-                        {% translate step %}
-                    {% endif %}
-                </li>
+                    </li>
 
-                {% endfor %}
-            </ul>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="wizard__back">
+          <div>
+            <a href="{% url 'project_search' proj_id %}">My projects</a>
+          </div>
         </div>
-        <div></div>
+        </div>
     </section>
 
     {% block progression_content %}

@@ -73,11 +73,15 @@
 {% endblock end_body_scripts %}
 
 {% block footer %}
-<div class="step-footer">
 
+<footer class="step-footer">
     <div>
-        <a class="btn btn--medium btn--hollow btn--previous" href="{% url 'scenario_steps_edit' proj_id scen_id 4 %}" aria-disabled="true">{% translate "Previous" %}</a>
-
+        <div class="step-footer__left"></div>
+        <div class="step-footer__center">
+            <a class="btn btn--medium btn--hollow btn--previous" href="{% url 'scenario_steps_edit' proj_id scen_id 4 %}" aria-disabled="true">{% translate "Previous" %}</a>        </div>
+        <div class="step-footer__right">
+        </div>
     </div>
-</div>
+</footer>
+
 {% endblock footer %}

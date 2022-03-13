@@ -9,10 +9,19 @@
   }
 
   &__scenarios {
-    h2 {
-      font-size: $font-size-normal;
-      font-weight: 700;
-      color: $primary-gray-color-4;
+    @include flex-row;
+    align-items: flex-end;
+    padding-bottom: 2rem;
+
+    .dashboard__select-scenarios {
+      flex: 1;
+    }
+
+    .dashboard__btn-scenarios {
+      @include flex-column;
+      justify-content: flex-end;
+      height: 100%;
+      padding-left: 1rem;
     }
   }
 
@@ -118,6 +127,12 @@
       &--worst .item__value {
         color: $dashboard-inadequate-value;
       }
+    }
+  }
+
+  &__create {
+    button {
+      float: right;
     }
   }
 }

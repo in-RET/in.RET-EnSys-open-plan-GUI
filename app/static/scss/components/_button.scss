@@ -1,5 +1,7 @@
 a.btn,
-button.btn {
+button.btn,
+footer a.btn,
+footer button.btn {
   display: inline-block;
   background-color: $primary-color-1;
   color: $white;
@@ -7,16 +9,13 @@ button.btn {
   letter-spacing: $letter-spacing-normal;
   font-weight: 400;
 
-  #{$anchor-pseudo-classes} {
+  #{$anchor-pseudo-classes},
+  .icon#{$anchor-pseudo-classes-active-states} {
     color: $white !important;
   }
 
   #{$anchor-pseudo-classes-active-state} {
     background-color: $primary-color-1-dark !important;
-  }
-
-  &:focus {
-    box-shadow: none;
   }
 
   &--large {
@@ -74,6 +73,10 @@ button.btn {
     #{$anchor-pseudo-classes-active-state} {
       color: $primary-color-2-light !important;
     }
+
+    &:focus {
+      box-shadow: 0 0 0 0.25rem rgba(0, 0, 0, 0.25);
+    }
   }
 
   &--hollow.btn--action {
@@ -97,6 +100,37 @@ button.btn {
     #{$anchor-pseudo-classes-active-state} {
       color: $primary-color-1-dark !important;
       background-color: transparent !important;
+    }
+  }
+
+  &--disabled {
+    background-color: $disabled-color;
+  }
+
+  &--pending {
+    @include btn-background-color($pending-color);
+    color: $black;
+
+    &:focus {
+      box-shadow: 0 0 0 0.25rem rgba(236, 154, 41, 0.25);
+    }
+  }
+
+  &--success {
+    @include btn-background-color($success-color);
+    color: $black;
+
+    &:focus {
+      box-shadow: 0 0 0 0.25rem rgba(9, 188, 138, 0.25);
+    }
+  }
+
+  &--error {
+    @include btn-background-color($error-color);
+    color: $white;
+
+    &:focus {
+      box-shadow: 0 0 0 0.25rem rgba(154, 3, 30, 0.25);
     }
   }
 

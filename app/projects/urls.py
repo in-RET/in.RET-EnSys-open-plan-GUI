@@ -8,6 +8,11 @@ urlpatterns = [
     path("notimplementedyet/", not_implemented, name="not_implemented"),
     path("project/search/", project_search, name="project_search"),
     path("project/search/<int:proj_id>", project_search, name="project_search"),
+    path(
+        "project/search/<int:proj_id>/scenario/<int:scen_id>",
+        project_search,
+        name="project_search",
+    ),
     path("project/update/<int:proj_id>", project_update, name="project_update"),
     path("project/detail/<int:proj_id>", project_detail, name="project_detail"),
     path(

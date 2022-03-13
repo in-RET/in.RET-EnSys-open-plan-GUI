@@ -310,7 +310,7 @@ def project_delete(request, proj_id):
 
 @login_required
 @require_http_methods(["GET"])
-def project_search(request, proj_id=None):
+def project_search(request, proj_id=None, scen_id=None):
     # project_list = Project.objects.filter(user=request.user)
     # shared_project_list = Project.objects.filter(viewers=request.user)
     combined_projects_list = Project.objects.filter(
@@ -326,6 +326,7 @@ def project_search(request, proj_id=None):
         {
             "project_list": combined_projects_list,
             "proj_id": proj_id,
+            "scen_id": scen_id,
             "scenario_upload_form": scenario_upload_form,
             "project_share_form": project_share_form,
             "project_revoke_form": project_revoke_form,

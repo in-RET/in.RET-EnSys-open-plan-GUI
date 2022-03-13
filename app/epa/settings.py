@@ -22,6 +22,13 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "cdn_static_root")
 
+STATICFILES_FINDERS = [
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "sass_processor.finders.CssFinder",
+]
+
+SASS_PROCESSOR_ROOT = STATIC_ROOT
+SASS_PRECISION = 8
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
@@ -51,6 +58,7 @@ INSTALLED_APPS = [
     # 3rd Party
     "crispy_forms",
     "django_q",
+    "sass_processor",
 ]
 
 MIDDLEWARE = [

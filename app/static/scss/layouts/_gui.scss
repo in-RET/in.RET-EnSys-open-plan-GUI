@@ -108,34 +108,47 @@
     }
   }
 
-  .drawflow-node {
-    position: relative;
+  .drawflow .connection .main-path {
+    width: 2px;
+  }
+
+  .parent-node .drawflow-delete {
+        content: 'X';
+        position: absolute;
+        top: 0;
+        right: 0;
+        background-color: $white;
+        color: black;
+        width: 1.15rem;
+        height: 1.15rem;
+        font-weight: 700;
+        line-height: 1rem;
+        padding-left: .25rem;
+        border: 1px solid $primary-gray-color-4;
+        border-radius: 100%;
+        cursor: pointer;
+  }
+
+  .drawflow .drawflow-node {
+    position: absolute;
     height: 8rem;
     width: 9.5rem;
     border-radius: $gui-component-radius;
     background-color: $primary-gray-color-1;
     font-size: 12px;
+    border-left: none;
+    border-right: none;
+    border-top: none;
     border-bottom: 4px solid #A4ADFB;
     cursor: move;
+    padding: 0 0.5rem 0.5rem;
 
     &:hover {
       background-color: darken($primary-gray-color-1, 2%);
     }
 
-    &:hover::after {
-      content: 'X';
-      position: absolute;
-      top: 0;
-      right: 0;
-      background-color: $white;
-      width: 1.15rem;
-      height: 1.15rem;
-      font-weight: 700;
-      line-height: 1rem;
-      padding-left: .25rem;
-      border: 1px solid $primary-gray-color-4;
-      border-radius: 100%;
-      cursor: pointer;
+    &.selected {
+      background-color: $primary-gray-color-2;
     }
 
     .drawflow_content_node {
@@ -165,17 +178,39 @@
         height: $gui-component-node-size;
         border-radius: 100%;
         margin: .25rem 0;
+        border: 1px solid $white;
         cursor: pointer;
       }
 
       .input {
         background-color: #4EC4C4;
+        left: -22px;
+
       }
 
       .output {
         background-color: #C46A4E;
+        right: -10px;
+
       }
     }
+
+     @each $component-name, $component-category in $component-categories-mapping {
+              @if $component-category == "providers" or $component-category == "production" {
+                  &.#{$component-name} .input{
+                    display: none;
+                  }
+              }
+            }
+
+    @each $component-name, $component-category in $component-categories-mapping {
+              @if $component-category == "demand" {
+                &.#{$component-name} .output {
+                  display: none;
+                }
+              }
+            }
+
 
     .img {
       position: relative;
@@ -185,17 +220,17 @@
       border-radius: 100%;
     }
 
-    // section colors
-    @each $component-category, $component-color in $component-categories {
-      &--#{$component-category} {
-        border-bottom-color: $component-color;
-      }
-    }
+    /* section colors */
+
 
     // components images
-    @each $component-name, $component-image in $component-images {
-      &--#{$component-name} .img::before {
-        @include gui-component-image(url('../../assets/gui/#{$component-image}.svg'));
+    @each $component-name, $component-category in $component-categories-mapping {
+              &.#{$component-category} {
+                      border-bottom-color: map-get($component-categories, $component-category);
+                    }
+
+      &.#{$component-name} .img::before {
+        @include gui-component-image(url('/static/assets/gui/#{$component-name}.svg'));
       }
     }
   }

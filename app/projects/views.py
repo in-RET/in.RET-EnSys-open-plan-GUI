@@ -37,7 +37,7 @@ from .scenario_topology_helpers import (
     load_scenario_from_dict,
 )
 from projects.helpers import format_scenario_for_mvs
-from .constants import DONE, ERROR, MODIFIED
+from .constants import DONE, PENDING, ERROR, MODIFIED
 from .services import (
     create_or_delete_simulation_scheduler,
     excuses_design_under_development,
@@ -743,7 +743,7 @@ def scenario_review(request, proj_id, scen_id, step_id=4, max_step=5):
         raise PermissionDenied
 
     if request.method == "GET":
-
+        html_template = f"scenario/simulation/no-status.html"
         context = {
             "scenario": scenario,
             "scen_id": scen_id,
@@ -760,6 +760,10 @@ def scenario_review(request, proj_id, scen_id, step_id=4, max_step=5):
 
         if qs.exists():
             simulation = qs.first()
+
+            if simulation.status == PENDING:
+                fetch_mvs_simulation_results(simulation)
+
             context.update(
                 {
                     "sim_id": simulation.id,
@@ -769,12 +773,19 @@ def scenario_review(request, proj_id, scen_id, step_id=4, max_step=5):
                     "mvs_token": simulation.mvs_token,
                 }
             )
+
             if simulation.status == ERROR:
                 context.update({"simulation_error_msg": simulation.errors})
+                html_template = "scenario/simulation/error.html"
+            elif simulation.status == PENDING:
+                html_template = "scenario/simulation/pending.html"
+            elif simulation.status == DONE:
+                html_template = "scenario/simulation/success.html"
+
         else:
             print("no simulation existing")
 
-        return render(request, f"scenario/scenario_step{step_id}.html", context)
+        return render(request, html_template, context)
 
 
 SCENARIOS_STEPS = [

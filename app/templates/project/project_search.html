@@ -260,6 +260,14 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
 <script>
+    $(document).ready(function(){
+        var elId = 'project' + `{{proj_id}}` + 'scenario-' + `{{scen_id}}`;
+        var projScenariosTab = "collapseScenarios" + `{{ proj_id }}`;
+        $("button[data-bs-target='#" + projScenariosTab + "']").click();
+        const yOffset = -100;
+        const y = document.getElementById(elId).getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({top: y, behavior: 'smooth'});
+    });
 
     const satellite = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
         attribution: '<a href="http://www.intracom-telecom.com/">Intracom Telecom S.A.</a>',

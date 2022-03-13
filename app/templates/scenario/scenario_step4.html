@@ -79,10 +79,14 @@
 {% endblock end_body_scripts %}
 
 {% block footer %}
-<div class="step-footer">
 
-    <div>
+
+<footer class="step-footer">
+  <div>
+    <div class="step-footer__left">
         <a class="btn btn--medium btn--hollow btn--previous" href="{% url 'scenario_steps_edit' proj_id scen_id step_id|add:-1 %}" aria-disabled="true">{% translate "Previous" %}</a>
+    </div>
+    <div class="step-footer__center">
 
         <form method="post" action="{% url 'request_mvs_simulation' scen_id %}">
             {% csrf_token %}
@@ -90,7 +94,9 @@
             <button class="btn btn--medium" type="submit" > {% translate "Run simulation" %}</button>
             <input type="checkbox" name="output_lp_file"> Include LP file (advanced users) </input>
         </form>
-
     </div>
-</div>
+    <div class="step-footer__right">
+    </div>
+  </div>
+</footer>
 {% endblock footer %}

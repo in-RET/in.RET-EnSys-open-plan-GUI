@@ -250,17 +250,21 @@
 
 
 {% block footer %}
-<div class="step-footer">
-
-    <div>
+<footer class="step-footer">
+  <div>
+    <div class="step-footer__left"></div>
+    <div class="step-footer__center">
         <a class="btn btn--medium btn--hollow btn--previous" href="{% url 'scenario_steps_edit' proj_id scen_id step_id|add:'-1' %}" aria-disabled="true">{% translate "Previous" %}</a>
         {% if scenario.project.user == request.user %}
         <button onclick="javascript:save_topology()">{% translate "Save" %}</button>
         {% endif %}
         <a onclick="javascript:save_topology(move_step=true)" id=next_btn" class="btn btn--medium" >{% translate "Next" %} </a>
-
     </div>
-</div>
+    <div class="step-footer__right">
+        <a class="btn btn--medium btn--transparent" href="{% url 'scenario_steps_edit' proj_id scen_id 4 %}">{% translate "Go to simulation" %}</a>
+    </div>
+  </div>
+</footer>
 {% endblock footer %}
 
 

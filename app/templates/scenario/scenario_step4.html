@@ -17,53 +17,6 @@
 
 
 
-<main>
-
-    <section class="dashboard">
-        <div>
-
-            {% if simulation_status %}
-
-                <div class="row">
-
-                    <a class="btn btn--medium" href="{% url 'view_mvs_data_input' scen_id %}" >{% translate "Proof parameters JSON file" %} </a>
-                    {% if simulation_status != "MODIFIED" %}
-                    The simulation <a href="{{ MVS_GET_URL }}{{ mvs_token }}">{{ mvs_token }}</a> has been started, its status is <span>{{ simulation_status }}</span>
-                    Advanced Users: If a lp file is available you can download it <a href="{{ MVS_LP_FILE_URL }}{{ mvs_token }}">here</a>
-
-
-                    {% else %}
-                    The parameters of the scenario linked to the simulation <a href="{{ MVS_GET_URL }}{{ mvs_token }}">{{ mvs_token }}</a> have been changed, you can rerun the simulation to update the results, please note that existing results will be erased only if the simulation does not have errors
-                    {% endif %}
-                </div>
-
-                <div class="row">
-                    {% if simulation_status == "DONE" %}
-                        <a class="btn btn--medium" href="{% url 'scenario_visualize_results' scen_id %}" >{% translate "Check results dashboard" %} </a>
-                    {% elif simulation_status == "ERROR" %}
-                        <p>{{ simulation_error_msg }}</p>
-                        <a class="btn btn--medium" href="{% url 'view_mvs_data_input' scen_id %}" >{% translate "Proof parameters JSON file" %} </a>
-                        <a class="btn btn--medium" href="" >{% translate "Link to send bug report automatically" %} </a>
-
-                    {% elif simulation_status == "PENDING" %}
-                        The simulation <a href="{{ MVS_GET_URL }}{{ mvs_token }}">{{ mvs_token }}</a> has been started, its status is <span>{{ simulation_status }}</span>
-                    {% endif %}
-                </div>
-                <div class="row">
-
-                    <a class="btn btn--medium" href="{% url 'sensitivity_analysis_create' scen_id %}" >{% translate "Perform a sensitivity analysis" %}</a>
-                </div>
-            {% else %}
-                <div class="row">{% translate "You can now click on 'Run simulation' button" %}</div>
-            {% endif %}
-        </div>
-    </section>
-
-
-</main>
-
-
-
 {% endblock progression_content %}
 
 
@@ -79,24 +32,6 @@
 {% endblock end_body_scripts %}
 
 {% block footer %}
-
-
-<footer class="step-footer">
-  <div>
-    <div class="step-footer__left">
-        <a class="btn btn--medium btn--hollow btn--previous" href="{% url 'scenario_steps_edit' proj_id scen_id step_id|add:-1 %}" aria-disabled="true">{% translate "Previous" %}</a>
-    </div>
-    <div class="step-footer__center">
-
-        <form method="post" action="{% url 'request_mvs_simulation' scen_id %}">
-            {% csrf_token %}
-
-            <button class="btn btn--medium" type="submit" > {% translate "Run simulation" %}</button>
-            <input type="checkbox" name="output_lp_file"> Include LP file (advanced users) </input>
-        </form>
-    </div>
-    <div class="step-footer__right">
-    </div>
-  </div>
-</footer>
+    <footer class="simulation-footer">
+    </footer>
 {% endblock footer %}

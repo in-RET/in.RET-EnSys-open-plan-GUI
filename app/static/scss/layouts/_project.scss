@@ -145,6 +145,18 @@
         @include project-btn;
         margin-top: 0;
       }
+      .btn--action.btn--disabled {
+        padding: 0.25rem 0.5rem;
+        margin-top: 0;
+      }
+      .btn--action.btn--error {
+        padding: 0.25rem 0.5rem;
+        margin-top: 0;
+      }
+      .btn--action.btn--pending {
+        padding: 0.25rem 0.5rem;
+        margin-top: 0;
+      }
 
       .action {
         @include project-actions;

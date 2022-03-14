@@ -1,9 +1,13 @@
-@each $anchor-state in $anchors-states-list {
+a {
+  font-weight: 700;
+  color: $primary-color-1 !important;
+  text-decoration: none !important;
+  cursor: pointer;
+}
+
+@each $anchor-state in $anchor-pseudo-classes-active-states {
   a#{$anchor-state} {
-    font-weight: 700;
-    color: $primary-color-1 !important;
-    text-decoration: none !important;
-    cursor: pointer;
+    color: $black;
   }
 }
 

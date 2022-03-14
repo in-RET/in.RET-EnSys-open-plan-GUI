@@ -13,6 +13,10 @@ import ast
 import os
 from django.contrib.messages import constants as messages
 
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = ast.literal_eval(os.getenv("DEBUG", "True"))
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -22,6 +26,12 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "cdn_static_root")
 
+STATICFILES_FINDERS = ["django.contrib.staticfiles.finders.FileSystemFinder"]
+
+if DEBUG is True:
+    STATICFILES_FINDERS.append("sass_processor.finders.CssFinder")
+    SASS_PROCESSOR_ROOT = STATIC_ROOT
+    SASS_PRECISION = 8
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
@@ -29,11 +39,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, "cdn_static_root")
 SECRET_KEY = os.getenv(
     "EPA_SECRET_KEY", "v@p9^=@lc3#1u_xtx*^xhrv0l3li1(+8ik^k@g-_bzmexb0$7n"
 )
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = ast.literal_eval(os.getenv("DEBUG", "True"))
+
 
 ALLOWED_HOSTS = ["*"]
-
 
 # Application definition
 
@@ -52,6 +60,10 @@ INSTALLED_APPS = [
     "crispy_forms",
     "django_q",
 ]
+
+if DEBUG is True:
+    INSTALLED_APPS.append("sass_processor")
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -84,6 +96,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "epa.context_processors.debug",
             ]
         },
     }

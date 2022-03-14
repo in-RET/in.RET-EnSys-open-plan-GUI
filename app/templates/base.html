@@ -26,9 +26,15 @@
 
     {% block head_block %}
     {% endblock head_block %}
-    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    {% if DEBUG == True %}
+        {% include "scss.html" %}
+    {% else %}
+        <link href="{% static 'css/main.css' %}" rel="stylesheet" type="text/css" />
+    {% endif %}
     <!--<meta http-equiv="X-UA-Compatible" content="IE=edge">-->
 </head>
+
+
 
 
 
@@ -55,14 +61,20 @@
 {% endblock index %}
 
 
-<section class="messages">{% include 'messages.html' %}</section>
+<!-- modal to show debug messages -->
+<div class="modal fade" id="messagesModal" tabindex="-1" role="dialog" aria-labelledby="messagesModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+       {% include 'messages.html' %}
+  </div>
+</div>
+
 {% block content %}
 {% endblock %}
 
 
-
+{% block footer %}
 <footer class="footer">
-    {% block footer %}
+
 
     <div>
         <div class="footer__logo">
@@ -79,11 +91,25 @@
             </ul>
         </div>
     </div>
-    {% endblock footer %}
 </footer>
+    {% endblock footer %}
+
+
 <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 {% block end_body_scripts %}{% endblock %}
 <script src="{% static 'node_modules/aos/dist/aos.js' %}"></script>
 <script src="{% static 'js/project.js' %}"></script>
+
+
+{% if messages %}
+<script>
+    $(document).ready(function(){
+        var messagesModal = new bootstrap.Modal(document.getElementById('messagesModal'))
+        messagesModal.show();
+    });
+
+</script>
+{% endif %}
+
 </body>
 </html>

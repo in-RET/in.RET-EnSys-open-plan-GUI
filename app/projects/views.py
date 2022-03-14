@@ -37,7 +37,7 @@ from .scenario_topology_helpers import (
     load_scenario_from_dict,
 )
 from projects.helpers import format_scenario_for_mvs
-from .constants import DONE, ERROR, MODIFIED
+from .constants import DONE, PENDING, ERROR, MODIFIED
 from .services import (
     create_or_delete_simulation_scheduler,
     excuses_design_under_development,
@@ -310,7 +310,7 @@ def project_delete(request, proj_id):
 
 @login_required
 @require_http_methods(["GET"])
-def project_search(request, proj_id=None):
+def project_search(request, proj_id=None, scen_id=None):
     # project_list = Project.objects.filter(user=request.user)
     # shared_project_list = Project.objects.filter(viewers=request.user)
     combined_projects_list = Project.objects.filter(
@@ -326,6 +326,7 @@ def project_search(request, proj_id=None):
         {
             "project_list": combined_projects_list,
             "proj_id": proj_id,
+            "scen_id": scen_id,
             "scenario_upload_form": scenario_upload_form,
             "project_share_form": project_share_form,
             "project_revoke_form": project_revoke_form,
@@ -559,11 +560,11 @@ def scenario_create_topology(request, proj_id, scen_id, step_id=2, max_step=3):
             "solar_thermal_plant": _("Solar Thermal Plant"),
         },
         "conversion": {
-            "transformer_station_in": _("Transformer Station (in)"),
-            "transformer_station_out": _("Transformer Station (out)"),
-            "storage_charge_controller_in": _("Storage Charge Controller (in)"),
-            "storage_charge_controller_out": _("Storage Charge Controller (out)"),
-            "solar_inverter": _("Solar Inverter"),
+            # "transformer_station_in": _("Transformer Station (in)"),
+            # "transformer_station_out": _("Transformer Station (out)"),
+            # "storage_charge_controller_in": _("Storage Charge Controller (in)"),
+            # "storage_charge_controller_out": _("Storage Charge Controller (out)"),
+            # "solar_inverter": _("Solar Inverter"),
             "diesel_generator": _("Diesel Generator"),
             "fuel_cell": _(" Fuel Cell"),
             "gas_boiler": _("Gas Boiler"),
@@ -572,14 +573,14 @@ def scenario_create_topology(request, proj_id, scen_id, step_id=2, max_step=3):
         },
         "storage": {
             "bess": _("Electricity Storage"),
-            "gess": _("Gas Storage"),
-            "h2ess": _("H2 Storage"),
+            # "gess": _("Gas Storage"),
+            # "h2ess": _("H2 Storage"),
             "hess": _("Heat Storage"),
         },
         "demand": {
             "demand": _("Electricity Demand"),
-            "gas_demand": _("Gas Demand"),
-            "h2_demand": _("H2 Demand"),
+            # "gas_demand": _("Gas Demand"),
+            # "h2_demand": _("H2 Demand"),
             "heat_demand": _("Heat Demand"),
         },
         "bus": {"bus": _("Bus")},
@@ -734,7 +735,6 @@ def scenario_create_constraints(request, proj_id, scen_id, step_id=3, max_step=4
 @require_http_methods(["GET", "POST"])
 def scenario_review(request, proj_id, scen_id, step_id=4, max_step=5):
 
-    excuses_design_under_development(request)
     scenario = get_object_or_404(Scenario, pk=scen_id)
 
     if (scenario.project.user != request.user) and (
@@ -743,7 +743,7 @@ def scenario_review(request, proj_id, scen_id, step_id=4, max_step=5):
         raise PermissionDenied
 
     if request.method == "GET":
-
+        html_template = f"scenario/simulation/no-status.html"
         context = {
             "scenario": scenario,
             "scen_id": scen_id,
@@ -760,6 +760,10 @@ def scenario_review(request, proj_id, scen_id, step_id=4, max_step=5):
 
         if qs.exists():
             simulation = qs.first()
+
+            if simulation.status == PENDING:
+                fetch_mvs_simulation_results(simulation)
+
             context.update(
                 {
                     "sim_id": simulation.id,
@@ -769,12 +773,19 @@ def scenario_review(request, proj_id, scen_id, step_id=4, max_step=5):
                     "mvs_token": simulation.mvs_token,
                 }
             )
+
             if simulation.status == ERROR:
                 context.update({"simulation_error_msg": simulation.errors})
+                html_template = "scenario/simulation/error.html"
+            elif simulation.status == PENDING:
+                html_template = "scenario/simulation/pending.html"
+            elif simulation.status == DONE:
+                html_template = "scenario/simulation/success.html"
+
         else:
             print("no simulation existing")
 
-        return render(request, f"scenario/scenario_step{step_id}.html", context)
+        return render(request, html_template, context)
 
 
 SCENARIOS_STEPS = [

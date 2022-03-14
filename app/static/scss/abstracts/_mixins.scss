@@ -1,5 +1,5 @@
 // Section-width
-@mixin section-width {
+@mixin nav-section-width {
   width: calc(100% - (#{$top-nav-padding-xsmall} * 2));
   padding-left: $top-nav-padding-xsmall;
   padding-right: $top-nav-padding-xsmall;
@@ -13,9 +13,9 @@
 
   @media screen and (min-width:$medium-screen) {
     width: calc(100% - (#{$top-nav-padding-large} * 2));
-    padding-left: $top-nav-padding-large;
-    padding-right: $top-nav-padding-large;
-    max-width: $section-max-width;
+    padding-left: $padding-sides-normal;
+    padding-right: $padding-sides-normal;
+    max-width: 100%;
   }
 }
 
@@ -107,6 +107,15 @@
   padding-left: 0;
 }
 
+// Buttons
+@mixin btn-background-color($btn-background-color) {
+  background-color: $btn-background-color;
+
+  #{$anchor-pseudo-classes-active-state} {
+    background-color: darken($btn-background-color, 10%) !important;
+  }
+}
+
 // Project details and actions
 @mixin project-details {
   color: $text-color-secondary;
@@ -145,7 +154,7 @@
 @mixin gui-component-image($img-path) {
   content: '';
   position: absolute;
-  top: 2.2rem;
+  top: calc(#{$gui-component-bg-size} / 2);
   right: calc((#{$gui-component-bg-size} - #{$gui-component-img-size}) / 2);
   transform: translateY(-50%);
   background-image: $img-path;
@@ -159,4 +168,18 @@
   padding-left: 0.35rem;
   cursor: pointer;
   vertical-align: middle;
+}
+
+// Back icon
+@mixin back-icon {
+  content: "";
+  position: absolute;
+  display: block;
+  background-image: url("/static/assets/icons/i_arrow_left.svg");
+  width: 0.75rem;
+  height: 0.75rem;
+  background-repeat: no-repeat;
+  background-size: cover;
+  top: 0.15rem;
+  left: -1.25rem;
 }

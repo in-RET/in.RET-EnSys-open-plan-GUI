@@ -218,15 +218,33 @@ class AssetsResults(models.Model):
 
         for category in categories:
             for asset in asset_dict[category]:
-                if asset_name == asset["label"]:
-                    if answer is None:
-                        answer = asset
-                        answer["category"] = category
-                        break
-                    else:
-                        raise ValueError(
-                            f"Asset named {asset_name} appears twice in simulations results, this should not be possible"
-                        )
+                if category == "energy_storage":
+                    for sub_cat in ("input_power", "output_power", "capacity"):
+                        if asset_name == asset["label"] + "_" + sub_cat:
+                            storage_subasset = asset.get(sub_cat)
+                            if storage_subasset is None:
+                                storage_subasset = asset.get(
+                                    MAP_EPA_MVS.get(sub_cat, sub_cat)
+                                )
+                            if storage_subasset is not None:
+                                if answer is None:
+                                    answer = storage_subasset
+                                    answer["category"] = category + "_" + sub_cat
+                                    break
+                                else:
+                                    raise ValueError(
+                                        f"Asset named {asset_name} appears twice in simulations results, this should not be possible"
+                                    )
+                else:
+                    if asset_name == asset["label"]:
+                        if answer is None:
+                            answer = asset
+                            answer["category"] = category
+                            break
+                        else:
+                            raise ValueError(
+                                f"Asset named {asset_name} appears twice in simulations results, this should not be possible"
+                            )
         return answer
 
     def single_asset_type_oemof(self, asset_name, asset_category=None):
@@ -403,7 +421,6 @@ class ReportItem(models.Model):
 
         if self.report_type == GRAPH_CAPACITIES:
             y_variables = parameters.get("y", None)
-            scenario = get_object_or_404(Scenario, pk=self.project_id)
 
             if y_variables is not None:
                 simulations_results = []
@@ -413,11 +430,12 @@ class ReportItem(models.Model):
                         []
                     )  # stores the capacity, both installed and optimized in seperate dicts, of each individual asset/ component
                     x_values = []  # stores the label of the corresponding asset
+
                     assets_results_obj = AssetsResults.objects.get(
                         simulation=simulation
                     )
 
-                    results_dict = json.loads(scenario.simulation.results)
+                    results_dict = json.loads(simulation.results)
 
                     kpi_scalar_matrix = results_dict["kpi"]["scalar_matrix"]
 

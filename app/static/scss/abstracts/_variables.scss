@@ -10,10 +10,14 @@ $primary-gray-color-3: #A8B5C0;
 $primary-gray-color-4: #495965;
 
 $white: #fff;
+$black: #000;
 $secondary-gray-color-1: #E4E4E4;
 $secondary-gray-color-2: #D6D6D6;
 
-$error-color: #FD3434;
+$error-color: #9A031E;
+$success-color: #09BC8A;
+$pending-color: #EC9A29;
+$disabled-color: $primary-gray-color-3;
 
 $dashboard-profitable-value: #20A10B;
 $dashboard-inadequate-value: #A10B0B;
@@ -29,7 +33,7 @@ $text-color-a-sec-hover: $primary-color-2-light;
 $text-color-invert: $white;
 
 $box-shadow-frame: 0px 0px 16px rgba(31, 86, 125, 0.08);
-$box-shadow-form: 0 0 0 0.25rem rgb(31 86 125 / 10%);
+$box-shadow-form: 0 0 0 0.25rem rgba(31, 86, 125, 0.1);
 
 // Media-breaks
 $small-screen: 640px;
@@ -43,7 +47,8 @@ $font-size-large: 1.953rem; // 31.25px
 $font-size-medium-2: 1.563rem; // 25px
 $font-size-medium: 1.25rem; // 20px
 $font-size-normal: 1rem; // 16px
-$font-size-small: 0.875rem; 
+$font-size-small: 0.875rem;
+$font-size-xsmall: 0.75rem;
 
 $line-height-normal: 1.75rem;
 $letter-spacing-small: 0.01rem;
@@ -75,6 +80,7 @@ $gray-border: 2px solid $primary-gray-color-1;
 $anchor-hover-transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out; // from Bootstrap
 $anchor-pseudo-classes: "&:link, &:hover, &:focus, &:visited, &:active";
 $anchor-pseudo-classes-active-state: "&:hover, &:focus, &:active";
+$anchor-pseudo-classes-active-states: ":hover, :focus, :active";
 $anchor-pseudo-classes-inactive-state: "&:link, &:visited";
 $anchors-states-list: '', ':link', ':hover', ':active', ':visited';
 $anchors-items-dark: '.project a', '.dropdown-item', 'footer a', '.nav-link';
@@ -110,18 +116,36 @@ $component-categories: (
   'demand': $component-border-color--demand, 
   'bus': $component-border-color--bus
 );
-$component-images: (
-  'dso': 'electric_grid',
-  'pv': 'pv_plant',
-  'wind_turbine': 'wind_turbine',
-  'transformer_in': 'transformer_in',
-  'transformer_out': 'transformer_out',
-  'storage_in': 'storage_in',
-  'storage_out': 'storage_out',
-  'solar_inverter': 'solar_inverter',
-  'storage': 'battery',
-  'demand': 'demand',
-  'bus': 'power_antenna'
+
+$component-categories-mapping: (
+    "dso": "providers",
+    "gas_dso": "providers",
+    "h2_dso": "providers",
+    "heat_dso": "providers",
+    "pv_plant": "production",
+    "wind_plant": "production",
+    "biogas_plant": "production",
+    "geothermal_conversion": "production",
+    "solar_thermal_plant": "production",
+    "transformer_station_in": "conversion",
+    "transformer_station_out": "conversion",
+    "storage_charge_controller_in": "conversion",
+    "storage_charge_controller_out": "conversion",
+    "solar_inverter": "conversion",
+    "diesel_generator": "conversion",
+    "fuel_cell": "conversion",
+    "gas_boiler": "conversion",
+    "electrolyzer": "conversion",
+    "heat_pump": "conversion",
+    "bess": "storage",
+    "gess": "storage",
+    "h2ess": "storage",
+    "hess": "storage",
+    "demand": "demand",
+    "gas_demand": "demand",
+    "h2_demand": "demand",
+    "heat_demand": "demand",
+    "bus": "bus",
 );
 $gui-component-bg-size: 4.5rem;
 $gui-component-img-size: 3rem;
@@ -137,7 +161,7 @@ $dashboard-space-between-charts: 1.5rem;
 $simulation-error-padding: 4rem;
 
 // Forms
-$form-control-placeholders: '', '::-webkit-input-placeholder', '::-moz-placeholder', ':-ms-input-placeholder', ':-moz-placeholder';
+$form-control-placeholders: '::placeholder', '::-webkit-input-placeholder', '::-moz-placeholder', ':-ms-input-placeholder', ':-moz-placeholder';
 
 // Z-index
 $z-index-nav: 9;

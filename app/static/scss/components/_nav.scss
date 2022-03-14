@@ -35,13 +35,17 @@ nav.navbar {
 
     &.navbar-expand-lg {
       .container-fluid {
-        @include section-width;
+        @include nav-section-width;
         justify-content: center;
       }
 
       .navbar-collapse {
         justify-content: flex-end;
       }
+    }
+
+    &.navbar-expand-lg.navbar--website .container-fluid {
+      max-width: $section-max-width;
     }
 
     .nav-item.locale {
@@ -96,15 +100,51 @@ nav.navbar {
 }
 
 .wizard {
-  @include flex-column-align-justify-center;
-  @include user-select-none;
+  position: relative;
   background-color: $primary-gray-color-1;
   height: $wizard-height;
   min-height: $wizard-height;
 
+  @include flex-row-justify-center;
+  padding-bottom: 2rem;
+
+  &> div {
+    @include flex-column-align-justify-center;
+    @include user-select-none;
+    @include section-width;
+    padding-top: 2rem;
+    position: relative;
+  }
+
+  &__back {
+    position: absolute;
+    right: 2rem;
+    top: 3rem;
+    bottom: $padding-sides-normal;
+    font-size: $font-size-small;
+
+    &::before {
+      @include back-icon;
+      top: 0.3rem;
+    }
+
+    @media only screen and (max-width: 1300px) {
+      font-size: $font-size-small;
+
+      &::before {
+        top: 0.25rem;
+      }
+    }
+
+    @media only screen and (max-width: 1100px) {
+      display: none;
+    }
+  }
+
   &__name {
     @include flex-row-justify-center;
     padding-bottom: .5rem;
+    font-size: $font-size-small;
 
     .project {
       font-weight: 700;
@@ -112,7 +152,6 @@ nav.navbar {
 
     .scenario {
       font-size: $font-size-small;
-      @include translateY(3px);
     }
   }
 
@@ -128,9 +167,10 @@ nav.navbar {
       color: $primary-gray-color-3;
       position: relative;
       font-weight: 700;
+      font-size: $font-size-small;
   
       &:not(:last-of-type) {
-        padding-right: 4.5rem;
+        padding-right: 2rem;
       }
   
       &::before {
@@ -150,18 +190,6 @@ nav.navbar {
         }
       }
   
-      &:not(:first-of-type)::after {
-        content: "";
-        display: block;
-        position: absolute;
-        left: 0;
-        width: 2.25rem;
-        height: 1px;
-        margin-left: -3.5rem;
-        top: .75rem;
-        background-color: $primary-gray-color-3;
-      }
-  
       &.active {
         color: $primary-color-1;
   
@@ -170,7 +198,17 @@ nav.navbar {
         }
       }
     }
-  }
 
-  
+    @media only screen and (max-width: 1300px) {
+      li::before {
+        font-size: $font-size-xsmall;
+        padding: 0.25rem 0.45rem;
+      }
+
+      li:not(:first-of-type)::after {
+        width: 1.25rem;
+        margin-left: -2.5rem;
+      }
+    }
+  }
 }

@@ -30,13 +30,16 @@
       content: "";
       position: absolute;
       display: block;
-      background-image: url(../../assets/icons/i_cell.svg);
+      background-image: url("/static/assets/icons/i_cell.svg");
       width: 1.5rem;
       height: 1.5rem;
       background-repeat: no-repeat;
       background-size: contain;
       top: 0.5rem;
       left: 0;
+    }
+    a {
+        font-size: 2rem;
     }
   }
 
@@ -142,6 +145,18 @@
         @include project-btn;
         margin-top: 0;
       }
+      .btn--action.btn--disabled {
+        padding: 0.25rem 0.5rem;
+        margin-top: 0;
+      }
+      .btn--action.btn--error {
+        padding: 0.25rem 0.5rem;
+        margin-top: 0;
+      }
+      .btn--action.btn--pending {
+        padding: 0.25rem 0.5rem;
+        margin-top: 0;
+      }
 
       .action {
         @include project-actions;
@@ -173,7 +188,7 @@
   text-align: center;
 
   button::before {
-    background-image: url(../../assets/icons/i_add.svg);
+    background-image: url("/static/assets/icons/i_add.svg");
   }
 
   button::after {

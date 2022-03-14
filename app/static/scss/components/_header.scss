@@ -32,16 +32,7 @@
     }
 
     a::before {
-      content: "";
-      position: absolute;
-      display: block;
-      background-image: url(../../assets/icons/i_arrow_left.svg);
-      width: 0.75rem;
-      height: 0.75rem;
-      background-repeat: no-repeat;
-      background-size: cover;
-      top: 0.15rem;
-      left: -1.25rem;
+      @include back-icon;
     }
   }
 }

@@ -1,5 +1,4 @@
 {% load static %}
-{% load sass_tags %}
 {% load i18n %}
 {% load custom_template_tags %}
 
@@ -27,7 +26,11 @@
 
     {% block head_block %}
     {% endblock head_block %}
-    <link href="{% sass_src 'scss/main.scss' %}" rel="stylesheet" type="text/css" />
+    {% if DEBUG == True %}
+        {% include "scss.html" %}
+    {% else %}
+        <link href="{% static 'css/main.css' %}" rel="stylesheet" type="text/css" />
+    {% endif %}
     <!--<meta http-equiv="X-UA-Compatible" content="IE=edge">-->
 </head>
 

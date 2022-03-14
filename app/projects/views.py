@@ -735,7 +735,6 @@ def scenario_create_constraints(request, proj_id, scen_id, step_id=3, max_step=4
 @require_http_methods(["GET", "POST"])
 def scenario_review(request, proj_id, scen_id, step_id=4, max_step=5):
 
-    excuses_design_under_development(request)
     scenario = get_object_or_404(Scenario, pk=scen_id)
 
     if (scenario.project.user != request.user) and (

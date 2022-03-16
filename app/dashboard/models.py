@@ -449,24 +449,84 @@ class ReportItem(models.Model):
                     }
 
                     for y_var in y_variables:
-                        x_values.append(
-                            y_var
-                            + " in "
-                            + assets_results_obj.single_asset_results(asset_name=y_var)[
-                                "installed_capacity"
-                            ]["unit"]
-                        )
-                        installed_capacity_dict["capacity"].append(
-                            assets_results_obj.single_asset_results(asset_name=y_var)[
-                                "installed_capacity"
-                            ]["value"]
-                        )
-                        if y_var in kpi_scalar_matrix:
-                            optimized_capacity_dict["capacity"].append(
-                                kpi_scalar_matrix[y_var]["optimizedAddCap"]
+                        if "_input_power" in y_var:  # for battery
+                            input_power_dict = assets_results_obj.single_asset_results(
+                                asset_name=y_var[0:-12]
+                            )["input power"]
+
+                            x_values.append(
+                                y_var
+                                + " in "
+                                + input_power_dict["installed_capacity"]["unit"]
                             )
+
+                            installed_capacity_dict["capacity"].append(
+                                input_power_dict["installed_capacity"]["value"]
+                            )
+
+                            optimized_capacity_dict["capacity"].append(
+                                input_power_dict["optimizedAddCap"]["value"]
+                            )
+
+                        elif "_output_power" in y_var:
+                            output_power_dict = assets_results_obj.single_asset_results(
+                                asset_name=y_var[0:-13]
+                            )["output power"]
+
+                            x_values.append(
+                                y_var
+                                + " in "
+                                + output_power_dict["installed_capacity"]["unit"]
+                            )
+
+                            installed_capacity_dict["capacity"].append(
+                                output_power_dict["installed_capacity"]["value"]
+                            )
+
+                            optimized_capacity_dict["capacity"].append(
+                                output_power_dict["optimizedAddCap"]["value"]
+                            )
+
+                        elif "_capacity" in y_var:
+                            storage_capacity_dict = assets_results_obj.single_asset_results(
+                                asset_name=y_var[0:-9]
+                            )[
+                                "storage capacity"
+                            ]
+
+                            x_values.append(
+                                y_var
+                                + " in "
+                                + storage_capacity_dict["installed_capacity"]["unit"]
+                            )
+
+                            installed_capacity_dict["capacity"].append(
+                                storage_capacity_dict["installed_capacity"]["value"]
+                            )
+
+                            optimized_capacity_dict["capacity"].append(
+                                storage_capacity_dict["optimizedAddCap"]["value"]
+                            )
+
                         else:
-                            optimized_capacity_dict["capacity"].append(0)
+                            x_values.append(
+                                y_var
+                                + " in "
+                                + assets_results_obj.single_asset_results(
+                                    asset_name=y_var
+                                )["installed_capacity"]["unit"]
+                            )
+                            installed_capacity_dict["capacity"].append(
+                                assets_results_obj.single_asset_results(
+                                    asset_name=y_var
+                                )["installed_capacity"]["value"]
+                            )
+                            if y_var in kpi_scalar_matrix:
+                                optimized_capacity_dict["capacity"].append(
+                                    kpi_scalar_matrix[y_var]["optimizedAddCap"]
+                                )
+                            else:
+                                optimized_capacity_dict["capacity"].append(0)
 
                     y_values.append(installed_capacity_dict)
                     y_values.append(optimized_capacity_dict)
@@ -479,7 +539,6 @@ class ReportItem(models.Model):
                             scenario_timestamps=x_values,
                         )
                     )
-
                 return simulations_results
 
     @property

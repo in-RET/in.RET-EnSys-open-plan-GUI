@@ -27,9 +27,16 @@
 
 {% block footer %}
     <footer class="simulation-footer">
+
       <div>
         <a class="btn btn--medium" href="{% url 'scenario_visualize_results' scen_id %}">{% translate "Check results dashboard" %}</a>
         <a class="btn btn--medium btn--hollow" href="{{ MVS_LP_FILE_URL }}{{ mvs_token }}">{% translate "Download LP files" %}</a>
+        <form method="post" action="{% url 'request_mvs_simulation' scen_id %}">
+            {% csrf_token %}
+
+            <button class="btn btn--medium btn--hollow" type="submit" > {% translate "Rerun simulation" %}</button>
+            <input type="checkbox" name="output_lp_file"> Include LP file (advanced users) </input>
+        </form>
       </div>
     </footer>
 {% endblock footer %}

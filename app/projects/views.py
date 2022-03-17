@@ -93,7 +93,7 @@ def scenario_upload(request, proj_id):
             else:
                 scen["name"] = new_scenario_name
 
-        load_scenario_from_dict(scen, project=project, user=request.user)
+        load_scenario_from_dict(scen, user=request.user, project=project)
 
     return HttpResponseRedirect(reverse("project_search"))
 
@@ -930,7 +930,7 @@ def scenario_export(request, proj_id):
         scenario_ids = json.loads(scenario_ids)
         scenario_data = []
         for scen_id in scenario_ids:
-            scenario = get_object_or_404(Scenario, pk=int(scen_id))
+            scenario = get_object_or_404(Scenario, id=int(scen_id))
             scenario_data.append(scenario.export(bind_project_data=True))
         response = HttpResponse(
             json.dumps(scenario_data), content_type="application/json"
@@ -938,13 +938,11 @@ def scenario_export(request, proj_id):
         response["Content-Disposition"] = "attachment; filename=scenario.json"
     return response
 
-    return {"success": False}
-
 
 @login_required
 @require_http_methods(["POST"])
 def scenario_delete(request, scen_id):
-    scenario = get_object_or_404(Scenario, pk=scen_id)
+    scenario = get_object_or_404(Scenario, id=scen_id)
     if scenario.project.user != request.user:
         logger.warning(
             f"Unauthorized user tried to delete project scenario with db id = {scen_id}."

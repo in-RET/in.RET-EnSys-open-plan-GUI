@@ -278,22 +278,52 @@ def duplicate_scenario_connections(connections_list, scenario, asset_map, bus_ma
 
 
 # endregion
+def load_project_from_dict(model_data, user=None):
+    """Create a new project for a user
+
+    Parameters
+    ----------
+    model_data: dict
+        output produced by the export() method of the Project model
+    user: users.models.CustomUser
+        the user which loads the scenario
+    """
+    scenario_set = model_data.pop("scenario_set_data", None)
+
+    model_data["user"] = user
+    economic_data = EconomicData(**model_data["economic_data"])
+    economic_data.save()
+    model_data["economic_data"] = economic_data
+    project = Project(**model_data)
+    project.save()
+
+    if scenario_set is not None:
+        for scenario_data in scenario_set:
+            load_scenario_from_dict(scenario_data, user, project)
+
+    return project.id
 
 
-def load_scenario_from_dict(model_data, project=None, user=None):
-    """ """
+def load_scenario_from_dict(model_data, user, project=None):
+    """Create a new scenario for a user within a given project
+
+    Parameters
+    ----------
+    model_data: dict
+        output produced by the export() method of the Scenario model
+    user: users.models.CustomUser
+        the user which loads the scenario
+    project: projects.models.Project
+        bind the scenario to a project if not None.
+        If None and 'project' field not in model_data an error is raised
+    """
     assets = model_data.pop("assets")
     busses = model_data.pop("busses")
 
     if project is None:
         if "project" in model_data:
             project_data = model_data.pop("project")
-            # TODO create project first here
-            project_data["user"] = user
-            economic_data = EconomicData(**project["economic_data"])
-            economic_data.save()
-            project = Project(**project)
-            project.save()
+            load_project_from_dict(project_data, user)
         else:
             raise ValueError("Project of a scenario cannot be None")
     else:
@@ -305,6 +335,7 @@ def load_scenario_from_dict(model_data, project=None, user=None):
     scenario.save()
 
     for asset_data in assets:
+        # TODO fix storage component here
         asset_type = asset_data.pop("asset_info")
         asset_data["asset_type"] = AssetType.objects.get(
             asset_type=asset_type["asset_type"]
@@ -326,6 +357,8 @@ def load_scenario_from_dict(model_data, project=None, user=None):
             new_connection.bus = bus
             new_connection.asset = scenario.asset_set.get(name=asset_name)
             new_connection.save()
+
+    return scenario.id
 
 
 class NodeObject:

@@ -294,6 +294,49 @@ def project_update(request, proj_id):
 
 
 @login_required
+@require_http_methods(["GET", "POST"])
+def project_export(request, proj_id):
+
+    project = get_object_or_404(Project, id=proj_id)
+    if request.method == "POST":
+        bind_scenario_data = request.POST.get("bind_scenario_data", True)
+        if bind_scenario_data == "True":
+            bind_scenario_data = True
+        if bind_scenario_data == "False":
+            bind_scenario_data = False
+    else:
+        bind_scenario_data = True
+
+    if project.user != request.user:
+        raise PermissionDenied
+
+    response = HttpResponse(
+        json.dumps(project.export(bind_scenario_data=bind_scenario_data)),
+        content_type="application/json",
+    )
+    response["Content-Disposition"] = "attachment; filename=project.json"
+    return response
+
+
+@login_required
+@require_http_methods(["POST"])
+def project_upload(request):
+
+    # read the project file to a dict
+    project_data = request.FILES["file"].read()
+    project_data = json.loads(project_data)
+
+    new_project_name = request.POST.get("name")
+
+    if new_project_name != "":
+        project_data["name"] = new_project_name
+
+    proj_id = load_project_from_dict(project_data, request.user)
+
+    return HttpResponseRedirect(reverse("project_search", args=[proj_id]))
+
+
+@login_required
 @require_http_methods(["POST"])
 def project_delete(request, proj_id):
     project = get_object_or_404(Project, id=proj_id)

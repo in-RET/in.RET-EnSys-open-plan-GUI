@@ -1,10 +1,13 @@
 import pytest
+import json
 from django.test import TestCase
 from django.urls import reverse
 from django.conf import settings as django_settings
 from django.test.client import RequestFactory
 from projects.models import Project, Viewer
 from users.models import CustomUser
+
+from projects.scenario_topology_helpers import load_project_from_dict
 
 
 class BasicOperationsTest(TestCase):
@@ -132,3 +135,59 @@ class BasicOperationsTest(TestCase):
         pass
 
     # user not owner cannot share or revoke share rights
+
+
+class ExportLoadTest(TestCase):
+    fixtures = ["fixtures/benchmarks_fixture.json"]
+
+    @classmethod
+    def setUpTestData(cls):
+        pass
+
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.client.login(username="testUser", password="ASas12,.")
+        self.project = Project.objects.get(id=1)
+
+    def test_export_and_load_project_without_scenarios(self):
+        user = self.project.user
+
+        dm = self.project.export()
+        json_dm = json.dumps(dm)
+        load_project_from_dict(json.loads(json_dm), user)
+
+        self.assertEqual(Project.objects.all().count(), 2)
+
+    def test_export_and_load_project_with_scenario(self):
+        user = self.project.user
+
+        dm = self.project.export(bind_scenario_data=True)
+        json_dm = json.dumps(dm)
+        load_project_from_dict(json.loads(json_dm), user)
+
+        self.assertEqual(Project.objects.all().count(), 2)
+        self.assertEqual(
+            Project.objects.last().scenario_set.count(),
+            self.project.scenario_set.count(),
+        )
+
+    def test_export_project_via_post_without_scenarios(self):
+        response = self.client.post(
+            reverse("project_export", args=[self.project.id]),
+            dict(bind_scenario_data=False),
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn("scenario_set_data", response.json())
+
+    def test_export_project_via_post_with_scenarios(self):
+        response = self.client.post(
+            reverse("project_export", args=[self.project.id]),
+            dict(bind_scenario_data=True),
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("scenario_set_data", response.json())
+
+    def test_export_project_via_get_with_scenarios(self):
+        response = self.client.get(reverse("project_export", args=[self.project.id]))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("scenario_set_data", response.json())

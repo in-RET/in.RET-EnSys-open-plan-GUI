@@ -449,24 +449,28 @@ class ReportItem(models.Model):
                     }
 
                     for y_var in y_variables:
+
+                        asset = assets_results_obj.single_asset_results(
+                            asset_name=y_var
+                        )
+
                         x_values.append(
-                            y_var
-                            + " in "
-                            + assets_results_obj.single_asset_results(asset_name=y_var)[
-                                "installed_capacity"
-                            ]["unit"]
+                            y_var + " in " + asset["installed_capacity"]["unit"]
                         )
                         installed_capacity_dict["capacity"].append(
-                            assets_results_obj.single_asset_results(asset_name=y_var)[
-                                "installed_capacity"
-                            ]["value"]
+                            asset["installed_capacity"]["value"]
                         )
                         if y_var in kpi_scalar_matrix:
                             optimized_capacity_dict["capacity"].append(
                                 kpi_scalar_matrix[y_var]["optimizedAddCap"]
                             )
                         else:
-                            optimized_capacity_dict["capacity"].append(0)
+                            if "optimizedAddCap" in asset:
+                                optimized_capacity_dict["capacity"].append(
+                                    asset["optimizedAddCap"]["value"]
+                                )
+                            else:
+                                optimized_capacity_dict["capacity"].append(0)
 
                     y_values.append(installed_capacity_dict)
                     y_values.append(optimized_capacity_dict)
@@ -479,7 +483,6 @@ class ReportItem(models.Model):
                             scenario_timestamps=x_values,
                         )
                     )
-
                 return simulations_results
 
     @property

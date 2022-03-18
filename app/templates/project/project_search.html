@@ -264,12 +264,21 @@
 
 <script>
     $(document).ready(function(){
-        var elId = 'project' + `{{proj_id}}` + 'scenario-' + `{{scen_id}}`;
         var projScenariosTab = "collapseScenarios" + `{{ proj_id }}`;
         $("button[data-bs-target='#" + projScenariosTab + "']").click();
-        const yOffset = -100;
-        const y = document.getElementById(elId).getBoundingClientRect().top + window.pageYOffset + yOffset;
-        window.scrollTo({top: y, behavior: 'smooth'});
+        var yOffset = -100;
+        var y = 0
+        if(`{{ scen_id }}` == "None"){
+            y = document.getElementById('project-' + `{{ proj_id }}`).getBoundingClientRect().top + window.pageYOffset;
+            yOffset = 0;
+        }
+        else{
+            const elId = 'project' + `{{ proj_id }}` + 'scenario-' + `{{ scen_id }}`;
+            y = document.getElementById(elId).getBoundingClientRect().top + window.pageYOffset;
+            yOffset = 0;
+        }
+        console.log(y+yOffset);
+        window.scrollTo(0, y + yOffset);
     });
 
     const satellite = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {

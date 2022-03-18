@@ -74,9 +74,25 @@ class Project(models.Model):
             simulation__results__isnull=False
         )
 
-    def export(self, scenarios_data=[]):
+    def export(self, bind_scenario_data=True):
+        """
+        Parameters
+        ----------
+        bind_scenario_data : bool
+            when True, the scenarios of the project are saved
+            Default: False.
+        ...
+        Returns
+        -------
+        A dict with the parameters describing a scenario model
+        """
         dm = model_to_dict(self, exclude=["id", "user", "viewers"])
         dm["economic_data"] = model_to_dict(self.economic_data, exclude=["id"])
+        if bind_scenario_data is True:
+            scenario_data = []
+            for scenario in self.scenario_set.all():
+                scenario_data.append(scenario.export())
+            dm["scenario_set_data"] = scenario_data
         return dm
 
     def add_viewer_if_not_exist(self, email=None, share_rights=""):

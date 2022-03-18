@@ -35,6 +35,7 @@ from .scenario_topology_helpers import (
     duplicate_scenario_objects,
     duplicate_scenario_connections,
     load_scenario_from_dict,
+    load_project_from_dict,
 )
 from projects.helpers import format_scenario_for_mvs
 from .constants import DONE, PENDING, ERROR, MODIFIED
@@ -360,7 +361,12 @@ def project_search(request, proj_id=None, scen_id=None):
         Q(user=request.user) | Q(viewers__user=request.user)
     ).distinct()
 
-    scenario_upload_form = UploadFileForm()
+    scenario_upload_form = UploadFileForm(
+        labels=dict(name=_("New scenario name"), file=_("Scenario file"))
+    )
+    project_upload_form = UploadFileForm(
+        labels=dict(name=_("New project name"), file=_("Project file"))
+    )
     project_share_form = ProjectShareForm()
     project_revoke_form = ProjectRevokeForm(proj_id=proj_id)
     return render(
@@ -371,6 +377,7 @@ def project_search(request, proj_id=None, scen_id=None):
             "proj_id": proj_id,
             "scen_id": scen_id,
             "scenario_upload_form": scenario_upload_form,
+            "project_upload_form": project_upload_form,
             "project_share_form": project_share_form,
             "project_revoke_form": project_revoke_form,
         },

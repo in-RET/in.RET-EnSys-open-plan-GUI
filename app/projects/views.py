@@ -35,6 +35,7 @@ from .scenario_topology_helpers import (
     duplicate_scenario_objects,
     duplicate_scenario_connections,
     load_scenario_from_dict,
+    load_project_from_dict,
 )
 from projects.helpers import format_scenario_for_mvs
 from .constants import DONE, PENDING, ERROR, MODIFIED
@@ -73,7 +74,7 @@ def scenario_upload(request, proj_id):
     scenario_data = request.FILES["file"].read()
     scenario_data = json.loads(scenario_data)
 
-    project = get_object_or_404(Project, pk=proj_id)
+    project = get_object_or_404(Project, id=proj_id)
 
     if project.user != request.user:
         raise PermissionDenied
@@ -93,9 +94,9 @@ def scenario_upload(request, proj_id):
             else:
                 scen["name"] = new_scenario_name
 
-        load_scenario_from_dict(scen, project=project, user=request.user)
+        scen_id = load_scenario_from_dict(scen, user=request.user, project=project)
 
-    return HttpResponseRedirect(reverse("project_search"))
+    return HttpResponseRedirect(reverse("project_search", args=[proj_id, scen_id]))
 
 
 # region Project
@@ -263,7 +264,7 @@ def project_create(request):
 @login_required
 @require_http_methods(["GET", "POST"])
 def project_update(request, proj_id):
-    project = get_object_or_404(Project, pk=proj_id)
+    project = get_object_or_404(Project, id=proj_id)
 
     if project.user != request.user:
         raise PermissionDenied
@@ -284,13 +285,56 @@ def project_update(request, proj_id):
         economic_data_form.save()
         # Save was successful, so send message
         messages.success(request, "Project Info updated successfully!")
-        return HttpResponseRedirect(reverse("project_search"))
+        return HttpResponseRedirect(reverse("project_search", args=[proj_id]))
 
     return render(
         request,
         "project/project_update.html",
         {"project_form": project_form, "economic_data_form": economic_data_form},
     )
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def project_export(request, proj_id):
+
+    project = get_object_or_404(Project, id=proj_id)
+    if request.method == "POST":
+        bind_scenario_data = request.POST.get("bind_scenario_data", True)
+        if bind_scenario_data == "True":
+            bind_scenario_data = True
+        if bind_scenario_data == "False":
+            bind_scenario_data = False
+    else:
+        bind_scenario_data = True
+
+    if project.user != request.user:
+        raise PermissionDenied
+
+    response = HttpResponse(
+        json.dumps(project.export(bind_scenario_data=bind_scenario_data)),
+        content_type="application/json",
+    )
+    response["Content-Disposition"] = "attachment; filename=project.json"
+    return response
+
+
+@login_required
+@require_http_methods(["POST"])
+def project_upload(request):
+
+    # read the project file to a dict
+    project_data = request.FILES["file"].read()
+    project_data = json.loads(project_data)
+
+    new_project_name = request.POST.get("name")
+
+    if new_project_name != "":
+        project_data["name"] = new_project_name
+
+    proj_id = load_project_from_dict(project_data, request.user)
+
+    return HttpResponseRedirect(reverse("project_search", args=[proj_id]))
 
 
 @login_required
@@ -317,7 +361,12 @@ def project_search(request, proj_id=None, scen_id=None):
         Q(user=request.user) | Q(viewers__user=request.user)
     ).distinct()
 
-    scenario_upload_form = UploadFileForm()
+    scenario_upload_form = UploadFileForm(
+        labels=dict(name=_("New scenario name"), file=_("Scenario file"))
+    )
+    project_upload_form = UploadFileForm(
+        labels=dict(name=_("New project name"), file=_("Project file"))
+    )
     project_share_form = ProjectShareForm()
     project_revoke_form = ProjectRevokeForm(proj_id=proj_id)
     return render(
@@ -328,6 +377,7 @@ def project_search(request, proj_id=None, scen_id=None):
             "proj_id": proj_id,
             "scen_id": scen_id,
             "scenario_upload_form": scenario_upload_form,
+            "project_upload_form": project_upload_form,
             "project_share_form": project_share_form,
             "project_revoke_form": project_revoke_form,
         },
@@ -337,19 +387,14 @@ def project_search(request, proj_id=None, scen_id=None):
 @login_required
 @require_http_methods(["POST"])
 def project_duplicate(request, proj_id):
-    """duplicates the selected project but none of its associated scenarios"""
+    """Duplicates the selected project along with its associated scenarios"""
     project = get_object_or_404(Project, pk=proj_id)
 
     # duplicate the project
-    project.pk = None
-    economic_data = project.economic_data
-    economic_data.pk = None
-    economic_data.save()
-    # economic_data = project.economic_data.save()
-    project.economic_data = economic_data
-    project.save()
+    dm = project.export(bind_scenario_data=True)
+    new_proj_id = load_project_from_dict(dm, user=project.user)
 
-    return HttpResponseRedirect(reverse("project_search", args=[project.id]))
+    return HttpResponseRedirect(reverse("project_search", args=[new_proj_id]))
 
 
 # endregion Project
@@ -887,7 +932,7 @@ def scenario_export(request, proj_id):
         scenario_ids = json.loads(scenario_ids)
         scenario_data = []
         for scen_id in scenario_ids:
-            scenario = get_object_or_404(Scenario, pk=int(scen_id))
+            scenario = get_object_or_404(Scenario, id=int(scen_id))
             scenario_data.append(scenario.export(bind_project_data=True))
         response = HttpResponse(
             json.dumps(scenario_data), content_type="application/json"
@@ -895,13 +940,11 @@ def scenario_export(request, proj_id):
         response["Content-Disposition"] = "attachment; filename=scenario.json"
     return response
 
-    return {"success": False}
-
 
 @login_required
 @require_http_methods(["POST"])
 def scenario_delete(request, scen_id):
-    scenario = get_object_or_404(Scenario, pk=scen_id)
+    scenario = get_object_or_404(Scenario, id=scen_id)
     if scenario.project.user != request.user:
         logger.warning(
             f"Unauthorized user tried to delete project scenario with db id = {scen_id}."

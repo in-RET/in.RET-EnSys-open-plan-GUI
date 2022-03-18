@@ -23,6 +23,7 @@
 
 <!-- use showModal(event, modalId=, attrs = { list of attributes you want to add to the form tag inside the modal }) to call the modal -->
 {% include "modal_template.html" with id="uploadScenarioModal" modal_style_class="modal--gui" submit_btn_label="Upload" title="Scenario upload" form=scenario_upload_form %}
+{% include "modal_template.html" with id="uploadProjectModal" modal_style_class="modal--gui" submit_btn_label="Upload" title="Project upload" form=project_upload_form %}
 {% include "modal_template.html" with id="shareProjectModal" modal_style_class="modal--gui" submit_btn_label="Share" title="Share project" form=project_share_form %}
 {% include "modal_template.html" with id="revokeProjectModal" modal_style_class="modal--gui" submit_btn_label="Revoke access" title="Manage project access" form=project_revoke_form %}
 
@@ -43,6 +44,7 @@
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="newProjectButton">
                     <li><a class="dropdown-item" href="{% url 'project_create' %}">{% translate "Empty project" %}</a></li>
+                    <li><a class="dropdown-item" onclick="javascript:showModal(event, modalId='uploadProjectModal', attrs={'action': `{% url 'project_upload' %}`, 'enctype': 'multipart/form-data' })">{% translate "From file" %}</a></li>
                     <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">{% translate "From use case" %}</a></li>
                 </ul>
             </div>
@@ -111,6 +113,7 @@
                                 <ul class="dropdown-menu" aria-labelledby="shareProject-{{ project.id }}">
                                   <li><a class="dropdown-item" onclick="javascript:showModal(event, modalId='shareProjectModal', attrs={'action': `{% url 'project_share' project.id %}`})">{% translate "Share project" %}</a></li>
                                   <li><a class="dropdown-item" onclick="javascript:showRevokeProjectModal(event, `{{ project.id }}`)">{% translate "Unshare project" %}</a></li>
+                                  <li><a class="dropdown-item" href="{% url 'project_export' project.id %}">{% translate "Export project" %}</a></li>
                                 </ul>
                             </div>
 

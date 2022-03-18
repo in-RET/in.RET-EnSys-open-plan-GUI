@@ -328,8 +328,15 @@ class ProjectRevokeForm(ModelForm):
 
 
 class UploadFileForm(forms.Form):
-    name = forms.CharField(label=_("New scenario name"), required=False)
-    file = forms.FileField(label=_("Scenario file"))
+    name = forms.CharField(required=False)
+    file = forms.FileField()
+
+    def __init__(self, *args, **kwargs):
+        labels = kwargs.pop("labels", None)
+        super().__init__(*args, **kwargs)
+        if labels is not None:
+            for field in labels:
+                self.fields[field].label = _(labels[field])
 
 
 class CommentForm(ModelForm):

@@ -387,19 +387,14 @@ def project_search(request, proj_id=None, scen_id=None):
 @login_required
 @require_http_methods(["POST"])
 def project_duplicate(request, proj_id):
-    """duplicates the selected project but none of its associated scenarios"""
+    """Duplicates the selected project along with its associated scenarios"""
     project = get_object_or_404(Project, pk=proj_id)
 
     # duplicate the project
-    project.pk = None
-    economic_data = project.economic_data
-    economic_data.pk = None
-    economic_data.save()
-    # economic_data = project.economic_data.save()
-    project.economic_data = economic_data
-    project.save()
+    dm = project.export(bind_scenario_data=True)
+    new_proj_id = load_project_from_dict(dm, user=project.user)
 
-    return HttpResponseRedirect(reverse("project_search", args=[project.id]))
+    return HttpResponseRedirect(reverse("project_search", args=[new_proj_id]))
 
 
 # endregion Project

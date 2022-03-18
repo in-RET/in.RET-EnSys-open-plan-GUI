@@ -74,7 +74,7 @@ def scenario_upload(request, proj_id):
     scenario_data = request.FILES["file"].read()
     scenario_data = json.loads(scenario_data)
 
-    project = get_object_or_404(Project, pk=proj_id)
+    project = get_object_or_404(Project, id=proj_id)
 
     if project.user != request.user:
         raise PermissionDenied
@@ -94,9 +94,9 @@ def scenario_upload(request, proj_id):
             else:
                 scen["name"] = new_scenario_name
 
-        load_scenario_from_dict(scen, user=request.user, project=project)
+        scen_id = load_scenario_from_dict(scen, user=request.user, project=project)
 
-    return HttpResponseRedirect(reverse("project_search"))
+    return HttpResponseRedirect(reverse("project_search", args=[proj_id, scen_id]))
 
 
 # region Project
@@ -264,7 +264,7 @@ def project_create(request):
 @login_required
 @require_http_methods(["GET", "POST"])
 def project_update(request, proj_id):
-    project = get_object_or_404(Project, pk=proj_id)
+    project = get_object_or_404(Project, id=proj_id)
 
     if project.user != request.user:
         raise PermissionDenied
@@ -285,7 +285,7 @@ def project_update(request, proj_id):
         economic_data_form.save()
         # Save was successful, so send message
         messages.success(request, "Project Info updated successfully!")
-        return HttpResponseRedirect(reverse("project_search"))
+        return HttpResponseRedirect(reverse("project_search", args=[proj_id]))
 
     return render(
         request,

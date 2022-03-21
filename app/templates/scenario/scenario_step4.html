@@ -21,14 +21,6 @@
 
 
 {% block end_body_scripts %}
-{% if simulation_status == "PENDING" %}
-<script>
-    const checkSimulationUrl = `{% url 'fetch_simulation_results' sim_id %}`;
-    console.log(checkSimulationUrl);
-</script>
-<script src="{% static 'js/simulation_requests.js' %}"></script>
-{% endif %}
-
 {% endblock end_body_scripts %}
 
 {% block footer %}

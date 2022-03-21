@@ -1,4 +1,5 @@
 {% extends 'scenario/scenario_progression.html' %}
+{% load static %}
 {% load i18n %}
 
 
@@ -28,3 +29,12 @@
 
 {% block footer %}
 {% endblock footer %}
+{% block end_body_scripts %}
+{% if simulation_status == "PENDING" %}
+<script>
+    const checkSimulationUrl = `{% url 'fetch_simulation_results' sim_id %}`;
+</script>
+<script src="{% static 'js/simulation_requests.js' %}"></script>
+{% endif %}
+
+{% endblock end_body_scripts %}

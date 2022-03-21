@@ -357,7 +357,7 @@ scenario_widgets = {
             "type": "date",
         },
     ),
-    "time_step": forms.NumberInput(
+    "time_step": forms.Select(
         attrs={
             "placeholder": "eg. 120 minutes",
             "min": "1",
@@ -365,7 +365,8 @@ scenario_widgets = {
             "step": "1",
             "data-toggle": "tooltip",
             "title": _("Length of the time-steps."),
-        }
+        },
+        choices=((60, "60 min"),),
     ),
     "evaluated_period": forms.NumberInput(
         attrs={

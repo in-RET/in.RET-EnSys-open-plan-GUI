@@ -1359,4 +1359,21 @@ def fetch_sensitivity_analysis_results(request, sa_id):
     )
 
 
+@login_required
+@require_http_methods(["GET"])
+def simulation_cancel(request, scen_id):
+    scenario = get_object_or_404(Scenario, id=scen_id)
+
+    if scenario.project.user != request.user:
+        raise PermissionDenied
+
+    qs = Simulation.objects.filter(scenario=scen_id)
+    if qs.exists():
+        scenario.simulation.delete()
+
+    return HttpResponseRedirect(
+        reverse("scenario_review", args=[scenario.project.id, scen_id])
+    )
+
+
 # endregion MVS JSON Related

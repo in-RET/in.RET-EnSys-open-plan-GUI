@@ -121,6 +121,9 @@ urlpatterns = [
     ),
     # MVS Simulation
     path(
+        "simulation/cancel/<int:scen_id>", simulation_cancel, name="simulation_cancel"
+    ),
+    path(
         "view_mvs_data_input/<int:scen_id>",
         view_mvs_data_input,
         name="view_mvs_data_input",

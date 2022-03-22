@@ -619,6 +619,12 @@ def parse_input_timeseries(timeseries_file):
                     timeseries_values = json.loads(timeseries_file_str)
                 else:
                     timeseries_values = parse_csv_timeseries(timeseries_file_str)
+            else:
+                raise TypeError(
+                    _(
+                        f'Input timeseries file type of "{timeseries_file.name}" is not supported. The supported formats are "json", "csv", "txt", "xls" and "xlsx"'
+                    )
+                )
         else:
             raise ValidationError(
                 _('Input timeseries file "%(fname)s" is empty'),
@@ -682,6 +688,8 @@ class AssetCreateForm(OpenPlanModelForm):
                     "File not properly formatted. Please ensure you upload a comma separated array of values. E.g. [1,2,0.32]"
                 )
             )
+        except TypeError as e:
+            raise ValidationError(str(e))
         except Exception as ex:
             raise ValidationError(_("Could not parse a file. Did you upload one?"))
 

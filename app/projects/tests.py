@@ -6,6 +6,7 @@ from django.conf import settings as django_settings
 from django.test.client import RequestFactory
 from projects.models import Project, Viewer, Asset
 from users.models import CustomUser
+from django.core.exceptions import ValidationError
 
 from projects.scenario_topology_helpers import load_project_from_dict
 
@@ -253,3 +254,14 @@ class UploadTimeseriesTest(TestCase):
             response = self.client.post(self.post_url, data, format="multipart")
             asset = Asset.objects.last()
         self.assertEqual(asset.input_timeseries_values, [1.2, 2, 3.0, 4])
+
+    def test_load_demand_file_wrong_format_raises_error(self):
+        with open("./test_files/test_ts.notsupported") as fp:
+            data = {
+                "name": "Test_input_timeseries",
+                "pos_x": 0,
+                "pos_y": 0,
+                "input_timeseries": fp,
+            }
+            response = self.client.post(self.post_url, data, format="multipart")
+            self.assertEqual(response.status_code, 422)

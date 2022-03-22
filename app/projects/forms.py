@@ -586,7 +586,7 @@ def parse_csv_timeseries(file_str):
 
 def parse_input_timeseries(timeseries_file):
     if timeseries_file.name.endswith("xls") or timeseries_file.name.endswith("xlsx"):
-        wb = load_workbook(filename=timeseries_file.name)
+        wb = load_workbook(filename=timeseries_file)
         worksheet = wb.active
         timeseries_values = []
         n_col = worksheet.max_column

@@ -218,7 +218,7 @@ class UploadTimeseriesTest(TestCase):
             asset = Asset.objects.last()
         self.assertEqual(asset.input_timeseries_values, [1, 2, 3, 4])
 
-    def test_load_demand_csv_decimal_point_with_comma(self):
+    def test_load_demand_csv_double_decimal_point_with_comma(self):
         with open("./test_files/test_ts_csv_semicolon.csv") as fp:
             data = {
                 "name": "Test_input_timeseries",
@@ -241,3 +241,15 @@ class UploadTimeseriesTest(TestCase):
             response = self.client.post(self.post_url, data, format="multipart")
             asset = Asset.objects.last()
         self.assertEqual(asset.input_timeseries_values, [1, 2, 3, 4])
+
+    def test_load_demand_csv_decimal_point_with_comma(self):
+        with open("./test_files/test_ts_comma_decimal.csv") as fp:
+            data = {
+                "name": "Test_input_timeseries",
+                "pos_x": 0,
+                "pos_y": 0,
+                "input_timeseries": fp,
+            }
+            response = self.client.post(self.post_url, data, format="multipart")
+            asset = Asset.objects.last()
+        self.assertEqual(asset.input_timeseries_values, [1.2, 2, 3.0, 4])

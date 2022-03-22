@@ -562,13 +562,20 @@ class BusForm(OpenPlanModelForm):
 
 def parse_csv_timeseries(file_str):
     io_string = io.StringIO(file_str)
-    reader = csv.reader(io_string, delimiter=",")
+    if file_str.count(";") > 0:
+        delimiter = ";"
+    else:
+        delimiter = ","
+    reader = csv.reader(io_string, delimiter=delimiter)
     timeseries_values = []
     for row in reader:
         if len(row) == 1:
-            timeseries_values.append(float(row[0]))
+            value = row[0]
         else:
-            timeseries_values.append(float(row[1]))
+            # assumes the first row is timestamps and read the second one, ignore any other row
+            value = row[1]
+        # convert potential comma used as decimal point to decimal point
+        timeseries_values.append(float(value.replace(",", ".")))
     return timeseries_values
 
 

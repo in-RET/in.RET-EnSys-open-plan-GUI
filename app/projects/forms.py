@@ -562,10 +562,15 @@ class BusForm(OpenPlanModelForm):
 
 def parse_csv_timeseries(file_str):
     io_string = io.StringIO(file_str)
+    delimiter = ","
     if file_str.count(";") > 0:
         delimiter = ";"
-    else:
-        delimiter = ","
+
+    # check if the number of , is an integer time the number of line return
+    # if not, the , is probably not a column separator and a decimal separator indeed
+    if file_str.count(",") % (file_str.count("\n") + 1) != 0:
+        delimiter = ";"
+
     reader = csv.reader(io_string, delimiter=delimiter)
     timeseries_values = []
     for row in reader:

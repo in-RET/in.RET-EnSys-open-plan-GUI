@@ -71,7 +71,7 @@ class UserModelTest(TestCase):
     """
     # Signup
     def test_view_url_exists_at_desired_location(self):
-        response = self.client.get("/users/signup/")
+        response = self.client.get("/en/users/signup/")
         self.assertEqual(response.status_code, 200)
 
     def test_signup_view_url_accessible_by_name(self):
@@ -86,7 +86,7 @@ class UserModelTest(TestCase):
     # user_info
     def test_redirect_if_not_logged_in(self):
         response = self.client.get(reverse("user_info"))
-        self.assertRedirects(response, "/users/login/?next=/users/user_info/")
+        self.assertRedirects(response, "/en/users/login/?next=/en/users/user_info/")
 
     def test_logged_in_user_can_access_self_user_info_view(self):
         request = self.factory.get(reverse("user_info"))

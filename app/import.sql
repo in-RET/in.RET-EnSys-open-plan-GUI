@@ -59,11 +59,11 @@ insert into projects_assettype(asset_type, energy_vector, asset_category, mvs_ty
 
 -- Battery Energy Storage System
 insert into projects_assettype(asset_type, energy_vector, asset_category, mvs_type, asset_fields, unit) values
-('charging_power','Electricity', 'energy_storage', 'storage', '[name,age_installed,installed_capacity,capex_fix,capex_var,opex_fix,opex_var,lifetime,crate,efficiency]', 'kW' );
+('charging_power','Electricity', 'energy_storage', 'storage', '[name,age_installed,installed_capacity,capex_fix,capex_var,opex_fix,opex_var,lifetime,crate,efficiency,dispatchable]', 'kW' );
 insert into projects_assettype(asset_type, energy_vector, asset_category, mvs_type, asset_fields, unit) values
-('discharging_power','Electricity', 'energy_storage', 'storage', '[name,age_installed,installed_capacity,capex_fix,capex_var,opex_fix,opex_var,lifetime,crate,efficiency]', 'kW' );
+('discharging_power','Electricity', 'energy_storage', 'storage', '[name,age_installed,installed_capacity,capex_fix,capex_var,opex_fix,opex_var,lifetime,crate,efficiency,dispatchable]', 'kW' );
 insert into projects_assettype(asset_type, energy_vector, asset_category, mvs_type, asset_fields, unit) values
-('capacity','Electricity', 'energy_storage', 'storage', '[name,age_installed,installed_capacity,capex_fix,capex_var,opex_fix,opex_var,lifetime,optimize_cap,efficiency,soc_max,soc_min]', 'kWh' );
+('capacity','Electricity', 'energy_storage', 'storage', '[name,age_installed,installed_capacity,capex_fix,capex_var,opex_fix,opex_var,lifetime,optimize_cap,efficiency,soc_max,soc_min,dispatchable]', 'kWh' );
 insert into projects_assettype(asset_type, energy_vector, asset_category, mvs_type, asset_fields, unit) values
 ('bess','Electricity', 'energy_storage', 'storage', '[name]', 'kW (el)' );
 -- Gas Energy Storage System

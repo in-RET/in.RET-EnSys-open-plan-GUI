@@ -4,11 +4,14 @@ from django.test import TestCase
 from django.urls import reverse
 from django.conf import settings as django_settings
 from django.test.client import RequestFactory
-from projects.models import Project, Viewer, Asset
+from projects.models import Project, Scenario, Viewer, Asset
 from users.models import CustomUser
 from django.core.exceptions import ValidationError
 
-from projects.scenario_topology_helpers import load_project_from_dict
+from projects.scenario_topology_helpers import (
+    load_scenario_from_dict,
+    load_project_from_dict,
+)
 
 
 class BasicOperationsTest(TestCase):
@@ -149,6 +152,41 @@ class ExportLoadTest(TestCase):
         self.factory = RequestFactory()
         self.client.login(username="testUser", password="ASas12,.")
         self.project = Project.objects.get(id=1)
+        self.scenario = self.project.scenario_set.first()
+
+    def test_export_and_load_scenario(self):
+        user = self.project.user
+
+        dm = self.scenario.export()
+        json_dm = json.dumps(dm)
+
+        self.assertNotIn("project", dm)
+        load_scenario_from_dict(json.loads(json_dm), user, project=self.project)
+
+        self.assertEqual(Project.objects.all().count(), 1)
+        self.assertEqual(Scenario.objects.all().count(), 2)
+
+    def test_export_and_load_scenario_with_project_info(self):
+        user = self.project.user
+
+        dm = self.scenario.export(bind_project_data=True)
+        json_dm = json.dumps(dm)
+
+        self.assertIn("project", dm)
+        self.assertNotIn("scenario_set_data", dm["project"])
+
+        # A new project should be created
+        load_scenario_from_dict(json.loads(json_dm), user)
+        self.assertEqual(Project.objects.all().count(), 2)
+        self.assertEqual(Scenario.objects.all().count(), 2)
+
+    def test_load_scenario_without_project_raises_error(self):
+        user = self.project.user
+
+        dm = self.scenario.export()
+        json_dm = json.dumps(dm)
+        with pytest.raises(ValueError):
+            load_scenario_from_dict(json.loads(json_dm), user)
 
     def test_export_and_load_project_without_scenarios(self):
         user = self.project.user

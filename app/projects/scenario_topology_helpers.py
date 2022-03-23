@@ -334,12 +334,19 @@ def load_scenario_from_dict(model_data, user, project=None):
     scenario.project = project
     scenario.save()
 
+    # push the children asset at the end of the list to make sure we create the parents first
+    assets.sort(key=lambda asset_data: 1 if "parent_asset" in asset_data else 0)
+
     for asset_data in assets:
-        # TODO fix storage component here
+        if "parent_asset" in asset_data:
+            asset_data["parent_asset"] = Asset.objects.get(
+                name=asset_data["parent_asset"], scenario=scenario
+            )
         asset_type = asset_data.pop("asset_info")
         asset_data["asset_type"] = AssetType.objects.get(
             asset_type=asset_type["asset_type"]
         )
+
         asset = Asset(**asset_data)
         asset.scenario = scenario
         asset.save()

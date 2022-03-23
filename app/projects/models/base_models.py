@@ -449,6 +449,11 @@ class Asset(TopologyNode):
         fields += ["name", "pos_x", "pos_y"]
         dm = model_to_dict(self, fields=fields)
         dm["asset_info"] = self.asset_type.export()
+
+        # check for parent assets
+        if self.parent_asset is not None:
+            dm["parent_asset"] = self.parent_asset.name
+
         return dm
 
     def is_input_timeseries_empty(self):

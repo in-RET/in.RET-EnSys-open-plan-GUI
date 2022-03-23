@@ -953,7 +953,7 @@ class AssetCreateForm(OpenPlanModelForm):
         }
         help_texts = {
             "input_timeseries": _(
-                "The timeseries in csv format is expected to be in comma separated values with dot as decimal separator"
+                "You can upload your timeseries as xls(x), csv or json format. Either there is one column with the values of the timeseries matching the scenario timesteps, or there are two columns, the first one being the timestamps and the second one the values of the timeseries. If you upload a spreadsheet with more than one tab only the first tab will be considered. The timeseries in csv format is expected to be in comma separated values with dot as decimal separator."
             )
         }
 

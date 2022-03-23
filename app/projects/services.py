@@ -23,12 +23,12 @@ from exchangelib import (
 logger = logging.getLogger(__name__)
 
 # email account which will send the feedback emails
-EXCHANGE_ACCOUNT = os.getenv("EXCHANGE_ACCOUNT")
-EXCHANGE_PW = os.getenv("EXCHANGE_PW")
-EXCHANGE_EMAIL = os.getenv("EXCHANGE_EMAIL")
-EXCHANGE_SERVER = os.getenv("EXCHANGE_SERVER")
+EXCHANGE_ACCOUNT = os.getenv("EXCHANGE_ACCOUNT", "dummy@dummy.com")
+EXCHANGE_PW = os.getenv("EXCHANGE_PW", "dummypw")
+EXCHANGE_EMAIL = os.getenv("EXCHANGE_EMAIL", "dummy@dummy.com")
+EXCHANGE_SERVER = os.getenv("EXCHANGE_SERVER", "dummy.com")
 # email addresses to which the feedback emails will be sent
-RECIPIENTS = os.getenv("RECIPIENTS").split(",")
+RECIPIENTS = os.getenv("RECIPIENTS", "dummy@dummy.com,dummy2@dummy.com").split(",")
 
 
 r"""Functions meant to be powered by Django-Q.

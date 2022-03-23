@@ -1187,14 +1187,16 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
 @login_required
 @require_http_methods(["POST"])
 def asset_create_or_update(request, scen_id=0, asset_type_name="", asset_uuid=None):
+
     if asset_type_name == "bus":
-        return handle_bus_form_post(request, scen_id, asset_type_name, asset_uuid)
+        answer = handle_bus_form_post(request, scen_id, asset_type_name, asset_uuid)
     elif asset_type_name in ["bess", "h2ess", "gess", "hess"]:
-        return handle_storage_unit_form_post(
+        answer = handle_storage_unit_form_post(
             request, scen_id, asset_type_name, asset_uuid
         )
     else:  # all assets
-        return handle_asset_form_post(request, scen_id, asset_type_name, asset_uuid)
+        answer = handle_asset_form_post(request, scen_id, asset_type_name, asset_uuid)
+    return answer
 
 
 # endregion Asset

@@ -75,8 +75,6 @@ def set_parameter_info(param_name, field, parameters=PARAMETERS):
             verbose = None
         if default_value == "None":
             default_value = None
-    else:
-        print(f"{param_name} is not within range")
 
     if verbose is not None:
         field.label = verbose
@@ -562,19 +560,31 @@ class BusForm(OpenPlanModelForm):
 
 def parse_csv_timeseries(file_str):
     io_string = io.StringIO(file_str)
-    reader = csv.reader(io_string, delimiter=",")
+    delimiter = ","
+    if file_str.count(";") > 0:
+        delimiter = ";"
+
+    # check if the number of , is an integer time the number of line return
+    # if not, the , is probably not a column separator and a decimal separator indeed
+    if file_str.count(",") % (file_str.count("\n") + 1) != 0:
+        delimiter = ";"
+
+    reader = csv.reader(io_string, delimiter=delimiter)
     timeseries_values = []
     for row in reader:
         if len(row) == 1:
-            timeseries_values.append(float(row[0]))
+            value = row[0]
         else:
-            timeseries_values.append(float(row[1]))
+            # assumes the first row is timestamps and read the second one, ignore any other row
+            value = row[1]
+        # convert potential comma used as decimal point to decimal point
+        timeseries_values.append(float(value.replace(",", ".")))
     return timeseries_values
 
 
 def parse_input_timeseries(timeseries_file):
     if timeseries_file.name.endswith("xls") or timeseries_file.name.endswith("xlsx"):
-        wb = load_workbook(filename=timeseries_file.name)
+        wb = load_workbook(filename=timeseries_file)
         worksheet = wb.active
         timeseries_values = []
         n_col = worksheet.max_column
@@ -607,6 +617,12 @@ def parse_input_timeseries(timeseries_file):
                     timeseries_values = json.loads(timeseries_file_str)
                 else:
                     timeseries_values = parse_csv_timeseries(timeseries_file_str)
+            else:
+                raise TypeError(
+                    _(
+                        f'Input timeseries file type of "{timeseries_file.name}" is not supported. The supported formats are "json", "csv", "txt", "xls" and "xlsx"'
+                    )
+                )
         else:
             raise ValidationError(
                 _('Input timeseries file "%(fname)s" is empty'),
@@ -657,6 +673,7 @@ class AssetCreateForm(OpenPlanModelForm):
             # read the timeseries from file if any
             if timeseries_file is not None:
                 input_timeseries_values = parse_input_timeseries(timeseries_file)
+                # TODO here list the possible options
             else:
                 # set the previous timeseries from the asset if any
                 if self.is_input_timeseries_empty() is False:
@@ -670,6 +687,8 @@ class AssetCreateForm(OpenPlanModelForm):
                     "File not properly formatted. Please ensure you upload a comma separated array of values. E.g. [1,2,0.32]"
                 )
             )
+        except TypeError as e:
+            raise ValidationError(str(e))
         except Exception as ex:
             raise ValidationError(_("Could not parse a file. Did you upload one?"))
 
@@ -931,6 +950,11 @@ class AssetCreateForm(OpenPlanModelForm):
             "renewable_share": _("Renewable share"),
             "installed_capacity": _("installed capacity (kW)"),
             "age_installed": _("Age installed"),
+        }
+        help_texts = {
+            "input_timeseries": _(
+                "You can upload your timeseries as xls(x), csv or json format. Either there is one column with the values of the timeseries matching the scenario timesteps, or there are two columns, the first one being the timestamps and the second one the values of the timeseries. If you upload a spreadsheet with more than one tab only the first tab will be considered. The timeseries in csv format is expected to be in comma separated values with dot as decimal separator."
+            )
         }
 
 

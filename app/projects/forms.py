@@ -75,8 +75,6 @@ def set_parameter_info(param_name, field, parameters=PARAMETERS):
             verbose = None
         if default_value == "None":
             default_value = None
-    else:
-        print(f"{param_name} is not within range")
 
     if verbose is not None:
         field.label = verbose
@@ -675,6 +673,7 @@ class AssetCreateForm(OpenPlanModelForm):
             # read the timeseries from file if any
             if timeseries_file is not None:
                 input_timeseries_values = parse_input_timeseries(timeseries_file)
+                # TODO here list the possible options
             else:
                 # set the previous timeseries from the asset if any
                 if self.is_input_timeseries_empty() is False:
@@ -951,6 +950,11 @@ class AssetCreateForm(OpenPlanModelForm):
             "renewable_share": _("Renewable share"),
             "installed_capacity": _("installed capacity (kW)"),
             "age_installed": _("Age installed"),
+        }
+        help_texts = {
+            "input_timeseries": _(
+                "The timeseries in csv format is expected to be in comma separated values with dot as decimal separator"
+            )
         }
 
 

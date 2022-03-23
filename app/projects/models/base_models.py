@@ -241,7 +241,7 @@ class Scenario(models.Model):
         dm = model_to_dict(self, exclude=["id"])
         dm["start_date"] = str(dm["start_date"])
         if bind_project_data is True:
-            dm["project"] = self.project.export()
+            dm["project"] = self.project.export(bind_scenario_data=False)
         else:
             dm.pop("project")
 

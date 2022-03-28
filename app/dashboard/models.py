@@ -3,6 +3,9 @@ import json
 import jsonschema
 import traceback
 import logging
+import numpy as np
+import plotly.graph_objects as go
+
 
 from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import get_object_or_404
@@ -27,7 +30,7 @@ from dashboard.helpers import (
     sensitivity_analysis_graph_render_to_json,
 )
 
-from projects.models import Simulation, SensitivityAnalysis
+from projects.models import Bus, Simulation, SensitivityAnalysis, ConnectionLink
 from projects.constants import MAP_EPA_MVS
 from projects.models import Simulation, Scenario
 
@@ -484,6 +487,101 @@ class ReportItem(models.Model):
                         )
                     )
                 return simulations_results
+
+        if self.report_type == GRAPH_SANKEY:
+            energy_vector = parameters.get("energy_vector", None)
+            if isinstance(energy_vector, list) is False:
+                energy_vector = [energy_vector]
+            if energy_vector is not None:
+                labels = []
+                sources = []
+                targets = []
+                values = []
+                colors = []
+
+                sim = self.simulations.get()
+                ar = AssetsResults.objects.get(simulation=sim)
+                results_ts = ar.available_timeseries
+                qs = ConnectionLink.objects.filter(scenario__simulation=sim)
+                for bus in Bus.objects.filter(
+                    scenario__simulation=sim, type__in=energy_vector
+                ):
+                    bus_label = bus.name
+                    labels.append(bus_label)
+                    colors.append("blue")
+                    # from asset to bus
+                    bus_inputs = qs.filter(flow_direction="A2B", bus=bus)
+                    asset_to_bus_names = []
+                    bus_to_asset_names = []
+
+                    for component in bus_inputs:
+                        # special case of providers which are bus input and output at the same time
+                        if component.asset.is_provider is True:
+                            asset_to_bus_names.append(
+                                component.asset.name + "_consumption"
+                            )
+                            bus_to_asset_names.append(component.asset.name + "_feedin")
+                        else:
+                            asset_to_bus_names.append(component.asset.name)
+
+                    bus_outputs = qs.filter(flow_direction="B2A", bus=bus)
+                    for component in bus_outputs:
+                        bus_to_asset_names.append(component.asset.name)
+
+                    for component_label in asset_to_bus_names:
+                        # draw link from the component to the bus
+                        if component_label not in labels:
+                            labels.append(component_label)
+                            colors.append("green")
+
+                        sources.append(labels.index(component_label))
+                        targets.append(labels.index(bus_label))
+
+                        val = np.sum(results_ts[component_label]["flow"]["value"])
+                        if val == 0:
+                            val = 1
+                        values.append(val)
+
+                    for component_label in bus_to_asset_names:
+                        # draw link from the bus to the component
+                        if component_label not in labels:
+                            labels.append(component_label)
+                            colors.append("red")
+
+                        sources.append(labels.index(bus_label))
+                        targets.append(labels.index(component_label))
+
+                        val = np.sum(results_ts[component_label]["flow"]["value"])
+
+                        if val == 0:
+                            val = 1
+                        values.append(val)
+
+                fig = go.Figure(
+                    data=[
+                        go.Sankey(
+                            node=dict(
+                                pad=15,
+                                thickness=20,
+                                line=dict(color="black", width=0.5),
+                                label=labels,
+                                hovertemplate="Node has total value %{value}<extra></extra>",
+                                color=colors,
+                            ),
+                            link=dict(
+                                source=sources,  # indices correspond to labels
+                                target=targets,
+                                value=values,
+                                hovertemplate="Link from node %{source.label}<br />"
+                                + "to node%{target.label}<br />has value %{value}"
+                                + "<br />and data <extra></extra>",
+                            ),
+                        )
+                    ]
+                )
+
+                fig.update_layout(font_size=10)
+                return fig.to_dict()
 
     @property
     def render_json(self):

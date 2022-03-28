@@ -437,6 +437,10 @@ class Asset(TopologyNode):
         return answer
 
     @property
+    def is_provider(self):
+        return self.asset_type.asset_type in ["dso", "gas_dso", "h2_dso", "heat_dso"]
+
+    @property
     def timestamps(self):
         return self.scenario.get_timestamps()
 
@@ -473,7 +477,6 @@ class Asset(TopologyNode):
 
 
 class Bus(TopologyNode):
-    # TODO name field?
     type = models.CharField(max_length=20, choices=ENERGY_VECTOR)
     # TODO now these parameters are useless ...
     input_ports = models.IntegerField(null=False, default=1)

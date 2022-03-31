@@ -39,5 +39,18 @@ def get_item(dictionary, key):
 
 
 @register.filter
+def is_economical_parameter(param):
+    return param in ["capex_fix", "capex_var", "opex_fix", "opex_var"]
+
+
+@register.filter
+def is_technical_parameter(param):
+    if param == "name":
+        return False
+    else:
+        return not is_economical_parameter(param)
+
+
+@register.filter
 def get_selected_scenarios(request, proj_id):
     return request.session.get("selected_scenarios", {}).get(str(proj_id))

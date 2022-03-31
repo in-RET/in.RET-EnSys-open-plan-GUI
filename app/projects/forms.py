@@ -697,7 +697,7 @@ class AssetCreateForm(OpenPlanModelForm):
         exclude = ["scenario"]
         widgets = {
             "optimize_cap": forms.Select(
-                choices=TRUE_FALSE_CHOICES,
+                choices=BOOL_CHOICES,
                 attrs={
                     "data-toggle": "tooltip",
                     "title": _(
@@ -809,13 +809,15 @@ class AssetCreateForm(OpenPlanModelForm):
                     "title": _("Ratio of energy output/energy input."),
                     "style": "font-weight:400; font-size:13px;",
                     "min": "0.0",
-                    "step": ".0001",
+                    "max": "1.0",
+                    "step": ".01",
                 }
             ),
             "soc_max": forms.NumberInput(
                 attrs={
-                    "placeholder": "e.g. 190",
+                    "placeholder": "e.g. 0.95",
                     "min": "0.0",
+                    "max": "1.0",
                     "step": ".01",
                     "data-toggle": "tooltip",
                     "title": _(
@@ -826,8 +828,9 @@ class AssetCreateForm(OpenPlanModelForm):
             ),
             "soc_min": forms.NumberInput(
                 attrs={
-                    "placeholder": "e.g. 20",
+                    "placeholder": "e.g. 0.1",
                     "min": "0.0",
+                    "max": "1.0",
                     "step": ".01",
                     "data-toggle": "tooltip",
                     "title": _(
@@ -958,537 +961,30 @@ class AssetCreateForm(OpenPlanModelForm):
         }
 
 
-class StorageForm(OpenPlanForm):
-    # ESS fields
-    name = forms.CharField(
-        label=_("ESS Name"),
-        widget=forms.TextInput(
-            attrs={
-                "placeholder": "Name...",
-                "data-toggle": "tooltip",
-                "title": _("A mnemonic name for the ESS unit."),
-            }
-        ),
-    )
-    # Charging Power Fields - chp_... = discharging power
-    # region charging power
-    chp_installed_capacity = forms.FloatField(
-        label=_("installed capacity (kW)"),
-        widget=forms.NumberInput(
-            attrs={
-                "placeholder": "e.g. 50",
-                "min": "0.0",
-                "step": ".01",
-                "data-toggle": "tooltip",
-                "title": _(
-                    "The already existing installed capacity in-place, which will also be replaced after its lifetime."
-                ),
-                "style": "font-weight:400; font-size:13px;",
-            }
-        ),
-        validators=[MinValueValidator(0.0)],
-    )
-    chp_age_installed = forms.IntegerField(
-        label=_("Age installed"),
-        widget=forms.NumberInput(
-            attrs={
-                "placeholder": "e.g. 10",
-                "min": "0.0",
-                "step": "1",
-                "data-toggle": "tooltip",
-                "title": _(
-                    "The number of years the asset has already been in operation."
-                ),
-                "style": "font-weight:400; font-size:13px;",
-            }
-        ),
-        validators=[MinValueValidator(0)],
-    )
-    chp_capex_fix = forms.FloatField(
-        label=_("Development costs"),
-        widget=forms.NumberInput(
-            attrs={
-                "placeholder": "e.g. 10000",
-                "min": "0.0",
-                "step": ".01",
-                "data-toggle": "tooltip",
-                "title": _(
-                    " A fixed cost to implement the asset, eg. planning costs which do not depend on the (optimized) asset capacity."
-                ),
-                "style": "font-weight:400; font-size:13px;",
-            }
-        ),
-        validators=[MinValueValidator(0.0)],
-    )
-    chp_capex_var = forms.FloatField(
-        label=_("Specific costs"),
-        widget=forms.NumberInput(
-            attrs={
-                "placeholder": "e.g. 4000",
-                "min": "0.0",
-                "step": ".01",
-                "data-toggle": "tooltip",
-                "title": _(
-                    " Actual CAPEX of the asset, i.e., specific investment costs"
-                ),
-                "style": "font-weight:400; font-size:13px;",
-            }
-        ),
-        validators=[MinValueValidator(0.0)],
-    )
-    chp_opex_fix = forms.FloatField(
-        label=_("Specific OM costs"),
-        widget=forms.NumberInput(
-            attrs={
-                "placeholder": "e.g. 0",
-                "min": "0.0",
-                "step": ".01",
-                "data-toggle": "tooltip",
-                "title": _(
-                    "Actual OPEX of the asset, i.e., specific operational and maintenance costs."
-                ),
-                "style": "font-weight:400; font-size:13px;",
-            }
-        ),
-        validators=[MinValueValidator(0.0)],
-    )
-    chp_opex_var = forms.FloatField(
-        label=_("Dispatch price"),
-        widget=forms.NumberInput(
-            attrs={
-                "placeholder": "Currency",
-                "min": "0.0",
-                "step": ".01",
-                "data-toggle": "tooltip",
-                "title": _(
-                    "Variable cost associated with a flow through/from the asset."
-                ),
-                "style": "font-weight:400; font-size:13px;",
-            }
-        ),
-        validators=[MinValueValidator(0.0)],
-    )
-    chp_lifetime = forms.IntegerField(
-        label=_("Asset Lifetime"),
-        widget=forms.NumberInput(
-            attrs={
-                "placeholder": "e.g. 10 years",
-                "min": "0",
-                "step": "1",
-                "data-toggle": "tooltip",
-                "title": _(
-                    "Number of operational years of the asset until it has to be replaced."
-                ),
-                "style": "font-weight:400; font-size:13px;",
-            }
-        ),
-        validators=[MinValueValidator(0)],
-    )
-    chp_crate = forms.FloatField(
-        label=_("Crate"),
-        widget=forms.NumberInput(
-            attrs={
-                "placeholder": "factor of total capacity (kWh), e.g. 0.7",
-                "min": "0.0",
-                "max": "1.0",
-                "step": ".0001",
-                "data-toggle": "tooltip",
-                "title": _(
-                    "C-rate is the rate at which the storage can charge or discharge relative to the nominal capacity of the storage. A c-rate of 1 implies that the battery can discharge or charge completely in a single timestep."
-                ),
-                "style": "font-weight:400; font-size:13px;",
-            }
-        ),
-        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
-    )
-    chp_efficiency = forms.FloatField(
-        label=_("Efficiency"),
-        widget=forms.NumberInput(
-            attrs={
-                "placeholder": "e.g. 0.99",
-                "data-toggle": "tooltip",
-                "title": _("Ratio of energy output/energy input."),
-                "style": "font-weight:400; font-size:13px;",
-                "min": "0.0",
-                "max": "1.0",
-                "step": ".0001",
-            }
-        ),
-        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
-    )
-    chp_dispatchable = forms.ChoiceField(
-        label=_("Dispatchable"),
-        choices=TRUE_FALSE_CHOICES,
-        widget=forms.Select(attrs={"style": "font-weight:400; font-size:13px;"}),
-    )
-    # endregion charging power
-
-    # Discharging Power Fields - dchp_... = discharging power
-    # region Discharging power
-    dchp_installed_capacity = forms.FloatField(
-        label=_("installed capacity (kW)"),
-        widget=forms.NumberInput(
-            attrs={
-                "placeholder": "e.g. 50",
-                "min": "0.0",
-                "step": ".01",
-                "data-toggle": "tooltip",
-                "title": _(
-                    "The already existing installed capacity in-place, which will also be replaced after its lifetime."
-                ),
-                "style": "font-weight:400; font-size:13px;",
-            }
-        ),
-        validators=[MinValueValidator(0.0)],
-    )
-    dchp_age_installed = forms.IntegerField(
-        label=_("Age installed"),
-        widget=forms.NumberInput(
-            attrs={
-                "placeholder": "e.g. 10",
-                "min": "0.0",
-                "step": "1",
-                "data-toggle": "tooltip",
-                "title": _(
-                    "The number of years the asset has already been in operation."
-                ),
-                "style": "font-weight:400; font-size:13px;",
-            }
-        ),
-        validators=[MinValueValidator(0)],
-    )
-    dchp_capex_fix = forms.FloatField(
-        label=_("Development costs"),
-        widget=forms.NumberInput(
-            attrs={
-                "placeholder": "e.g. 10000",
-                "min": "0.0",
-                "step": ".01",
-                "data-toggle": "tooltip",
-                "title": _(
-                    " A fixed cost to implement the asset, eg. planning costs which do not depend on the (optimized) asset capacity."
-                ),
-                "style": "font-weight:400; font-size:13px;",
-            }
-        ),
-        validators=[MinValueValidator(0.0)],
-    )
-    dchp_capex_var = forms.FloatField(
-        label=_("Specific costs"),
-        widget=forms.NumberInput(
-            attrs={
-                "placeholder": "e.g. 4000",
-                "min": "0.0",
-                "step": ".01",
-                "data-toggle": "tooltip",
-                "title": _(
-                    " Actual CAPEX of the asset, i.e., specific investment costs"
-                ),
-                "style": "font-weight:400; font-size:13px;",
-            }
-        ),
-        validators=[MinValueValidator(0.0)],
-    )
-    dchp_opex_fix = forms.FloatField(
-        label=_("Specific OM costs"),
-        widget=forms.NumberInput(
-            attrs={
-                "placeholder": "e.g. 0",
-                "min": "0.0",
-                "step": ".01",
-                "data-toggle": "tooltip",
-                "title": _(
-                    "Actual OPEX of the asset, i.e., specific operational and maintenance costs."
-                ),
-                "style": "font-weight:400; font-size:13px;",
-            }
-        ),
-        validators=[MinValueValidator(0.0)],
-    )
-    dchp_opex_var = forms.FloatField(
-        label=_("Dispatch price"),
-        widget=forms.NumberInput(
-            attrs={
-                "placeholder": "Currency",
-                "min": "0.0",
-                "step": ".01",
-                "data-toggle": "tooltip",
-                "title": _(
-                    "Variable cost associated with a flow through/from the asset."
-                ),
-                "style": "font-weight:400; font-size:13px;",
-            }
-        ),
-        validators=[MinValueValidator(0.0)],
-    )
-    dchp_lifetime = forms.IntegerField(
-        label=_("Asset Lifetime"),
-        widget=forms.NumberInput(
-            attrs={
-                "placeholder": "e.g. 10 years",
-                "min": "0",
-                "step": "1",
-                "data-toggle": "tooltip",
-                "title": _(
-                    "Number of operational years of the asset until it has to be replaced."
-                ),
-                "style": "font-weight:400; font-size:13px;",
-            }
-        ),
-        validators=[MinValueValidator(0)],
-    )
-    dchp_crate = forms.FloatField(
-        label=_("Crate"),
-        widget=forms.NumberInput(
-            attrs={
-                "placeholder": "factor of total capacity (kWh), e.g. 0.7",
-                "min": "0.0",
-                "max": "1.0",
-                "step": ".0001",
-                "data-toggle": "tooltip",
-                "title": _(
-                    "C-rate is the rate at which the storage can charge or discharge relative to the nominal capacity of the storage. A c-rate of 1 implies that the battery can discharge or charge completely in a single timestep."
-                ),
-                "style": "font-weight:400; font-size:13px;",
-            }
-        ),
-        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
-    )
-    dchp_efficiency = forms.FloatField(
-        label=_("Efficiency"),
-        widget=forms.NumberInput(
-            attrs={
-                "placeholder": "e.g. 0.99",
-                "data-toggle": "tooltip",
-                "title": _("Ratio of energy output/energy input."),
-                "style": "font-weight:400; font-size:13px;",
-                "min": "0.0",
-                "max": "1.0",
-                "step": ".0001",
-            }
-        ),
-        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
-    )
-    dchp_dispatchable = forms.ChoiceField(
-        label=_("Dispatchable"),
-        choices=TRUE_FALSE_CHOICES,
-        widget=forms.Select(attrs={"style": "font-weight:400; font-size:13px;"}),
-    )
-    # endregion Discharging power
-
-    # Capacity Fields - cp_... = capacity
-    # region Capacity
-    cp_installed_capacity = forms.FloatField(
-        label=_("installed capacity (kW)"),
-        widget=forms.NumberInput(
-            attrs={
-                "placeholder": "e.g. 50",
-                "min": "0.0",
-                "step": ".01",
-                "data-toggle": "tooltip",
-                "title": _(
-                    "The already existing installed capacity in-place, which will also be replaced after its lifetime."
-                ),
-                "style": "font-weight:400; font-size:13px;",
-            }
-        ),
-        validators=[MinValueValidator(0.0)],
-    )
-    cp_age_installed = forms.IntegerField(
-        label=_("Age installed"),
-        widget=forms.NumberInput(
-            attrs={
-                "placeholder": "e.g. 10",
-                "min": "0.0",
-                "step": "1",
-                "data-toggle": "tooltip",
-                "title": _(
-                    "The number of years the asset has already been in operation."
-                ),
-                "style": "font-weight:400; font-size:13px;",
-            }
-        ),
-        validators=[MinValueValidator(0)],
-    )
-    cp_capex_fix = forms.FloatField(
-        label=_("Development costs"),
-        widget=forms.NumberInput(
-            attrs={
-                "placeholder": "e.g. 10000",
-                "min": "0.0",
-                "step": ".01",
-                "data-toggle": "tooltip",
-                "title": _(
-                    " A fixed cost to implement the asset, eg. planning costs which do not depend on the (optimized) asset capacity."
-                ),
-                "style": "font-weight:400; font-size:13px;",
-            }
-        ),
-        validators=[MinValueValidator(0.0)],
-    )
-    cp_capex_var = forms.FloatField(
-        label=_("Specific costs"),
-        widget=forms.NumberInput(
-            attrs={
-                "placeholder": "e.g. 4000",
-                "min": "0.0",
-                "step": ".01",
-                "data-toggle": "tooltip",
-                "title": _(
-                    " Actual CAPEX of the asset, i.e., specific investment costs"
-                ),
-                "style": "font-weight:400; font-size:13px;",
-            }
-        ),
-        validators=[MinValueValidator(0.0)],
-    )
-    cp_opex_fix = forms.FloatField(
-        label=_("Specific OM costs"),
-        widget=forms.NumberInput(
-            attrs={
-                "placeholder": "e.g. 0",
-                "min": "0.0",
-                "step": ".01",
-                "data-toggle": "tooltip",
-                "title": _(
-                    "Actual OPEX of the asset, i.e., specific operational and maintenance costs."
-                ),
-                "style": "font-weight:400; font-size:13px;",
-            }
-        ),
-        validators=[MinValueValidator(0.0)],
-    )
-    cp_opex_var = forms.FloatField(
-        label=_("Dispatch price"),
-        widget=forms.NumberInput(
-            attrs={
-                "placeholder": "Currency",
-                "min": "0.0",
-                "step": ".01",
-                "data-toggle": "tooltip",
-                "title": _(
-                    "Variable cost associated with a flow through/from the asset."
-                ),
-                "style": "font-weight:400; font-size:13px;",
-            }
-        ),
-        validators=[MinValueValidator(0.0)],
-    )
-    cp_lifetime = forms.IntegerField(
-        label=_("Asset Lifetime"),
-        widget=forms.NumberInput(
-            attrs={
-                "placeholder": "e.g. 10 years",
-                "min": "0",
-                "step": "1",
-                "data-toggle": "tooltip",
-                "title": _(
-                    "Number of operational years of the asset until it has to be replaced."
-                ),
-                "style": "font-weight:400; font-size:13px;",
-            }
-        ),
-        validators=[MinValueValidator(0)],
-    )
-    cp_crate = forms.FloatField(
-        label=_("Crate"),
-        widget=forms.NumberInput(
-            attrs={
-                "placeholder": "factor of total capacity (kWh), e.g. 0.7",
-                "min": "0.0",
-                "max": "1.0",
-                "step": ".0001",
-                "data-toggle": "tooltip",
-                "title": _(
-                    "C-rate is the rate at which the storage can charge or discharge relative to the nominal capacity of the storage. A c-rate of 1 implies that the battery can discharge or charge completely in a single timestep."
-                ),
-                "style": "font-weight:400; font-size:13px;",
-            }
-        ),
-        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
-    )
-    cp_efficiency = forms.FloatField(
-        label=_("Efficiency"),
-        widget=forms.NumberInput(
-            attrs={
-                "placeholder": "e.g. 0.99",
-                "data-toggle": "tooltip",
-                "title": _("Ratio of energy output/energy input."),
-                "style": "font-weight:400; font-size:13px;",
-                "min": "0.0",
-                "max": "1.0",
-                "step": ".0001",
-            }
-        ),
-        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
-    )
-    cp_dispatchable = forms.ChoiceField(
-        label=_("Dispatchable"),
-        choices=TRUE_FALSE_CHOICES,
-        widget=forms.Select(attrs={"style": "font-weight:400; font-size:13px;"}),
-    )
-    cp_optimize_cap = forms.ChoiceField(
-        label=_("Optimize cap"),
-        choices=TRUE_FALSE_CHOICES,
-        widget=forms.Select(
-            attrs={
-                "data-toggle": "tooltip",
-                "title": _(
-                    "True if the user wants to perform capacity optimization for various components as part of the simulation."
-                ),
-                "style": "font-weight:400; font-size:13px;",
-            }
-        ),
-    )
-    cp_soc_max = forms.FloatField(
-        label=_("SoC max"),
-        widget=forms.NumberInput(
-            attrs={
-                "placeholder": "e.g. 190",
-                "min": "0.0",
-                "step": ".01",
-                "data-toggle": "tooltip",
-                "title": _(
-                    "The maximum permissible level of charge in the battery (generally, it is when the battery is filled to its nominal capacity), represented by the value 1.0. Users can  also specify a certain value as a factor of the actual capacity."
-                ),
-                "style": "font-weight:400; font-size:13px;",
-            }
-        ),
-        validators=[MinValueValidator(0.0)],
-    )
-    cp_soc_min = forms.FloatField(
-        label=_("SoC min"),
-        widget=forms.NumberInput(
-            attrs={
-                "placeholder": "e.g. 20",
-                "min": "0.0",
-                "step": ".01",
-                "data-toggle": "tooltip",
-                "title": _(
-                    "The minimum permissible level of charge in the battery as a factor of the nominal capacity of the battery."
-                ),
-                "style": "font-weight:400; font-size:13px;",
-            }
-        ),
-        validators=[MinValueValidator(0.0)],
-    )
-    # endregion Capacity
-
-    # Render form
+class StorageForm(AssetCreateForm):
     def __init__(self, *args, **kwargs):
-        storage_asset_type_name = kwargs.pop(
-            "asset_type", None
-        )  # b(attery)ess or h(eat)ess or g(ass)ess or ...
-        super(StorageForm, self).__init__(*args, **kwargs)
-        [
-            self.fields[field].widget.attrs.update({f"df-{field}": ""})
-            for field in self.fields
-        ]
-        # self.helper = FormHelper()
-        # self.helper.form_id = 'storage_form_id'
-        # self.helper.form_class = 'blueForm'
-        # self.helper.form_method = 'post'
-        # self.helper.add_input(Submit('submit', 'Save'))
-        # self.helper.form_class = 'form-horizontal'
-        # self.helper.label_class = 'col-lg-8'
-        # self.helper.field_class = 'col-lg-10'
+        asset_type_name = kwargs.pop("asset_type", None)
+        super(StorageForm, self).__init__(*args, asset_type="capacity", **kwargs)
+
+        self.fields["crate"].widget = forms.HiddenInput()
+        self.fields["crate"].initial = 1
+        self.fields["dispatchable"].widget = forms.HiddenInput()
+        self.fields["dispatchable"].initial = True
+        self.fields["installed_capacity"].label = _("Installed capacity (kWh)")
+
+    field_order = [
+        "name",
+        "capex_fix",
+        "capex_var",
+        "opex_fix",
+        "opex_var",
+        "installed_capacity",
+        "optimize_cap",
+        "lifetime",
+        "age_installed",
+        "crate",
+        "efficiency",
+        "soc_max",
+        "soc_min",
+        "dispatchable",
+    ]

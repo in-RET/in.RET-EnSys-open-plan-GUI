@@ -319,7 +319,7 @@ def project_export(request, proj_id):
         json.dumps(project.export(bind_scenario_data=bind_scenario_data)),
         content_type="application/json",
     )
-    response["Content-Disposition"] = "attachment; filename=project.json"
+    response["Content-Disposition"] = f"attachment; filename=project{project.id}.json"
     return response
 
 

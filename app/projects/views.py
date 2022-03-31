@@ -299,6 +299,10 @@ def project_update(request, proj_id):
 def project_export(request, proj_id):
 
     project = get_object_or_404(Project, id=proj_id)
+
+    if project.user != request.user:
+        raise PermissionDenied
+
     if request.method == "POST":
         bind_scenario_data = request.POST.get("bind_scenario_data", True)
         if bind_scenario_data == "True":

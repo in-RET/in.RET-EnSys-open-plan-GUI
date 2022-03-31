@@ -346,13 +346,19 @@ class Asset(TopologyNode):
         validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
     )
     efficiency = models.FloatField(
-        null=True, blank=False, validators=[MinValueValidator(0.0)]
+        null=True,
+        blank=False,
+        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
     )
     soc_max = models.FloatField(
-        null=True, blank=False, validators=[MinValueValidator(0.0)]
+        null=True,
+        blank=False,
+        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
     )
     soc_min = models.FloatField(
-        null=True, blank=False, validators=[MinValueValidator(0.0)]
+        null=True,
+        blank=False,
+        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
     )
     dispatchable = models.BooleanField(
         null=True, blank=False, choices=TRUE_FALSE_CHOICES, default=None

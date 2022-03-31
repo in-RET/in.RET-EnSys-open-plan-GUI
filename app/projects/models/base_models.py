@@ -346,13 +346,19 @@ class Asset(TopologyNode):
         validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
     )
     efficiency = models.FloatField(
-        null=True, blank=False, validators=[MinValueValidator(0.0)]
+        null=True,
+        blank=False,
+        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
     )
     soc_max = models.FloatField(
-        null=True, blank=False, validators=[MinValueValidator(0.0)]
+        null=True,
+        blank=False,
+        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
     )
     soc_min = models.FloatField(
-        null=True, blank=False, validators=[MinValueValidator(0.0)]
+        null=True,
+        blank=False,
+        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
     )
     dispatchable = models.BooleanField(
         null=True, blank=False, choices=TRUE_FALSE_CHOICES, default=None
@@ -384,7 +390,7 @@ class Asset(TopologyNode):
         AssetType, on_delete=models.CASCADE, null=False, blank=True
     )
     optimize_cap = models.BooleanField(
-        null=True, blank=False, choices=TRUE_FALSE_CHOICES
+        null=True, blank=False, choices=BOOL_CHOICES, default=False
     )
     installed_capacity = models.FloatField(
         null=True, blank=False, validators=[MinValueValidator(0.0)]

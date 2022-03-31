@@ -1,4 +1,5 @@
 import uuid
+import numpy as np
 from django.shortcuts import get_object_or_404
 from projects.models import (
     Bus,
@@ -12,6 +13,7 @@ from projects.models import (
 import json
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 from projects.forms import AssetCreateForm, BusForm, StorageForm
+from django.template.loader import get_template
 
 # region sent db nodes to js
 from crispy_forms.templatetags import crispy_forms_filters
@@ -53,6 +55,7 @@ def handle_storage_unit_form_post(
 ):
     form = StorageForm(request.POST, request.FILES, asset_type=asset_type_name)
     scenario = get_object_or_404(Scenario, id=scen_id)
+
     if form.is_valid():
         try:
             # First delete all existing associated storage assets from the db
@@ -62,7 +65,7 @@ def handle_storage_unit_form_post(
 
             # Create the ESS Parent Asset
             ess_asset = Asset.objects.create(
-                name=form.cleaned_data["name"],
+                name=form.cleaned_data.pop("name"),
                 asset_type=get_object_or_404(
                     AssetType, asset_type=f"{asset_type_name}"
                 ),
@@ -96,14 +99,22 @@ def handle_storage_unit_form_post(
                 scenario=scenario,
                 parent_asset=ess_asset,
             )
+
             # Populate all subassets
-            for key, value in form.cleaned_data.items():
-                if key.startswith("cp_"):
-                    setattr(ess_capacity_asset, key[3:], value)
-                elif key.startswith("chp_"):
-                    setattr(ess_charging_power_asset, key[4:], value)
-                elif key.startswith("dchp_"):
-                    setattr(ess_discharging_power_asset, key[5:], value)
+            for param, value in form.cleaned_data.items():
+                setattr(ess_capacity_asset, param, value)
+
+                # split efficiency between charge and discharge
+                if param == "efficiency":
+                    value = np.sqrt(value)
+                # for the charge and discharge set all costs to 0
+                if param in ["capex_fix", "capex_var", "opex_fix", "opex_var"]:
+                    value = 0
+
+                if ess_charging_power_asset.has_parameter(param):
+                    setattr(ess_charging_power_asset, param, value)
+                if ess_discharging_power_asset.has_parameter(param):
+                    setattr(ess_discharging_power_asset, param, value)
 
             ess_capacity_asset.save()
             ess_charging_power_asset.save()
@@ -116,9 +127,12 @@ def handle_storage_unit_form_post(
                 f"Failed to create storage asset {ess_asset.name} in scenario: {scen_id}."
             )
             return JsonResponse({"success": False, "exception": ex}, status=422)
+
     logger.warning(f"The submitted asset has erroneous field values.")
-    form_html = crispy_forms_filters.as_crispy_form(form)
-    return JsonResponse({"success": False, "form_html": form_html}, status=422)
+    form_html = get_template("asset/storage_asset_create_form.html")
+    return JsonResponse(
+        {"success": False, "form_html": form_html.render({"form": form})}, status=422
+    )
 
 
 def handle_asset_form_post(request, scen_id=0, asset_type_name="", asset_uuid=None):

@@ -8,6 +8,7 @@
 {% block head_block %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables.net-bs/1.10.23/dataTables.bootstrap.min.css" integrity="sha512-Z+BWkkwxMpBhQthPeqw2UbG1tamgkRHi1UaYyZ8mTnjt04iXqeVx/Wu4CYzPOn3E+x663DIV+SiAuKDHbTg6FQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link href="https://unpkg.com/bootstrap-table@1.19.1/dist/bootstrap-table.min.css" rel="stylesheet">
+<link href="{% static 'css/quick_fix.css' %}" rel="stylesheet" type="text/css" />
 {% endblock head_block %}
 
 {% block start_body_scripts %}
@@ -135,6 +136,7 @@
 
 
 <!-- insert tabs here -->
+    <div class="result-selector">
     <ul class="nav nav-pills" id="results-analysis-links">
   <li class="nav-item">
       <a class="nav-link" id="single-scenario-link" href="{% url 'project_visualize_results' proj_id %}">Single scenarios</a>
@@ -146,6 +148,7 @@
     <a class="nav-link" id="sensitivity-analysis-link" href="{% url 'project_sensitivity_analysis' proj_id %}">Sensitivity Analysis</a>
   </li>
 </ul>
+        </div>
 
 
 

@@ -100,7 +100,9 @@
             <div class="header__left"></div>
             <h1 class="header__title">{% translate "Simulation results" %}</h1>
             <div class="header__back">
-                <a href="{% url 'project_search' %}">{% translate "My projects" %}</a>
+                {% if scen_id %}
+                    <a href="{% url 'scenario_review' proj_id scen_id %}">{% translate "To scenario" %}</a>
+                {% endif %}
             </div>
         </div>
     </section>

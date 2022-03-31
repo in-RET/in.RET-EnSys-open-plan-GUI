@@ -124,10 +124,11 @@
                 </div>
             </div>
             <div class="header-results__export">
-                <button class="btn btn--small" type="submit">
-                    <span class="icon icon-export"></span>
-                    {% translate "Export results" %}
-                </button>
+                <a type="button" class="btn btn-info" href="{% url 'download_timeseries_results' scen_id %}"> <span class="icon icon-export"></span>{% translate "Download Results" %}</a>
+                 {# TODO: make button or add kpi/scalar matrix results to downloadable excel sheet #}
+            {% if scen_id %}
+                <a type="button" class="btn btn-info" href="{% url 'download_timeseries_results' scen_id %}"><span class="icon icon-export"></span>{% translate "Download Timeseries only" %}</a>
+            {% endif %}
             </div>
         </div>
     </section>
@@ -406,10 +407,6 @@
                     </div>
                 </div>
             </div>
-            {# TODO: make button or add kpi/scalar matrix results to downloadable excel sheet #}
-            {% if scen_id %}
-                <a type="button" class="btn btn-info" href="{% url 'download_timeseries_results' scen_id %}">{% translate "Download Timeseries" %}</a>
-            {% endif %}
             {% endif %}
         </div>
     </section>

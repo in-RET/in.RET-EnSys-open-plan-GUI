@@ -47,10 +47,6 @@
                 <div class="col" id="report_items">
                 </div>
             </div>
-            {# TODO: make button or add kpi/scalar matrix results to downloadable excel sheet #}
-            {% if scen_id %}
-                <a type="button" class="btn btn-info" href="{% url 'download_timeseries_results' scen_id %}">{% translate "Download Timeseries" %}</a>
-            {% endif %}
             {% endif %}
         </div>
     </section>

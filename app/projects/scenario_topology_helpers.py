@@ -116,9 +116,12 @@ def handle_storage_unit_form_post(
                 f"Failed to create storage asset {ess_asset.name} in scenario: {scen_id}."
             )
             return JsonResponse({"success": False, "exception": ex}, status=422)
+
     logger.warning(f"The submitted asset has erroneous field values.")
-    form_html = crispy_forms_filters.as_crispy_form(form)
-    return JsonResponse({"success": False, "form_html": form_html}, status=422)
+    form_html = get_template("asset/storage_asset_create_form.html")
+    return JsonResponse(
+        {"success": False, "form_html": form_html.render({"form": form})}, status=422
+    )
 
 
 def handle_asset_form_post(request, scen_id=0, asset_type_name="", asset_uuid=None):

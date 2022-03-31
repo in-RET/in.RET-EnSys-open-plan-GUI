@@ -31,7 +31,7 @@
     <footer class="simulation-footer">
 
       <div>
-        <a class="btn btn--medium btn--hollow" href="{% url 'simulation_cancel' scen_id %}">{% translate "Cancel simulation" %}</a>
+        <a class="btn btn--medium btn--hollow" href="{% url 'simulation_cancel' scen_id %}" onclick="return confirm('Are you sure?')">{% translate "Cancel simulation" %}</a>
         <form method="post" action="{% url 'request_mvs_simulation' scen_id %}">
             {% csrf_token %}
 

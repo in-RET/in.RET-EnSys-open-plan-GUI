@@ -9,10 +9,9 @@
 
 
 {% block export-results %}
-    {% if scen_id %}
+
         <!--<a type="button" class="btn btn-info" href="{% url 'download_timeseries_results' scen_id %}"> <span class="icon icon-export"></span>{% translate "Download Results" %}</a>-->
-        <a type="button" class="btn btn-info" href="{% url 'download_timeseries_results' scen_id %}"><span class="icon icon-export"></span>{% translate "Download Timeseries" %}</a>
-    {% endif %}
+        <a type="button" class="btn btn-info" href="{% url 'redirect_download_timeseries_results' proj_id %}"><span class="icon icon-export"></span>{% translate "Download Timeseries" %}</a>
 {% endblock export-results %}
 
 

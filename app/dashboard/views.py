@@ -1225,7 +1225,7 @@ def download_timeseries_results(request, scen_id):
         workbook.close()
         output.seek(0)
 
-        filename = "timeseries_results.xlsx"
+        filename = f"scenario{scen_id}_timeseries_results.xlsx"
         response = HttpResponse(
             output,
             content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -1238,3 +1238,24 @@ def download_timeseries_results(request, scen_id):
             f"Dashboard ERROR: Could not generate Timeseries Results file for the Scenario with Id: {scen_id}. Thrown Exception: {e}"
         )
         raise Http404()
+
+
+@login_required
+@require_http_methods(["GET"])
+def redirect_download_timeseries_results(request, proj_id):
+
+    selected_scenario = get_selected_scenarios_in_cache(request, proj_id)
+
+    if len(selected_scenario) >= 1:
+        scen_id = int(selected_scenario[0])
+        answer = download_timeseries_results(request, scen_id)
+    else:
+        messages.error(
+            request,
+            _(
+                "No scenario was available in the cache, try refreshing the page and make sure one scenario is selected."
+            ),
+        )
+        answer = HttpResponseRedirect(request.headers.get("Referer"))
+
+    return answer

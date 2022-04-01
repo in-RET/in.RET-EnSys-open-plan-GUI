@@ -43,6 +43,7 @@ from .services import (
     create_or_delete_simulation_scheduler,
     excuses_design_under_development,
     send_feedback_email,
+    get_selected_scenarios_in_cache,
 )
 import traceback
 
@@ -299,6 +300,10 @@ def project_update(request, proj_id):
 def project_export(request, proj_id):
 
     project = get_object_or_404(Project, id=proj_id)
+
+    if project.user != request.user:
+        raise PermissionDenied
+
     if request.method == "POST":
         bind_scenario_data = request.POST.get("bind_scenario_data", True)
         if bind_scenario_data == "True":
@@ -315,7 +320,7 @@ def project_export(request, proj_id):
         json.dumps(project.export(bind_scenario_data=bind_scenario_data)),
         content_type="application/json",
     )
-    response["Content-Disposition"] = "attachment; filename=project.json"
+    response["Content-Disposition"] = f"attachment; filename=project{project.id}.json"
     return response
 
 
@@ -831,6 +836,27 @@ def scenario_review(request, proj_id, scen_id, step_id=4, max_step=5):
             print("no simulation existing")
 
         return render(request, html_template, context)
+
+
+@login_required
+@require_http_methods(["GET"])
+def back_to_scenario_review(request, proj_id):
+
+    selected_scenario = get_selected_scenarios_in_cache(request, proj_id)
+
+    if len(selected_scenario) >= 1:
+        scen_id = selected_scenario[0]
+        answer = scenario_review(request, proj_id, scen_id)
+    else:
+        messages.error(
+            request,
+            _(
+                "No scenario was available in the cache, try refreshing the page and make sure one scenario is selected."
+            ),
+        )
+        answer = HttpResponseRedirect(request.headers.get("Referer"))
+
+    return answer
 
 
 SCENARIOS_STEPS = [

@@ -25,7 +25,10 @@ from projects.models import (
     SensitivityAnalysis,
     get_project_sensitivity_analysis,
 )
-from projects.services import excuses_design_under_development
+from projects.services import (
+    excuses_design_under_development,
+    get_selected_scenarios_in_cache,
+)
 from dashboard.models import (
     ReportItem,
     SensitivityAnalysisGraph,
@@ -206,9 +209,7 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
         ):
             raise PermissionDenied
 
-        selected_scenarios_per_project = request.session.get("selected_scenarios", {})
-        selected_scenarios = selected_scenarios_per_project.get(str(proj_id), [])
-
+        selected_scenarios = get_selected_scenarios_in_cache(request, proj_id)
         user_scenarios = project.get_scenarios_with_results()
 
         if user_scenarios.exists() is False:
@@ -231,7 +232,7 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
                     scen_id = user_scenarios.first().id
                 else:
                     # TODO here allow more than one scenario to be selected
-                    scen_id = int(selected_scenarios[0])
+                    scen_id = selected_scenarios[0]
 
             report_items_data = [
                 ri.render_json for ri in get_project_reportitems(project)
@@ -613,9 +614,9 @@ def update_selected_scenarios(request, proj_id, scen_id):
 def request_kpi_table(request, proj_id=None, table_style=None):
 
     # TODO fetch selected scenarios values here
-    selected_scenarios_per_project = request.session.get("selected_scenarios", {})
-    selected_scenarios = selected_scenarios_per_project.get(str(proj_id), [])
-    scen_id = int(selected_scenarios[0])  # TODO: fetch multiple scenarios results
+    selected_scenarios = get_selected_scenarios_in_cache(request, proj_id)
+
+    scen_id = selected_scenarios[0]  # TODO: fetch multiple scenarios results
     scenario = get_object_or_404(Scenario, pk=scen_id)
 
     kpi_scalar_results_obj = KPIScalarResults.objects.get(
@@ -1224,7 +1225,7 @@ def download_timeseries_results(request, scen_id):
         workbook.close()
         output.seek(0)
 
-        filename = "timeseries_results.xlsx"
+        filename = f"scenario{scen_id}_timeseries_results.xlsx"
         response = HttpResponse(
             output,
             content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -1237,3 +1238,24 @@ def download_timeseries_results(request, scen_id):
             f"Dashboard ERROR: Could not generate Timeseries Results file for the Scenario with Id: {scen_id}. Thrown Exception: {e}"
         )
         raise Http404()
+
+
+@login_required
+@require_http_methods(["GET"])
+def redirect_download_timeseries_results(request, proj_id):
+
+    selected_scenario = get_selected_scenarios_in_cache(request, proj_id)
+
+    if len(selected_scenario) >= 1:
+        scen_id = int(selected_scenario[0])
+        answer = download_timeseries_results(request, scen_id)
+    else:
+        messages.error(
+            request,
+            _(
+                "No scenario was available in the cache, try refreshing the page and make sure one scenario is selected."
+            ),
+        )
+        answer = HttpResponseRedirect(request.headers.get("Referer"))
+
+    return answer

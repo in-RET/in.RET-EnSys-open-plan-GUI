@@ -108,6 +108,7 @@ def update_selected_scenarios_in_cache(request, proj_id, scen_id):
     """Update the cache which contains the selected scenarios per project"""
     proj_id = str(proj_id)
     scen_id = str(scen_id)
+
     selected_scenarios_per_project = request.session.get("selected_scenarios", {})
     selected_scenarios = selected_scenarios_per_project.get(proj_id, [])
 

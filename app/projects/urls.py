@@ -98,6 +98,11 @@ urlpatterns = [
         scenario_review,
         name="scenario_review",
     ),
+    path(
+        "project/<int:proj_id>/scenario/review/",
+        back_to_scenario_review,
+        name="back_to_scenario_review",
+    ),
     path("scenario/update/<int:scen_id>", scenario_update, name="scenario_update"),
     path("scenario/delete/<int:scen_id>", scenario_delete, name="scenario_delete"),
     path(

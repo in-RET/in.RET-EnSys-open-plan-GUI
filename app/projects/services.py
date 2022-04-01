@@ -132,3 +132,12 @@ def excuses_design_under_development(request, link=False):
 
     url = reverse("user_feedback")
     messages.warning(request, _(mark_safe(msg.format(url=url))))
+
+
+def get_selected_scenarios_in_cache(request, proj_id):
+    """Given a request and the project id returns the list of selected scenarios"""
+    if isinstance(proj_id, int):
+        proj_id = str(proj_id)
+    selected_scenarios_per_project = request.session.get("selected_scenarios", {})
+    selected_scenario = selected_scenarios_per_project.get(proj_id, [])
+    return [int(scen_id) for scen_id in selected_scenario]

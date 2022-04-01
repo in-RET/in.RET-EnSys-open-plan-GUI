@@ -13,6 +13,20 @@ This repository contains the code for the user interface. The simulations are pe
 
 # Getting Started
 
+## Deploy locally using and using our open plan MVS server
+
+Prior to be able to develop locally, you might need to install mysql, simply google `install mysql` followed by your os name (`linux/mac/windows`)
+You can also try the next step and only install mysql if you see an error message talking about mysql.
+
+1. Create a virtual environment
+2. Activate your virtual environment
+3. Install the dependencies with `pip install -r app/requirements.txt`
+4. Install extra local development dependencies with `pip install -r app/dev_requirements.txt`
+5. Move to the `app` folder with `cd app`
+6. Execute the `local_setup.sh` file (`. local_setup.sh` on linux/mac `bash local_setup.sh` on windows) you might have to make it executable first. Answer yes to the question
+7. Start the local server with `python manage.py runserver`
+8. You can login with `testUser` and `ASas12,.` or create your own account
+
 ## Deploy using Docker Compose - use of MVS web API
 The following commands should get everything up and running, utilzing the web based version of the MVS API.
 1. `git clone --single-branch --branch main https://github.com/open-plan-tool/gui.git`

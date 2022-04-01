@@ -1,0 +1,13 @@
+#!bin/bash
+export EPA_SECRET_KEY="dummy"
+export DEBUG="True"
+export EMAIL_HOST_IP="127.0.0.1"
+export USE_PROXY="False"
+export PROXY_ADDRESS="http://proxy_address:port"
+export MYSQL_DB_CONTAINER="False"
+export MVS_API_HOST="https://mvs-open-plan.rl-institut.de"
+export EXCHANGE_ACCOUNT="dummy@rl-institut.de"
+export EXCHANGE_PW="dummy"
+export EXCHANGE_EMAIL="dummy@rl-institut.de"
+export EXCHANGE_SERVER="dummy"
+export RECIPIENTS="dummy@b.de,dummy@a.com"

@@ -1,0 +1,5 @@
+black==19.3b0
+click==8.0.3
+libsass
+django-compressor
+django-sass-processor

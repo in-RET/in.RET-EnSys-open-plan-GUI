@@ -837,6 +837,28 @@ def scenario_review(request, proj_id, scen_id, step_id=4, max_step=5):
         return render(request, html_template, context)
 
 
+@login_required
+@require_http_methods(["GET"])
+def back_to_scenario_review(request, proj_id):
+
+    selected_scenarios_per_project = request.session.get("selected_scenarios", {})
+    selected_scenario = selected_scenarios_per_project.get(str(proj_id), [])
+
+    if len(selected_scenario) >= 1:
+        scen_id = int(selected_scenario[0])
+        answer = scenario_review(request, proj_id, scen_id)
+    else:
+        messages.error(
+            request,
+            _(
+                "No scenario was available in the cache, try refreshing the page and make sure one scenario is selected."
+            ),
+        )
+        answer = HttpResponseRedirect(request.headers.get("Referer"))
+
+    return answer
+
+
 SCENARIOS_STEPS = [
     scenario_create_parameters,
     scenario_create_topology,

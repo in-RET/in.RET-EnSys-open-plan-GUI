@@ -8,6 +8,14 @@
 {% block title %}{% translate "Single Scenarios" %}{% endblock title %}
 
 
+{% block export-results %}
+    {% if scen_id %}
+        <!--<a type="button" class="btn btn-info" href="{% url 'download_timeseries_results' scen_id %}"> <span class="icon icon-export"></span>{% translate "Download Results" %}</a>-->
+        <a type="button" class="btn btn-info" href="{% url 'download_timeseries_results' scen_id %}"><span class="icon icon-export"></span>{% translate "Download Timeseries" %}</a>
+    {% endif %}
+{% endblock export-results %}
+
+
 {% block dashboard %}
 
     <section class="dashboard">

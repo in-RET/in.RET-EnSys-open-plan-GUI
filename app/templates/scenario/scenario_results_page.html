@@ -123,11 +123,8 @@
                 </div>
             </div>
             <div class="header-results__export">
-                <a type="button" class="btn btn-info" href="{% url 'download_timeseries_results' scen_id %}"> <span class="icon icon-export"></span>{% translate "Download Results" %}</a>
-                 {# TODO: make button or add kpi/scalar matrix results to downloadable excel sheet #}
-            {% if scen_id %}
-                <a type="button" class="btn btn-info" href="{% url 'download_timeseries_results' scen_id %}"><span class="icon icon-export"></span>{% translate "Download Timeseries only" %}</a>
-            {% endif %}
+                {% block export-results %}
+                {% endblock export-results %}
             </div>
         </div>
     </section>
@@ -462,7 +459,7 @@ function update_selected_scenarios(target){
                 //TODO: call functions which update graphs and so from here
 
                 /* Update the kpi table */
-                update_kpi_table_style(document.getElementById("kpi-table-style"));
+                //update_kpi_table_style(document.getElementById("kpi-table-style"));
 
                 scenario_visualize_timeseries(scen_id);
                 scenario_visualize_stacked_timeseries(scen_id);

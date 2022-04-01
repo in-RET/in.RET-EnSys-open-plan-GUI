@@ -9,8 +9,7 @@
   }
 
   &__scenarios {
-    @include flex-row;
-    align-items: flex-end;
+    @include flex-column;
     padding-bottom: 2rem;
 
     .dashboard__select-scenarios {
@@ -131,8 +130,10 @@
   }
 
   &__create {
+    margin-bottom: 1.5rem;
     button {
       float: right;
+
     }
   }
 }

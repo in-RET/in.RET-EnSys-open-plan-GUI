@@ -43,6 +43,7 @@ from .services import (
     create_or_delete_simulation_scheduler,
     excuses_design_under_development,
     send_feedback_email,
+    get_selected_scenarios_in_cache,
 )
 import traceback
 
@@ -841,11 +842,10 @@ def scenario_review(request, proj_id, scen_id, step_id=4, max_step=5):
 @require_http_methods(["GET"])
 def back_to_scenario_review(request, proj_id):
 
-    selected_scenarios_per_project = request.session.get("selected_scenarios", {})
-    selected_scenario = selected_scenarios_per_project.get(str(proj_id), [])
+    selected_scenario = get_selected_scenarios_in_cache(request, proj_id)
 
     if len(selected_scenario) >= 1:
-        scen_id = int(selected_scenario[0])
+        scen_id = selected_scenario[0]
         answer = scenario_review(request, proj_id, scen_id)
     else:
         messages.error(

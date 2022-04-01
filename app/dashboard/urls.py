@@ -113,6 +113,11 @@ urlpatterns = [
         name="download_timeseries_results",
     ),
     path(
+        "project/<int:proj_id>/scenario/results/download_timeseries",
+        redirect_download_timeseries_results,
+        name="redirect_download_timeseries_results",
+    ),
+    path(
         "project/<int:proj_id>/scenario/results/add_graph",
         report_create_item,
         name="report_create_item",

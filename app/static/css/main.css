@@ -1403,8 +1403,7 @@ nav.navbar {
     padding-right: 1rem; }
   .dashboard__scenarios {
     display: flex;
-    flex-direction: row;
-    align-items: flex-end;
+    flex-direction: column;
     padding-bottom: 2rem; }
     .dashboard__scenarios .dashboard__select-scenarios {
       flex: 1; }
@@ -1485,8 +1484,10 @@ nav.navbar {
         color: #20A10B; }
       .dashboard .chart .item--worst .item__value {
         color: #A10B0B; }
-  .dashboard__create button {
-    float: right; }
+  .dashboard__create {
+    margin-bottom: 1.5rem; }
+    .dashboard__create button {
+      float: right; }
 
 .projects-empty,
 .scenario-empty {

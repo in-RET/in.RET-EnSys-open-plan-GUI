@@ -8,6 +8,13 @@
 {% block title %}{% translate "Single Scenarios" %}{% endblock title %}
 
 
+{% block export-results %}
+
+        <!--<a type="button" class="btn btn-info" href="{% url 'download_timeseries_results' scen_id %}"> <span class="icon icon-export"></span>{% translate "Download Results" %}</a>-->
+        <a type="button" class="btn btn-info" href="{% url 'redirect_download_timeseries_results' proj_id %}"><span class="icon icon-export"></span>{% translate "Download Timeseries" %}</a>
+{% endblock export-results %}
+
+
 {% block dashboard %}
 
     <section class="dashboard">
@@ -41,7 +48,7 @@
                   </button>
                 </div>
             </div>
-            <div class="row">
+            <!--<div class="row">
                 <div class="col col-md-12">
                     <div class="chart">
                         <div class="chart__header">
@@ -68,111 +75,6 @@
                         </div>
                         <div class="chart__plot">
                             <table class="table" id="selectedKPITable"></table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-                <!--<div class="col col-md-4">
-                    <div class="chart chart--small">
-                        <div class="chart__header">
-                            <div>
-                                <span class="title">Emission Costs</span>
-                            </div>
-                            <div class="dropdown">
-                                <button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <span class="icon icon-more"></span>
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as .xls</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as PDF</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="chart__content">
-                            <div class="item item--best">
-                                <div class="item__name">
-                                    Scenario name 5
-                                </div>
-                                <div class="item__value">
-                                    500.000 EUR
-                                </div>
-                            </div>
-                            <div class="item item--worst">
-                                <div class="item__name">
-                                    Scenario name 10
-                                </div>
-                                <div class="item__value">
-                                    1.000.000 EUR
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="chart chart--small">
-                        <div class="chart__header">
-                            <div>
-                                <span class="title">Investment Costs</span>
-                            </div>
-                            <div class="dropdown">
-                                <button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <span class="icon icon-more"></span>
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
-                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as .xls</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as PDF</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="chart__content">
-                            <div class="item item--best">
-                                <div class="item__name">
-                                    Scenario name 5
-                                </div>
-                                <div class="item__value">
-                                    500.000 EUR
-                                </div>
-                            </div>
-                            <div class="item item--worst">
-                                <div class="item__name">
-                                    Scenario name 10
-                                </div>
-                                <div class="item__value">
-                                    1.000.000 EUR
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="chart chart--small">
-                        <div class="chart__header">
-                            <div>
-                                <span class="title">Emission Costs</span>
-                            </div>
-                            <div class="dropdown">
-                                <button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuButton3" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <span class="icon icon-more"></span>
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton3">
-                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as .xls</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as PDF</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="chart__content">
-                            <div class="item item--best">
-                                <div class="item__name">
-                                    Scenario name 5
-                                </div>
-                                <div class="item__value">
-                                    500.000 EUR
-                                </div>
-                            </div>
-                            <div class="item item--worst">
-                                <div class="item__name">
-                                    Scenario name 10
-                                </div>
-                                <div class="item__value">
-                                    1.000.000 EUR
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -266,10 +168,6 @@
                     </div>
                 </div>
             </div>
-            {# TODO: make button or add kpi/scalar matrix results to downloadable excel sheet #}
-            {% if scen_id %}
-                <a type="button" class="btn btn-info" href="{% url 'download_timeseries_results' scen_id %}">{% translate "Download Timeseries" %}</a>
-            {% endif %}
             {% endif %}
         </div>
     </section>

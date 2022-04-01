@@ -139,13 +139,13 @@
     <div class="result-selector">
     <ul class="nav nav-pills" id="results-analysis-links">
   <li class="nav-item">
-      <a class="nav-link" id="single-scenario-link" href="{% url 'project_visualize_results' proj_id %}">Single scenarios</a>
+      <a class="nav-link" id="single-scenario-link" href="{% url 'project_visualize_results' proj_id %}"><h2>{% translate "Single scenarios" %}</h2></a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="compare-scenario-link" href="{% url 'project_compare_results' proj_id %}">Compare scenarios</a>
+    <a class="nav-link" id="compare-scenario-link" href="{% url 'project_compare_results' proj_id %}"><h2>{% translate "Compare scenarios" %}</h2></a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="sensitivity-analysis-link" href="{% url 'project_sensitivity_analysis' proj_id %}">Sensitivity Analysis</a>
+    <a class="nav-link" id="sensitivity-analysis-link" href="{% url 'project_sensitivity_analysis' proj_id %}"><h2>{% translate "Sensitivity Analysis" %}</h2></a>
   </li>
 </ul>
         </div>

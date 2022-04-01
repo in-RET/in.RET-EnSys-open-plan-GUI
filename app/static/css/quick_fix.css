@@ -9,6 +9,24 @@
 	margin-top: 3rem;
 }
 
+.result-selector h2{
+ font-size: 1.563rem !important;
+}
+
 #single-scenario-link.active{
 background-color: #F4F7F9 ;
+}
+
+#compare-scenario-link.active{
+background-color: #F4F7F9 ;
+}
+
+
+#sensitivity-analysis-link.active{
+background-color: #F4F7F9 ;
+}
+
+.dashboard__scenarios {
+    flex-direction: column !important;
+    align-items: flex-start !important;
 }

@@ -986,7 +986,7 @@ def scenario_visualize_stacked_capacities(request, scen_id):
         )
 
 
-# TODO: push optimizedAddCap for DSO to KPI as "Spitzenlast"/ "Peak Demand"
+# TODO: push optimized_add_cap for DSO to KPI as "Spitzenlast"/ "Peak Demand"
 # TODO: Make a note appear if all components have optimized_capacity = False because no figure will be shown
 # TODO: Change "if results_dict = json.loads(Scenario.objects.first().simulation.results)"
 def scenario_visualize_stacked_optimized_capacities(request, scen_id):
@@ -1016,7 +1016,7 @@ def scenario_visualize_stacked_optimized_capacities(request, scen_id):
                 "values": [
                     {
                         "x": ["Optimierte Kapazität"],
-                        "y": [kpi_scalar_matrix[asset]["optimizedAddCap"]],
+                        "y": [kpi_scalar_matrix[asset]["optimized_add_cap"]],
                         "name": asset.replace("_", " ").upper()
                         + " in "
                         + kpi_scalar_matrix[asset]["unit"]

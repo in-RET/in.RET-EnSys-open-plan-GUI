@@ -697,15 +697,15 @@ def scenario_create_constraints(request, proj_id, scen_id, step_id=3, max_step=4
         "net_zero_energy": _("Net zero energy system"),
     }
     constraints_forms = {
-        "minimal_degree_of_autonomy": MinRenewableConstraintForm,
-        "minimal_renewable_factor": MinDOAConstraintForm,
+        "minimal_degree_of_autonomy": MinDOAConstraintForm,
+        "minimal_renewable_factor": MinRenewableConstraintForm,
         "maximum_emissions": MaxEmissionConstraintForm,
         "net_zero_energy": NZEConstraintForm,
     }
 
     constraints_models = {
-        "minimal_degree_of_autonomy": MinRenewableConstraint,
-        "minimal_renewable_factor": MinDOAConstraint,
+        "minimal_degree_of_autonomy": MinDOAConstraint,
+        "minimal_renewable_factor": MinRenewableConstraint,
         "maximum_emissions": MaxEmissionConstraint,
         "net_zero_energy": NZEConstraint,
     }

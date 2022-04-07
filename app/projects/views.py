@@ -1219,11 +1219,11 @@ def view_mvs_data_input(request, scen_id=0):
             content_type="application/json",
         )
     # Load scenario
-    scenario = Scenario.objects.get(pk=scen_id)
+    scenario = Scenario.objects.get(id=scen_id)
 
     if scenario.project.user != request.user:
         logger.warning(
-            f"Unauthorized user tried to delete project scenario with db id = {scen_id}."
+            f"Unauthorized user tried to access scenario with db id = {scen_id}."
         )
         raise PermissionDenied
 

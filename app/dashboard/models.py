@@ -517,6 +517,7 @@ class ReportItem(models.Model):
                 ar = AssetsResults.objects.get(simulation=sim)
                 results_ts = ar.available_timeseries
                 qs = ConnectionLink.objects.filter(scenario__simulation=sim)
+
                 for bus in Bus.objects.filter(
                     scenario__simulation=sim, type__in=energy_vector
                 ):
@@ -535,12 +536,25 @@ class ReportItem(models.Model):
                                 component.asset.name + "_consumption"
                             )
                             bus_to_asset_names.append(component.asset.name + "_feedin")
+                        elif component.asset.is_storage is True:
+                            asset_to_bus_names.append(
+                                format_storage_subasset_name(
+                                    component.asset.name, OUTPUT_POWER
+                                )
+                            )
                         else:
                             asset_to_bus_names.append(component.asset.name)
 
                     bus_outputs = qs.filter(flow_direction="B2A", bus=bus)
                     for component in bus_outputs:
-                        bus_to_asset_names.append(component.asset.name)
+                        if component.asset.is_storage is True:
+                            bus_to_asset_names.append(
+                                format_storage_subasset_name(
+                                    component.asset.name, INPUT_POWER
+                                )
+                            )
+                        else:
+                            bus_to_asset_names.append(component.asset.name)
 
                     for component_label in asset_to_bus_names:
                         # draw link from the component to the bus
@@ -571,6 +585,7 @@ class ReportItem(models.Model):
                             val = 1
                         values.append(val)
 
+                # TODO display the installed capacity, max capacity and optimized_add_capacity on the nodes if applicable
                 fig = go.Figure(
                     data=[
                         go.Sankey(

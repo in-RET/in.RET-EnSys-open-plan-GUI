@@ -292,6 +292,12 @@ class AssetType(models.Model):
     def visible_fields(self):
         return self.asset_fields.replace("[", "").replace("]", "").split(",")
 
+    def add_field(self, field_name):
+        temp = self.visible_fields
+        if field_name not in temp:
+            temp.append(field_name)
+            self.asset_fields = "[" + ",".join(temp) + "]"
+
 
 class TopologyNode(models.Model):
     name = models.CharField(max_length=60, null=False, blank=False)

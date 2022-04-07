@@ -462,12 +462,12 @@ class ReportItem(models.Model):
                         )
                         if y_var in kpi_scalar_matrix:
                             optimized_capacity_dict["capacity"].append(
-                                kpi_scalar_matrix[y_var]["optimizedAddCap"]
+                                kpi_scalar_matrix[y_var]["optimized_add_cap"]
                             )
                         else:
-                            if "optimizedAddCap" in asset:
+                            if "optimized_add_cap" in asset:
                                 optimized_capacity_dict["capacity"].append(
-                                    asset["optimizedAddCap"]["value"]
+                                    asset["optimized_add_cap"]["value"]
                                 )
                             else:
                                 optimized_capacity_dict["capacity"].append(0)

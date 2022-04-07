@@ -28,10 +28,16 @@ from dashboard.helpers import (
     simulation_timeseries_to_json,
     report_item_render_to_json,
     sensitivity_analysis_graph_render_to_json,
+    format_storage_subasset_name,
 )
 
 from projects.models import Bus, Simulation, SensitivityAnalysis, ConnectionLink
-from projects.constants import MAP_EPA_MVS
+from projects.constants import (
+    MAP_EPA_MVS,
+    STORAGE_SUB_CATEGORIES,
+    INPUT_POWER,
+    OUTPUT_POWER,
+)
 from projects.models import Simulation, Scenario
 
 logger = logging.getLogger(__name__)
@@ -182,17 +188,21 @@ class AssetsResults(models.Model):
             for category in asset_dict:
                 for asset in asset_dict[category]:
                     if category == "energy_storage":
-                        for sub_cat in ("input_power", "output_power", "capacity"):
+                        for sub_cat in STORAGE_SUB_CATEGORIES:
                             storage_subasset = asset.get(sub_cat)
                             if storage_subasset is None:
                                 storage_subasset = asset.get(
                                     MAP_EPA_MVS.get(sub_cat, sub_cat)
                                 )
                             if storage_subasset is not None:
-                                storage_subasset["category"] = category + "_" + sub_cat
+                                storage_subasset[
+                                    "category"
+                                ] = format_storage_subasset_name(category, sub_cat)
                                 storage_subasset["type_oemof"] = asset["type_oemof"]
                                 self.__available_timeseries[
-                                    asset["label"] + "_" + sub_cat
+                                    format_storage_subasset_name(
+                                        asset["label"], sub_cat
+                                    )
                                 ] = storage_subasset
                     else:
                         if (
@@ -223,7 +233,9 @@ class AssetsResults(models.Model):
             for asset in asset_dict[category]:
                 if category == "energy_storage":
                     for sub_cat in ("input_power", "output_power", "capacity"):
-                        if asset_name == asset["label"] + "_" + sub_cat:
+                        if asset_name == format_storage_subasset_name(
+                            asset["label"], sub_cat
+                        ):
                             storage_subasset = asset.get(sub_cat)
                             if storage_subasset is None:
                                 storage_subasset = asset.get(
@@ -232,7 +244,9 @@ class AssetsResults(models.Model):
                             if storage_subasset is not None:
                                 if answer is None:
                                     answer = storage_subasset
-                                    answer["category"] = category + "_" + sub_cat
+                                    answer["category"] = format_storage_subasset_name(
+                                        category, sub_cat
+                                    )
                                     break
                                 else:
                                     raise ValueError(

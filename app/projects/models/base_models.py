@@ -378,6 +378,11 @@ class Asset(TopologyNode):
     feedin_tariff = models.FloatField(
         null=True, blank=False, validators=[MinValueValidator(0.0)]
     )
+
+    feedin_cap = models.FloatField(
+        default=None, null=True, blank=False, validators=[MinValueValidator(0.0)]
+    )
+
     peak_demand_pricing = models.FloatField(
         null=True, blank=False, validators=[MinValueValidator(0.0)]
     )

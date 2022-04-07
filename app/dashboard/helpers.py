@@ -104,6 +104,10 @@ def storage_asset_to_list(assets_results_json):
                     assets_results_json["energy_storage"].append(subasset)
 
 
+def format_storage_subasset_name(asset_name, subasset_name):
+    return f"{asset_name}_{subasset_name}"
+
+
 def update_selected_scenarios_in_cache(request, proj_id, scen_id):
     """Update the cache which contains the selected scenarios per project"""
     proj_id = str(proj_id)

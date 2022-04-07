@@ -441,6 +441,10 @@ class Asset(TopologyNode):
         return self.asset_type.asset_type in ["dso", "gas_dso", "h2_dso", "heat_dso"]
 
     @property
+    def is_storage(self):
+        return self.asset_type.asset_category == "energy_storage"
+
+    @property
     def timestamps(self):
         return self.scenario.get_timestamps()
 

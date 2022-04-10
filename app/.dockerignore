@@ -2,8 +2,6 @@
 **/__pycache__/
 **/*.py[cod]
 *.sqlite3
-**/migrations/
-!migrations/__init__.py
 *.log
 node_modules/
 static_src/

@@ -3,8 +3,6 @@
 **/__pycache__/
 **/*.py[cod]
 **/*.sqlite3
-**/migrations/
-!migrations/__init__.py
 **/src/
 !app/cdn_static_root/
 **/*.log

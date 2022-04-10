@@ -3,6 +3,7 @@
 **/*.py[cod]
 *.sqlite3
 *.log
+compose/*
 node_modules/
 static_src/
 Dockerfile

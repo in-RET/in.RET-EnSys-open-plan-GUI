@@ -240,7 +240,8 @@ LOGGING = {
             "handlers": ["info_file", "warnings_file", "console"],
             "level": "DEBUG",
             "propagate": True,
-        }
+        },
+        "asyncio": {"level": "WARNING"},
     },
 }
 

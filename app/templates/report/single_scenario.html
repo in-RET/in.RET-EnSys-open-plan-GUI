@@ -10,7 +10,6 @@
 
 {% block export-results %}
 
-        <!--<a type="button" class="btn btn-info" href="{% url 'download_timeseries_results' scen_id %}"> <span class="icon icon-export"></span>{% translate "Download Results" %}</a>-->
         <a type="button" class="btn btn-info" href="{% url 'redirect_download_timeseries_results' proj_id %}"><span class="icon icon-export"></span>{% translate "Download Timeseries" %}</a>
 {% endblock export-results %}
 
@@ -79,7 +78,9 @@
                     </div>
                 </div>
             </div>
-
+            <div id="energy-system" class="system-design" style="height:650px;margin-bottom:1rem;">
+                <div id="drawflow" class="gui chart"></div>
+            </div>
             <div class="row">
                 <div class="col" id="report_items">
                 {% include "report/graph_template.html" with id="all_timeseries" title="All timeseries" %}

@@ -869,6 +869,15 @@ class AssetCreateForm(OpenPlanModelForm):
                     "style": "font-weight:400; font-size:13px;",
                 }
             ),
+            "feedin_cap": forms.NumberInput(
+                attrs={
+                    "placeholder": "e.g. 0.0",
+                    "min": "0.0",
+                    "data-toggle": "tooltip",
+                    "title": _("Capping the feedin capacity of a DSO."),
+                    "style": "font-weight:400; font-size:13px;",
+                }
+            ),
             "peak_demand_pricing": forms.NumberInput(
                 attrs={
                     "placeholder": "e.g. 60",

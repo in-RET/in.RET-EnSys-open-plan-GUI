@@ -337,6 +337,16 @@ class UploadFileForm(forms.Form):
                 self.fields[field].label = _(labels[field])
 
 
+class UseCaseForm(forms.Form):
+    usecase = forms.ChoiceField(label=_("Select a use case"))
+
+    def __init__(self, *args, **kwargs):
+        usecase_qs = kwargs.pop("usecase_qs")
+        super().__init__(*args, **kwargs)
+        if usecase_qs is not None:
+            self.fields["usecase"].choices = [(uc.id, uc.name) for uc in usecase_qs]
+
+
 class CommentForm(ModelForm):
     class Meta:
         model = Comment

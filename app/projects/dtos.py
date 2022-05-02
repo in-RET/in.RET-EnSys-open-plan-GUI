@@ -95,6 +95,7 @@ class AssetDto:
         maximum_capacity: ValueTypeDto,
         energy_price: ValueTypeDto,
         feedin_tariff: ValueTypeDto,
+        feedin_cap: ValueTypeDto,
         optimize_capacity: ValueTypeDto,
         peak_demand_pricing: ValueTypeDto,
         peak_demand_pricing_period: ValueTypeDto,
@@ -125,6 +126,7 @@ class AssetDto:
         self.maximum_capacity = maximum_capacity
         self.energy_price = energy_price
         self.feedin_tariff = feedin_tariff
+        self.feedin_cap = feedin_cap
         self.optimize_capacity = optimize_capacity
         self.peak_demand_pricing = peak_demand_pricing
         self.peak_demand_pricing_period = peak_demand_pricing_period
@@ -348,6 +350,7 @@ def convert_to_dto(scenario: Scenario):
                 to_value_type(asset, "maximum_capacity"),
                 to_value_type(asset, "energy_price"),
                 to_value_type(asset, "feedin_tariff"),
+                to_value_type(asset, "feedin_cap"),
                 to_value_type(asset, "optimize_cap"),
                 to_value_type(asset, "peak_demand_pricing"),
                 to_value_type(asset, "peak_demand_pricing_period"),
@@ -413,6 +416,7 @@ def convert_to_dto(scenario: Scenario):
             to_value_type(asset, "maximum_capacity"),
             to_value_type(asset, "energy_price"),
             to_value_type(asset, "feedin_tariff"),
+            to_value_type(asset, "feedin_cap"),
             to_value_type(asset, "optimize_cap"),
             to_value_type(asset, "peak_demand_pricing"),
             to_value_type(asset, "peak_demand_pricing_period"),

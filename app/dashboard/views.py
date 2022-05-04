@@ -34,6 +34,7 @@ from dashboard.models import (
     SensitivityAnalysisGraph,
     get_project_reportitems,
     get_project_sensitivity_analysis_graphs,
+    REPORT_GRAPHS,
 )
 from dashboard.forms import (
     ReportItemForm,
@@ -764,49 +765,21 @@ def scenario_visualize_timeseries(request, scen_id):
     ):
         raise PermissionDenied
 
-    try:
-        assets_results_obj = AssetsResults.objects.get(simulation=scenario.simulation)
-        assets_results_json = assets_results_obj.assets_dict
-        datetime_list = scenario.get_timestamps(json_format=True)
+    assets_results = AssetsResults.objects.get(simulation__scenario__id=scenario.id)
+    y_variables = [n for n in assets_results.available_timeseries]
 
-        results_json = [
-            {
-                "values": [
-                    {
-                        "x": datetime_list,
-                        "y": asset_obj["flow"]["value"],
-                        "name": asset_obj["label"].replace("_", " ").upper()
-                        + " in "
-                        + asset_obj["flow"]["unit"]
-                        if asset_obj["flow"]["unit"] != "?"
-                        else asset_obj["label"].replace("_", " ").upper() + " in kWh",
-                        "type": "scatter",
-                        "line": {"shape": "hv"},
-                    }
-                    for asset_list in assets_results_json.values()
-                    for asset_obj in asset_list
-                    if "flow" in asset_obj.keys()
-                    and "consumption_period" not in asset_obj["label"]
-                ],
-                "title": "Alle Zeitreihen",
-                "yaxistitle": "Energie",
-                "div": "all_timeseries",
-            }
-        ]
+    results_json = report_item_render_to_json(
+        report_item_id="all_timeseries",
+        data=REPORT_GRAPHS[GRAPH_TIMESERIES](
+            simulations=[scenario.simulation], y_variables=y_variables
+        ),
+        title="",
+        report_item_type=GRAPH_TIMESERIES,
+    )
 
-        return JsonResponse(
-            results_json, status=200, content_type="application/json", safe=False
-        )
-    except Exception as e:
-        logger.error(
-            f"Dashboard ERROR: MVS Req Id: {scenario.simulation.mvs_token}. Thrown Exception: {traceback.format_exc()}"
-        )
-        return JsonResponse(
-            {"error": f"Could not retrieve kpi cost data."},
-            status=404,
-            content_type="application/json",
-            safe=False,
-        )
+    return JsonResponse(
+        results_json, status=200, content_type="application/json", safe=False
+    )
 
 
 def scenario_visualize_stacked_timeseries(request, scen_id):

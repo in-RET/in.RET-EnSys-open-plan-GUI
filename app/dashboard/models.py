@@ -309,6 +309,37 @@ def parse_manytomany_object_list(object_list, model):
     return object_list
 
 
+def graph_timeseries(simulations, y_variables):
+    simulations_results = []
+
+    for sim in simulations:
+        y_values = []
+        assets_results_obj = AssetsResults.objects.get(simulation=sim)
+        asset_timeseries = assets_results_obj.available_timeseries
+        for y_var in y_variables:
+            if y_var in asset_timeseries:
+                y_values.append(assets_results_obj.single_asset_timeseries(y_var))
+        simulations_results.append(
+            simulation_timeseries_to_json(
+                scenario_name=sim.scenario.name,
+                scenario_id=sim.scenario.id,
+                scenario_timeseries=y_values,
+                scenario_timestamps=sim.scenario.get_timestamps(),
+            )
+        )
+    return simulations_results
+
+
+REPORT_GRAPHS = {
+    GRAPH_TIMESERIES: graph_timeseries,
+    GRAPH_TIMESERIES_STACKED: "Stacked timeseries graph",
+    GRAPH_CAPACITIES: "Installed and optimized capacities",
+    GRAPH_BAR: "Bar chart",
+    GRAPH_PIE: "Pie chart",
+    GRAPH_LOAD_DURATION: "Load duration curve",
+    GRAPH_SANKEY: "Sankey diagram",
+}
+
 # # TODO change the form from this model to adapt the choices depending on single scenario/compare scenario or sensitivity
 class ReportItem(models.Model):
     title = models.CharField(max_length=120, default="", blank=True)
@@ -381,28 +412,9 @@ class ReportItem(models.Model):
         if self.report_type == GRAPH_TIMESERIES:
             y_variables = parameters.get("y", None)
             if y_variables is not None:
-                simulations_results = []
-
-                for simulation in self.simulations.all():
-                    y_values = []
-                    assets_results_obj = AssetsResults.objects.get(
-                        simulation=simulation
-                    )
-                    asset_timeseries = assets_results_obj.available_timeseries
-                    for y_var in y_variables:
-                        if y_var in asset_timeseries:
-                            y_values.append(
-                                assets_results_obj.single_asset_timeseries(y_var)
-                            )
-                    simulations_results.append(
-                        simulation_timeseries_to_json(
-                            scenario_name=simulation.scenario.name,
-                            scenario_id=simulation.scenario.id,
-                            scenario_timeseries=y_values,
-                            scenario_timestamps=simulation.scenario.get_timestamps(),
-                        )
-                    )
-                return simulations_results
+                return graph_timeseries(
+                    simulations=self.simulations.all(), y_variables=y_variables
+                )
 
         if self.report_type == GRAPH_TIMESERIES_STACKED:
             y_variables = parameters.get("y", None)

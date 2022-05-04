@@ -82,90 +82,10 @@
 
             <div class="row">
                 <div class="col" id="report_items">
-
-
-                    <div class="chart" style="height: fit-content;">
-                        <div class="chart__header">
-                            <div>
-                                <span class="title">All time series</span>
-                            </div>
-                            <div class="dropdown">
-                                <button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuTS" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <span class="icon icon-more"></span>
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuTS">
-                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as .xls</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as PDF</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="chart__plot">
-                            <div id="all_timeseries"></div>
-                        </div>
-                    </div>
-
-
-                    <div class="chart" style="height: fit-content;">
-                        <div class="chart__header">
-                            <div>
-                                <span class="title">Stacked time series by sector</span>
-                            </div>
-                            <div class="dropdown">
-                                <button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuTS" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <span class="icon icon-more"></span>
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuTS">
-                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as .xls</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as PDF</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="chart__plot">
-                            <div id="stacked_timeseries"></div>
-                        </div>
-                    </div>
-
-
-                    <div class="chart" style="height: fit-content;">
-                        <div class="chart__header">
-                            <div>
-                                <span class="title">Aggregated total flow over project period</span>
-                            </div>
-                            <div class="dropdown">
-                                <button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuTS" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <span class="icon icon-more"></span>
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuTS">
-                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as .xls</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as PDF</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="chart__plot">
-                            <div id="stacked_total_flow"></div>
-                        </div>
-                    </div>
-
-
-                    <div class="chart" style="height: fit-content;">
-                        <div class="chart__header">
-                            <div>
-                                <span class="title">Installed and optimized capacities</span>
-                            </div>
-                            <div class="dropdown">
-                                <button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuTS" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <span class="icon icon-more"></span>
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuTS">
-                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as .xls</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as PDF</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="chart__plot">
-                            <div id="capacities"></div>
-                        </div>
-                    </div>
+                {% include "report/graph_template.html" with id="all_timeseries" title="All time series" %}
+                {% include "report/graph_template.html" with id="stacked_timeseries" title="Stacked time series by sector" %}
+                {% include "report/graph_template.html" with id="stacked_total_flow" title="Aggregated total flow over project period" %}
+                {% include "report/graph_template.html" with id="capacities" title="Installed and optimized capacities" %}
                 </div>
             </div>
             {% endif %}

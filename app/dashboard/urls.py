@@ -88,14 +88,9 @@ urlpatterns = [
         name="scenario_visualize_sankey",
     ),
     re_path(
-        r"^scenario/results/request_stacked_capacities/(?P<scen_id>\d+)?$",
-        scenario_visualize_stacked_capacities,
-        name="scenario_visualize_stacked_capacities",
-    ),
-    re_path(
-        r"^scenario/results/request_stacked_optimized_capacities/(?P<scen_id>\d+)?$",
-        scenario_visualize_stacked_optimized_capacities,
-        name="scenario_visualize_stacked_optimized_capacities",
+        r"^scenario/results/request_capacities/(?P<scen_id>\d+)?$",
+        scenario_visualize_capacities,
+        name="scenario_visualize_capacities",
     ),
     path(
         "scenario/results/download_scalars/<int:scen_id>",

@@ -366,6 +366,58 @@ def graph_timeseries_stacked(simulations, y_variables, energy_vector):
     return simulations_results
 
 
+def graph_capacities(simulations, y_variables):
+    simulations_results = []
+
+    for simulation in simulations:
+        y_values = (
+            []
+        )  # stores the capacity, both installed and optimized in seperate dicts, of each individual asset/ component
+        x_values = []  # stores the label of the corresponding asset
+
+        assets_results_obj = AssetsResults.objects.get(simulation=simulation)
+
+        results_dict = json.loads(simulation.results)
+
+        kpi_scalar_matrix = results_dict["kpi"]["scalar_matrix"]
+
+        installed_capacity_dict = {"capacity": [], "name": "Installed Capacity"}
+        optimized_capacity_dict = {"capacity": [], "name": "Optimized Capacity"}
+
+        for y_var in y_variables:
+
+            asset = assets_results_obj.single_asset_results(asset_name=y_var)
+
+            x_values.append(y_var + " in " + asset["installed_capacity"]["unit"])
+            installed_capacity_dict["capacity"].append(
+                asset["installed_capacity"]["value"]
+            )
+            if y_var in kpi_scalar_matrix:
+                optimized_capacity_dict["capacity"].append(
+                    kpi_scalar_matrix[y_var]["optimized_add_cap"]
+                )
+            else:
+                if "optimized_add_cap" in asset:
+                    optimized_capacity_dict["capacity"].append(
+                        asset["optimized_add_cap"]["value"]
+                    )
+                else:
+                    optimized_capacity_dict["capacity"].append(0)
+
+        y_values.append(installed_capacity_dict)
+        y_values.append(optimized_capacity_dict)
+
+        simulations_results.append(
+            simulation_timeseries_to_json(
+                scenario_name=simulation.scenario.name,
+                scenario_id=simulation.scenario.id,
+                scenario_timeseries=y_values,
+                scenario_timestamps=x_values,
+            )
+        )
+    return simulations_results
+
+
 def graph_sankey(simulation, energy_vector):
     if isinstance(energy_vector, list) is False:
         energy_vector = [energy_vector]
@@ -472,7 +524,7 @@ def graph_sankey(simulation, energy_vector):
 REPORT_GRAPHS = {
     GRAPH_TIMESERIES: graph_timeseries,
     GRAPH_TIMESERIES_STACKED: graph_timeseries_stacked,
-    GRAPH_CAPACITIES: "Installed and optimized capacities",
+    GRAPH_CAPACITIES: graph_capacities,
     GRAPH_BAR: "Bar chart",
     GRAPH_PIE: "Pie chart",
     GRAPH_LOAD_DURATION: "Load duration curve",
@@ -568,67 +620,9 @@ class ReportItem(models.Model):
             y_variables = parameters.get("y", None)
 
             if y_variables is not None:
-                simulations_results = []
-
-                for simulation in self.simulations.all():
-                    y_values = (
-                        []
-                    )  # stores the capacity, both installed and optimized in seperate dicts, of each individual asset/ component
-                    x_values = []  # stores the label of the corresponding asset
-
-                    assets_results_obj = AssetsResults.objects.get(
-                        simulation=simulation
-                    )
-
-                    results_dict = json.loads(simulation.results)
-
-                    kpi_scalar_matrix = results_dict["kpi"]["scalar_matrix"]
-
-                    installed_capacity_dict = {
-                        "capacity": [],
-                        "name": "Installed Capacity",
-                    }
-                    optimized_capacity_dict = {
-                        "capacity": [],
-                        "name": "Optimized Capacity",
-                    }
-
-                    for y_var in y_variables:
-
-                        asset = assets_results_obj.single_asset_results(
-                            asset_name=y_var
-                        )
-
-                        x_values.append(
-                            y_var + " in " + asset["installed_capacity"]["unit"]
-                        )
-                        installed_capacity_dict["capacity"].append(
-                            asset["installed_capacity"]["value"]
-                        )
-                        if y_var in kpi_scalar_matrix:
-                            optimized_capacity_dict["capacity"].append(
-                                kpi_scalar_matrix[y_var]["optimized_add_cap"]
-                            )
-                        else:
-                            if "optimized_add_cap" in asset:
-                                optimized_capacity_dict["capacity"].append(
-                                    asset["optimized_add_cap"]["value"]
-                                )
-                            else:
-                                optimized_capacity_dict["capacity"].append(0)
-
-                    y_values.append(installed_capacity_dict)
-                    y_values.append(optimized_capacity_dict)
-
-                    simulations_results.append(
-                        simulation_timeseries_to_json(
-                            scenario_name=simulation.scenario.name,
-                            scenario_id=simulation.scenario.id,
-                            scenario_timeseries=y_values,
-                            scenario_timestamps=x_values,
-                        )
-                    )
-                return simulations_results
+                return graph_capacities(
+                    simulations=self.simulations.all(), y_variables=y_variables
+                )
 
         if self.report_type == GRAPH_SANKEY:
             energy_vector = parameters.get("energy_vector", None)

@@ -484,14 +484,8 @@ function scenario_visualize_timeseries(scen_id){
  $.ajax({
             url: "{% url 'scenario_visualize_timeseries' %}" + scen_id,
             type: "GET",
-            success: async (dataList) => {
-                await drawScatterPLot(dataList);
-            },
-            error: function (xhr, errmsg) {
-                console.log("backend_error!")
-                //Show the error message
-                $('#message-div').html("<div class='alert-error'>" +
-                    "<strong>Success: </strong> We have encountered an error: " + errmsg + "</div>");
+            success: async (parameters) => {
+                await graph_type_mapping[parameters.type](parameters.id, parameters);
             }
         });
 };

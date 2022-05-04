@@ -199,6 +199,10 @@ class AssetsResults(models.Model):
                                     "category"
                                 ] = format_storage_subasset_name(category, sub_cat)
                                 storage_subasset["type_oemof"] = asset["type_oemof"]
+                                storage_subasset["energy_vector"] = asset[
+                                    "energy_vector"
+                                ]
+
                                 self.__available_timeseries[
                                     format_storage_subasset_name(
                                         asset["label"], sub_cat
@@ -247,6 +251,7 @@ class AssetsResults(models.Model):
                                     answer["category"] = format_storage_subasset_name(
                                         category, sub_cat
                                     )
+                                    answer["energy_vector"] = asset["energy_vector"]
                                     break
                                 else:
                                     raise ValueError(

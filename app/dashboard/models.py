@@ -597,6 +597,15 @@ class ReportItem(models.Model):
         if self.proof_parameters_follow_schema(parameter_dict) is True:
             self.parameters = json.dumps(parameter_dict)
 
+    @property
+    def render_json(self):
+        return report_item_render_to_json(
+            report_item_id=f"reportItem{self.project_id}-{self.id}",
+            data=self.fetch_parameters_values(),
+            title=self.title,
+            report_item_type=self.report_type,
+        )
+
     def fetch_parameters_values(self):
         parameters = json.loads(self.parameters)
         # TODO : adjust for other report types
@@ -627,15 +636,6 @@ class ReportItem(models.Model):
         if self.report_type == GRAPH_SANKEY:
             energy_vector = parameters.get("energy_vector", None)
 
-
-    @property
-    def render_json(self):
-        return report_item_render_to_json(
-            report_item_id=f"reportItem{self.project_id}-{self.id}",
-            data=self.fetch_parameters_values(),
-            title=self.title,
-            report_item_type=self.report_type,
-        )
             return graph_sankey(
                 simulation=self.simulations.get(), energy_vector=energy_vector
             )

@@ -73,6 +73,16 @@ function nester(el, n) {
     return el;
 }
 
+function format_trace_name(scenario_name, label, unit, compare=false){
+
+    var trace_name = label + ' (' + unit + ')' ;
+    if(compare == true){
+        trace_name = scenario_name + ' ' + trace_name;
+    }
+    return trace_name;
+
+}
+
 
 function addTimeseriesGraph(graphId, parameters){
     // prepare traces in ploty format
@@ -121,17 +131,25 @@ function addTimeseriesGraph(graphId, parameters){
 function addStackedTimeseriesGraph(graphId, parameters){
     // prepare traces in ploty format
     var data = []
+
+    if(parameters.data.length == 1){
+        compare = false;
+        parameters.title = parameters.title + " sector of scenario " + parameters.data[0].scenario_name;
+    }
+
     parameters.data.forEach(scenario => {
         scenario.timeseries.forEach(timeseries => {
             // todo provide a function to format the name of the timeseries
-            data.push({x: scenario.timestamps,
+            var trace = {x: scenario.timestamps,
                 y: timeseries.value,
-                name:scenario.scenario_name + timeseries.label + timeseries.unit,
+                name: '',
                 type: 'scatter',
                 line: {shape: 'hv'},
                 stackgroup: timeseries.asset_type,
                 fill: timeseries.fill
-            })
+            };
+            trace.name = format_trace_name(scenario.scenario_name, timeseries.label, timeseries.unit, compare=compare);
+            data.push(trace);
         });
     });
     // prepare graph layout in plotly format

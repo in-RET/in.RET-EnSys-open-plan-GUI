@@ -494,15 +494,15 @@ function scenario_visualize_stacked_timeseries(scen_id){
  $.ajax({
             url: "{% url 'scenario_visualize_stacked_timeseries'%}" +  scen_id,
             type: "GET",
-            success: async (data) => {
-                await data.map(dataObj => drawstackedScatterPlot(dataObj));
+            success: async (graphs) => {
+                const parentDiv = document.getElementById("stacked_timeseries");
+                await graphs.map(parameters => {
+                    const newGraph = document.createElement('div');
+                    newGraph.id = "stacked_timeseries" + parameters.id;
+                    parentDiv.appendChild(newGraph);
+                    graph_type_mapping[parameters.type](newGraph.id, parameters);
+                });
             },
-            error: function (xhr, errmsg) {
-                console.log("backend_error!")
-                //Show the error message
-                $('#message-div').html("<div class='alert-error'>" +
-                    "<strong>Success: </strong> We have encountered an error: " + errmsg + "</div>");
-            }
         });
 };
 

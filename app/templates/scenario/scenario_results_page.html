@@ -180,7 +180,7 @@
                   </button>
                 </div>
             </div>
-            <!--<div class="row">
+            <div class="row">
                 <div class="col col-md-12">
                     <div class="chart">
                         <div class="chart__header">
@@ -210,7 +210,7 @@
                         </div>
                     </div>
                 </div>
-            </div>-->
+            </div>
             <div class="row">
                 <div class="col" id="report_items">
 
@@ -311,8 +311,7 @@
 {% block end_body_scripts %}
 
 
-
-
+{{ report_items_data|json_script:"existingReportItemsData" }}
 
 <script>
 const urlNotImplemented = `{% url 'not_implemented' %}?url={{ request.get_full_path }}`;
@@ -338,24 +337,9 @@ const deleteReportItem = (event) => {
         })
     }
 };
-
 </script>
-{{ report_items_data|json_script:"existingReportItemsData" }}
 <script src="{% static 'js/report_items.js' %}"></script>
 <script>
-
-    $(document).ready(function () {
-        // add search field to the kpi info modal
-        $('#kpiTable').DataTable();
-        // update the kpi table
-        update_kpi_table_style(document.getElementById("kpi-table-style"));
-        const scen_id = "{{ scen_id }}"
-        scenario_visualize_timeseries(scen_id);
-        scenario_visualize_stacked_timeseries(scen_id);
-        scenario_visualize_stacked_total_flow(scen_id);
-        scenario_visualize_stacked_capacities(scen_id);
-        scenario_visualize_stacked_optimized_capacities(scen_id);
-    });
 
 function update_kpi_table_style(target){
     $.ajax({
@@ -463,10 +447,8 @@ function update_selected_scenarios(target){
 
                 scenario_visualize_timeseries(scen_id);
                 scenario_visualize_stacked_timeseries(scen_id);
-                scenario_visualize_stacked_total_flow(scen_id);
-                scenario_visualize_stacked_capacities(scen_id);
-                scenario_visualize_stacked_optimized_capacities(scen_id);
-
+                scenario_visualize_sankey(scen_id);
+                scenario_visualize_capacities(scen_id);
             },
             error: function (xhr, errmsg) {
                 if (xhr.status != 405){
@@ -528,58 +510,6 @@ function scenario_visualize_capacities(scen_id){
 };
 
 
-    function drawScatterPLot(dataList) {
-        const data= dataList[0].values;
-        const layout= {
-            title: dataList[0].title,
-            yaxis:{
-                title: dataList[0].yaxistitle,
-            }
-        }
-        Plotly.newPlot(dataList[0].div, data, layout);
-
-    }
-
-    function drawstackedScatterPlot(dataList) {
-        const data = dataList.values;
-        if(data.length >0){
-            const parentDiv = document.getElementById(dataList.div);
-            const newGraph = document.createElement('div');
-            newGraph.id = "scatter" + dataList.commodity.replaceAll(' ', '');
-            parentDiv.appendChild(newGraph);
-            const layout = {
-                title: dataList.commodity,
-                showlegend: true,
-                paper_bgcolor: "transparent",
-                yaxis:{
-                    title: dataList.yaxistitle,
-                }
-            }
-            Plotly.newPlot(newGraph.id, data, layout);
-        }
-    }
-
-    function drawstackedBarChart(dataList) {
-
-        const data = dataList[0].values;
-        const title = dataList[0].title;
-        const parentDiv = document.getElementById(dataList[0].div);
-        const newGraph = document.createElement('div');
-        newGraph.id = "bar" + title.replaceAll(' ', '');
-        parentDiv.appendChild(newGraph);
-        const layout = {
-            title: title,
-            barmode: 'stack',
-            yaxis:{
-                title: dataList[0].yaxistitle,
-                categoryorder:'category ascending'
-
-            },
-            showlegend: true
-        }
-        Plotly.newPlot(newGraph.id, data, layout);
-    }
-
 </script>
 
 {% if multiple_scenario_selection %}
@@ -587,15 +517,9 @@ function scenario_visualize_capacities(scen_id){
 {% else %}
 <script>const multipleScenarioSelection = false;</script>
 {% endif %}
-
-
 <script src="{% static 'js/modal_utils.js' %}"></script>
 
 <script>
-
-
-
-
     /** Add a new report item **/
 
     var createReportItemModalDOM = document.getElementById("createReportItemModal");

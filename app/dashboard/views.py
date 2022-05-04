@@ -1,4 +1,5 @@
 from django.core.exceptions import PermissionDenied
+from django.template.loader import get_template
 from django.db.models import Count
 from django.http.response import Http404, HttpResponse
 from dashboard.helpers import *
@@ -437,14 +438,28 @@ def report_create_item(request, proj_id):
             else:
 
                 # TODO workout the passing of post when there are errors (in crisp format)
+                form_html = get_template("report/report_item_parameters_form.html")
+                answer_context.update(
+                    {
+                        "report_form": form_html.render(
+                            {
+                                "report_item_form": report_form,
+                                "graph_parameters_form": graph_parameter_form,
+                            }
+                        )
+                    }
+                )
+
                 answer = JsonResponse(
                     answer_context, status=422, content_type="application/json"
                 )
         else:
             # TODO workout the passing of post when there are errors (in crisp format)
+
             answer = JsonResponse(
                 answer_context, status=422, content_type="application/json"
             )
+
     else:
         answer = JsonResponse(
             {"error": "This url is only for post calls"},

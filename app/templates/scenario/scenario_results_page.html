@@ -735,9 +735,21 @@ function scenario_visualize_stacked_optimized_capacities(scen_id){
             },
             error: function (err) {
                 var jsonRes = err.responseJSON;
-                createReportItemForm.innerHTML = jsonRes.report_form;
-                updateReportItemParametersForm(jsonRes.report_type)
-                }, //err => {alert("Modal form JS Error: " + err);console.log(err);}
+                var csrfToken = createReportItemForm.querySelector('input[name="csrfmiddlewaretoken"]');
+                // update the report item graph
+                createReportItemForm.innerHTML = csrfToken.outerHTML + jsonRes.report_form;
+
+                // (re)link the changing of report_item type combobox to loading new parameters form
+                // the name of the id is linked with the name of the attribute of ReportItem model in dashboard/models.py
+                $("#id_report_type").change(function (event) {
+                    var reportItemType = $(this).val();
+                    updateReportItemParametersForm(reportItemType)
+                })
+                $("#id_scenarios").change(function (event) {
+                    var reportItemType = $("#id_report_type").val();
+                    updateReportItemParametersForm(reportItemType)
+                })
+            },
         })
     }
 

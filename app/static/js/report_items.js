@@ -184,8 +184,15 @@ function addCapacitiyGraph(graphId, parameters){
     // prepare graph layout in plotly format
     const layout= {
         title: parameters.title,
+        xaxis:{
+            title: parameters.x_label,
+        },
+        yaxis:{
+            title: parameters.y_label,
+        },
         barmode: 'stack',
-        showlegend: true
+        showlegend: true,
+        margin: {b: 150}
     }
     // create plot
     Plotly.newPlot(graphId, data, layout);

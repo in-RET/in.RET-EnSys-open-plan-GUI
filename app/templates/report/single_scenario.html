@@ -84,7 +84,7 @@
                 <div class="col" id="report_items">
                 {% include "report/graph_template.html" with id="all_timeseries" title="All time series" %}
                 {% include "report/graph_template.html" with id="stacked_timeseries" title="Stacked time series by sector" %}
-                {% include "report/graph_template.html" with id="stacked_total_flow" title="Aggregated total flow over project period" %}
+                {% include "report/graph_template.html" with id="sankey" title="Sankey diagram" %}
                 {% include "report/graph_template.html" with id="capacities" title="Installed and optimized capacities" %}
                 </div>
             </div>
@@ -97,8 +97,21 @@
 
 {% block results_end_body_scripts %}
 <script>
-
-
 document.getElementById('single-scenario-link').classList.add('active');
+
+
+    $(document).ready(function () {
+        // add search field to the kpi info modal
+        $('#kpiTable').DataTable();
+        // update the kpi table
+        update_kpi_table_style(document.getElementById("kpi-table-style"));
+        const scen_id = "{{ scen_id }}"
+        scenario_visualize_timeseries(scen_id);
+        scenario_visualize_stacked_timeseries(scen_id);
+        scenario_visualize_sankey(scen_id);
+        scenario_visualize_stacked_capacities(scen_id);
+        scenario_visualize_stacked_optimized_capacities(scen_id);
+    });
+
 </script>
 {% endblock results_end_body_scripts %}

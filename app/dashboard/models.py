@@ -366,6 +366,108 @@ def graph_timeseries_stacked(simulations, y_variables, energy_vector):
     return simulations_results
 
 
+def graph_sankey(simulation, energy_vector):
+    if isinstance(energy_vector, list) is False:
+        energy_vector = [energy_vector]
+    if energy_vector is not None:
+        labels = []
+        sources = []
+        targets = []
+        values = []
+        colors = []
+
+        sim = simulation
+        ar = AssetsResults.objects.get(simulation=sim)
+        results_ts = ar.available_timeseries
+        qs = ConnectionLink.objects.filter(scenario__simulation=sim)
+
+        for bus in Bus.objects.filter(scenario__simulation=sim, type__in=energy_vector):
+            bus_label = bus.name
+            labels.append(bus_label)
+            colors.append("blue")
+            # from asset to bus
+            bus_inputs = qs.filter(flow_direction="A2B", bus=bus)
+            asset_to_bus_names = []
+            bus_to_asset_names = []
+
+            for component in bus_inputs:
+                # special case of providers which are bus input and output at the same time
+                if component.asset.is_provider is True:
+                    asset_to_bus_names.append(component.asset.name + "_consumption")
+                    bus_to_asset_names.append(component.asset.name + "_feedin")
+                elif component.asset.is_storage is True:
+                    asset_to_bus_names.append(
+                        format_storage_subasset_name(component.asset.name, OUTPUT_POWER)
+                    )
+                else:
+                    asset_to_bus_names.append(component.asset.name)
+
+            bus_outputs = qs.filter(flow_direction="B2A", bus=bus)
+            for component in bus_outputs:
+                if component.asset.is_storage is True:
+                    bus_to_asset_names.append(
+                        format_storage_subasset_name(component.asset.name, INPUT_POWER)
+                    )
+                else:
+                    bus_to_asset_names.append(component.asset.name)
+
+            for component_label in asset_to_bus_names:
+                # draw link from the component to the bus
+                if component_label not in labels:
+                    labels.append(component_label)
+                    colors.append("green")
+
+                sources.append(labels.index(component_label))
+                targets.append(labels.index(bus_label))
+
+                val = np.sum(results_ts[component_label]["flow"]["value"])
+                if val == 0:
+                    val = 1
+                values.append(val)
+
+            for component_label in bus_to_asset_names:
+                # draw link from the bus to the component
+                if component_label not in labels:
+                    labels.append(component_label)
+                    colors.append("red")
+
+                sources.append(labels.index(bus_label))
+                targets.append(labels.index(component_label))
+
+                val = np.sum(results_ts[component_label]["flow"]["value"])
+
+                if val == 0:
+                    val = 1
+                values.append(val)
+
+        # TODO display the installed capacity, max capacity and optimized_add_capacity on the nodes if applicable
+        fig = go.Figure(
+            data=[
+                go.Sankey(
+                    node=dict(
+                        pad=15,
+                        thickness=20,
+                        line=dict(color="black", width=0.5),
+                        label=labels,
+                        hovertemplate="Node has total value %{value}<extra></extra>",
+                        color=colors,
+                    ),
+                    link=dict(
+                        source=sources,  # indices correspond to labels
+                        target=targets,
+                        value=values,
+                        hovertemplate="Link from node %{source.label}<br />"
+                        + "to node%{target.label}<br />has value %{value}"
+                        + "<br />and data <extra></extra>",
+                    ),
+                )
+            ]
+        )
+
+        fig.update_layout(font_size=10)
+        return fig.to_dict()
+
+
 # These graphs are related to the graphs in static/js/report_items.js
 REPORT_GRAPHS = {
     GRAPH_TIMESERIES: graph_timeseries,
@@ -374,7 +476,7 @@ REPORT_GRAPHS = {
     GRAPH_BAR: "Bar chart",
     GRAPH_PIE: "Pie chart",
     GRAPH_LOAD_DURATION: "Load duration curve",
-    GRAPH_SANKEY: "Sankey diagram",
+    GRAPH_SANKEY: graph_sankey,
 }
 
 # # TODO change the form from this model to adapt the choices depending on single scenario/compare scenario or sensitivity
@@ -530,113 +632,7 @@ class ReportItem(models.Model):
 
         if self.report_type == GRAPH_SANKEY:
             energy_vector = parameters.get("energy_vector", None)
-            if isinstance(energy_vector, list) is False:
-                energy_vector = [energy_vector]
-            if energy_vector is not None:
-                labels = []
-                sources = []
-                targets = []
-                values = []
-                colors = []
 
-                sim = self.simulations.get()
-                ar = AssetsResults.objects.get(simulation=sim)
-                results_ts = ar.available_timeseries
-                qs = ConnectionLink.objects.filter(scenario__simulation=sim)
-
-                for bus in Bus.objects.filter(
-                    scenario__simulation=sim, type__in=energy_vector
-                ):
-                    bus_label = bus.name
-                    labels.append(bus_label)
-                    colors.append("blue")
-                    # from asset to bus
-                    bus_inputs = qs.filter(flow_direction="A2B", bus=bus)
-                    asset_to_bus_names = []
-                    bus_to_asset_names = []
-
-                    for component in bus_inputs:
-                        # special case of providers which are bus input and output at the same time
-                        if component.asset.is_provider is True:
-                            asset_to_bus_names.append(
-                                component.asset.name + "_consumption"
-                            )
-                            bus_to_asset_names.append(component.asset.name + "_feedin")
-                        elif component.asset.is_storage is True:
-                            asset_to_bus_names.append(
-                                format_storage_subasset_name(
-                                    component.asset.name, OUTPUT_POWER
-                                )
-                            )
-                        else:
-                            asset_to_bus_names.append(component.asset.name)
-
-                    bus_outputs = qs.filter(flow_direction="B2A", bus=bus)
-                    for component in bus_outputs:
-                        if component.asset.is_storage is True:
-                            bus_to_asset_names.append(
-                                format_storage_subasset_name(
-                                    component.asset.name, INPUT_POWER
-                                )
-                            )
-                        else:
-                            bus_to_asset_names.append(component.asset.name)
-
-                    for component_label in asset_to_bus_names:
-                        # draw link from the component to the bus
-                        if component_label not in labels:
-                            labels.append(component_label)
-                            colors.append("green")
-
-                        sources.append(labels.index(component_label))
-                        targets.append(labels.index(bus_label))
-
-                        val = np.sum(results_ts[component_label]["flow"]["value"])
-                        if val == 0:
-                            val = 1
-                        values.append(val)
-
-                    for component_label in bus_to_asset_names:
-                        # draw link from the bus to the component
-                        if component_label not in labels:
-                            labels.append(component_label)
-                            colors.append("red")
-
-                        sources.append(labels.index(bus_label))
-                        targets.append(labels.index(component_label))
-
-                        val = np.sum(results_ts[component_label]["flow"]["value"])
-
-                        if val == 0:
-                            val = 1
-                        values.append(val)
-
-                # TODO display the installed capacity, max capacity and optimized_add_capacity on the nodes if applicable
-                fig = go.Figure(
-                    data=[
-                        go.Sankey(
-                            node=dict(
-                                pad=15,
-                                thickness=20,
-                                line=dict(color="black", width=0.5),
-                                label=labels,
-                                hovertemplate="Node has total value %{value}<extra></extra>",
-                                color=colors,
-                            ),
-                            link=dict(
-                                source=sources,  # indices correspond to labels
-                                target=targets,
-                                value=values,
-                                hovertemplate="Link from node %{source.label}<br />"
-                                + "to node%{target.label}<br />has value %{value}"
-                                + "<br />and data <extra></extra>",
-                            ),
-                        )
-                    ]
-                )
-
-                fig.update_layout(font_size=10)
-                return fig.to_dict()
 
     @property
     def render_json(self):
@@ -646,6 +642,9 @@ class ReportItem(models.Model):
             title=self.title,
             report_item_type=self.report_type,
         )
+            return graph_sankey(
+                simulation=self.simulations.get(), energy_vector=energy_vector
+            )
 
 
 def get_project_reportitems(project):

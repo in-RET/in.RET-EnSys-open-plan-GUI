@@ -83,9 +83,9 @@ urlpatterns = [
         name="scenario_visualize_stacked_timeseries",
     ),
     re_path(
-        r"^scenario/results/request_stacked_total_flow/(?P<scen_id>\d+)?$",
-        scenario_visualize_stacked_total_flow,
-        name="scenario_visualize_stacked_total_flow",
+        r"^scenario/results/request_sankey/(?P<scen_id>\d+)?$",
+        scenario_visualize_sankey,
+        name="scenario_visualize_sankey",
     ),
     re_path(
         r"^scenario/results/request_stacked_capacities/(?P<scen_id>\d+)?$",

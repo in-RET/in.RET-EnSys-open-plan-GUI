@@ -77,15 +77,29 @@ function nester(el, n) {
 function addTimeseriesGraph(graphId, parameters){
     // prepare traces in ploty format
     var data = []
+
+    var compare = true;
+    if(parameters.data.length == 1){
+        compare = false;
+        parameters.title = "Scenario " + parameters.data[0].scenario_name;
+    }
+
     parameters.data.forEach(scenario => {
         scenario.timeseries.forEach(timeseries => {
             // todo provide a function to format the name of the timeseries
-            data.push({x: scenario.timestamps,
+            var trace = {x: scenario.timestamps,
                 y: timeseries.value,
-                name:scenario.scenario_name + timeseries.label + timeseries.unit,
+                name:"",
                 type: 'scatter',
                 line: {shape: 'hv'},
-            })
+            }
+            if(compare == true){
+               trace.name = scenario.scenario_name + timeseries.label + timeseries.unit
+            }
+            else{
+               trace.name = timeseries.label + timeseries.unit
+            }
+            data.push(trace)
         });
     });
     // prepare graph layout in plotly format

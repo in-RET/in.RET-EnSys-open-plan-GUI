@@ -789,70 +789,26 @@ def scenario_visualize_stacked_timeseries(request, scen_id):
     ):
         raise PermissionDenied
 
-    try:
-        assets_results_obj = AssetsResults.objects.get(simulation=scenario.simulation)
-        assets_results_json = assets_results_obj.assets_dict
+    assets_results = AssetsResults.objects.get(simulation__scenario__id=scenario.id)
+    y_variables = [n for n in assets_results.available_timeseries]
 
-        # create new dict which has as its keys sectors (Electricity, Heat, Gas, H2)
-        # and as its values the corresponding asset dictionaries {energy_consumption: [{asset_type: ...}, .. ], ..}
-
-        new_dict = {
-            commodity: {
-                asset: [
-                    asset_obj
-                    for asset_obj in asset_list
-                    if asset_obj["energy_vector"] == commodity
-                ]
-                for asset, asset_list in assets_results_json.items()
-            }
-            for commodity in sectors
-        }
-
-        datetime_list = scenario.get_timestamps(json_format=True)
-        results_json = [
-            {
-                "values": [
-                    {
-                        "x": datetime_list,
-                        "y": asset_obj["flow"]["value"],
-                        "name": asset_obj["label"].replace("_", " ").upper()
-                        + " in "
-                        + asset_obj["flow"]["unit"]
-                        if asset_obj["flow"]["unit"] != "?"
-                        else asset_obj["label"].replace("_", " ").upper() + " in kWh",
-                        "type": "scatter",
-                        "line": {"shape": "hv"},
-                        "stackgroup": asset_obj["type_oemof"],
-                        "fill": "none"
-                        if asset_obj["type_oemof"] == "sink"
-                        else "tonexty",
-                        "mode": "none" if asset_obj["type_oemof"] != "sink" else "",
-                    }
-                    for asset_class, asset_list in asset_class_list.items()
-                    for asset_obj in asset_list
-                    if "flow" in asset_obj.keys()
-                    and "consumption_period" not in asset_obj["label"]
-                ],
-                "commodity": commodity,
-                "yaxistitle": "Energie",
-                "div": "stacked_timeseries",
-            }
-            for commodity, asset_class_list in new_dict.items()
-        ]
-
-        return JsonResponse(
-            results_json, status=200, content_type="application/json", safe=False
+    results_json = [
+        report_item_render_to_json(
+            report_item_id=energy_vector,
+            data=REPORT_GRAPHS[GRAPH_TIMESERIES_STACKED](
+                simulations=[scenario.simulation],
+                y_variables=y_variables,
+                energy_vector=energy_vector,
+            ),
+            title=energy_vector,
+            report_item_type=GRAPH_TIMESERIES_STACKED,
         )
-    except Exception as e:
-        logger.error(
-            f"Dashboard ERROR: MVS Req Id: {scenario.simulation.mvs_token}. Thrown Exception: {traceback.format_exc()}"
-        )
-        return JsonResponse(
-            {"error": f"Could not retrieve kpi cost data."},
-            status=404,
-            content_type="application/json",
-            safe=False,
-        )
+        for energy_vector in scenario.energy_vectors
+    ]
+
+    return JsonResponse(
+        results_json, status=200, content_type="application/json", safe=False
+    )
 
 
 # TODO: Sector coupling must be refined (including transformer flows)

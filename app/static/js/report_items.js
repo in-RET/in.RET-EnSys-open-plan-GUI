@@ -15,10 +15,10 @@ function addReportItemGraphToDOM(parameters, reportDOMId="report_items"){
                        ml("span", { class: "icon icon-more"}, [])
                     ]),
                     ml("ul", { class: "dropdown-menu", 'aria-labelledby': "dropdownMenuTS"}, [
-                        ml("li", { class: "dropdown-item"}, ml("a", {href: urlNotImplemented}, "Export as .xls")),
-                        ml("li", { class: "dropdown-item"}, ml("a", {href: urlNotImplemented}, "Export as .pdf")),
-                        ml("li", { class: "dropdown-item"}, ml("a", {href: urlCopyReportItem}, "Copy item")),
-                        ml("li", { class: "dropdown-item"}, ml("button", {onclick: deleteReportItem, "data-report-item-id": parameters.id }, "Delete item")),
+                        ml("li", {}, ml("a", { class: "dropdown-item", href: urlNotImplemented}, "Export as .xls")),
+                        ml("li", {}, ml("a", { class: "dropdown-item", href: urlNotImplemented}, "Export as .pdf")),
+                        ml("li", {}, ml("a", { class: "dropdown-item", href: urlCopyReportItem}, "Copy item")),
+                        ml("li", {}, ml("button", { class: "dropdown-item", onclick: deleteReportItem, "data-report-item-id": parameters.id }, "Delete item")),
                     ]),
                 ]),
             ]),

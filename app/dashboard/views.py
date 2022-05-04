@@ -826,6 +826,30 @@ def scenario_visualize_stacked_timeseries(request, scen_id):
     )
 
 
+def scenario_visualize_capacities(request, scen_id):
+    scenario = get_object_or_404(Scenario, pk=scen_id)
+    if (scenario.project.user != request.user) and (
+        request.user not in scenario.project.viewers.all()
+    ):
+        raise PermissionDenied
+
+    assets_results = AssetsResults.objects.get(simulation__scenario__id=scenario.id)
+    y_variables = [n for n in assets_results.available_timeseries]
+
+    results_json = report_item_render_to_json(
+        report_item_id="capacities",
+        data=REPORT_GRAPHS[GRAPH_CAPACITIES](
+            simulations=[scenario.simulation], y_variables=y_variables
+        ),
+        title="",
+        report_item_type=GRAPH_CAPACITIES,
+    )
+
+    return JsonResponse(
+        results_json, status=200, content_type="application/json", safe=False
+    )
+
+
 # TODO: Sector coupling must be refined (including transformer flows)
 def scenario_visualize_sankey(request, scen_id):
     scenario = get_object_or_404(Scenario, pk=scen_id)
@@ -848,117 +872,6 @@ def scenario_visualize_sankey(request, scen_id):
     )
 
 
-# TODO exclude sink components
-def scenario_visualize_stacked_capacities(request, scen_id):
-    scenario = get_object_or_404(Scenario, pk=scen_id)
-    if (scenario.project.user != request.user) and (
-        request.user not in scenario.project.viewers.all()
-    ):
-        raise PermissionDenied
-
-    try:
-        assets_results_obj = AssetsResults.objects.get(simulation=scenario.simulation)
-        assets_results_json = assets_results_obj.assets_dict
-
-        results_json = [
-            {
-                "values": [
-                    {
-                        "x": ["Installierte Kapazität"],
-                        "y": [asset_obj["installed_capacity"]["value"]],
-                        "name": asset_obj["label"].replace("_", " ").upper()
-                        + " in "
-                        + asset_obj["installed_capacity"]["unit"]
-                        if asset_obj["installed_capacity"]["unit"] != "unit"
-                        else asset_obj["label"].replace("_", " ").upper() + " in kW",
-                        "type": "bar",
-                    }
-                    for asset, asset_list in assets_results_json.items()
-                    for asset_obj in asset_list
-                    if "flow" in asset_obj.keys()
-                    and "consumption_period" not in asset_obj["label"]
-                ],
-                "title": "Installierte Kapazität",
-                "yaxistitle": "Leistung",
-                "div": "capacities",
-            }
-        ]
-
-        return JsonResponse(
-            results_json, status=200, content_type="application/json", safe=False
-        )
-    except Exception as e:
-        logger.error(
-            f"Dashboard ERROR: MVS Req Id: {scenario.simulation.mvs_token}. Thrown Exception: {traceback.format_exc()}"
-        )
-        return JsonResponse(
-            {"error": f"Could not retrieve kpi cost data."},
-            status=404,
-            content_type="application/json",
-            safe=False,
-        )
-
-
-# TODO: push optimized_add_cap for DSO to KPI as "Spitzenlast"/ "Peak Demand"
-# TODO: Make a note appear if all components have optimized_capacity = False because no figure will be shown
-# TODO: Change "if results_dict = json.loads(Scenario.objects.first().simulation.results)"
-def scenario_visualize_stacked_optimized_capacities(request, scen_id):
-    scenario = get_object_or_404(Scenario, pk=scen_id)
-    if (scenario.project.user != request.user) and (
-        request.user not in scenario.project.viewers.all()
-    ):
-        raise PermissionDenied
-
-    try:
-        results_dict = json.loads(
-            Scenario.objects.get(simulation=scenario.simulation).simulation.results
-        )
-        kpi_scalar_matrix = results_dict["kpi"]["scalar_matrix"]
-
-        assets_results_obj = AssetsResults.objects.get(simulation=scenario.simulation)
-        assets_results_json = assets_results_obj.assets_dict
-        asset_optimize_cap = []
-
-        for asset, asset_list in assets_results_json.items():
-            for asset_obj in asset_list:
-                if asset_obj["optimize_capacity"]["value"]:
-                    asset_optimize_cap.append(asset_obj["label"])
-
-        results_json = [
-            {
-                "values": [
-                    {
-                        "x": ["Optimierte Kapazität"],
-                        "y": [kpi_scalar_matrix[asset]["optimized_add_cap"]],
-                        "name": asset.replace("_", " ").upper()
-                        + " in "
-                        + kpi_scalar_matrix[asset]["unit"]
-                        if kpi_scalar_matrix[asset]["unit"] != "?"
-                        else asset.replace("_", " ").upper() + " in kW",
-                        "type": "bar",
-                    }
-                    for asset in asset_optimize_cap
-                    if "consumption_period" not in asset
-                ],
-                "title": "Optimierte Kapazität",
-                "yaxistitle": "Leistung",
-                "div": "capacities",
-            }
-        ]
-
-        return JsonResponse(
-            results_json, status=200, content_type="application/json", safe=False
-        )
-    except Exception as e:
-        logger.error(
-            f"Dashboard ERROR: MVS Req Id: {scenario.simulation.mvs_token}. Thrown Exception: {traceback.format_exc()}"
-        )
-        return JsonResponse(
-            {"error": f"Could not retrieve kpi cost data."},
-            status=404,
-            content_type="application/json",
-            safe=False,
-        )
 
 
 @login_required

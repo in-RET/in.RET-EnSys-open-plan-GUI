@@ -517,37 +517,16 @@ function scenario_visualize_sankey(scen_id){
         });
 };
 
-function scenario_visualize_stacked_capacities(scen_id){
+function scenario_visualize_capacities(scen_id){
  $.ajax({
-            url: "{% url 'scenario_visualize_stacked_capacities' %}" + scen_id,
+            url: "{% url 'scenario_visualize_capacities' %}" + scen_id,
             type: "GET",
-            success: async (data) => {
-                await drawstackedBarChart(data);
+            success: async (parameters) => {
+                await await graph_type_mapping[parameters.type](parameters.id, parameters);;
             },
-            error: function (xhr, errmsg) {
-                console.log("backend_error!")
-                //Show the error message
-                $('#message-div').html("<div class='alert-error'>" +
-                    "<strong>Success: </strong> We have encountered an error: " + errmsg + "</div>");
-            }
         });
 };
 
-function scenario_visualize_stacked_optimized_capacities(scen_id){
- $.ajax({
-            url: "{% url 'scenario_visualize_stacked_optimized_capacities' %}" + scen_id,
-            type: "GET",
-            success: async (data) => {
-                await drawstackedBarChart(data);
-            },
-            error: function (xhr, errmsg) {
-                console.log("backend_error!")
-                //Show the error message
-                $('#message-div').html("<div class='alert-error'>" +
-                    "<strong>Success: </strong> We have encountered an error: " + errmsg + "</div>");
-            }
-        });
-};
 
     function drawScatterPLot(dataList) {
         const data= dataList[0].values;

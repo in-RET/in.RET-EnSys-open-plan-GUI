@@ -102,14 +102,9 @@ function addTimeseriesGraph(graphId, parameters){
                 name:"",
                 type: 'scatter',
                 line: {shape: 'hv'},
-            }
-            if(compare == true){
-               trace.name = scenario.scenario_name + timeseries.label + timeseries.unit
-            }
-            else{
-               trace.name = timeseries.label + timeseries.unit
-            }
-            data.push(trace)
+            };
+            trace.name = format_trace_name(scenario.scenario_name, timeseries.label, timeseries.unit, compare=compare);
+            data.push(trace);
         });
     });
     // prepare graph layout in plotly format

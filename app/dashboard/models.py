@@ -283,9 +283,7 @@ class AssetsResults(models.Model):
     ):
         """Provided the user name of the asset, return the timeseries linked to this asset"""
         if self.__available_timeseries is None:
-            asset_results = self.single_asset_results(
-                asset_name, asset_category, energy_vector
-            )
+            asset_results = self.single_asset_results(asset_name, asset_category)
 
         else:
             asset_results = self.__available_timeseries.get(asset_name)
@@ -381,28 +379,28 @@ def graph_capacities(simulations, y_variables):
 
         kpi_scalar_matrix = results_dict["kpi"]["scalar_matrix"]
 
-        installed_capacity_dict = {"capacity": [], "name": "Installed Capacity"}
-        optimized_capacity_dict = {"capacity": [], "name": "Optimized Capacity"}
-
+        # TODO link unit to unit in asset["installed_capacity"]["unit"] or asset["optimized_add_cap"]["unit"]
+        installed_capacity_dict = {"capacity": [], "name": "Installed Capacity (kW)"}
+        optimized_capacity_dict = {"capacity": [], "name": "Optimized Capacity (kW)"}
         for y_var in y_variables:
 
-            asset = assets_results_obj.single_asset_results(asset_name=y_var)
-
-            x_values.append(y_var + " in " + asset["installed_capacity"]["unit"])
-            installed_capacity_dict["capacity"].append(
-                asset["installed_capacity"]["value"]
-            )
-            if y_var in kpi_scalar_matrix:
-                optimized_capacity_dict["capacity"].append(
-                    kpi_scalar_matrix[y_var]["optimized_add_cap"]
+            if "@" not in y_var:
+                asset = assets_results_obj.single_asset_results(asset_name=y_var)
+                x_values.append(y_var)
+                installed_capacity_dict["capacity"].append(
+                    asset["installed_capacity"]["value"]
                 )
-            else:
-                if "optimized_add_cap" in asset:
+                if y_var in kpi_scalar_matrix:
                     optimized_capacity_dict["capacity"].append(
-                        asset["optimized_add_cap"]["value"]
+                        kpi_scalar_matrix[y_var]["optimized_add_cap"]
                     )
                 else:
-                    optimized_capacity_dict["capacity"].append(0)
+                    if "optimized_add_cap" in asset:
+                        optimized_capacity_dict["capacity"].append(
+                            asset["optimized_add_cap"]["value"]
+                        )
+                    else:
+                        optimized_capacity_dict["capacity"].append(0)
 
         y_values.append(installed_capacity_dict)
         y_values.append(optimized_capacity_dict)

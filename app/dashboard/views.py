@@ -827,57 +827,25 @@ def scenario_visualize_stacked_timeseries(request, scen_id):
 
 
 # TODO: Sector coupling must be refined (including transformer flows)
-def scenario_visualize_stacked_total_flow(request, scen_id):
+def scenario_visualize_sankey(request, scen_id):
     scenario = get_object_or_404(Scenario, pk=scen_id)
     if (scenario.project.user != request.user) and (
         request.user not in scenario.project.viewers.all()
     ):
         raise PermissionDenied
 
-    try:
-        assets_results_obj = AssetsResults.objects.get(simulation=scenario.simulation)
-        assets_results_json = assets_results_obj.assets_dict
+    results_json = report_item_render_to_json(
+        report_item_id="sankey",
+        data=REPORT_GRAPHS[GRAPH_SANKEY](
+            simulation=scenario.simulation, energy_vector=scenario.energy_vectors
+        ),
+        title="Sankey",
+        report_item_type=GRAPH_SANKEY,
+    )
 
-        results_json = [
-            {
-                "values": [
-                    {
-                        "x": ["Erzeugung", "Verbrauch"],
-                        "y": [sum(asset_obj["flow"]["value"]), 0]
-                        if asset_obj["type_oemof"] == "source"
-                        else [0, sum(asset_obj["flow"]["value"])],
-                        "name": asset_obj["label"].replace("_", " ").upper()
-                        + " in "
-                        + asset_obj["flow"]["unit"]
-                        if asset_obj["flow"]["unit"] != "?"
-                        else asset_obj["label"].replace("_", " ").upper() + " in kWh",
-                        "type": "bar",
-                    }
-                    for asset_list in assets_results_json.values()
-                    for asset_obj in asset_list
-                    if asset_obj["type_oemof"] in ["source", "sink"]
-                    if "flow" in asset_obj.keys()
-                    and "consumption_period" not in asset_obj["label"]
-                ],
-                "title": "Erzeugung und Verbrauch",
-                "yaxistitle": "Kumulierte Energie",
-                "div": "stacked_total_flow",
-            }
-        ]
-
-        return JsonResponse(
-            results_json, status=200, content_type="application/json", safe=False
-        )
-    except Exception as e:
-        logger.error(
-            f"Dashboard ERROR: MVS Req Id: {scenario.simulation.mvs_token}. Thrown Exception: {traceback.format_exc()}"
-        )
-        return JsonResponse(
-            {"error": f"Could not retrieve kpi cost data."},
-            status=404,
-            content_type="application/json",
-            safe=False,
-        )
+    return JsonResponse(
+        results_json, status=200, content_type="application/json", safe=False
+    )
 
 
 # TODO exclude sink components

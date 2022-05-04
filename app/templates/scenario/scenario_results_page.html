@@ -507,19 +507,13 @@ function scenario_visualize_stacked_timeseries(scen_id){
 };
 
 
-function scenario_visualize_stacked_total_flow(scen_id){
+function scenario_visualize_sankey(scen_id){
  $.ajax({
-            url: "{% url 'scenario_visualize_stacked_total_flow' %}" + scen_id,
+            url: "{% url 'scenario_visualize_sankey' %}" + scen_id,
             type: "GET",
-            success: async (data) => {
-                await drawstackedBarChart(data);
+            success: async (parameters) => {
+                await graph_type_mapping[parameters.type](parameters.id, parameters);
             },
-            error: function (xhr, errmsg) {
-                console.log("backend_error!")
-                //Show the error message
-                $('#message-div').html("<div class='alert-error'>" +
-                    "<strong>Success: </strong> We have encountered an error: " + errmsg + "</div>");
-            }
         });
 };
 

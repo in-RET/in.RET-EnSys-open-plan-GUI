@@ -278,13 +278,18 @@ class AssetsResults(models.Model):
             answer = None
         return answer
 
-    def single_asset_timeseries(self, asset_name, asset_category=None):
+    def single_asset_timeseries(
+        self, asset_name, asset_category=None, energy_vector=None
+    ):
         """Provided the user name of the asset, return the timeseries linked to this asset"""
         if self.__available_timeseries is None:
-            asset_results = self.single_asset_results(asset_name, asset_category)
+            asset_results = self.single_asset_results(
+                asset_name, asset_category, energy_vector
+            )
 
         else:
             asset_results = self.__available_timeseries.get(asset_name)
+        answer = None
 
         if "flow" in asset_results:
             answer = single_timeseries_to_json(
@@ -293,8 +298,11 @@ class AssetsResults(models.Model):
                 label=asset_name,
                 asset_type=asset_results["type_oemof"],
             )
-        else:
-            answer = None
+
+        # if an energy_vector is provided return the timeseries only if the energy_vector type of the asset matches
+        if energy_vector is not None:
+            if asset_results["energy_vector"] != energy_vector:
+                answer = None
         return answer
 
 

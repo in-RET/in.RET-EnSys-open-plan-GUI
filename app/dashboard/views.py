@@ -869,20 +869,33 @@ def scenario_visualize_stacked_timeseries(request, scen_id):
     )
 
 
-def scenario_visualize_capacities(request, scen_id):
-    scenario = get_object_or_404(Scenario, pk=scen_id)
-    if (scenario.project.user != request.user) and (
-        request.user not in scenario.project.viewers.all()
-    ):
-        raise PermissionDenied
+# TODO exclude sink components
+def scenario_visualize_capacities(request, proj_id, scen_id=None):
 
-    assets_results = AssetsResults.objects.get(simulation__scenario__id=scenario.id)
-    y_variables = [n for n in assets_results.available_timeseries]
+    if scen_id is None:
+        selected_scenario = get_selected_scenarios_in_cache(request, proj_id)
+    else:
+        selected_scenario = [scen_id]
+
+    simulations = []
+
+    common_assets = []  # TODO take intersection of all y_variables sets
+
+    for scen_id in selected_scenario:
+        scenario = get_object_or_404(Scenario, pk=scen_id)
+        if (scenario.project.user != request.user) and (
+            request.user not in scenario.project.viewers.all()
+        ):
+            raise PermissionDenied
+        simulations.append(scenario.simulation)
+
+        assets_results = AssetsResults.objects.get(simulation__scenario__id=scenario.id)
+        y_variables = [n for n in assets_results.available_timeseries]
 
     results_json = report_item_render_to_json(
         report_item_id="capacities",
         data=REPORT_GRAPHS[GRAPH_CAPACITIES](
-            simulations=[scenario.simulation], y_variables=y_variables
+            simulations=simulations, y_variables=y_variables
         ),
         title="",
         report_item_type=GRAPH_CAPACITIES,

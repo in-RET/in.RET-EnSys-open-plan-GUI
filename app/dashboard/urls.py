@@ -77,6 +77,8 @@ urlpatterns = [
         update_selected_multi_scenarios,
         name="update_selected_multi_scenarios",
     ),
+    re_path(
+        r"^project/(?P<proj_id>\d+)/scenario/results/request_timeseries/(?P<scen_id>\d+)?$",
         scenario_visualize_timeseries,
         name="scenario_visualize_timeseries",
     ),

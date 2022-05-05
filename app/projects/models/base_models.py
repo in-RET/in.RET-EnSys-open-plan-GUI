@@ -63,7 +63,9 @@ class Project(models.Model):
     economic_data = models.OneToOneField(
         EconomicData, on_delete=models.SET_NULL, null=True
     )
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True
+    )
     viewers = models.ManyToManyField(Viewer, related_name="viewer_projects")
 
     def __str__(self):

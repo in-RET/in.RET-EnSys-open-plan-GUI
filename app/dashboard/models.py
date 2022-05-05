@@ -300,6 +300,7 @@ class AssetsResults(models.Model):
                 unit=asset_results["flow"]["unit"],
                 label=asset_name,
                 asset_type=asset_results["type_oemof"],
+                asset_category=asset_results["category"],
             )
 
         # if an energy_vector is provided return the timeseries only if the energy_vector type of the asset matches
@@ -329,7 +330,14 @@ def graph_timeseries(simulations, y_variables):
         asset_timeseries = assets_results_obj.available_timeseries
         for y_var in y_variables:
             if y_var in asset_timeseries:
-                y_values.append(assets_results_obj.single_asset_timeseries(y_var))
+                single_ts_json = assets_results_obj.single_asset_timeseries(y_var)
+                if single_ts_json["asset_type"] == "sink" or single_ts_json[
+                    "asset_category"
+                ] == format_storage_subasset_name("energy_storage", "input_power"):
+                    single_ts_json["value"] = (
+                        -np.array(single_ts_json["value"])
+                    ).tolist()
+                y_values.append(single_ts_json)
         simulations_results.append(
             simulation_timeseries_to_json(
                 scenario_name=sim.scenario.name,

@@ -354,9 +354,14 @@ def graph_timeseries_stacked(simulations, y_variables, energy_vector):
                     y_var, energy_vector=energy_vector
                 )
                 if single_ts_json is not None:
-                    single_ts_json["fill"] = (
-                        "none" if single_ts_json["asset_type"] == "sink" else "tonexty"
-                    )
+
+                    if single_ts_json["asset_type"] == "sink" or single_ts_json[
+                        "asset_category"
+                    ] == format_storage_subasset_name("energy_storage", "input_power"):
+                        single_ts_json["fill"] = "none"
+                    else:
+                        single_ts_json["fill"] = "tonexty"
+                    print(single_ts_json["fill"])
                     y_values.append(single_ts_json)
         simulations_results.append(
             simulation_timeseries_to_json(

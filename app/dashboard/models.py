@@ -384,7 +384,9 @@ def graph_timeseries_stacked(simulations, y_variables, energy_vector):
 
 def graph_capacities(simulations, y_variables):
     simulations_results = []
-
+    multi_scenario = False
+    if len(simulations) > 1:
+        multi_scenario = True
     for simulation in simulations:
         y_values = (
             []
@@ -398,28 +400,38 @@ def graph_capacities(simulations, y_variables):
         kpi_scalar_matrix = results_dict["kpi"]["scalar_matrix"]
 
         # TODO link unit to unit in asset["installed_capacity"]["unit"] or asset["optimized_add_cap"]["unit"]
-        installed_capacity_dict = {"capacity": [], "name": "Installed Capacity (kW)"}
-        optimized_capacity_dict = {"capacity": [], "name": "Optimized Capacity (kW)"}
+        installed_capacity_dict = {
+            "capacity": [],
+            "name": "Installed Capacity (kW)"
+            if multi_scenario is False
+            else f"Inst. Cap. {simulation.scenario.name} (kW)",
+        }
+        optimized_capacity_dict = {
+            "capacity": [],
+            "name": "Optimized Capacity (kW)"
+            if multi_scenario is False
+            else f"Opt. Cap. {simulation.scenario.name} (kW)",
+        }
         for y_var in y_variables:
 
             if "@" not in y_var:
                 asset = assets_results_obj.single_asset_results(asset_name=y_var)
                 x_values.append(y_var)
-                installed_capacity_dict["capacity"].append(
-                    asset["installed_capacity"]["value"]
-                )
+                if asset is not None:
+                    installed_cap = asset["installed_capacity"]["value"]
+                else:
+                    installed_cap = 0
+                installed_capacity_dict["capacity"].append(installed_cap)
                 if y_var in kpi_scalar_matrix:
                     optimized_capacity_dict["capacity"].append(
                         kpi_scalar_matrix[y_var]["optimized_add_cap"]
                     )
                 else:
-                    if "optimized_add_cap" in asset:
-                        optimized_capacity_dict["capacity"].append(
-                            asset["optimized_add_cap"]["value"]
-                        )
-                    else:
-                        optimized_capacity_dict["capacity"].append(0)
-
+                    optimized_cap = 0
+                    if asset is not None:
+                        if "optimized_add_cap" in asset:
+                            optimized_cap = asset["optimized_add_cap"]["value"]
+                    optimized_capacity_dict["capacity"].append(optimized_cap)
         y_values.append(installed_capacity_dict)
         y_values.append(optimized_capacity_dict)
 

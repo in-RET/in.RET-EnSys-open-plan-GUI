@@ -93,7 +93,7 @@ urlpatterns = [
         name="scenario_visualize_sankey",
     ),
     re_path(
-        r"^scenario/results/request_capacities/(?P<scen_id>\d+)?$",
+        r"^project/(?P<proj_id>\d+)/scenario/results/request-capacities/(?P<scen_id>\d+)?$",
         scenario_visualize_capacities,
         name="scenario_visualize_capacities",
     ),

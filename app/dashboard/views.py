@@ -30,6 +30,7 @@ from projects.services import (
     excuses_design_under_development,
     get_selected_scenarios_in_cache,
 )
+from projects.constants import COMPARE_VIEW
 from dashboard.models import (
     ReportItem,
     SensitivityAnalysisGraph,
@@ -53,8 +54,6 @@ import traceback
 import ast
 
 logger = logging.getLogger(__name__)
-
-COMPARE_VIEW = "compare"
 
 
 @login_required
@@ -591,13 +590,13 @@ def ajax_get_sensitivity_analysis_parameters(request):
 @login_required
 @json_view
 @require_http_methods(["GET"])
-def update_selected_scenarios(request, proj_id, scen_id):
+def update_selected_single_scenario(request, proj_id, scen_id):
     proj_id = str(proj_id)
     scen_id = str(scen_id)
     if request.is_ajax():
         status_code = 200
         selected_scenarios_per_project = request.session.get("selected_scenarios", {})
-        selected_scenario = selected_scenarios_per_project.get(str(proj_id), [])
+        selected_scenario = selected_scenarios_per_project.get(proj_id, [])
 
         if scen_id in selected_scenario:
             if len(selected_scenario) > 1:
@@ -612,6 +611,41 @@ def update_selected_scenarios(request, proj_id, scen_id):
             selected_scenario = [scen_id]
             msg = _(f"Scenario {scen_id} was selected")
         selected_scenarios_per_project[proj_id] = selected_scenario
+        request.session["selected_scenarios"] = selected_scenarios_per_project
+        answer = JsonResponse(
+            {"success": msg}, status=status_code, content_type="application/json"
+        )
+    else:
+        answer = JsonResponse(
+            {"error": "This url is only for AJAX calls"},
+            status=405,
+            content_type="application/json",
+        )
+    return answer
+
+
+@login_required
+@json_view
+@require_http_methods(["GET"])
+def update_selected_multi_scenarios(request, proj_id, scen_id):
+    proj_id = str(proj_id)
+    scen_id = str(scen_id)
+    if request.is_ajax():
+        status_code = 200
+        selected_scenarios_per_project = request.session.get("selected_scenarios", {})
+        selected_scenarios = selected_scenarios_per_project.get(proj_id, [])
+
+        if scen_id in selected_scenarios:
+            if len(selected_scenarios) > 1:
+                selected_scenarios.pop(selected_scenarios.index(scen_id))
+                msg = _(f"Scenario {scen_id} was deselected")
+            else:
+                msg = _(f"At least one scenario need to be selected")
+                status_code = 405
+        else:
+            selected_scenarios.append(scen_id)
+            msg = _(f"Scenarios {','.join(selected_scenarios)} was selected")
+        selected_scenarios_per_project[proj_id] = selected_scenarios
         request.session["selected_scenarios"] = selected_scenarios_per_project
         answer = JsonResponse(
             {"success": msg}, status=status_code, content_type="application/json"

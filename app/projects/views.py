@@ -344,6 +344,20 @@ def project_upload(request):
 
 @login_required
 @require_http_methods(["POST"])
+def project_from_usecase(request):
+    usecase_id = request.POST.get("usecase", None)
+    if usecase_id is not None:
+        usecase_id = int(usecase_id)
+    else:
+        usecase_id = 0
+    usecase = get_object_or_404(UseCase, id=usecase_id)
+    proj_id = usecase.assign(request.user)
+
+    return HttpResponseRedirect(reverse("project_search", args=[proj_id]))
+
+
+@login_required
+@require_http_methods(["POST"])
 def project_delete(request, proj_id):
     project = get_object_or_404(Project, id=proj_id)
 
@@ -374,6 +388,8 @@ def project_search(request, proj_id=None, scen_id=None):
     )
     project_share_form = ProjectShareForm()
     project_revoke_form = ProjectRevokeForm(proj_id=proj_id)
+    usecase_form = UseCaseForm(usecase_qs=UseCase.objects.all())
+
     return render(
         request,
         "project/project_search.html",
@@ -385,6 +401,7 @@ def project_search(request, proj_id=None, scen_id=None):
             "project_upload_form": project_upload_form,
             "project_share_form": project_share_form,
             "project_revoke_form": project_revoke_form,
+            "usecase_form": usecase_form,
         },
     )
 

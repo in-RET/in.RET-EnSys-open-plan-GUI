@@ -20,6 +20,7 @@ urlpatterns = [
     ),
     path("project/export/<int:proj_id>", project_export, name="project_export"),
     path("project/upload", project_upload, name="project_upload"),
+    path("project/from/usecase", project_from_usecase, name="project_from_usecase"),
     path("project/delete/<int:proj_id>", project_delete, name="project_delete"),
     path(
         "project/project_members_list/<int:proj_id>",

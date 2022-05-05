@@ -421,3 +421,5 @@ MAP_EPA_MVS = {
     "duration": "project_duration",
 }
 MAP_MVS_EPA = {value: key for (key, value) in MAP_EPA_MVS.items()}
+
+COMPARE_VIEW = "compare"

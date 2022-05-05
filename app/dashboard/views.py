@@ -807,12 +807,21 @@ def scenario_economic_results(request, scen_id=None):
 @login_required
 @json_view
 @require_http_methods(["GET"])
-def scenario_visualize_timeseries(request, scen_id):
-    scenario = get_object_or_404(Scenario, pk=scen_id)
-    if (scenario.project.user != request.user) and (
-        request.user not in scenario.project.viewers.all()
-    ):
-        raise PermissionDenied
+def scenario_visualize_timeseries(request, proj_id=None, scen_id=None):
+    if scen_id is None:
+        selected_scenario = get_selected_scenarios_in_cache(request, proj_id)
+    else:
+        selected_scenario = [scen_id]
+
+    simulations = []
+
+    for scen_id in selected_scenario:
+        scenario = get_object_or_404(Scenario, pk=scen_id)
+        if (scenario.project.user != request.user) and (
+            request.user not in scenario.project.viewers.all()
+        ):
+            raise PermissionDenied
+        simulations.append(scenario.simulation)
 
     assets_results = AssetsResults.objects.get(simulation__scenario__id=scenario.id)
     y_variables = [n for n in assets_results.available_timeseries]
@@ -820,7 +829,7 @@ def scenario_visualize_timeseries(request, scen_id):
     results_json = report_item_render_to_json(
         report_item_id="all_timeseries",
         data=REPORT_GRAPHS[GRAPH_TIMESERIES](
-            simulations=[scenario.simulation], y_variables=y_variables
+            simulations=simulations, y_variables=y_variables
         ),
         title="",
         report_item_type=GRAPH_TIMESERIES,
@@ -904,8 +913,6 @@ def scenario_visualize_sankey(request, scen_id):
     return JsonResponse(
         results_json, status=200, content_type="application/json", safe=False
     )
-
-
 
 
 @login_required

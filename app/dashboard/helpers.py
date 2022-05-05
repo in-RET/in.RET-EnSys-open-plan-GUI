@@ -364,11 +364,19 @@ REPORT_TYPES = (
 )
 
 
-def single_timeseries_to_json(value=None, unit="", label="", asset_type=""):
+def single_timeseries_to_json(
+    value=None, unit="", label="", asset_type="", asset_category=""
+):
     """format the information about a single timeseries in a specific JSON"""
     if value is None:
         value = []
-    return {"value": value, "unit": unit, "label": label, "asset_type": asset_type}
+    return {
+        "value": value,
+        "unit": unit,
+        "label": label,
+        "asset_type": asset_type,
+        "asset_category": asset_category,
+    }
 
 
 def simulation_timeseries_to_json(

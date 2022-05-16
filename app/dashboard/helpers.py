@@ -28,7 +28,9 @@ KPI_PARAMETERS = {}
 KPI_PARAMETERS_ASSETS = {}
 
 if os.path.exists(staticfiles_storage.path("MVS_kpis_list.csv")) is True:
-    with open(staticfiles_storage.path("MVS_kpis_list.csv")) as csvfile:
+    with open(
+        staticfiles_storage.path("MVS_kpis_list.csv"), encoding="utf-8"
+    ) as csvfile:
         csvreader = csv.reader(csvfile, delimiter=",", quotechar='"')
         for i, row in enumerate(csvreader):
             if i == 0:
@@ -74,7 +76,9 @@ if os.path.exists(staticfiles_storage.path("MVS_kpis_list.csv")) is True:
                 #                 {"name": _(verbose), "id": label, "unit": _(unit)}
                 #             )
 
-    with open(staticfiles_storage.path("MVS_kpis_list.csv")) as csvfile:
+    with open(
+        staticfiles_storage.path("MVS_kpis_list.csv"), encoding="utf-8"
+    ) as csvfile:
         csvreader = csv.reader(csvfile, delimiter=",", quotechar='"')
         for i, row in enumerate(csvreader):
             if i == 0:

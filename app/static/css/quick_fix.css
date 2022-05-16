@@ -30,3 +30,13 @@ background-color: #F4F7F9 ;
     flex-direction: column !important;
     align-items: flex-start !important;
 }
+
+.greyed_out{
+pointer-events: none;
+opacity: 0.6;
+}
+
+.info__icon{
+height: 1.2rem;
+margin-left: .5rem;
+}

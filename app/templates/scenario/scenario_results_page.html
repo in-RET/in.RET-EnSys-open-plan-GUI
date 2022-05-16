@@ -112,7 +112,7 @@
                     {% translate "Project" %}
                 </div>
                 <div class="project-name">
-                    <form action="{{ request.get_full_path }}" method="POST">
+                    <form action="{% url 'result_change_project' %}" method="POST">
                         {% csrf_token %}
                         <select name="proj_id" class="form-select" aria-label="Default select example" onchange="this.form.submit()">
                         {% for project in project_list %}
@@ -153,7 +153,7 @@
         <div>
             <div class="row">
                 <div class="dashboard__scenarios">
-                    <h2>My scenarios</h2>
+                    <h2>{% translate "My scenarios" %}</h2>
                     <div class="scenario-select">
                         {% for scenario in scenario_list %}
                         {% if scenario.id|stringformat:'s' in request|get_selected_scenarios:proj_id %}
@@ -176,7 +176,7 @@
                 <div class="col">
                   <button class="btn btn--medium" onclick="javascript:showCreateReportItemModal(event)">
                     <span class="icon icon-add"></span>
-                    Create graph
+                    {% translate "Create graph" %}
                   </button>
                 </div>
             </div>

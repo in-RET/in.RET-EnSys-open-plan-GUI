@@ -228,6 +228,15 @@ class Scenario(models.Model):
     def get_currency(self):
         return self.project.economic_data.currency
 
+    @property
+    def energy_vectors(self):
+        """Return a list of energy vectors used in a scenario"""
+        vectors = []
+        for vector in self.bus_set.all().values_list("type", flat=True):
+            if vector not in vectors:
+                vectors.append(vector)
+        return vectors
+
     def export(self, bind_project_data=False):
         """
         Parameters

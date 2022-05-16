@@ -199,6 +199,10 @@ class AssetsResults(models.Model):
                                     "category"
                                 ] = format_storage_subasset_name(category, sub_cat)
                                 storage_subasset["type_oemof"] = asset["type_oemof"]
+                                storage_subasset["energy_vector"] = asset[
+                                    "energy_vector"
+                                ]
+
                                 self.__available_timeseries[
                                     format_storage_subasset_name(
                                         asset["label"], sub_cat
@@ -247,6 +251,7 @@ class AssetsResults(models.Model):
                                     answer["category"] = format_storage_subasset_name(
                                         category, sub_cat
                                     )
+                                    answer["energy_vector"] = asset["energy_vector"]
                                     break
                                 else:
                                     raise ValueError(
@@ -278,13 +283,16 @@ class AssetsResults(models.Model):
             answer = None
         return answer
 
-    def single_asset_timeseries(self, asset_name, asset_category=None):
+    def single_asset_timeseries(
+        self, asset_name, asset_category=None, energy_vector=None
+    ):
         """Provided the user name of the asset, return the timeseries linked to this asset"""
         if self.__available_timeseries is None:
             asset_results = self.single_asset_results(asset_name, asset_category)
 
         else:
             asset_results = self.__available_timeseries.get(asset_name)
+        answer = None
 
         if "flow" in asset_results:
             answer = single_timeseries_to_json(
@@ -292,9 +300,13 @@ class AssetsResults(models.Model):
                 unit=asset_results["flow"]["unit"],
                 label=asset_name,
                 asset_type=asset_results["type_oemof"],
+                asset_category=asset_results["category"],
             )
-        else:
-            answer = None
+
+        # if an energy_vector is provided return the timeseries only if the energy_vector type of the asset matches
+        if energy_vector is not None:
+            if asset_results["energy_vector"] != energy_vector:
+                answer = None
         return answer
 
 
@@ -308,6 +320,244 @@ def parse_manytomany_object_list(object_list, model):
             object_list = [s for s in model.objects.filter(id__in=object_list)]
     return object_list
 
+
+def graph_timeseries(simulations, y_variables):
+    simulations_results = []
+
+    for sim in simulations:
+        y_values = []
+        assets_results_obj = AssetsResults.objects.get(simulation=sim)
+        asset_timeseries = assets_results_obj.available_timeseries
+        for y_var in y_variables:
+            if y_var in asset_timeseries:
+                single_ts_json = assets_results_obj.single_asset_timeseries(y_var)
+                if single_ts_json["asset_type"] == "sink" or single_ts_json[
+                    "asset_category"
+                ] == format_storage_subasset_name("energy_storage", "input_power"):
+                    single_ts_json["value"] = (
+                        -np.array(single_ts_json["value"])
+                    ).tolist()
+                y_values.append(single_ts_json)
+        simulations_results.append(
+            simulation_timeseries_to_json(
+                scenario_name=sim.scenario.name,
+                scenario_id=sim.scenario.id,
+                scenario_timeseries=y_values,
+                scenario_timestamps=sim.scenario.get_timestamps(),
+            )
+        )
+    return simulations_results
+
+
+def graph_timeseries_stacked(simulations, y_variables, energy_vector):
+    simulations_results = []
+
+    for simulation in simulations:
+        y_values = []
+        assets_results_obj = AssetsResults.objects.get(simulation=simulation)
+        asset_timeseries = assets_results_obj.available_timeseries
+        for y_var in y_variables:
+            if y_var in asset_timeseries:
+                single_ts_json = assets_results_obj.single_asset_timeseries(
+                    y_var, energy_vector=energy_vector
+                )
+                if single_ts_json is not None:
+
+                    if single_ts_json["asset_type"] == "sink" or single_ts_json[
+                        "asset_category"
+                    ] == format_storage_subasset_name("energy_storage", "input_power"):
+                        single_ts_json["fill"] = "none"
+                    else:
+                        single_ts_json["fill"] = "tonexty"
+                    print(single_ts_json["fill"])
+                    y_values.append(single_ts_json)
+        simulations_results.append(
+            simulation_timeseries_to_json(
+                scenario_name=simulation.scenario.name,
+                scenario_id=simulation.scenario.id,
+                scenario_timeseries=y_values,
+                scenario_timestamps=simulation.scenario.get_timestamps(),
+            )
+        )
+    return simulations_results
+
+
+def graph_capacities(simulations, y_variables):
+    simulations_results = []
+    multi_scenario = False
+    if len(simulations) > 1:
+        multi_scenario = True
+    for simulation in simulations:
+        y_values = (
+            []
+        )  # stores the capacity, both installed and optimized in seperate dicts, of each individual asset/ component
+        x_values = []  # stores the label of the corresponding asset
+
+        assets_results_obj = AssetsResults.objects.get(simulation=simulation)
+
+        results_dict = json.loads(simulation.results)
+
+        kpi_scalar_matrix = results_dict["kpi"]["scalar_matrix"]
+
+        # TODO link unit to unit in asset["installed_capacity"]["unit"] or asset["optimized_add_cap"]["unit"]
+        installed_capacity_dict = {
+            "capacity": [],
+            "name": "Installed Capacity (kW)"
+            if multi_scenario is False
+            else f"Inst. Cap. {simulation.scenario.name} (kW)",
+        }
+        optimized_capacity_dict = {
+            "capacity": [],
+            "name": "Optimized Capacity (kW)"
+            if multi_scenario is False
+            else f"Opt. Cap. {simulation.scenario.name} (kW)",
+        }
+        for y_var in y_variables:
+
+            if "@" not in y_var:
+                asset = assets_results_obj.single_asset_results(asset_name=y_var)
+                x_values.append(y_var)
+                if asset is not None:
+                    installed_cap = asset["installed_capacity"]["value"]
+                else:
+                    installed_cap = 0
+                installed_capacity_dict["capacity"].append(installed_cap)
+                if y_var in kpi_scalar_matrix:
+                    optimized_capacity_dict["capacity"].append(
+                        kpi_scalar_matrix[y_var]["optimized_add_cap"]
+                    )
+                else:
+                    optimized_cap = 0
+                    if asset is not None:
+                        if "optimized_add_cap" in asset:
+                            optimized_cap = asset["optimized_add_cap"]["value"]
+                    optimized_capacity_dict["capacity"].append(optimized_cap)
+        y_values.append(installed_capacity_dict)
+        y_values.append(optimized_capacity_dict)
+
+        simulations_results.append(
+            simulation_timeseries_to_json(
+                scenario_name=simulation.scenario.name,
+                scenario_id=simulation.scenario.id,
+                scenario_timeseries=y_values,
+                scenario_timestamps=x_values,
+            )
+        )
+    return simulations_results
+
+
+def graph_sankey(simulation, energy_vector):
+    if isinstance(energy_vector, list) is False:
+        energy_vector = [energy_vector]
+    if energy_vector is not None:
+        labels = []
+        sources = []
+        targets = []
+        values = []
+        colors = []
+
+        sim = simulation
+        ar = AssetsResults.objects.get(simulation=sim)
+        results_ts = ar.available_timeseries
+        qs = ConnectionLink.objects.filter(scenario__simulation=sim)
+
+        for bus in Bus.objects.filter(scenario__simulation=sim, type__in=energy_vector):
+            bus_label = bus.name
+            labels.append(bus_label)
+            colors.append("blue")
+            # from asset to bus
+            bus_inputs = qs.filter(flow_direction="A2B", bus=bus)
+            asset_to_bus_names = []
+            bus_to_asset_names = []
+
+            for component in bus_inputs:
+                # special case of providers which are bus input and output at the same time
+                if component.asset.is_provider is True:
+                    asset_to_bus_names.append(component.asset.name + "_consumption")
+                    bus_to_asset_names.append(component.asset.name + "_feedin")
+                elif component.asset.is_storage is True:
+                    asset_to_bus_names.append(
+                        format_storage_subasset_name(component.asset.name, OUTPUT_POWER)
+                    )
+                else:
+                    asset_to_bus_names.append(component.asset.name)
+
+            bus_outputs = qs.filter(flow_direction="B2A", bus=bus)
+            for component in bus_outputs:
+                if component.asset.is_storage is True:
+                    bus_to_asset_names.append(
+                        format_storage_subasset_name(component.asset.name, INPUT_POWER)
+                    )
+                else:
+                    bus_to_asset_names.append(component.asset.name)
+
+            for component_label in asset_to_bus_names:
+                # draw link from the component to the bus
+                if component_label not in labels:
+                    labels.append(component_label)
+                    colors.append("green")
+
+                sources.append(labels.index(component_label))
+                targets.append(labels.index(bus_label))
+
+                val = np.sum(results_ts[component_label]["flow"]["value"])
+                if val == 0:
+                    val = 1
+                values.append(val)
+
+            for component_label in bus_to_asset_names:
+                # draw link from the bus to the component
+                if component_label not in labels:
+                    labels.append(component_label)
+                    colors.append("red")
+
+                sources.append(labels.index(bus_label))
+                targets.append(labels.index(component_label))
+
+                val = np.sum(results_ts[component_label]["flow"]["value"])
+
+                if val == 0:
+                    val = 1
+                values.append(val)
+
+        # TODO display the installed capacity, max capacity and optimized_add_capacity on the nodes if applicable
+        fig = go.Figure(
+            data=[
+                go.Sankey(
+                    node=dict(
+                        pad=15,
+                        thickness=20,
+                        line=dict(color="black", width=0.5),
+                        label=labels,
+                        hovertemplate="Node has total value %{value}<extra></extra>",
+                        color=colors,
+                    ),
+                    link=dict(
+                        source=sources,  # indices correspond to labels
+                        target=targets,
+                        value=values,
+                        hovertemplate="Link from node %{source.label}<br />"
+                        + "to node%{target.label}<br />has value %{value}"
+                        + "<br />and data <extra></extra>",
+                    ),
+                )
+            ]
+        )
+
+        fig.update_layout(font_size=10)
+        return fig.to_dict()
+
+
+# These graphs are related to the graphs in static/js/report_items.js
+REPORT_GRAPHS = {
+    GRAPH_TIMESERIES: graph_timeseries,
+    GRAPH_TIMESERIES_STACKED: graph_timeseries_stacked,
+    GRAPH_CAPACITIES: graph_capacities,
+    GRAPH_BAR: "Bar chart",
+    GRAPH_PIE: "Pie chart",
+    GRAPH_LOAD_DURATION: "Load duration curve",
+    GRAPH_SANKEY: graph_sankey,
+}
 
 # # TODO change the form from this model to adapt the choices depending on single scenario/compare scenario or sensitivity
 class ReportItem(models.Model):
@@ -375,243 +625,6 @@ class ReportItem(models.Model):
         if self.proof_parameters_follow_schema(parameter_dict) is True:
             self.parameters = json.dumps(parameter_dict)
 
-    def fetch_parameters_values(self):
-        parameters = json.loads(self.parameters)
-        # TODO : adjust for other report types
-        if self.report_type == GRAPH_TIMESERIES:
-            y_variables = parameters.get("y", None)
-            if y_variables is not None:
-                simulations_results = []
-
-                for simulation in self.simulations.all():
-                    y_values = []
-                    assets_results_obj = AssetsResults.objects.get(
-                        simulation=simulation
-                    )
-                    asset_timeseries = assets_results_obj.available_timeseries
-                    for y_var in y_variables:
-                        if y_var in asset_timeseries:
-                            y_values.append(
-                                assets_results_obj.single_asset_timeseries(y_var)
-                            )
-                    simulations_results.append(
-                        simulation_timeseries_to_json(
-                            scenario_name=simulation.scenario.name,
-                            scenario_id=simulation.scenario.id,
-                            scenario_timeseries=y_values,
-                            scenario_timestamps=simulation.scenario.get_timestamps(),
-                        )
-                    )
-                return simulations_results
-
-        if self.report_type == GRAPH_TIMESERIES_STACKED:
-            y_variables = parameters.get("y", None)
-            if y_variables is not None:
-                simulations_results = []
-
-                for simulation in self.simulations.all():
-                    y_values = []
-                    assets_results_obj = AssetsResults.objects.get(
-                        simulation=simulation
-                    )
-                    asset_timeseries = assets_results_obj.available_timeseries
-                    for y_var in y_variables:
-                        if y_var in asset_timeseries:
-                            single_ts_json = assets_results_obj.single_asset_timeseries(
-                                y_var
-                            )
-                            single_ts_json["fill"] = (
-                                "none"
-                                if single_ts_json["asset_type"] == "sink"
-                                else "tonexty"
-                            )
-                            y_values.append(single_ts_json)
-                    simulations_results.append(
-                        simulation_timeseries_to_json(
-                            scenario_name=simulation.scenario.name,
-                            scenario_id=simulation.scenario.id,
-                            scenario_timeseries=y_values,
-                            scenario_timestamps=simulation.scenario.get_timestamps(),
-                        )
-                    )
-                return simulations_results
-
-        if self.report_type == GRAPH_CAPACITIES:
-            y_variables = parameters.get("y", None)
-
-            if y_variables is not None:
-                simulations_results = []
-
-                for simulation in self.simulations.all():
-                    y_values = (
-                        []
-                    )  # stores the capacity, both installed and optimized in seperate dicts, of each individual asset/ component
-                    x_values = []  # stores the label of the corresponding asset
-
-                    assets_results_obj = AssetsResults.objects.get(
-                        simulation=simulation
-                    )
-
-                    results_dict = json.loads(simulation.results)
-
-                    kpi_scalar_matrix = results_dict["kpi"]["scalar_matrix"]
-
-                    installed_capacity_dict = {
-                        "capacity": [],
-                        "name": "Installed Capacity",
-                    }
-                    optimized_capacity_dict = {
-                        "capacity": [],
-                        "name": "Optimized Capacity",
-                    }
-
-                    for y_var in y_variables:
-
-                        asset = assets_results_obj.single_asset_results(
-                            asset_name=y_var
-                        )
-
-                        x_values.append(
-                            y_var + " in " + asset["installed_capacity"]["unit"]
-                        )
-                        installed_capacity_dict["capacity"].append(
-                            asset["installed_capacity"]["value"]
-                        )
-                        if y_var in kpi_scalar_matrix:
-                            optimized_capacity_dict["capacity"].append(
-                                kpi_scalar_matrix[y_var]["optimized_add_cap"]
-                            )
-                        else:
-                            if "optimized_add_cap" in asset:
-                                optimized_capacity_dict["capacity"].append(
-                                    asset["optimized_add_cap"]["value"]
-                                )
-                            else:
-                                optimized_capacity_dict["capacity"].append(0)
-
-                    y_values.append(installed_capacity_dict)
-                    y_values.append(optimized_capacity_dict)
-
-                    simulations_results.append(
-                        simulation_timeseries_to_json(
-                            scenario_name=simulation.scenario.name,
-                            scenario_id=simulation.scenario.id,
-                            scenario_timeseries=y_values,
-                            scenario_timestamps=x_values,
-                        )
-                    )
-                return simulations_results
-
-        if self.report_type == GRAPH_SANKEY:
-            energy_vector = parameters.get("energy_vector", None)
-            if isinstance(energy_vector, list) is False:
-                energy_vector = [energy_vector]
-            if energy_vector is not None:
-                labels = []
-                sources = []
-                targets = []
-                values = []
-                colors = []
-
-                sim = self.simulations.get()
-                ar = AssetsResults.objects.get(simulation=sim)
-                results_ts = ar.available_timeseries
-                qs = ConnectionLink.objects.filter(scenario__simulation=sim)
-
-                for bus in Bus.objects.filter(
-                    scenario__simulation=sim, type__in=energy_vector
-                ):
-                    bus_label = bus.name
-                    labels.append(bus_label)
-                    colors.append("blue")
-                    # from asset to bus
-                    bus_inputs = qs.filter(flow_direction="A2B", bus=bus)
-                    asset_to_bus_names = []
-                    bus_to_asset_names = []
-
-                    for component in bus_inputs:
-                        # special case of providers which are bus input and output at the same time
-                        if component.asset.is_provider is True:
-                            asset_to_bus_names.append(
-                                component.asset.name + "_consumption"
-                            )
-                            bus_to_asset_names.append(component.asset.name + "_feedin")
-                        elif component.asset.is_storage is True:
-                            asset_to_bus_names.append(
-                                format_storage_subasset_name(
-                                    component.asset.name, OUTPUT_POWER
-                                )
-                            )
-                        else:
-                            asset_to_bus_names.append(component.asset.name)
-
-                    bus_outputs = qs.filter(flow_direction="B2A", bus=bus)
-                    for component in bus_outputs:
-                        if component.asset.is_storage is True:
-                            bus_to_asset_names.append(
-                                format_storage_subasset_name(
-                                    component.asset.name, INPUT_POWER
-                                )
-                            )
-                        else:
-                            bus_to_asset_names.append(component.asset.name)
-
-                    for component_label in asset_to_bus_names:
-                        # draw link from the component to the bus
-                        if component_label not in labels:
-                            labels.append(component_label)
-                            colors.append("green")
-
-                        sources.append(labels.index(component_label))
-                        targets.append(labels.index(bus_label))
-
-                        val = np.sum(results_ts[component_label]["flow"]["value"])
-                        if val == 0:
-                            val = 1
-                        values.append(val)
-
-                    for component_label in bus_to_asset_names:
-                        # draw link from the bus to the component
-                        if component_label not in labels:
-                            labels.append(component_label)
-                            colors.append("red")
-
-                        sources.append(labels.index(bus_label))
-                        targets.append(labels.index(component_label))
-
-                        val = np.sum(results_ts[component_label]["flow"]["value"])
-
-                        if val == 0:
-                            val = 1
-                        values.append(val)
-
-                # TODO display the installed capacity, max capacity and optimized_add_capacity on the nodes if applicable
-                fig = go.Figure(
-                    data=[
-                        go.Sankey(
-                            node=dict(
-                                pad=15,
-                                thickness=20,
-                                line=dict(color="black", width=0.5),
-                                label=labels,
-                                hovertemplate="Node has total value %{value}<extra></extra>",
-                                color=colors,
-                            ),
-                            link=dict(
-                                source=sources,  # indices correspond to labels
-                                target=targets,
-                                value=values,
-                                hovertemplate="Link from node %{source.label}<br />"
-                                + "to node%{target.label}<br />has value %{value}"
-                                + "<br />and data <extra></extra>",
-                            ),
-                        )
-                    ]
-                )
-
-                fig.update_layout(font_size=10)
-                return fig.to_dict()
-
     @property
     def render_json(self):
         return report_item_render_to_json(
@@ -620,6 +633,40 @@ class ReportItem(models.Model):
             title=self.title,
             report_item_type=self.report_type,
         )
+
+    def fetch_parameters_values(self):
+        parameters = json.loads(self.parameters)
+        # TODO : adjust for other report types
+        if self.report_type == GRAPH_TIMESERIES:
+            y_variables = parameters.get("y", None)
+            if y_variables is not None:
+                return graph_timeseries(
+                    simulations=self.simulations.all(), y_variables=y_variables
+                )
+
+        if self.report_type == GRAPH_TIMESERIES_STACKED:
+            y_variables = parameters.get("y", None)
+            if y_variables is not None:
+                return graph_timeseries_stacked(
+                    simulations=self.simulations.all(),
+                    y_variables=y_variables,
+                    energy_vector=parameters.get("energy_vector"),
+                )
+
+        if self.report_type == GRAPH_CAPACITIES:
+            y_variables = parameters.get("y", None)
+
+            if y_variables is not None:
+                return graph_capacities(
+                    simulations=self.simulations.all(), y_variables=y_variables
+                )
+
+        if self.report_type == GRAPH_SANKEY:
+            energy_vector = parameters.get("energy_vector", None)
+
+            return graph_sankey(
+                simulation=self.simulations.get(), energy_vector=energy_vector
+            )
 
 
 def get_project_reportitems(project):

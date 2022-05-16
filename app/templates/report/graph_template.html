@@ -1,0 +1,33 @@
+{% load static %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% comment %}
+Here is a list of the parameters one can provide to this template
+
+id:
+    the id of the modal (should be unique to the modal within same html template
+title:
+    the text display in the title bar of the modal
+{% endcomment %}
+
+
+<div class="chart" style="height: fit-content;">
+    <div class="chart__header">
+        <div>
+            <span class="title">{% translate title %}</span>
+        </div>
+        <div class="dropdown">
+            <button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuTS" data-bs-toggle="dropdown" aria-expanded="false">
+                <span class="icon icon-more"></span>
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuTS">
+                <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">{% translate 'Export as .xls' %}</a></li>
+                <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">{% translate 'Export as PDF' %}</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="chart__plot">
+        <div id="{{ id }}"></div>
+    </div>
+</div>

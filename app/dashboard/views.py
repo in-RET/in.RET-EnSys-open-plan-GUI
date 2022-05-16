@@ -1,4 +1,5 @@
 from django.core.exceptions import PermissionDenied
+from django.template.loader import get_template
 from django.db.models import Count
 from django.http.response import Http404, HttpResponse
 from dashboard.helpers import *
@@ -29,11 +30,13 @@ from projects.services import (
     excuses_design_under_development,
     get_selected_scenarios_in_cache,
 )
+from projects.constants import COMPARE_VIEW
 from dashboard.models import (
     ReportItem,
     SensitivityAnalysisGraph,
     get_project_reportitems,
     get_project_sensitivity_analysis_graphs,
+    REPORT_GRAPHS,
 )
 from dashboard.forms import (
     ReportItemForm,
@@ -51,8 +54,6 @@ import traceback
 import ast
 
 logger = logging.getLogger(__name__)
-
-COMPARE_VIEW = "compare"
 
 
 @login_required
@@ -436,14 +437,28 @@ def report_create_item(request, proj_id):
             else:
 
                 # TODO workout the passing of post when there are errors (in crisp format)
+                form_html = get_template("report/report_item_parameters_form.html")
+                answer_context.update(
+                    {
+                        "report_form": form_html.render(
+                            {
+                                "report_item_form": report_form,
+                                "graph_parameters_form": graph_parameter_form,
+                            }
+                        )
+                    }
+                )
+
                 answer = JsonResponse(
                     answer_context, status=422, content_type="application/json"
                 )
         else:
             # TODO workout the passing of post when there are errors (in crisp format)
+
             answer = JsonResponse(
                 answer_context, status=422, content_type="application/json"
             )
+
     else:
         answer = JsonResponse(
             {"error": "This url is only for post calls"},
@@ -575,13 +590,13 @@ def ajax_get_sensitivity_analysis_parameters(request):
 @login_required
 @json_view
 @require_http_methods(["GET"])
-def update_selected_scenarios(request, proj_id, scen_id):
+def update_selected_single_scenario(request, proj_id, scen_id):
     proj_id = str(proj_id)
     scen_id = str(scen_id)
     if request.is_ajax():
         status_code = 200
         selected_scenarios_per_project = request.session.get("selected_scenarios", {})
-        selected_scenario = selected_scenarios_per_project.get(str(proj_id), [])
+        selected_scenario = selected_scenarios_per_project.get(proj_id, [])
 
         if scen_id in selected_scenario:
             if len(selected_scenario) > 1:
@@ -596,6 +611,41 @@ def update_selected_scenarios(request, proj_id, scen_id):
             selected_scenario = [scen_id]
             msg = _(f"Scenario {scen_id} was selected")
         selected_scenarios_per_project[proj_id] = selected_scenario
+        request.session["selected_scenarios"] = selected_scenarios_per_project
+        answer = JsonResponse(
+            {"success": msg}, status=status_code, content_type="application/json"
+        )
+    else:
+        answer = JsonResponse(
+            {"error": "This url is only for AJAX calls"},
+            status=405,
+            content_type="application/json",
+        )
+    return answer
+
+
+@login_required
+@json_view
+@require_http_methods(["GET"])
+def update_selected_multi_scenarios(request, proj_id, scen_id):
+    proj_id = str(proj_id)
+    scen_id = str(scen_id)
+    if request.is_ajax():
+        status_code = 200
+        selected_scenarios_per_project = request.session.get("selected_scenarios", {})
+        selected_scenarios = selected_scenarios_per_project.get(proj_id, [])
+
+        if scen_id in selected_scenarios:
+            if len(selected_scenarios) > 1:
+                selected_scenarios.pop(selected_scenarios.index(scen_id))
+                msg = _(f"Scenario {scen_id} was deselected")
+            else:
+                msg = _(f"At least one scenario need to be selected")
+                status_code = 405
+        else:
+            selected_scenarios.append(scen_id)
+            msg = _(f"Scenarios {','.join(selected_scenarios)} was selected")
+        selected_scenarios_per_project[proj_id] = selected_scenarios
         request.session["selected_scenarios"] = selected_scenarios_per_project
         answer = JsonResponse(
             {"success": msg}, status=status_code, content_type="application/json"
@@ -757,56 +807,37 @@ def scenario_economic_results(request, scen_id=None):
 @login_required
 @json_view
 @require_http_methods(["GET"])
-def scenario_visualize_timeseries(request, scen_id):
-    scenario = get_object_or_404(Scenario, pk=scen_id)
-    if (scenario.project.user != request.user) and (
-        request.user not in scenario.project.viewers.all()
-    ):
-        raise PermissionDenied
+def scenario_visualize_timeseries(request, proj_id=None, scen_id=None):
+    if scen_id is None:
+        selected_scenario = get_selected_scenarios_in_cache(request, proj_id)
+    else:
+        selected_scenario = [scen_id]
 
-    try:
-        assets_results_obj = AssetsResults.objects.get(simulation=scenario.simulation)
-        assets_results_json = assets_results_obj.assets_dict
-        datetime_list = scenario.get_timestamps(json_format=True)
+    simulations = []
 
-        results_json = [
-            {
-                "values": [
-                    {
-                        "x": datetime_list,
-                        "y": asset_obj["flow"]["value"],
-                        "name": asset_obj["label"].replace("_", " ").upper()
-                        + " in "
-                        + asset_obj["flow"]["unit"]
-                        if asset_obj["flow"]["unit"] != "?"
-                        else asset_obj["label"].replace("_", " ").upper() + " in kWh",
-                        "type": "scatter",
-                        "line": {"shape": "hv"},
-                    }
-                    for asset_list in assets_results_json.values()
-                    for asset_obj in asset_list
-                    if "flow" in asset_obj.keys()
-                    and "consumption_period" not in asset_obj["label"]
-                ],
-                "title": "Alle Zeitreihen",
-                "yaxistitle": "Energie",
-                "div": "all_timeseries",
-            }
-        ]
+    for scen_id in selected_scenario:
+        scenario = get_object_or_404(Scenario, pk=scen_id)
+        if (scenario.project.user != request.user) and (
+            request.user not in scenario.project.viewers.all()
+        ):
+            raise PermissionDenied
+        simulations.append(scenario.simulation)
 
-        return JsonResponse(
-            results_json, status=200, content_type="application/json", safe=False
-        )
-    except Exception as e:
-        logger.error(
-            f"Dashboard ERROR: MVS Req Id: {scenario.simulation.mvs_token}. Thrown Exception: {traceback.format_exc()}"
-        )
-        return JsonResponse(
-            {"error": f"Could not retrieve kpi cost data."},
-            status=404,
-            content_type="application/json",
-            safe=False,
-        )
+    assets_results = AssetsResults.objects.get(simulation__scenario__id=scenario.id)
+    y_variables = [n for n in assets_results.available_timeseries]
+
+    results_json = report_item_render_to_json(
+        report_item_id="all_timeseries",
+        data=REPORT_GRAPHS[GRAPH_TIMESERIES](
+            simulations=simulations, y_variables=y_variables
+        ),
+        title="",
+        report_item_type=GRAPH_TIMESERIES,
+    )
+
+    return JsonResponse(
+        results_json, status=200, content_type="application/json", safe=False
+    )
 
 
 def scenario_visualize_stacked_timeseries(request, scen_id):
@@ -816,237 +847,85 @@ def scenario_visualize_stacked_timeseries(request, scen_id):
     ):
         raise PermissionDenied
 
-    try:
-        assets_results_obj = AssetsResults.objects.get(simulation=scenario.simulation)
-        assets_results_json = assets_results_obj.assets_dict
+    assets_results = AssetsResults.objects.get(simulation__scenario__id=scenario.id)
+    y_variables = [n for n in assets_results.available_timeseries]
 
-        # create new dict which has as its keys sectors (Electricity, Heat, Gas, H2)
-        # and as its values the corresponding asset dictionaries {energy_consumption: [{asset_type: ...}, .. ], ..}
-
-        new_dict = {
-            commodity: {
-                asset: [
-                    asset_obj
-                    for asset_obj in asset_list
-                    if asset_obj["energy_vector"] == commodity
-                ]
-                for asset, asset_list in assets_results_json.items()
-            }
-            for commodity in sectors
-        }
-
-        datetime_list = scenario.get_timestamps(json_format=True)
-        results_json = [
-            {
-                "values": [
-                    {
-                        "x": datetime_list,
-                        "y": asset_obj["flow"]["value"],
-                        "name": asset_obj["label"].replace("_", " ").upper()
-                        + " in "
-                        + asset_obj["flow"]["unit"]
-                        if asset_obj["flow"]["unit"] != "?"
-                        else asset_obj["label"].replace("_", " ").upper() + " in kWh",
-                        "type": "scatter",
-                        "line": {"shape": "hv"},
-                        "stackgroup": asset_obj["type_oemof"],
-                        "fill": "none"
-                        if asset_obj["type_oemof"] == "sink"
-                        else "tonexty",
-                        "mode": "none" if asset_obj["type_oemof"] != "sink" else "",
-                    }
-                    for asset_class, asset_list in asset_class_list.items()
-                    for asset_obj in asset_list
-                    if "flow" in asset_obj.keys()
-                    and "consumption_period" not in asset_obj["label"]
-                ],
-                "commodity": commodity,
-                "yaxistitle": "Energie",
-                "div": "stacked_timeseries",
-            }
-            for commodity, asset_class_list in new_dict.items()
-        ]
-
-        return JsonResponse(
-            results_json, status=200, content_type="application/json", safe=False
+    results_json = [
+        report_item_render_to_json(
+            report_item_id=energy_vector,
+            data=REPORT_GRAPHS[GRAPH_TIMESERIES_STACKED](
+                simulations=[scenario.simulation],
+                y_variables=y_variables,
+                energy_vector=energy_vector,
+            ),
+            title=energy_vector,
+            report_item_type=GRAPH_TIMESERIES_STACKED,
         )
-    except Exception as e:
-        logger.error(
-            f"Dashboard ERROR: MVS Req Id: {scenario.simulation.mvs_token}. Thrown Exception: {traceback.format_exc()}"
-        )
-        return JsonResponse(
-            {"error": f"Could not retrieve kpi cost data."},
-            status=404,
-            content_type="application/json",
-            safe=False,
-        )
+        for energy_vector in scenario.energy_vectors
+    ]
 
-
-# TODO: Sector coupling must be refined (including transformer flows)
-def scenario_visualize_stacked_total_flow(request, scen_id):
-    scenario = get_object_or_404(Scenario, pk=scen_id)
-    if (scenario.project.user != request.user) and (
-        request.user not in scenario.project.viewers.all()
-    ):
-        raise PermissionDenied
-
-    try:
-        assets_results_obj = AssetsResults.objects.get(simulation=scenario.simulation)
-        assets_results_json = assets_results_obj.assets_dict
-
-        results_json = [
-            {
-                "values": [
-                    {
-                        "x": ["Erzeugung", "Verbrauch"],
-                        "y": [sum(asset_obj["flow"]["value"]), 0]
-                        if asset_obj["type_oemof"] == "source"
-                        else [0, sum(asset_obj["flow"]["value"])],
-                        "name": asset_obj["label"].replace("_", " ").upper()
-                        + " in "
-                        + asset_obj["flow"]["unit"]
-                        if asset_obj["flow"]["unit"] != "?"
-                        else asset_obj["label"].replace("_", " ").upper() + " in kWh",
-                        "type": "bar",
-                    }
-                    for asset_list in assets_results_json.values()
-                    for asset_obj in asset_list
-                    if asset_obj["type_oemof"] in ["source", "sink"]
-                    if "flow" in asset_obj.keys()
-                    and "consumption_period" not in asset_obj["label"]
-                ],
-                "title": "Erzeugung und Verbrauch",
-                "yaxistitle": "Kumulierte Energie",
-                "div": "stacked_total_flow",
-            }
-        ]
-
-        return JsonResponse(
-            results_json, status=200, content_type="application/json", safe=False
-        )
-    except Exception as e:
-        logger.error(
-            f"Dashboard ERROR: MVS Req Id: {scenario.simulation.mvs_token}. Thrown Exception: {traceback.format_exc()}"
-        )
-        return JsonResponse(
-            {"error": f"Could not retrieve kpi cost data."},
-            status=404,
-            content_type="application/json",
-            safe=False,
-        )
+    return JsonResponse(
+        results_json, status=200, content_type="application/json", safe=False
+    )
 
 
 # TODO exclude sink components
-def scenario_visualize_stacked_capacities(request, scen_id):
+def scenario_visualize_capacities(request, proj_id, scen_id=None):
+
+    if scen_id is None:
+        selected_scenario = get_selected_scenarios_in_cache(request, proj_id)
+    else:
+        selected_scenario = [scen_id]
+
+    simulations = []
+
+    common_assets = []  # TODO take intersection of all y_variables sets
+
+    for scen_id in selected_scenario:
+        scenario = get_object_or_404(Scenario, pk=scen_id)
+        if (scenario.project.user != request.user) and (
+            request.user not in scenario.project.viewers.all()
+        ):
+            raise PermissionDenied
+        simulations.append(scenario.simulation)
+
+        assets_results = AssetsResults.objects.get(simulation__scenario__id=scenario.id)
+        y_variables = [n for n in assets_results.available_timeseries]
+
+    results_json = report_item_render_to_json(
+        report_item_id="capacities",
+        data=REPORT_GRAPHS[GRAPH_CAPACITIES](
+            simulations=simulations, y_variables=y_variables
+        ),
+        title="",
+        report_item_type=GRAPH_CAPACITIES,
+    )
+
+    return JsonResponse(
+        results_json, status=200, content_type="application/json", safe=False
+    )
+
+
+# TODO: Sector coupling must be refined (including transformer flows)
+def scenario_visualize_sankey(request, scen_id):
     scenario = get_object_or_404(Scenario, pk=scen_id)
     if (scenario.project.user != request.user) and (
         request.user not in scenario.project.viewers.all()
     ):
         raise PermissionDenied
 
-    try:
-        assets_results_obj = AssetsResults.objects.get(simulation=scenario.simulation)
-        assets_results_json = assets_results_obj.assets_dict
+    results_json = report_item_render_to_json(
+        report_item_id="sankey",
+        data=REPORT_GRAPHS[GRAPH_SANKEY](
+            simulation=scenario.simulation, energy_vector=scenario.energy_vectors
+        ),
+        title="Sankey",
+        report_item_type=GRAPH_SANKEY,
+    )
 
-        results_json = [
-            {
-                "values": [
-                    {
-                        "x": ["Installierte Kapazität"],
-                        "y": [asset_obj["installed_capacity"]["value"]],
-                        "name": asset_obj["label"].replace("_", " ").upper()
-                        + " in "
-                        + asset_obj["installed_capacity"]["unit"]
-                        if asset_obj["installed_capacity"]["unit"] != "unit"
-                        else asset_obj["label"].replace("_", " ").upper() + " in kW",
-                        "type": "bar",
-                    }
-                    for asset, asset_list in assets_results_json.items()
-                    for asset_obj in asset_list
-                    if "flow" in asset_obj.keys()
-                    and "consumption_period" not in asset_obj["label"]
-                ],
-                "title": "Installierte Kapazität",
-                "yaxistitle": "Leistung",
-                "div": "capacities",
-            }
-        ]
-
-        return JsonResponse(
-            results_json, status=200, content_type="application/json", safe=False
-        )
-    except Exception as e:
-        logger.error(
-            f"Dashboard ERROR: MVS Req Id: {scenario.simulation.mvs_token}. Thrown Exception: {traceback.format_exc()}"
-        )
-        return JsonResponse(
-            {"error": f"Could not retrieve kpi cost data."},
-            status=404,
-            content_type="application/json",
-            safe=False,
-        )
-
-
-# TODO: push optimized_add_cap for DSO to KPI as "Spitzenlast"/ "Peak Demand"
-# TODO: Make a note appear if all components have optimized_capacity = False because no figure will be shown
-# TODO: Change "if results_dict = json.loads(Scenario.objects.first().simulation.results)"
-def scenario_visualize_stacked_optimized_capacities(request, scen_id):
-    scenario = get_object_or_404(Scenario, pk=scen_id)
-    if (scenario.project.user != request.user) and (
-        request.user not in scenario.project.viewers.all()
-    ):
-        raise PermissionDenied
-
-    try:
-        results_dict = json.loads(
-            Scenario.objects.get(simulation=scenario.simulation).simulation.results
-        )
-        kpi_scalar_matrix = results_dict["kpi"]["scalar_matrix"]
-
-        assets_results_obj = AssetsResults.objects.get(simulation=scenario.simulation)
-        assets_results_json = assets_results_obj.assets_dict
-        asset_optimize_cap = []
-
-        for asset, asset_list in assets_results_json.items():
-            for asset_obj in asset_list:
-                if asset_obj["optimize_capacity"]["value"]:
-                    asset_optimize_cap.append(asset_obj["label"])
-
-        results_json = [
-            {
-                "values": [
-                    {
-                        "x": ["Optimierte Kapazität"],
-                        "y": [kpi_scalar_matrix[asset]["optimized_add_cap"]],
-                        "name": asset.replace("_", " ").upper()
-                        + " in "
-                        + kpi_scalar_matrix[asset]["unit"]
-                        if kpi_scalar_matrix[asset]["unit"] != "?"
-                        else asset.replace("_", " ").upper() + " in kW",
-                        "type": "bar",
-                    }
-                    for asset in asset_optimize_cap
-                    if "consumption_period" not in asset
-                ],
-                "title": "Optimierte Kapazität",
-                "yaxistitle": "Leistung",
-                "div": "capacities",
-            }
-        ]
-
-        return JsonResponse(
-            results_json, status=200, content_type="application/json", safe=False
-        )
-    except Exception as e:
-        logger.error(
-            f"Dashboard ERROR: MVS Req Id: {scenario.simulation.mvs_token}. Thrown Exception: {traceback.format_exc()}"
-        )
-        return JsonResponse(
-            {"error": f"Could not retrieve kpi cost data."},
-            status=404,
-            content_type="application/json",
-            safe=False,
-        )
+    return JsonResponse(
+        results_json, status=200, content_type="application/json", safe=False
+    )
 
 
 @login_required

@@ -15,10 +15,10 @@ function addReportItemGraphToDOM(parameters, reportDOMId="report_items"){
                        ml("span", { class: "icon icon-more"}, [])
                     ]),
                     ml("ul", { class: "dropdown-menu", 'aria-labelledby': "dropdownMenuTS"}, [
-                        ml("li", { class: "dropdown-item"}, ml("a", {href: urlNotImplemented}, "Export as .xls")),
-                        ml("li", { class: "dropdown-item"}, ml("a", {href: urlNotImplemented}, "Export as .pdf")),
-                        ml("li", { class: "dropdown-item"}, ml("a", {href: urlCopyReportItem}, "Copy item")),
-                        ml("li", { class: "dropdown-item"}, ml("button", {onclick: deleteReportItem, "data-report-item-id": parameters.id }, "Delete item")),
+                        ml("li", {}, ml("a", { class: "dropdown-item", href: urlNotImplemented}, "Export as .xls")),
+                        ml("li", {}, ml("a", { class: "dropdown-item", href: urlNotImplemented}, "Export as .pdf")),
+                        ml("li", {}, ml("a", { class: "dropdown-item", href: urlCopyReportItem}, "Copy item")),
+                        ml("li", {}, ml("button", { class: "dropdown-item", onclick: deleteReportItem, "data-report-item-id": parameters.id }, "Delete item")),
                     ]),
                 ]),
             ]),
@@ -73,19 +73,38 @@ function nester(el, n) {
     return el;
 }
 
+function format_trace_name(scenario_name, label, unit, compare=false){
+
+    var trace_name = label + ' (' + unit + ')' ;
+    if(compare == true){
+        trace_name = scenario_name + ' ' + trace_name;
+    }
+    return trace_name;
+
+}
+
 
 function addTimeseriesGraph(graphId, parameters){
     // prepare traces in ploty format
     var data = []
+
+    var compare = true;
+    if(parameters.data.length == 1){
+        compare = false;
+        parameters.title = "Scenario " + parameters.data[0].scenario_name;
+    }
+
     parameters.data.forEach(scenario => {
         scenario.timeseries.forEach(timeseries => {
             // todo provide a function to format the name of the timeseries
-            data.push({x: scenario.timestamps,
+            var trace = {x: scenario.timestamps,
                 y: timeseries.value,
-                name:scenario.scenario_name + timeseries.label + timeseries.unit,
+                name:"",
                 type: 'scatter',
                 line: {shape: 'hv'},
-            })
+            };
+            trace.name = format_trace_name(scenario.scenario_name, timeseries.label, timeseries.unit, compare=compare);
+            data.push(trace);
         });
     });
     // prepare graph layout in plotly format
@@ -107,17 +126,25 @@ function addTimeseriesGraph(graphId, parameters){
 function addStackedTimeseriesGraph(graphId, parameters){
     // prepare traces in ploty format
     var data = []
+
+    if(parameters.data.length == 1){
+        compare = false;
+        parameters.title = parameters.title + " sector of scenario " + parameters.data[0].scenario_name;
+    }
+
     parameters.data.forEach(scenario => {
         scenario.timeseries.forEach(timeseries => {
             // todo provide a function to format the name of the timeseries
-            data.push({x: scenario.timestamps,
+            var trace = {x: scenario.timestamps,
                 y: timeseries.value,
-                name:scenario.scenario_name + timeseries.label + timeseries.unit,
+                name: '',
                 type: 'scatter',
                 line: {shape: 'hv'},
                 stackgroup: timeseries.asset_type,
                 fill: timeseries.fill
-            })
+            };
+            trace.name = format_trace_name(scenario.scenario_name, timeseries.label, timeseries.unit, compare=compare);
+            data.push(trace);
         });
     });
     // prepare graph layout in plotly format
@@ -157,8 +184,15 @@ function addCapacitiyGraph(graphId, parameters){
     // prepare graph layout in plotly format
     const layout= {
         title: parameters.title,
+        xaxis:{
+            title: parameters.x_label,
+        },
+        yaxis:{
+            title: parameters.y_label,
+        },
         barmode: 'stack',
-        showlegend: true
+        showlegend: true,
+        margin: {b: 150}
     }
     // create plot
     Plotly.newPlot(graphId, data, layout);

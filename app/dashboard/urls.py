@@ -68,12 +68,17 @@ urlpatterns = [
         name="request_kpi_table",
     ),
     re_path(
-        r"^project/(?P<proj_id>\d+)/scenario/results/update_selected_scenarios/(?P<scen_id>\d+)?$",
-        update_selected_scenarios,
-        name="update_selected_scenarios",
+        r"^project/(?P<proj_id>\d+)/scenario/results/update-selected-single-scenario/(?P<scen_id>\d+)?$",
+        update_selected_single_scenario,
+        name="update_selected_single_scenario",
     ),
     re_path(
-        r"^scenario/results/request_timeseries/(?P<scen_id>\d+)?$",
+        r"^project/(?P<proj_id>\d+)/scenario/results/update-selected-multi-scenarios/(?P<scen_id>\d+)?$",
+        update_selected_multi_scenarios,
+        name="update_selected_multi_scenarios",
+    ),
+    re_path(
+        r"^project/(?P<proj_id>\d+)/scenario/results/request_timeseries/(?P<scen_id>\d+)?$",
         scenario_visualize_timeseries,
         name="scenario_visualize_timeseries",
     ),
@@ -83,19 +88,14 @@ urlpatterns = [
         name="scenario_visualize_stacked_timeseries",
     ),
     re_path(
-        r"^scenario/results/request_stacked_total_flow/(?P<scen_id>\d+)?$",
-        scenario_visualize_stacked_total_flow,
-        name="scenario_visualize_stacked_total_flow",
+        r"^scenario/results/request_sankey/(?P<scen_id>\d+)?$",
+        scenario_visualize_sankey,
+        name="scenario_visualize_sankey",
     ),
     re_path(
-        r"^scenario/results/request_stacked_capacities/(?P<scen_id>\d+)?$",
-        scenario_visualize_stacked_capacities,
-        name="scenario_visualize_stacked_capacities",
-    ),
-    re_path(
-        r"^scenario/results/request_stacked_optimized_capacities/(?P<scen_id>\d+)?$",
-        scenario_visualize_stacked_optimized_capacities,
-        name="scenario_visualize_stacked_optimized_capacities",
+        r"^project/(?P<proj_id>\d+)/scenario/results/request-capacities/(?P<scen_id>\d+)?$",
+        scenario_visualize_capacities,
+        name="scenario_visualize_capacities",
     ),
     path(
         "scenario/results/download_scalars/<int:scen_id>",

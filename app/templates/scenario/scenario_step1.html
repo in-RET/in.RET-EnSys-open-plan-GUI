@@ -72,7 +72,9 @@
             <a onclick="javascript:next_btn_clicked()" class="btn btn--medium" >{% translate "Next" %} </a>
         </div>
         <div class="step-footer__right">
+            {% if scen_id %}
             <a class="btn btn--medium btn--transparent" href="{% url 'scenario_steps_edit' proj_id scen_id 4 %}">{% translate "Go to simulation" %}</a>
+            {% endif %}
         </div>
     </div>
 </footer>

@@ -532,10 +532,45 @@ STEP_LIST = [
 
 @login_required
 @require_http_methods(["GET", "POST"])
+def scenario_select_project(request, step_id=0, max_step=1):
+    user_projects = request.user.project_set.all()
+    if request.method == "GET":
+
+        if user_projects.exists():
+            form = ScenarioSelectProjectForm(project_queryset=user_projects)
+            answer = render(
+                request,
+                f"scenario/scenario_step{step_id}.html",
+                {
+                    "form": form,
+                    "step_id": step_id,
+                    "step_list": [_("Project selection")] + STEP_LIST,
+                    "max_step": max_step,
+                },
+            )
+        else:
+            messages.info(
+                request, _("You have currently no projects, please create one first")
+            )
+            answer = HttpResponseRedirect(reverse("project_search"))
+
+    elif request.method == "POST":
+        form = ScenarioSelectProjectForm(request.POST, project_queryset=user_projects)
+
+        if form.is_valid():
+            proj_id = form.cleaned_data.get("project").id
+            answer = HttpResponseRedirect(
+                reverse("scenario_create_parameters", args=[proj_id])
+            )
+
+    return answer
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
 def scenario_create_parameters(request, proj_id, scen_id=None, step_id=1, max_step=2):
 
     project = get_object_or_404(Project, pk=proj_id)
-
     # all projects which the user is able to select (the one the user created)
     user_projects = request.user.project_set.all()
 

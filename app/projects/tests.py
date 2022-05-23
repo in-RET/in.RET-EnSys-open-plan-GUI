@@ -140,6 +140,13 @@ class BasicOperationsTest(TestCase):
 
     # user not owner cannot share or revoke share rights
 
+    def test_visit_create_scenario_link_from_landing_page_links_to_right_view(self):
+        """Make sure a user clicking on create project link from does not experience errors"""
+        response = self.client.get(reverse("scenario_steps", args=[self.project.id]))
+        response = self.client.get(response.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "scenario/scenario_step1.html")
+
 
 class ExportLoadTest(TestCase):
     fixtures = ["fixtures/benchmarks_fixture.json"]

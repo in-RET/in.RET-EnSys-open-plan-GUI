@@ -436,6 +436,26 @@ class ScenarioCreateForm(OpenPlanModelForm):
             visible.field.widget.attrs["class"] = "form-control"
 
 
+class ScenarioSelectProjectForm(OpenPlanModelForm):
+    field_order = scenario_field_order
+
+    class Meta:
+        model = Scenario
+        fields = ["project"]
+        widgets = scenario_widgets
+        labels = scenario_labels
+
+    def __init__(self, *args, **kwargs):
+        project_queryset = kwargs.pop("project_queryset", None)
+        super().__init__(*args, **kwargs)
+        if project_queryset is not None:
+            self.fields["project"].queryset = project_queryset
+        else:
+            self.fields["project"] = forms.ChoiceField(label="Project", choices=())
+        for visible in self.visible_fields():
+            visible.field.widget.attrs["class"] = "form-control"
+
+
 class ScenarioUpdateForm(OpenPlanModelForm):
     field_order = scenario_field_order
 

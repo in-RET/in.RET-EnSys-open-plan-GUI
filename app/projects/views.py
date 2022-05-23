@@ -402,6 +402,10 @@ def project_search(request, proj_id=None, scen_id=None):
             "project_share_form": project_share_form,
             "project_revoke_form": project_revoke_form,
             "usecase_form": usecase_form,
+            "translated_text": {
+                "showScenarioText": _("Show scenarios"),
+                "hideScenarioText": _("Hide scenarios"),
+            },
         },
     )
 

@@ -259,7 +259,7 @@
 
 {% block end_body_scripts %}
 
-
+{{ translated_text|json_script:"translatedText" }}
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 

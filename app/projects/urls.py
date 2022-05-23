@@ -60,6 +60,11 @@ urlpatterns = [
         name="scenario_steps_edit",
     ),
     path(
+        "scenario/select/project",
+        scenario_select_project,
+        name="scenario_select_project",
+    ),
+    path(
         "project/<int:proj_id>/scenario/create_parameters",
         scenario_create_parameters,
         name="scenario_create_parameters",

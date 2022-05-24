@@ -120,7 +120,9 @@ async function addNodeToDrawFlow(name, pos_x, pos_y, nodeInputs = 1, nodeOutputs
     // return createNodeObject(name, nodeInputs, nodeOutputs, {}, pos_x, pos_y); was like that
 }
 
-document.addEventListener("dblclick", function (e) {
+
+// one needs to add
+const dblClick = (e) => {
 
     const closestNode = e.target.closest('.drawflow-node');
     const nodeType = closestNode.querySelector('.box').getAttribute(ASSET_TYPE_NAME);
@@ -137,7 +139,7 @@ document.addEventListener("dblclick", function (e) {
         .then(formContent=> {
 
             // assign the content of the form to the form tag of the modal
-            guiModalDOM.querySelector('.modal-body form').innerHTML = formContent;
+            guiModalDOM.querySelector('form .modal-body').innerHTML = formContent;
 
             // set parameters which uniquely identify the asset
             guiModalDOM.setAttribute("data-node-type", nodeType);
@@ -155,16 +157,14 @@ document.addEventListener("dblclick", function (e) {
                 makePlotly( ts_idx, ts_data, plot_id="timeseries_trace")
             }
 
-
-
             guiModal.show()
             $('[data-bs-toggle="tooltip"]').tooltip()
 
         })
-        .catch(err => alert("Modal get form JS Error: " + err));
+        //.catch(err => alert("Modal get form JS Error: " + err));
 
     }
-});
+};
 // endregion
 
 
@@ -238,7 +238,7 @@ $("#guiModal").on('show.bs.modal', function (event) {
 /* Triggered before the modal hides */
 $("#guiModal").on('hide.bs.modal', function (event) {
   // reset the modal form to empty
-  guiModalDOM.querySelector('.modal-body form').innerHTML = "<form></form>";
+  guiModalDOM.querySelector('form .modal-body').innerHTML = "";
   editor.editor_mode = "edit";
 })
 

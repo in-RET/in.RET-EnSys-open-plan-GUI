@@ -42,10 +42,13 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
+                         <form>
+                             {% csrf_token %}
             <div class="modal-body">
-                <form>
-                </form>
+
+
             </div>
+                             </form>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate "Close" %}</button>
                 {% if scenario.project.user == request.user %}
@@ -127,6 +130,9 @@
 <script src="{% static 'js/grid_model_topology.js' %}"></script>
 
 <script>
+        // activate the double click function provided in grid_model_topology
+        document.querySelector('.drawflow').addEventListener("dblclick", dblClick);
+
         /* Script to retrieve nodes (assets and busses) and links data from the backend. */
         /* Html of asset modification is provided in grid_model_topology.js:createNodeObject function */
         const addBusses = async (data) =>

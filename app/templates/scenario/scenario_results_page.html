@@ -37,15 +37,12 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body">
-                <form>
-                </form>
-            </div>
+            <form>
+                {% csrf_token %}
+                <div class="modal-body"></div>
+            </form>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate "Close" %}</button>
-                {% if scenario.project.user == request.user %}
-                <button class="btn btn--medium" onclick="submitForm(event)">{% translate "Save" %}</button>
-                {% endif %}
             </div>
         </div>
     </div>
@@ -379,8 +376,8 @@ const deleteReportItem = (event) => {
 
 <script>
         const csrfToken = '{{ csrf_token }}';
-        const formGetUrl = `{% url 'get_asset_create_form' scen_id %}`;
-        const formPostUrl = `{% url 'asset_create_or_update' scen_id %}`;
+        const formGetUrl = `{% url 'view_asset_parameters' scen_id %}`;
+        const formPostUrl = "";
         const scenarioBelongsToUser = {% if scenario.project.user == request.user %}true{% else %}false{% endif %};
     </script>
 <script src="{% static 'js/grid_model_topology.js' %}"></script>

@@ -3,7 +3,7 @@ version: "3.7"
 services:
 
   db_pg:
-    image: postgres:14.1-alpine
+    image: postgres:14.3-alpine
     container_name: open_plan_pg
     restart: always
     env_file:
@@ -23,7 +23,7 @@ services:
     env_file:
       - .envs/epa.postgres
     expose:
-      - 8000  # use expose instead of port to expose ports internal between containers and not to the host maschine
+      - 8000
     volumes:
       - static_volume_pg:/src/cdn_static_root
     command: "gunicorn --workers=2 --bind=0.0.0.0:8000 epa.wsgi:application"

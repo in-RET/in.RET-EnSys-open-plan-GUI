@@ -25,7 +25,7 @@ services:
     expose:
       - 8000  # use expose instead of port to expose ports internal between containers and not to the host maschine
     volumes:
-      - static_volume:/src/cdn_static_root
+      - static_volume_pg:/src/cdn_static_root
     command: "gunicorn --workers=2 --bind=0.0.0.0:8000 epa.wsgi:application"
     depends_on:
       - db_pg
@@ -65,7 +65,7 @@ services:
 
 volumes:
   db_data_pg:
-  static_volume:
+  static_volume_pg:
 
 networks:
   open_plan_network_pg:

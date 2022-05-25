@@ -31,19 +31,46 @@ SQL_PASSWORD=<your password>
 SQL_PORT=5432
 DATABASE=postgres
 ```
-8. Execute the `local_setup.sh` file (`. local_setup.sh` on linux/mac `bash local_setup.sh` on windows) you might have to make it executable first. Answer yes to the question
-9. Start the local server with `python manage.py runserver`
-10. You can then login with `testUser` and `ASas12,.` or create your own account
+8. Add an environment variable `MVS_HOST_API` and set the url of the simulation server you wish to use for your models
+9. Execute the `local_setup.sh` file (`. local_setup.sh` on linux/mac `bash local_setup.sh` on windows) you might have to make it executable first. Answer yes to the question
+10. Start the local server with `python manage.py runserver`
+11. You can then login with `testUser` and `ASas12,.` or create your own account
 
-## Deploy using Docker Compose - use of MVS web API
-The following commands should get everything up and running, utilzing the web based version of the MVS API.
-1. `git clone --single-branch --branch main https://github.com/open-plan-tool/gui.git`
-2. cd inside the created folder
-4. `docker-compose --file=docker-compose-postgres.yml up -d --build` (you can replace `postgres` by `mysql` if you want to use mysql)
-5. `docker-compose exec app_pg sh setup.sh` (this will also load a default testUser account with sample scenario).
-6. Open browser and navigate to http://localhost:80.
+## Deploy using Docker Compose
+The following commands should get everything up and running, using the web based version of the MVS API.
 
->**_NOTE:_** If you use a proxy you will need to introduce modifications to app/epa.env to fit your needs.
+You need to be able to run docker-compose inside your terminal. If you can't you should install [Docker desktop](https://www.docker.com/products/docker-desktop/) first. 
+
+
+* Clone the repository locally `git clone --single-branch --branch main https://github.com/open-plan-tool/gui.git open_plan_gui`
+* Move inside the created folder (`cd open_plan_gui`)
+* Edit the `.envs/epa.postgres` and `.envs/db.postgres` environment files
+   * Change the value assigned to `EPA_SECRET_KEY` with a [randomly generated one](https://randomkeygen.com/)
+   * Make sure to replace dummy names with you preferred names
+   * The value assigned to the variables `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD` in `.envs/db.postgres` should match the ones of 
+   the variables `SQL_DATABASE`, `SQL_USER`, `SQL_PASSWORD` in `.envs/epa.postgres`, respectively
+
+   * Define an environment variable `MVS_HOST_API` in `.envs/epa.postgres` and set the url of the simulation server 
+   you wish to use for your models (for example `MVS_API_HOST="<url to your favorite simulation server>"`), you can deploy your own [simulation server](https://github.com/open-plan-tool/simulation-server) locally if you need
+
+Next you can either provide the following commands inside a terminal (with ubuntu you might have to prepend `sudo`)
+* `docker-compose --file=docker-compose-postgres.yml up -d --build` (you can replace `postgres` by `mysql` if you want to use mysql)
+* `docker-compose --file=docker-compose-postgres.yml exec -u root app_pg sh initial_setup.sh` (this will also load a default testUser account with sample scenario). 
+
+Or you can run a python script with the following command
+* `python deploy.py -db postgres`
+
+Finally
+* Open browser and navigate to http://localhost:8080 (or to http://localhost:8090 if you chose to use `mysql` instead of `postgres`): you should see the login page of the open_plan app
+* You can then login with `testUser` and `ASas12,.` or create your own account
+
+### Proxy settings (optional)
+If you use a proxy you will need to set `USE_PROXY=True` and edit `PROXY_ADDRESS=http://proxy_address:port` with your proxy settings in `.envs/epa.postgres`. 
+
+>**_NOTE:_** If you wish to use mysql instead of postgres, simply replace `postgres` by `mysql` and `app_pg` by `app` in the above commands or filenames
+<hr>
+
+>**_NOTE:_** Grab a cup of coffee or tea for this...
 <hr>
 
 >**_NOTE:_** Grab a cup of coffee or tea for this...
@@ -53,12 +80,13 @@ The following commands should get everything up and running, utilzing the web ba
 > You can access a preconfigured project using the following login credentials:  `testUser:ASas12,.`
 <hr>
 
-## Tear down
-> To remove the application (including relevant images, volumes etc.), one can use the following commands in cmd:
-- `docker-compose down --file=docker-compose-postgres.yml --volumes --rmi local`, or
-- `docker-compose -f docker-compose_with_mvs.yml down --volumes --rmi local` if docker-compose_with_mvs.yml configuration was utilized.
-<hr>
+## Tear down (uninstall) docker containers
+To remove the application (including relevant images, volumes etc.), one can use the following commands in terminal:
+    
+`docker-compose down --file=docker-compose-postgres.yml -v`
 
-## Installation Notes
-1. Docker engine should be started to run the application
-2. An error might occur on `setup.sh` execution. This is because of the underlying OS and the way it handles EOL. Try to execute the commands in the file sequentially instead.
+you can add `--rmi local` if you wish to also remove the images (this will take you a long time to rebuild the docker containers from scratch if you want to redeploy the app later then)
+
+Or you can run a python script with the following command
+
+`python deploy.py -db postgres --down`

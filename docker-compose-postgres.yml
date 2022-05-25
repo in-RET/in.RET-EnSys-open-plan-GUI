@@ -56,8 +56,8 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - ./nginx_pg:/etc/nginx/conf.d
-      - static_volume:/static
+      - ./nginx/postgres:/etc/nginx/conf.d
+      - static_volume_pg:/static
     depends_on:
       - app_pg
     networks:

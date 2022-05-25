@@ -56,7 +56,7 @@ services:
     ports:
       - "8090:80"
     volumes:
-      - ./nginx:/etc/nginx/conf.d
+      - ./nginx/mysql:/etc/nginx/conf.d
       - ./src/cdn_static_root:/static
     depends_on:
       - app

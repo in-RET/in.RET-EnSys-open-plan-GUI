@@ -1,4 +1,4 @@
-FROM python:3.8-alpine
+FROM python:3.9.5-alpine
 
 RUN echo POSTGRES
 ENV APP_ROOT /src
@@ -10,7 +10,7 @@ RUN mkdir ${CONFIG_ROOT}
 COPY requirements/postgres.txt ${CONFIG_ROOT}/requirements.txt
 
 RUN apk update \
-    && apk add --no-cache --virtual .build-deps gcc libffi-dev musl-dev python3-dev cargo\
+    && apk add --no-cache --virtual .build-deps gcc g++ libffi-dev musl-dev python3-dev cargo\
     && apk add postgresql-dev \
     && pip install --upgrade pip \
     && pip install --no-cache-dir -r ${CONFIG_ROOT}/requirements.txt \

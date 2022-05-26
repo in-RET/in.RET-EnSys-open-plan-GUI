@@ -1,4 +1,4 @@
-FROM python:3.8-alpine
+FROM python:3.9.5-alpine
 
 ENV APP_ROOT /src
 ENV CONFIG_ROOT /config
@@ -9,7 +9,7 @@ RUN mkdir ${CONFIG_ROOT}
 COPY requirements/mysql.txt ${CONFIG_ROOT}/requirements.txt
 
 RUN apk update \
-    && apk add --no-cache --virtual .build-deps gcc musl-dev libffi-dev openssl-dev python3-dev cargo\
+    && apk add --no-cache --virtual .build-deps gcc g++ musl-dev libffi-dev openssl-dev python3-dev cargo\
     && apk add libxml2-dev libxslt-dev \
     && apk add --no-cache mariadb-dev \
     && pip install --upgrade pip \

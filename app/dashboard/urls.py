@@ -64,6 +64,11 @@ urlpatterns = [
         name="scenario_economic_results",
     ),
     re_path(
+        r"^asset/view_form/(?P<scen_id>\d+)/(?P<asset_type_name>\w+)?(/(?P<asset_uuid>[0-9a-f-]+))?$",
+        view_asset_parameters,
+        name="view_asset_parameters",
+    ),
+    re_path(
         r"^project/(?P<proj_id>\d+)/scenario/results/request_kpi_table/(?P<table_style>\w+)?$",
         request_kpi_table,
         name="request_kpi_table",

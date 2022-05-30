@@ -126,11 +126,6 @@ urlpatterns = [
         name="get_asset_create_form",
     ),
     re_path(
-        r"^asset/view_form/(?P<scen_id>\d+)/(?P<asset_type_name>\w+)?(/(?P<asset_uuid>[0-9a-f-]+))?$",
-        view_asset_parameters,
-        name="view_asset_parameters",
-    ),
-    re_path(
         r"^asset/create_or_update_post/(?P<scen_id>\d+)/(?P<asset_type_name>\w+)?(/(?P<asset_uuid>[0-9a-f-]+))?$",
         asset_create_or_update,
         name="asset_create_or_update",

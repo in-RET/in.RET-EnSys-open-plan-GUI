@@ -1243,69 +1243,6 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
 
 
 @login_required
-@require_http_methods(["GET"])
-def view_asset_parameters(request, scen_id, asset_type_name, asset_uuid):
-    """Return a template to view the input parameters and results, if any"""
-    scenario = Scenario.objects.get(id=scen_id)
-
-    if asset_type_name == "bus":
-        template = "asset/bus_create_form.html"
-        existing_bus = get_object_or_404(Bus, pk=asset_uuid)
-        form = BusForm(asset_type=asset_type_name, instance=existing_bus)
-
-        context = {"form": form}
-    elif asset_type_name in ["bess", "h2ess", "gess", "hess"]:
-        template = "asset/storage_asset_create_form.html"
-        existing_ess_asset = get_object_or_404(Asset, unique_id=asset_uuid)
-        ess_asset_children = Asset.objects.filter(parent_asset=existing_ess_asset.id)
-        ess_capacity_asset = ess_asset_children.get(asset_type__asset_type="capacity")
-        ess_charging_power_asset = ess_asset_children.get(
-            asset_type__asset_type="charging_power"
-        )
-        ess_discharging_power_asset = ess_asset_children.get(
-            asset_type__asset_type="discharging_power"
-        )
-        # also get all child assets
-        form = StorageForm(
-            asset_type=asset_type_name,
-            initial={
-                "name": existing_ess_asset.name,
-                "installed_capacity": ess_capacity_asset.installed_capacity,
-                "age_installed": ess_capacity_asset.age_installed,
-                "capex_fix": ess_capacity_asset.capex_fix,
-                "capex_var": ess_capacity_asset.capex_var,
-                "opex_fix": ess_capacity_asset.opex_fix,
-                "opex_var": ess_capacity_asset.opex_var,
-                "lifetime": ess_capacity_asset.lifetime,
-                "crate": ess_capacity_asset.crate,
-                "efficiency": ess_capacity_asset.efficiency,
-                "dispatchable": ess_capacity_asset.dispatchable,
-                "optimize_cap": ess_capacity_asset.optimize_cap,
-                "soc_max": ess_capacity_asset.soc_max,
-                "soc_min": ess_capacity_asset.soc_min,
-            },
-        )
-        context = {"form": form}
-    else:  # all other assets
-        template = "asset/asset_create_form.html"
-        existing_asset = get_object_or_404(Asset, unique_id=asset_uuid)
-        form = AssetCreateForm(asset_type=asset_type_name, instance=existing_asset)
-        input_timeseries_data = (
-            existing_asset.input_timeseries if existing_asset.input_timeseries else ""
-        )
-
-        context = {
-            "form": form,
-            "input_timeseries_data": input_timeseries_data,
-            "input_timeseries_timestamps": json.dumps(
-                scenario.get_timestamps(json_format=True)
-            ),
-        }
-
-    return render(request, template, context)
-
-
-@login_required
 @require_http_methods(["POST"])
 def asset_create_or_update(request, scen_id=0, asset_type_name="", asset_uuid=None):
 

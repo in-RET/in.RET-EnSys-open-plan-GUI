@@ -156,7 +156,14 @@ function update_selected_single_scenario(target){
 </script>
 
 <script>
+        const csrfToken = '{{ csrf_token }}';
+        const formGetUrl = `{% url 'view_asset_parameters' scen_id %}`;
+        const formPostUrl = "";
+        const scenarioBelongsToUser = {% if scenario.project.user == request.user %}true{% else %}false{% endif %};
+    </script>
+<script src="{% static 'js/grid_model_topology.js' %}"></script>
 
+<script>
 
 // double click
 //add to the div only
@@ -167,11 +174,11 @@ document.querySelector('.drawflow').addEventListener("dblclick", function (e) {
 
     if (closestNode) {
         const topologyNodeId = closestNode.id;
-        // formGetUrl is defined in scenario_step2.html
+        // formGetUrl is defined above
         const getUrl = formGetUrl + nodeType +
             (nodesToDB.has(topologyNodeId) ? "/" + nodesToDB.get(topologyNodeId).uid : "");
 
-        // get the form of the asset of the type "nodeType" (projects/views.py::get_asset_create_form)
+        // get the form of the asset of the type "nodeType" (dashboard/views.py::view_asset_parameters)
         fetch(getUrl)
         .then(formContent=>formContent.text())
         .then(formContent=> {
@@ -186,14 +193,17 @@ document.querySelector('.drawflow').addEventListener("dblclick", function (e) {
             guiModalDOM.setAttribute("data-node-df-id", topologyNodeId.split("-").pop());
             editor.editor_mode = "fixed";
 
-            //update the
-            ts_data_div = document.getElementById("input_timeseries_data");
+            //update the graph of the flow timeseries, if any
+            ts_data_div = document.getElementById("flow_data");
             if(ts_data_div){
                 var ts_data = JSON.parse(ts_data_div.querySelector("textarea").value);
-                var ts_data = ts_data.map(String);
-                var ts_idx = [...Array(ts_data.length).keys()];
-                ts_idx = ts_idx.map(String);
-                makePlotly( ts_idx, ts_data, plot_id="timeseries_trace")
+                var ts_data_value = ts_data.value.map(String);
+                var ts_idx = ts_data.timestamps.map(String);
+                var plotLayout = {
+                    "yaxis": {"title": { "text": "flow " + ts_data.unit}},
+                    "xaxis": {"title": { "text": "time"}},
+                };
+                makePlotly( ts_idx, ts_data_value, plot_id="flow_trace", userLayout=plotLayout)
             }
 
             guiModal.show()

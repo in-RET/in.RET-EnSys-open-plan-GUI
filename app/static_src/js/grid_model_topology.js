@@ -140,7 +140,7 @@ document.addEventListener("dblclick", function (e) {
             const box = formParentDiv.closest('.box');
             openModal(box);
         })
-        .catch(err => console.log("Modal get form JS Error: " + err));
+        //.catch(err => console.log("Modal get form JS Error: " + err));
     }
 });
 // endregion

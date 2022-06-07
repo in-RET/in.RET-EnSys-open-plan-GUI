@@ -1,3 +1,4 @@
+import numpy as np
 from django.core.exceptions import PermissionDenied
 from django.template.loader import get_template
 from django.db.models import Count
@@ -43,6 +44,7 @@ from dashboard.models import (
     get_project_sensitivity_analysis_graphs,
     REPORT_GRAPHS,
     STORAGE_SUB_CATEGORIES,
+    OUTPUT_POWER,
 )
 from projects.scenario_topology_helpers import load_scenario_topology_from_db
 from dashboard.forms import (
@@ -811,13 +813,16 @@ def view_asset_parameters(request, scen_id, asset_type_name, asset_uuid):
                 # flow is a dict with keys "value" and "unit"
                 result_param = "flow"
                 if result_param in subasset_results:
-                    subasset_results[result_param].update(
-                        {
-                            "name": format_storage_subasset_name(
-                                existing_ess_asset.name, subasset_name
-                            )
-                        }
-                    )
+                    if subasset_name == OUTPUT_POWER:
+
+                        subasset_results[result_param]["value"] = -1 * np.array(
+                            subasset_results[result_param]["value"]
+                        )
+                        subasset_results[result_param]["value"] = subasset_results[
+                            result_param
+                        ]["value"].tolist()
+
+                    subasset_results[result_param].update({"name": subasset_name})
                     flows.append(subasset_results[result_param])
 
             context.update(
@@ -844,7 +849,9 @@ def view_asset_parameters(request, scen_id, asset_type_name, asset_uuid):
         context = {
             "form": form,
             "input_timeseries_data": input_timeseries_data,
-            "input_timeseries_timestamps": scenario.get_timestamps(json_format=True),
+            "input_timeseries_timestamps": json.dumps(
+                scenario.get_timestamps(json_format=True)
+            ),
         }
 
         qs = Simulation.objects.filter(scenario=scenario)
@@ -856,6 +863,20 @@ def view_asset_parameters(request, scen_id, asset_type_name, asset_uuid):
             result_param = "optimized_add_cap"
             if result_param in asset_results:
                 context.update({result_param: asset_results[result_param]})
+            else:
+                if asset_results["optimize_capacity"]["value"] is True:
+
+                    results_dict = json.loads(qs.get().results)
+
+                    kpi = results_dict["kpi"]["scalar_matrix"]
+                    context.update(
+                        {
+                            result_param: {
+                                "value": kpi[existing_asset.name][result_param],
+                                "unit": kpi[existing_asset.name]["unit"],
+                            }
+                        }
+                    )
             # flow is a dict with keys "value" and "unit"
             result_param = "flow"
             if result_param in asset_results:

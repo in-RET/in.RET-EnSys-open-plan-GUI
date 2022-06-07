@@ -180,7 +180,7 @@ function storageResultGraph(x, ts_data, plot_id="",userLayout=null){
         height: 140,
         margin:{
             b:30,
-            l:30,
+            l:60,
             r:0,
             t:10,
         },

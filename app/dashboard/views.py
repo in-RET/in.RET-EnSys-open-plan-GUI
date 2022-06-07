@@ -42,6 +42,7 @@ from dashboard.models import (
     get_project_reportitems,
     get_project_sensitivity_analysis_graphs,
     REPORT_GRAPHS,
+    STORAGE_SUB_CATEGORIES,
 )
 from projects.scenario_topology_helpers import load_scenario_topology_from_db
 from dashboard.forms import (
@@ -234,8 +235,10 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
 
         selected_scenarios = get_selected_scenarios_in_cache(request, proj_id)
         user_scenarios = project.get_scenarios_with_results()
-
         if user_scenarios.exists() is False:
+            # TODO if user click on results from project before any scenario is simulated it might lead to problems
+            if scen_id is None:
+                scen_id = 0
             # There are no scenarios with results yet for this project
             answer = render(
                 request,
@@ -243,6 +246,7 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
                 {
                     "project_list": user_projects,
                     "proj_id": proj_id,
+                    "scen_id": scen_id,
                     "scenario_list": [],
                     "kpi_list": KPI_PARAMETERS,
                     "table_styles": TABLES,
@@ -785,7 +789,47 @@ def view_asset_parameters(request, scen_id, asset_type_name, asset_uuid):
                 "soc_min": ess_capacity_asset.soc_min,
             },
         )
+
         context = {"form": form}
+
+        qs = Simulation.objects.filter(scenario=scenario)
+        if qs.exists():
+            asset_results = AssetsResults.objects.get(simulation=qs.get())
+            flows = []
+            # collect optimized add cap of capacity and flow of all 3 sub assets of storage asset
+            for subasset_name in STORAGE_SUB_CATEGORIES:
+                subasset_results = asset_results.single_asset_results(
+                    asset_name=format_storage_subasset_name(
+                        existing_ess_asset.name, subasset_name
+                    ),
+                    asset_category="energy_storage",
+                )
+                # this parameter will only be present for capacity
+                result_param = "optimized_add_cap"
+                if result_param in subasset_results:
+                    context.update({result_param: subasset_results[result_param]})
+                # flow is a dict with keys "value" and "unit"
+                result_param = "flow"
+                if result_param in subasset_results:
+                    subasset_results[result_param].update(
+                        {
+                            "name": format_storage_subasset_name(
+                                existing_ess_asset.name, subasset_name
+                            )
+                        }
+                    )
+                    flows.append(subasset_results[result_param])
+
+            context.update(
+                {
+                    "soc_traces": json.dumps(
+                        {
+                            "timestamps": scenario.get_timestamps(json_format=True),
+                            "flows": flows,
+                        }
+                    )
+                }
+            )
 
     else:  # all other assets
         template = "asset/asset_create_form.html"
@@ -800,9 +844,7 @@ def view_asset_parameters(request, scen_id, asset_type_name, asset_uuid):
         context = {
             "form": form,
             "input_timeseries_data": input_timeseries_data,
-            "input_timeseries_timestamps": json.dumps(
-                scenario.get_timestamps(json_format=True)
-            ),
+            "input_timeseries_timestamps": scenario.get_timestamps(json_format=True),
         }
 
         qs = Simulation.objects.filter(scenario=scenario)
@@ -814,14 +856,14 @@ def view_asset_parameters(request, scen_id, asset_type_name, asset_uuid):
             result_param = "optimized_add_cap"
             if result_param in asset_results:
                 context.update({result_param: asset_results[result_param]})
+            # flow is a dict with keys "value" and "unit"
             result_param = "flow"
             if result_param in asset_results:
-                # add timestamps to the results flow
+                # add key "timestamp" to the flow dict
                 asset_results[result_param].update(
                     {"timestamps": scenario.get_timestamps(json_format=True)}
                 )
                 context.update({result_param: json.dumps(asset_results[result_param])})
-
     return render(request, template, context)
 
 

@@ -161,6 +161,49 @@ function addStackedTimeseriesGraph(graphId, parameters){
     Plotly.newPlot(graphId, data, layout);
 };
 
+function storageResultGraph(x, ts_data, plot_id="",userLayout=null){
+
+    // get the handle of the plotly plot
+    if(plot_id == ""){
+        plot_id = PLOT_ID;
+    }
+    var plotDiv = document.getElementById(plot_id);
+    /* if the timestamps from the scenario are available, loads them
+    var ts_timestamps_div = document.getElementById("input_timeseries_timestamps");
+    if (ts_timestamps_div){
+        var ts_timestamps = JSON.parse(ts_timestamps_div.querySelector("textarea").value);
+        x = ts_timestamps
+    }
+    */
+
+    var plotLayout = {
+        height: 140,
+        margin:{
+            b:30,
+            l:30,
+            r:0,
+            t:10,
+        },
+        xaxis:{
+            type: "date",
+            title: "Time",
+            autorange: "true",
+        },
+        yaxis:{
+            title: "SoC/charge/discharge",
+            autorange: "true",
+        }
+    };
+    plotLayout = {...plotLayout, ...userLayout};
+    var traces = []
+    for(var i=0; i<ts_data.length;++i){
+        traces.push({type: "scatter", x: x, y: ts_data[i].value, name: ts_data[i].name + "(" + ts_data[i].unit + ")"});
+    }
+
+    Plotly.newPlot(plotDiv, traces, plotLayout, config);
+    // simulate a click on autoscale
+    plotDiv.querySelector('[data-title="Autoscale"]').click()
+};
 
 function addCapacitiyGraph(graphId, parameters){
     // prepare traces in ploty format

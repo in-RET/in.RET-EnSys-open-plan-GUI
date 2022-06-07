@@ -231,8 +231,10 @@ const submitForm = (e) => {
 $("#guiModal").on('show.bs.modal', function (event) {
   var modal = $(event.target)
   // rename the node on the fly (to avoid the need of refreshing the page)
-  const nodeName = guiModalDOM.querySelector('input[df-name]').value;
-  modal.find('.modal-title').text(nodeName.replaceAll("_", " "));
+  const nodeName = guiModalDOM.querySelector('input[df-name]');
+  if(nodeName){
+    modal.find('.modal-title').text(nodeName.value.replaceAll("_", " "));
+  }
 })
 
 /* Triggered before the modal hides */

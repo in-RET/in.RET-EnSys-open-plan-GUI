@@ -215,9 +215,7 @@ document.querySelector('.drawflow').addEventListener("dblclick", function (e) {
         fetch(getUrl)
         .then(formContent=>formContent.text())
         .then(formContent=> {
-
             // assign the content of the form to the form tag of the modal
-            console.log(guiModalDOM);
             guiModalDOM.querySelector('form .modal-body').innerHTML = formContent;
 
             // set parameters which uniquely identify the asset
@@ -230,13 +228,19 @@ document.querySelector('.drawflow').addEventListener("dblclick", function (e) {
             ts_data_div = document.getElementById("flow_data");
             if(ts_data_div){
                 var ts_data = JSON.parse(ts_data_div.querySelector("textarea").value);
-                var ts_data_value = ts_data.value.map(String);
-                var ts_idx = ts_data.timestamps.map(String);
-                var plotLayout = {
-                    "yaxis": {"title": { "text": "flow " + ts_data.unit}},
-                    "xaxis": {"title": { "text": "time"}},
-                };
-                makePlotly( ts_idx, ts_data_value, plot_id="flow_trace", userLayout=plotLayout)
+                if(["bess", "h2ess", "gess", "hess"].includes(nodeType)){
+                    //storage asset
+                    storageResultGraph(ts_data.timestamps, ts_data.flows, plot_id="soc_traces")
+                }
+                else{
+                    // all other assets
+                    var ts_data_value = ts_data.value.map(String);
+                    var plotLayout = {
+                        "yaxis": {"title": { "text": "flow " + ts_data.unit}},
+                        "xaxis": {"title": { "text": "time"}},
+                    };
+                    makePlotly( ts_data.timestamps, ts_data_value, plot_id="flow_trace", userLayout=plotLayout)
+                }
             }
 
             guiModal.show()

@@ -236,8 +236,15 @@ document.querySelector('.drawflow').addEventListener("dblclick", function (e) {
                     // all other assets
                     var ts_data_value = ts_data.value.map(String);
                     var plotLayout = {
-                        "yaxis": {"title": { "text": "flow " + ts_data.unit}},
-                        "xaxis": {"title": { "text": "time"}},
+                        "height": 140,
+                        "margin":{
+                            "b":30,
+                            "l":60,
+                            "r":0,
+                            "t":10,
+                        },
+                        "yaxis": {"title": { "text": "flow " + ts_data.unit}, "autorange": "true"},
+                        "xaxis": {"title": { "text": "time"}, "autorange": "true"},
                     };
                     makePlotly( ts_data.timestamps, ts_data_value, plot_id="flow_trace", userLayout=plotLayout)
                 }

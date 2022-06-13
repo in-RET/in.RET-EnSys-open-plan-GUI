@@ -868,20 +868,21 @@ def view_asset_parameters(request, scen_id, asset_type_name, asset_uuid):
                 context.update({result_param: asset_results[result_param]})
                 context.update({"display_results": True})
             else:
-                if asset_results["optimize_capacity"]["value"] is True:
+                if "optimize_capacity" in asset_results:
+                    if asset_results["optimize_capacity"]["value"] is True:
 
-                    results_dict = json.loads(qs.get().results)
+                        results_dict = json.loads(qs.get().results)
 
-                    kpi = results_dict["kpi"]["scalar_matrix"]
-                    context.update(
-                        {
-                            result_param: {
-                                "value": kpi[existing_asset.name][result_param],
-                                "unit": kpi[existing_asset.name]["unit"],
+                        kpi = results_dict["kpi"]["scalar_matrix"]
+                        context.update(
+                            {
+                                result_param: {
+                                    "value": kpi[existing_asset.name][result_param],
+                                    "unit": kpi[existing_asset.name]["unit"],
+                                }
                             }
-                        }
-                    )
-                    context.update({"display_results": True})
+                        )
+                        context.update({"display_results": True})
             # flow is a dict with keys "value" and "unit"
             result_param = "flow"
             if result_param in asset_results:

@@ -182,86 +182,80 @@ function update_selected_single_scenario(target){
 {% if scen_id > 0 %}
 
 <script>
-        const csrfToken = '{{ csrf_token }}';
-        const formGetUrl = `{% url 'view_asset_parameters' scen_id %}`;
-        const formPostUrl = "";
-        const scenarioBelongsToUser = {% if scenario.project.user == request.user %}true{% else %}false{% endif %};
-    </script>
+    const csrfToken = '{{ csrf_token }}';
+    const formGetUrl = `{% url 'view_asset_parameters' scen_id %}`;
+    const formPostUrl = "";
+    const scenarioBelongsToUser = {% if scenario.project.user == request.user %}true{% else %}false{% endif %};
+</script>
 <script src="{% static 'js/grid_model_topology.js' %}"></script>
 
 <script>
-        /* First retrieve the busses and assets, then draw the links */
+    /* First retrieve the busses and assets, then draw the links */
 
-        $(window).on('load', async function () {
-            const data = JSON.parse(`{{topology_data_list| escapejs }}`);
-            Promise.all([addBusses(data['busses']), addAssets(data['assets'])])
-                .then(async () => addLinks(data['links']))
-                .catch(err=>Swal.fire('Grid Model Error', 'Could not retrieve grid nodes.', 'error'));
-        });
+    $(window).on('load', async function () {
+        const data = JSON.parse(`{{topology_data_list| escapejs }}`);
+        Promise.all([addBusses(data['busses']), addAssets(data['assets'])])
+            .then(async () => addLinks(data['links']))
+            .catch(err=>Swal.fire('Grid Model Error', 'Could not retrieve grid nodes.', 'error'));
+    });
 
-// double click
-//add to the div only
-document.querySelector('.drawflow').addEventListener("dblclick", function (e) {
+    // assign double click on the energy system area
+    document.querySelector('.drawflow').addEventListener("dblclick", function (e) {
 
-    const closestNode = e.target.closest('.drawflow-node');
-    const nodeType = closestNode.querySelector('.box').getAttribute(ASSET_TYPE_NAME);
+        const closestNode = e.target.closest('.drawflow-node');
+        const nodeType = closestNode.querySelector('.box').getAttribute(ASSET_TYPE_NAME);
 
-    if (closestNode) {
-        const topologyNodeId = closestNode.id;
-        // formGetUrl is defined above
-        const getUrl = formGetUrl + nodeType +
-            (nodesToDB.has(topologyNodeId) ? "/" + nodesToDB.get(topologyNodeId).uid : "");
+        if (closestNode) {
+            const topologyNodeId = closestNode.id;
+            // formGetUrl is defined above
+            const getUrl = formGetUrl + nodeType +
+                (nodesToDB.has(topologyNodeId) ? "/" + nodesToDB.get(topologyNodeId).uid : "");
 
-        // get the form of the asset of the type "nodeType" (dashboard/views.py::view_asset_parameters)
-        fetch(getUrl)
-        .then(formContent=>formContent.text())
-        .then(formContent=> {
-            // assign the content of the form to the form tag of the modal
-            guiModalDOM.querySelector('form .modal-body').innerHTML = formContent;
+            // get the form of the asset of the type "nodeType" (dashboard/views.py::view_asset_parameters)
+            fetch(getUrl)
+            .then(formContent=>formContent.text())
+            .then(formContent=> {
+                // assign the content of the form to the form tag of the modal
+                guiModalDOM.querySelector('form .modal-body').innerHTML = formContent;
 
-            // set parameters which uniquely identify the asset
-            guiModalDOM.setAttribute("data-node-type", nodeType);
-            guiModalDOM.setAttribute("data-node-topo-id", topologyNodeId);
-            guiModalDOM.setAttribute("data-node-df-id", topologyNodeId.split("-").pop());
-            editor.editor_mode = "fixed";
+                // set parameters which uniquely identify the asset
+                guiModalDOM.setAttribute("data-node-type", nodeType);
+                guiModalDOM.setAttribute("data-node-topo-id", topologyNodeId);
+                guiModalDOM.setAttribute("data-node-df-id", topologyNodeId.split("-").pop());
+                editor.editor_mode = "fixed";
 
-            //update the graph of the flow timeseries, if any
-            ts_data_div = document.getElementById("flow_data");
-            if(ts_data_div){
-                var ts_data = JSON.parse(ts_data_div.querySelector("textarea").value);
-                if(["bess", "h2ess", "gess", "hess"].includes(nodeType)){
-                    //storage asset
-                    storageResultGraph(ts_data.timestamps, ts_data.flows, plot_id="soc_traces")
+                //update the graph of the flow timeseries, if any
+                ts_data_div = document.getElementById("flow_data");
+                if(ts_data_div){
+                    var ts_data = JSON.parse(ts_data_div.querySelector("textarea").value);
+                    if(["bess", "h2ess", "gess", "hess"].includes(nodeType)){
+                        //storage asset
+                        storageResultGraph(ts_data.timestamps, ts_data.flows, plot_id="soc_traces")
+                    }
+                    else{
+                        // all other assets
+                        var ts_data_value = ts_data.value.map(String);
+                        var plotLayout = {
+                            "height": 140,
+                            "margin":{
+                                "b":30,
+                                "l":60,
+                                "r":60,
+                                "t":10,
+                            },
+                            "yaxis": {"title": { "text": "flow " + ts_data.unit}, "autorange": "true"},
+                            "xaxis": {"title": { "text": "time"}, "autorange": "true"},
+                        };
+                        makePlotly( ts_data.timestamps, ts_data_value, plot_id="flow_trace", userLayout=plotLayout)
+                    }
                 }
-                else{
-                    // all other assets
-                    var ts_data_value = ts_data.value.map(String);
-                    var plotLayout = {
-                        "height": 140,
-                        "margin":{
-                            "b":30,
-                            "l":60,
-                            "r":60,
-                            "t":10,
-                        },
-                        "yaxis": {"title": { "text": "flow " + ts_data.unit}, "autorange": "true"},
-                        "xaxis": {"title": { "text": "time"}, "autorange": "true"},
-                    };
-                    makePlotly( ts_data.timestamps, ts_data_value, plot_id="flow_trace", userLayout=plotLayout)
-                }
-            }
 
-            guiModal.show()
-            $('[data-bs-toggle="tooltip"]').tooltip()
+                guiModal.show()
+                $('[data-bs-toggle="tooltip"]').tooltip()
 
-        })
-        //.catch(err => alert("Modal get form JS Error: " + err));
-
-    }
-
-
-
-        });
+            })
+        }
+});
 
 
 </script>

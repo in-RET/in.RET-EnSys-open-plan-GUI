@@ -177,12 +177,12 @@ function storageResultGraph(x, ts_data, plot_id="",userLayout=null){
     */
 
     var plotLayout = {
-        height: 140,
+        height: 220,
         margin:{
-            b:30,
+            b:45,
             l:60,
-            r:0,
-            t:10,
+            r:60,
+            t:15,
         },
         xaxis:{
             type: "date",
@@ -190,14 +190,24 @@ function storageResultGraph(x, ts_data, plot_id="",userLayout=null){
             autorange: "true",
         },
         yaxis:{
-            title: "SoC/charge/discharge",
+            title: "Charge/discharge",
             autorange: "true",
-        }
+        },
+        yaxis2:{
+            title: "Capacity",
+            overlaying: "y",
+            side: "right",
+            autorange: "true",
+        },
+        legend: {orientation: "h"},
     };
     plotLayout = {...plotLayout, ...userLayout};
-    var traces = []
+    var traces = [];
+    var plot_y_axis = "y";
     for(var i=0; i<ts_data.length;++i){
-        traces.push({type: "scatter", x: x, y: ts_data[i].value, name: ts_data[i].name + "(" + ts_data[i].unit + ")"});
+    // change legend layout
+        plot_y_axis = (ts_data[i].name.includes("capacity") ? "y2" : "y");
+        traces.push({type: "scatter", x: x, y: ts_data[i].value, name: ts_data[i].name + "(" + ts_data[i].unit + ")", yaxis: plot_y_axis});
     }
 
     Plotly.newPlot(plotDiv, traces, plotLayout, config);

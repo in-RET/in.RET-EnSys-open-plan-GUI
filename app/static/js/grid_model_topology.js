@@ -298,3 +298,27 @@ async function createNodeObject(nodeName, connectionInputs = 1, connectionOutput
         "specificNodeType": nodeName
     };
 }
+
+
+/* Script to retrieve nodes (assets and busses) and links data from the backend. */
+/* Html of asset modification is provided in grid_model_topology.js:createNodeObject function */
+const addBusses = async (data) =>
+    await Promise.all(data.map(async nodeData => {
+        const result = await createNodeObject(nodeData.name, nodeData.input_ports, nodeData.output_ports, nodeData.data, nodeData.pos_x, nodeData.pos_y);
+        nodesToDB.set(`node-${result.editorNodeId}`, {uid:nodeData.data.databaseId, assetTypeName: "bus" });
+    }));
+
+const addAssets = async (data) =>
+    await Promise.all(data.map(async nodeData => {
+        const result = await createNodeObject(nodeData.name, 1, 1, nodeData.data, nodeData.pos_x, nodeData.pos_y);
+        nodesToDB.set(`node-${result.editorNodeId}`, {uid:nodeData.data.unique_id, assetTypeName: nodeData.name });
+    }));
+
+/* 'editor' is the variable name of the DrawFlow instance used here as a global variable */
+const addLinks = async (data) => data.map(async linkData => {
+    const busNodeId = [...nodesToDB.entries()].filter(([key,val])=>val.uid===linkData.bus_id).map(([k,v])=>k)[0].split("-").pop();
+    const assetNodeId = [...nodesToDB.entries()].filter(([key,val])=>val.uid===linkData.asset_id).map(([k,v])=>k)[0].split("-").pop();
+    (linkData.flow_direction === "B2A") ?
+        editor.addConnection(busNodeId, assetNodeId, linkData.bus_connection_port, 'input_1')
+        : editor.addConnection(assetNodeId, busNodeId, 'output_1', linkData.bus_connection_port);
+});

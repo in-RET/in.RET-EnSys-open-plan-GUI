@@ -16,7 +16,6 @@ from projects.forms import AssetCreateForm, BusForm, StorageForm
 from django.template.loader import get_template
 
 # region sent db nodes to js
-from crispy_forms.templatetags import crispy_forms_filters
 from django.http import JsonResponse
 import logging
 

@@ -792,7 +792,7 @@ def view_asset_parameters(request, scen_id, asset_type_name, asset_uuid):
             },
         )
 
-        context = {"form": form}
+        context = {"form": form, "display_results": False}
 
         qs = Simulation.objects.filter(scenario=scenario)
         if qs.exists():
@@ -810,6 +810,7 @@ def view_asset_parameters(request, scen_id, asset_type_name, asset_uuid):
                 result_param = "optimized_add_cap"
                 if result_param in subasset_results:
                     context.update({result_param: subasset_results[result_param]})
+                    context.update({"display_results": True})
                 # flow is a dict with keys "value" and "unit"
                 result_param = "flow"
                 if result_param in subasset_results:
@@ -824,17 +825,18 @@ def view_asset_parameters(request, scen_id, asset_type_name, asset_uuid):
 
                     subasset_results[result_param].update({"name": subasset_name})
                     flows.append(subasset_results[result_param])
-
-            context.update(
-                {
-                    "soc_traces": json.dumps(
-                        {
-                            "timestamps": scenario.get_timestamps(json_format=True),
-                            "flows": flows,
-                        }
-                    )
-                }
-            )
+            if len(flows) > 0:
+                context.update(
+                    {
+                        "soc_traces": json.dumps(
+                            {
+                                "timestamps": scenario.get_timestamps(json_format=True),
+                                "flows": flows,
+                            }
+                        )
+                    }
+                )
+                context.update({"display_results": True})
 
     else:  # all other assets
         template = "asset/asset_create_form.html"
@@ -852,6 +854,7 @@ def view_asset_parameters(request, scen_id, asset_type_name, asset_uuid):
             "input_timeseries_timestamps": json.dumps(
                 scenario.get_timestamps(json_format=True)
             ),
+            "display_results": False,
         }
 
         qs = Simulation.objects.filter(scenario=scenario)
@@ -863,6 +866,7 @@ def view_asset_parameters(request, scen_id, asset_type_name, asset_uuid):
             result_param = "optimized_add_cap"
             if result_param in asset_results:
                 context.update({result_param: asset_results[result_param]})
+                context.update({"display_results": True})
             else:
                 if asset_results["optimize_capacity"]["value"] is True:
 
@@ -877,6 +881,7 @@ def view_asset_parameters(request, scen_id, asset_type_name, asset_uuid):
                             }
                         }
                     )
+                    context.update({"display_results": True})
             # flow is a dict with keys "value" and "unit"
             result_param = "flow"
             if result_param in asset_results:
@@ -885,6 +890,7 @@ def view_asset_parameters(request, scen_id, asset_type_name, asset_uuid):
                     {"timestamps": scenario.get_timestamps(json_format=True)}
                 )
                 context.update({result_param: json.dumps(asset_results[result_param])})
+                context.update({"display_results": True})
     return render(request, template, context)
 
 

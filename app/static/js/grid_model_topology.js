@@ -227,6 +227,20 @@ const submitForm = (e) => {
 }
 
 
+$("#guiModal").on('shown.bs.modal', function (event) {
+     var formDiv = document.getElementsByClassName("form-group");
+     var plotDiv = null;
+
+     var plotDivIds = ["flow_trace", "timeseries_trace", "soc_traces"];
+
+     for(i=0;i<plotDivIds.length;++i){
+         plotDiv = document.getElementById(plotDivIds[i]);
+         if (plotDiv){
+            Plotly.relayout(plotDiv, {width: plotDiv.clientWidth});
+         }
+     }
+ })
+
 /* Triggered before the modal opens */
 $("#guiModal").on('show.bs.modal', function (event) {
   var modal = $(event.target)

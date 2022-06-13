@@ -41,9 +41,10 @@
 </div>
 
 <div class="container">
-    {% if optimized_add_cap %}
+    {% if display_results %}
       <div class="row">
           <h3>Results</h3>
+              {% if optimized_add_cap %}
               <div class="form-group{% if field.errors %} invalid{% endif %}">
 
                 <label for="id_optimized_add_cap">
@@ -54,6 +55,7 @@
 
 
               </div>
+              {% endif %}
               {% if flow %}
                 <div id="flow_trace"></div>
                 <div>

@@ -7,9 +7,10 @@
 </div>
 
 <div class="container">
-  {% if optimized_add_cap %}
+  {% if display_results == True %}
       <div class="row">
           <h3>Results</h3>
+              {% if optimized_add_cap %}
               <div class="form-group{% if field.errors %} invalid{% endif %}">
 
                 <label for="id_optimized_add_cap">
@@ -18,6 +19,7 @@
 
                 <input readonly type="number" name="optimized_add_cap" value="{{ optimized_add_cap|get_item:'value' }}" min="0.0"  data-bs-toggle="tooltip" title="" style="font-weight:400; font-size:13px;" class="view-only numberinput form-control form-control" required="" id="id_optimized_add_cap" data-bs-original-title="TBD" aria-label="TDB">
               </div>
+              {% endif %}
               {% if soc_traces %}
                 <div id="soc_traces"></div>
                 <div>

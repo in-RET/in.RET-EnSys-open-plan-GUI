@@ -701,6 +701,8 @@ class AssetCreateForm(OpenPlanModelForm):
             self.fields[field].widget.attrs.update({f"df-{field}": ""})
             if field == "input_timeseries":
                 self.fields[field].required = self.is_input_timeseries_empty()
+            if view_only:
+                self.fields[field].disabled = True
         """ ----------------------------------------------------- """
 
     def is_input_timeseries_empty(self):

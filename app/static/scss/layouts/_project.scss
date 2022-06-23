@@ -6,9 +6,9 @@
   &> div {
     @include section-width;
     position: relative;
-    padding-bottom: 4rem;
+    padding-bottom: 2rem;
     border-bottom: 2px solid $primary-gray-color-1;
-    margin-bottom: 4rem;
+    margin-bottom: 2rem;
   }
 
   &__top {
@@ -22,8 +22,15 @@
     }
 
     .name {
+      @include user-select-none;
       margin-right: $space-between-project-elements;
       padding-left: $space-between-project-elements;
+      font-size: $font-size-medium-2;
+      font-weight: 700;
+    }
+
+    .location {
+      font-size: $font-size-normal;
     }
 
     .name::before {
@@ -38,12 +45,10 @@
       top: 0.5rem;
       left: 0;
     }
-    a {
-        font-size: 2rem;
-    }
   }
 
   &__details {
+    @include user-select-none;
     padding-top: $space-between-project-elements;
     padding-left: $space-between-project-elements;
 
@@ -90,8 +95,13 @@
     }
   }
 
+  &__description {
+    max-width: 52rem;
+    padding-left: $space-between-project-elements;
+  }
+
   &__scenarios {
-    padding-top: $space-between-project-elements;
+    padding-top: $space-between-project-elements-small;
     padding-left: $space-between-project-elements;
 
     .toggle {
@@ -112,8 +122,24 @@
     .list-group-item {
       @include flex-row-space-between;
       @include user-select-none;
-      padding: $space-between-project-elements;
+      padding: $space-between-project-elements-small $space-between-project-elements;
       border-color: $primary-gray-color-1;
+
+      &--uc {
+        @include flex-row;
+        justify-content: flex-start;
+        user-select: text;
+      }
+
+      &__name {
+        font-weight: 700;
+      }
+
+      &__description {
+        padding-left: $space-between-project-elements;
+        font-weight: 300;
+        max-width: 48rem;
+      }
     }
 
     .details {
@@ -145,18 +171,6 @@
         @include project-btn;
         margin-top: 0;
       }
-      .btn--action.btn--disabled {
-        padding: 0.25rem 0.5rem;
-        margin-top: 0;
-      }
-      .btn--action.btn--error {
-        padding: 0.25rem 0.5rem;
-        margin-top: 0;
-      }
-      .btn--action.btn--pending {
-        padding: 0.25rem 0.5rem;
-        margin-top: 0;
-      }
 
       .action {
         @include project-actions;
@@ -179,6 +193,42 @@
       .btn::after {
         content: none;
       }
+    }
+  }
+
+  &--uc > div {
+    @include flex-row;
+  }
+
+  &__img {
+    width: 12rem;
+
+    & > img {
+      width: 12rem;
+    }
+
+    & > span {
+      font-size: $font-size-xsmall;
+      font-weight: 700;
+      color: $primary-color-1;
+      cursor: pointer;
+    }
+
+    .icon {
+      vertical-align: middle;
+      padding-right: 0.25rem;
+    }
+  }
+
+  &__content {
+    flex: 1;
+
+    .name:before {
+      display: none;
+    }
+
+    .project__description {
+      max-width: 40rem;
     }
   }
 }

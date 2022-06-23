@@ -31,6 +31,6 @@ table.table {
   }
 
   &>:not(caption)>*>* {
-    padding: .75rem;
+    padding: $dashboard-table-cell-padding;
   }
 }

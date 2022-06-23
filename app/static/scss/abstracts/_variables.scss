@@ -87,6 +87,7 @@ $anchors-items-dark: '.project a', '.dropdown-item', 'footer a', '.nav-link';
 
 // Layout
 $section-max-width: 82rem;
+$section-max-width-small: 50rem;
 $padding-sides-normal: 1rem;
 $padding-sides-large: 2rem;
 $padding-frames: 4rem;
@@ -99,6 +100,7 @@ $header-dashboard-margin-bottom: 1rem;
 
 // Projects
 $space-between-project-elements: 1.5rem;
+$space-between-project-elements-small: 0.5rem;
 
 // GUI
 $gui-component-radius: 8px;
@@ -156,6 +158,7 @@ $gui-component-position-side: 0.9rem;
 // Dashboard
 $dashboard-chart-height: 32rem;
 $dashboard-space-between-charts: 1.5rem;
+$dashboard-table-cell-padding: 0.75rem 1rem;
 
 // Simulation error
 $simulation-error-padding: 4rem;

@@ -1,3 +1,5 @@
+@use 'variables' as *;
+
 // Section-width
 @mixin nav-section-width {
   width: calc(100% - (#{$top-nav-padding-xsmall} * 2));
@@ -127,6 +129,10 @@
   &__property {
     font-weight: 300;
     padding-right: .75rem;
+  }
+
+  &__value:active {
+    color: $text-color-secondary;
   }
 }
 

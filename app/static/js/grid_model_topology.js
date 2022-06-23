@@ -40,36 +40,7 @@ function drop(ev) {
     ev.preventDefault();
     // corresponds to data-node defined in templates/scenario/topology_drag_items.html
     const nodeName = ev.dataTransfer.getData("node");
-    (nodeName === BUS) ? IOBusOptions(nodeName, ev.clientX, ev.clientY)
-        : addNodeToDrawFlow(nodeName, ev.clientX, ev.clientY);
-}
-
-
-function IOBusOptions(nodeName, posX, posY) {
-    const checkMinMax = (value, min, max) => (value <= min) ? min : (value >= max) ? max : value;
-    Swal.mixin({
-        input: 'number',
-        confirmButtonText: 'Next',
-        showCancelButton: true,
-        progressSteps: ['1', '2']
-    })
-        .queue([
-            {
-                title: 'Bus Inputs',
-                text: 'Provide the number of bus Inputs (default 1)',
-            },
-            {
-                title: 'Bus Outputs',
-                text: 'Provide the number of bus Outputs (default 1)',
-            }
-        ])
-        .then((result) => {
-            if (result.value) {
-                const inputs = checkMinMax(result.value[0], 1, 7);
-                const outputs = checkMinMax(result.value[1], 1, 7);
-                addNodeToDrawFlow(nodeName, posX, posY, inputs, outputs);
-            }
-        })
+    addNodeToDrawFlow(nodeName, ev.clientX, ev.clientY);
 }
 
 
@@ -117,7 +88,6 @@ async function addNodeToDrawFlow(name, pos_x, pos_y, nodeInputs = 1, nodeOutputs
     pos_x = pos_x * (editor.precanvas.clientWidth / (editor.precanvas.clientWidth * editor.zoom)) - (editor.precanvas.getBoundingClientRect().x * (editor.precanvas.clientWidth / (editor.precanvas.clientWidth * editor.zoom)));
     pos_y = pos_y * (editor.precanvas.clientHeight / (editor.precanvas.clientHeight * editor.zoom)) - (editor.precanvas.getBoundingClientRect().y * (editor.precanvas.clientHeight / (editor.precanvas.clientHeight * editor.zoom)));
     return createNodeObject(name, nodeInputs, nodeOutputs, nodeData, pos_x, pos_y);
-    // return createNodeObject(name, nodeInputs, nodeOutputs, {}, pos_x, pos_y); was like that
 }
 
 function updateInputTimeseries(){
@@ -132,9 +102,7 @@ function updateInputTimeseries(){
     }
 }
 
-
-
-// one needs to add
+// one needs to add this function as event with eventListener (<some jquery div>.addEventListener("dblclick", dblClick))
 const dblClick = (e) => {
 
     const closestNode = e.target.closest('.drawflow-node');

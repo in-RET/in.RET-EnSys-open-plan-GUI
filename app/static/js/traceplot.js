@@ -13,12 +13,12 @@ const config = {
         'toggleSpikelines']
 }; //displayModeBar: true
 const layout = {
-    height: 140,
+    height: 220,
     margin:{
-        b:30,
-        l:30,
-        r:0,
-        t:10,
+        b:45,
+        l:60,
+        r:60,
+        t:15,
     },
     xaxis:{
         type: "date"

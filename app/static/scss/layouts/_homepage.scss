@@ -1,3 +1,6 @@
+@import '../abstracts/variables';
+@import '../abstracts/mixins';
+
 .hero {
   padding-top: $top-nav-height;
   @include flex-row-justify-center;

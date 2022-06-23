@@ -1,3 +1,43 @@
+
+.dashboard-tabs {
+  @include flex-row-justify-center;
+
+  &> div {
+    @include section-width;
+  }
+
+  .nav-tabs {
+    border-bottom: 0;
+
+    .nav-link {
+      margin-bottom: -2px;
+    }
+
+    .nav-link.active {
+      background-color: $primary-gray-color-2;
+      border: 0;
+      font-weight: 700 !important;
+    }
+
+    .nav-link:hover {
+      border-color: transparent;
+    }
+  }
+}
+
+.dashboard-options {
+  @include flex-row-justify-center;
+  background-color: $primary-gray-color-2;
+
+  &> div {
+    @include section-width;
+  }
+
+  &.sticky-top {
+    top: 3.5rem;
+  }
+}
+
 .dashboard {
   @include flex-row-justify-center;
   background-color: $primary-gray-color-1;
@@ -9,11 +49,17 @@
   }
 
   &__scenarios {
-    @include flex-column;
-    padding-bottom: 2rem;
+    @include flex-row;
+    align-items: flex-end;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
 
     .dashboard__select-scenarios {
-      flex: 1;
+      width: 50rem;
+
+      &--small {
+        width: 32rem !important;
+      }
     }
 
     .dashboard__btn-scenarios {
@@ -21,6 +67,18 @@
       justify-content: flex-end;
       height: 100%;
       padding-left: 1rem;
+    }
+
+    .form-label {
+      display: none;
+    }
+
+    .dashboard__add {
+      flex: 1;
+      @include flex-row;
+      justify-content: flex-end;
+      align-items: center;
+      height: 100%;
     }
   }
 
@@ -54,7 +112,6 @@
     background-color: $white;
     border-radius: $button-border-radius;
     box-shadow: $box-shadow-frame;
-    height: $dashboard-chart-height;
     margin-bottom: $dashboard-space-between-charts;
 
     &__header {
@@ -71,6 +128,18 @@
 
         .icon {
           font-size: .75rem;
+        }
+      }
+    }
+
+    &__plot {
+      .table-add {
+        display: inline-block;
+        padding: $dashboard-table-cell-padding;
+        color: $primary-color-1;
+
+        &__text {
+          padding-left: 0.25rem;
         }
       }
     }
@@ -126,14 +195,6 @@
       &--worst .item__value {
         color: $dashboard-inadequate-value;
       }
-    }
-  }
-
-  &__create {
-    margin-bottom: 1.5rem;
-    button {
-      float: right;
-
     }
   }
 }

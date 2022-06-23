@@ -1,3 +1,6 @@
+@import '../abstracts/variables';
+@import '../abstracts/mixins';
+
 .modal {
   .modal-header {
     background-color: $primary-gray-color-1;

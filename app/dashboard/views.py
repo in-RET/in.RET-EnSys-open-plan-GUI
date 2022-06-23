@@ -60,7 +60,7 @@ import json
 import datetime
 import logging
 import traceback
-import ast
+from projects.helpers import parameters_helper
 
 logger = logging.getLogger(__name__)
 
@@ -841,6 +841,7 @@ def view_asset_parameters(request, scen_id, asset_type_name, asset_uuid):
     else:  # all other assets
         template = "asset/asset_create_form.html"
         existing_asset = get_object_or_404(Asset, unique_id=asset_uuid)
+
         form = AssetCreateForm(
             asset_type=asset_type_name, instance=existing_asset, view_only=True
         )
@@ -857,6 +858,7 @@ def view_asset_parameters(request, scen_id, asset_type_name, asset_uuid):
             "display_results": False,
         }
 
+        # fetch optimized capacity and flow if they exist
         qs = Simulation.objects.filter(scenario=scenario)
         if qs.exists():
             asset_results = AssetsResults.objects.get(
@@ -872,7 +874,6 @@ def view_asset_parameters(request, scen_id, asset_type_name, asset_uuid):
                     if asset_results["optimize_capacity"]["value"] is True:
 
                         results_dict = json.loads(qs.get().results)
-
                         kpi = results_dict["kpi"]["scalar_matrix"]
                         context.update(
                             {
@@ -883,6 +884,7 @@ def view_asset_parameters(request, scen_id, asset_type_name, asset_uuid):
                             }
                         )
                         context.update({"display_results": True})
+
             # flow is a dict with keys "value" and "unit"
             result_param = "flow"
             if result_param in asset_results:
@@ -892,6 +894,53 @@ def view_asset_parameters(request, scen_id, asset_type_name, asset_uuid):
                 )
                 context.update({result_param: json.dumps(asset_results[result_param])})
                 context.update({"display_results": True})
+            else:
+                # provider have their flows under consumption and feedin
+                if existing_asset.is_provider is True:
+                    traces = []
+                    timestamps = scenario.get_timestamps(json_format=True)
+                    for fl, fl_name in zip(
+                        ("connected_consumption_sources", "connected_feedin_sink"),
+                        ("Consumption", "Feedin"),
+                    ):
+                        subasset_name = asset_results[fl]
+                        subasset_results = AssetsResults.objects.get(
+                            simulation=qs.get()
+                        ).single_asset_results(asset_name=subasset_name)
+
+                        subasset_results = subasset_results["flow"]
+                        subasset_results.update({"name": fl_name})
+
+                        # make consumption values negative
+                        if fl_name == "Consumption":
+                            subasset_results["value"] = -1 * np.array(
+                                subasset_results["value"]
+                            )
+                            subasset_results["value"] = subasset_results[
+                                "value"
+                            ].tolist()
+
+                        traces.append(subasset_results)
+
+                    # add the possibility to see the cap limit on the feedin on the result graph
+                    feedin_cap = existing_asset.feedin_cap
+                    traces.append(
+                        {
+                            "value": [feedin_cap for t in timestamps],
+                            "name": parameters_helper.get_doc_verbose("feedin_cap"),
+                            "unit": parameters_helper.get_doc_unit("feedin_cap"),
+                            "options": {"visible": "legendonly"},
+                        }
+                    )
+
+                    context.update(
+                        {
+                            "flow": json.dumps(
+                                {"timestamps": timestamps, "traces": traces}
+                            )
+                        }
+                    )
+                    context.update({"display_results": True})
     return render(request, template, context)
 
 

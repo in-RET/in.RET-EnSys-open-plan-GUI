@@ -42,10 +42,10 @@ testDuplicateScenario.addEventListener("click", () => {
 */
 
 ////////////////////////////////////////////// Design saved animation
-const saveDesignBtn = document.getElementById('js-saveDesign');
+/*const saveDesignBtn = document.getElementById('js-saveDesign');
 const designSavedFeedback = document.getElementById('js-designSaved');
 
 saveDesignBtn.addEventListener('click', function() {
   saveDesignBtn.classList.add('hidden');
   designSavedFeedback.classList.add('display');
-});
+});*/

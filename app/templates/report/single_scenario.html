@@ -9,115 +9,116 @@
 
 
 {% block export-results %}
-
-        <a type="button" class="btn btn-info" href="{% url 'redirect_download_timeseries_results' proj_id %}"><span class="icon icon-export"></span>{% translate "Download Timeseries" %}</a>
+<a type="button" class="btn btn-small" href="{% url 'redirect_download_timeseries_results' proj_id %}"><span class="icon icon-export"></span>{% translate "Download Timeseries" %}</a>
 {% endblock export-results %}
 
 
 {% block dashboard %}
-
-    <section class="dashboard">
-        <div>
-            <div class="row">
-                <div class="dashboard__scenarios">
-                    <h2>{% translate "My scenarios" %}</h2>
-                    <div class="scenario-select">
-                        {% for scenario in scenario_list %}
-                        {% if scenario.id|stringformat:'s' in request|get_selected_scenarios:proj_id %}
-                            {% setvar "selected" as selected %}
-                        {% else%}
-                            {% setvar "" as selected %}
-                        {% endif %}
-                            <button id="scenario-{{ proj_id }}-{{ scenario.id}}" class="scenario-select__item {{ selected }}" onclick="update_selected_single_scenario(this)">
-                                {{ scenario.name }}
-                            </button>
-                        {% empty %}
-                            {% translate "You have no scenario with completed simulation, please run simulations to display results" %}
-                        {% endfor %}
-
-                    </div>
-                </div>
-            </div>
-            {% if scenario_list %}
-            <div class="row dashboard__create">
-                <div class="col">
-                  <button class="btn btn--medium" onclick="javascript:showCreateReportItemModal(event)">
-                    <span class="icon icon-add"></span>
-                    {% translate "Create graph" %}
-                  </button>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col col-md-12">
-                    <div class="chart">
-                        <div class="chart__header">
-                            <div style="display: flex;gap: 10px;align-items: center;">
-                                <span class="title">{% translate "Choose KPI table display" %}</span>
-                                <span><select id="kpi-table-style" name="kpi-table-style" class="form-select" aria-label="Default select example" onchange="update_kpi_table_style(this)">
-                                    {% for style in table_styles %}
-                                    <option value="{{ style }}"> {{ style }}  </option>
-                                    {% endfor %}
-                                </select></span>
-                                <span class="view" data-bs-toggle="modal" data-bs-target="#KPIModal">
-                                    <span class="icon icon-i_arrow_right"></span> {% translate "View KPIs" %}
-                                </span>
-                            </div>
-                            <div class="dropdown">
-                                <button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuKPI" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <span class="icon icon-more"></span>
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuKPI">
-                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">{% translate "Export as .xls" %}</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">{% translate "Export as PDF" %}</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="chart__plot">
-                            <table class="table" id="selectedKPITable"></table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-
-
-            <div class="chart" style="height: fit-content;">
-                <div class="chart__header">
-                    <div>
-                        <span class="title">{% translate "Energy system" %}</span>
-                    </div>
-                    <!--div class="dropdown">
-                        <button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuTS" data-bs-toggle="dropdown" aria-expanded="false">
-                            <span class="icon icon-more"></span>
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuTS">
-                            <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">{% translate 'some option A' %}</a></li>
-                            <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">{% translate 'some option B' %}</a></li>
-                        </ul>
-                    </div-->
-                </div>
-                <div class="chart__plot">
-                    <div id="energy-system" class="system-design" style="height:650px;margin-bottom:1rem;">
-                <div id="drawflow" class="gui chart"></div>
-                </div>
-                </div>
-            </div>
-
-
-
-
-            <div class="row">
-                <div class="col" id="report_items">
-                {% include "report/graph_template.html" with id="all_timeseries" title="All timeseries" %}
-                {% include "report/graph_template.html" with id="stacked_timeseries" title="Stacked timeseries by sector" %}
-                {% include "report/graph_template.html" with id="sankey" title="Sankey diagram" %}
-                {% include "report/graph_template.html" with id="capacities" title="Installed and optimized capacities" %}
-                </div>
-            </div>
-            {% endif %}
-        </div>
-    </section>
+<div class="dashboard-options sticky-top">
+	<div>
+		<div class="row">
+			<div class="dashboard__scenarios">
+				<div class="dashboard__select-scenarios dashboard__select-scenarios--small">
+					<label for="results-single-scenario" class="form-label">{% translate "Scenario" %}</label>
+					<select name="results-single-scenario" id="results-single-scenario" placeholder="This is a placeholder" onchange="update_selected_single_scenario(this.value)">
+						{% for scenario in scenario_list %}
+						<option value="scenario-{{ proj_id }}-{{ scenario.id}}">{{ scenario.name }}</option>
+						{% empty %}
+						{% translate "You have no scenario with completed simulation, please run simulations to display results" %}
+						{% endfor %}
+					</select>
+				</div>
+				{% if scenario_list %}
+				<div class="dashboard__add">
+					<button class="btn btn--small btn--transparent" type="submit" onclick="javascript:showCreateReportItemModal(event)">
+						<span class="icon icon-add"></span>
+						{% translate "Add chart" %}
+					</button>
+				</div>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+</div>
+<div class="dashboard">
+	<div>
+		{% if scenario_list %}
+		<!-- KPI table start -->
+		<div class="row">
+			<div class="col col-md-12">
+				<div class="chart">
+					<div class="chart__header">
+						<!-- style="display: flex;gap: 10px;align-items: center;" -->
+						<div>
+							<span class="title">{% translate "Choose KPI table display" %}</span>
+							<span><select id="kpi-table-style" name="kpi-table-style" class="form-select" aria-label="Default select example" onchange="update_kpi_table_style(this)">
+																		{% for style in table_styles %}
+																		<option value="{{ style }}"> {{ style }}  </option>
+																		{% endfor %}
+																</select></span>
+							<span class="view" data-bs-toggle="modal" data-bs-target="#KPIModal">
+								<span class="icon icon-add"></span> <span class="table-add__text">{% translate "View KPIs" %}</span>
+							</span>
+						</div>
+						<div class="dropdown">
+							<button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuKPI" data-bs-toggle="dropdown" aria-expanded="false">
+								<span class="icon icon-more"></span>
+							</button>
+							<ul class="dropdown-menu" aria-labelledby="dropdownMenuKPI">
+								<li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">{% translate "Export as .xls" %}</a></li>
+								<li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">{% translate "Export as PDF" %}</a></li>
+							</ul>
+						</div>
+					</div>
+					<div class="chart__plot">
+						<table class="table" id="selectedKPITable"></table>
+						<div class="table-add">
+							<span class="icon icon-add"></span>
+							<span class="table-add__text">
+								{% translate "Add KPI" %}
+              </span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- KPI table end -->
+		<!-- ES design start -->
+		<div class="chart" style="height: fit-content;">
+			<div class="chart__header">
+				<div>
+					<span class="title">{% translate "Energy system" %}</span>
+				</div>
+				<!--div class="dropdown">
+						<button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuTS" data-bs-toggle="dropdown" aria-expanded="false">
+								<span class="icon icon-more"></span>
+						</button>
+						<ul class="dropdown-menu" aria-labelledby="dropdownMenuTS">
+								<li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">{% translate 'some option A' %}</a></li>
+								<li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">{% translate 'some option B' %}</a></li>
+						</ul>
+				</div-->
+			</div>
+			<div class="chart__plot">
+				<div id="energy-system" class="system-design" style="height:650px;margin-bottom:1rem;">
+					<div id="drawflow" class="gui chart"></div>
+				</div>
+			</div>
+		</div>
+		<!-- ES design stop -->
+		<!-- Graphs area start -->
+		<div class="row">
+			<div class="col" id="report_items">
+				{% include "report/graph_template.html" with id="all_timeseries" title="All timeseries" %}
+				{% include "report/graph_template.html" with id="stacked_timeseries" title="Stacked timeseries by sector" %}
+				{% include "report/graph_template.html" with id="sankey" title="Sankey diagram" %}
+				{% include "report/graph_template.html" with id="capacities" title="Installed and optimized capacities" %}
+			</div>
+		</div>
+		<!-- Graphs area  stop -->
+		{% endif %}
+	</div>
+</div>
 
 {% endblock dashboard %}
 
@@ -125,6 +126,11 @@
 {% block results_end_body_scripts %}
 <script>
 document.getElementById('single-scenario-link').classList.add('active');
+
+var thirdElement = new Choices('#results-single-scenario', {
+	allowHTML: true,
+	itemSelectText: '',
+});
 
 
 $(document).ready(function () {
@@ -139,13 +145,14 @@ $(document).ready(function () {
     scenario_visualize_sankey(scen_id);
     scenario_visualize_capacities(scen_id);
     // Highlight only the selected scenario
-    $(".scenario-select__item").map((i, item) => {item.classList.remove("selected");});
-    document.getElementById("scenario-" + proj_id + "-" + scen_id).classList.add("selected");
+    //$(".scenario-select__item").map((i, item) => {item.classList.remove("selected");});
+    // todo select the correct_scenario
+    //document.getElementById("scenario-" + proj_id + "-" + scen_id).classList.add("selected");
 });
 
 function update_selected_single_scenario(target){
-    const proj_id = target.id.split("-")[1];
-    const scen_id = target.id.split("-")[2];
+    const proj_id = target.split("-")[1];
+    const scen_id = target.split("-")[2];
 
     // call the list and the success should then call other function which collect the data in the session's cache and plot it(session cache should use mvs tokens to know if a simulation was updated or not)
     if(scen_id != null){
@@ -154,8 +161,8 @@ function update_selected_single_scenario(target){
             url: "{% url 'update_selected_single_scenario' proj_id %}" + scen_id,
             type: "GET",
             success: async (data) => {
-                await console.log(data);$(".scenario-select__item").map((i, item) => {item.classList.remove("selected");});
-                target.classList.add("selected");
+                //await console.log(data);$(".scenario-select__item").map((i, item) => {item.classList.remove("selected");});
+                //target.classList.add("selected");
                 //TODO: call functions which update graphs below
 
                 /* Update the kpi table */
@@ -177,18 +184,18 @@ function update_selected_single_scenario(target){
         });
     }
 }
-</script>>
+</script>
 
 {% if scen_id > 0 %}
-    <script>
+<script>
         const csrfToken = '{{ csrf_token }}';
         const formGetUrl = `{% url 'view_asset_parameters' scen_id %}`;
         const formPostUrl = "";
         const scenarioBelongsToUser = {% if scenario.project.user == request.user %}true{% else %}false{% endif %};
-    </script>
-    <script src="{% static 'js/grid_model_topology.js' %}"></script>
+</script>
+<script src="{% static 'js/grid_model_topology.js' %}"></script>
 
-    <script>
+<script>
         /* First retrieve the busses and assets, then draw the links */
 
         $(window).on('load', async function () {
@@ -255,6 +262,6 @@ function update_selected_single_scenario(target){
     });
 
 
-    </script>
+</script>
 {% endif %}
 {% endblock results_end_body_scripts %}

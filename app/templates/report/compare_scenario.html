@@ -9,49 +9,74 @@
 
 
 {% block dashboard %}
+<div class="dashboard-options sticky-top">
+	<div>
+		<div class="row">
+			<div class="dashboard__scenarios">
+				<div class="dashboard__select-scenarios">
+					<label for="results-scenarios" class="form-label">{% translate "Scenarios" %}</label>
+					<select name="results-scenarios" id="results-scenarios" placeholder="This is a placeholder" multiple>
+						{% for scenario in scenario_list %}
+						<option value="{{ scenario.id }}">{{ scenario.name }}</option>
+						{% empty %}
+						{% translate "You have no scenario with completed simulation, please run simulations to display results" %}
+						{% endfor %}
+					</select>
+				</div>
+				{% if scenario_list %}
+				<div class="dashboard__add">
+					<button class="btn btn--small btn--transparent" type="submit" onclick="javascript:showCreateReportItemModal(event)">
+						<span class="icon icon-add"></span>
+						{% translate "Add chart" %}
+					</button>
+				</div>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+</div>
+<section class="dashboard">
+	<div>
+		<div class="row">
+			<div class="dashboard__scenarios">
+				<h2>{% translate "My scenarios" %}</h2>
+				<div class="scenario-select">
+					{% for scenario in scenario_list %}
+					{% if scenario.id|stringformat:'s' in request|get_selected_scenarios:proj_id %}
+					{% setvar "selected" as selected %}
+					{% else%}
+					{% setvar "" as selected %}
+					{% endif %}
+					<button id="scenario-{{ proj_id }}-{{ scenario.id}}" class="scenario-select__item {{ selected }}" onclick="update_selected_multi_scenarios(this)">
+						{{ scenario.name }}
+					</button>
+					{% empty %}
+					{% translate "You have no scenario with completed simulation, please run simulations to display results" %}
+					{% endfor %}
 
-    <section class="dashboard">
-        <div>
-            <div class="row">
-                <div class="dashboard__scenarios">
-                    <h2>{% translate "My scenarios" %}</h2>
-                    <div class="scenario-select">
-                        {% for scenario in scenario_list %}
-                        {% if scenario.id|stringformat:'s' in request|get_selected_scenarios:proj_id %}
-                            {% setvar "selected" as selected %}
-                        {% else%}
-                            {% setvar "" as selected %}
-                        {% endif %}
-                            <button id="scenario-{{ proj_id }}-{{ scenario.id}}" class="scenario-select__item {{ selected }}" onclick="update_selected_multi_scenarios(this)">
-                                {{ scenario.name }}
-                            </button>
-                        {% empty %}
-                            {% translate "You have no scenario with completed simulation, please run simulations to display results" %}
-                        {% endfor %}
+				</div>
+			</div>
+		</div>
+		{% if scenario_list %}
+		<div class="row dashboard__create">
+			<div class="col">
+				<button class="btn btn--medium" onclick="javascript:showCreateReportItemModal(event)">
+					<span class="icon icon-add"></span>
+					{% translate "Create graph" %}
+				</button>
+			</div>
+		</div>
+		{% endif %}
+		<div class="row">
+			<div class="col" id="report_items">
 
-                    </div>
-                </div>
-            </div>
-            {% if scenario_list %}
-                <div class="row dashboard__create">
-                    <div class="col">
-                      <button class="btn btn--medium" onclick="javascript:showCreateReportItemModal(event)">
-                        <span class="icon icon-add"></span>
-                        {% translate "Create graph" %}
-                      </button>
-                    </div>
-                </div>
-            {% endif %}
-            <div class="row">
-                <div class="col" id="report_items">
+				{% include "report/graph_template.html" with id="all_timeseries" title="All timeseries" %}
+				{% include "report/graph_template.html" with id="capacities" title="Installed and optimized capacities" %}
 
-                {% include "report/graph_template.html" with id="all_timeseries" title="All timeseries" %}
-                {% include "report/graph_template.html" with id="capacities" title="Installed and optimized capacities" %}
-
-                </div>
-            </div>
-        </div>
-    </section>
+			</div>
+		</div>
+	</div>
+</section>
 
 {% endblock dashboard %}
 
@@ -99,5 +124,11 @@ function update_selected_multi_scenarios(target){
 }
 
 document.getElementById('compare-scenario-link').classList.add('active');
+
+var secondElement = new Choices('#results-scenarios', {
+	removeItemButton: true,
+	allowHTML: true
+});
+
 </script>
 {% endblock results_end_body_scripts %}

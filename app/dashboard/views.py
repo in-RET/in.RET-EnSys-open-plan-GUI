@@ -569,6 +569,10 @@ def ajax_get_graph_parameters_form(request, proj_id):
         initial_values["scenarios"] = [
             int(s) for s in json.loads(request.POST.get("selected_scenarios"))
         ]
+        # TODO here is the problem with the format of the scenario values
+        import pdb
+
+        pdb.set_trace()
         multi_scenario = request.session.get(COMPARE_VIEW, False)
 
         # TODO add a parameter reportitem_id to the function, default to None and load the values from the db if it exits, then also changes the initial of the graph parameters form

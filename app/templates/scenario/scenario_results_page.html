@@ -301,12 +301,16 @@ function update_kpi_table_style(target){
 /* loop over scenario selection buttons and return the ids of the selected ones */
 function fetchSelectedScenarios(){
     var selectedScenarios = [];
-    $(".scenario-select__item").map((i, item) => {
-        if(item.classList.contains("selected")){
-            selectedScenarios.push(item.id.split("-")[2])
-        }
-    });
-    return selectedScenarios
+    var scenariosDropDown = $("#results-scenarios");
+    if(scenariosDropDown){
+			if(Array.isArray(scenariosDropDown.val()) == false){
+				selectedScenarios.push(scenariosDropDown.val().split("-")[2]);
+			}
+			else{
+				selectedScenarios = scenariosDropDown.val();
+			};
+    };
+    return selectedScenarios;
 };
 
 

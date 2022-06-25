@@ -79,7 +79,7 @@ urlpatterns = [
         name="update_selected_single_scenario",
     ),
     re_path(
-        r"^project/(?P<proj_id>\d+)/scenario/results/update-selected-multi-scenarios/(?P<scen_id>\d+)?$",
+        r"^project/(?P<proj_id>\d+)/scenario/results/update-selected-multi-scenarios$",
         update_selected_multi_scenarios,
         name="update_selected_multi_scenarios",
     ),

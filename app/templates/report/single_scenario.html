@@ -19,8 +19,8 @@
 		<div class="row">
 			<div class="dashboard__scenarios">
 				<div class="dashboard__select-scenarios dashboard__select-scenarios--small">
-					<label for="results-single-scenario" class="form-label">{% translate "Scenario" %}</label>
-					<select name="results-single-scenario" id="results-single-scenario" placeholder="This is a placeholder" onchange="update_selected_single_scenario(this.value)">
+					<label for="results-scenarios" class="form-label">{% translate "Scenario" %}</label>
+					<select name="results-single-scenario" id="results-scenarios" placeholder="This is a placeholder" onchange="update_selected_single_scenario(this.value)">
 						{% for scenario in scenario_list %}
 						<option value="scenario-{{ proj_id }}-{{ scenario.id}}">{{ scenario.name }}</option>
 						{% empty %}
@@ -127,7 +127,7 @@
 <script>
 document.getElementById('single-scenario-link').classList.add('active');
 
-var thirdElement = new Choices('#results-single-scenario', {
+var dropdownElement = new Choices('#results-scenarios', {
 	allowHTML: true,
 	itemSelectText: '',
 });

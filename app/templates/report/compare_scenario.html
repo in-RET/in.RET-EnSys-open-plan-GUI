@@ -61,15 +61,17 @@ $(document).ready(function () {
 });
 
 function update_selected_multi_scenarios(target){
-    const proj_id = target.id.split("-")[1];
-    const scen_id = target.id.split("-")[2];
 
-    if(scen_id != null){
+		const scen_ids = fetchSelectedScenarios();
+		console.log(scen_ids);
+    if( scen_ids != null){
         $.ajax({
-            url: "{% url 'update_selected_multi_scenarios' proj_id %}" + scen_id,
-            type: "GET",
+        		headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            url: "{% url 'update_selected_multi_scenarios' proj_id %}",
+            type: "POST",
+            data: {"scen_ids": JSON.stringify(scen_ids)},
+            dataType: "json",
             success: async (data) => {
-                await target.classList.toggle("selected");
                 //call functions which update graphs below
 
                 /* Update the kpi table */
@@ -78,14 +80,6 @@ function update_selected_multi_scenarios(target){
                 scenario_visualize_timeseries();
                 scenario_visualize_capacities();
             },
-            error: function (xhr, errmsg) {
-                if (xhr.status != 405){
-                    console.log("backend_error!")
-                    //Show the error message
-                    $('#message-div').html("<div class='alert-error'>" +
-                        "<strong>Success: </strong> We have encountered an error: " + errmsg + "</div>");
-                }
-            }
         });
     }
 }

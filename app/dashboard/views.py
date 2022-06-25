@@ -569,10 +569,6 @@ def ajax_get_graph_parameters_form(request, proj_id):
         initial_values["scenarios"] = [
             int(s) for s in json.loads(request.POST.get("selected_scenarios"))
         ]
-        # TODO here is the problem with the format of the scenario values
-        import pdb
-
-        pdb.set_trace()
         multi_scenario = request.session.get(COMPARE_VIEW, False)
 
         # TODO add a parameter reportitem_id to the function, default to None and load the values from the db if it exits, then also changes the initial of the graph parameters form
@@ -640,8 +636,6 @@ def update_selected_single_scenario(request, proj_id, scen_id):
                 msg = _(f"At least one scenario need to be selected")
                 status_code = 405
         else:
-            # TODO: uncomment following and delete the line after when multi-scenario selection is allowed
-            # selected_scenario.append(scen_id)
             selected_scenario = [scen_id]
             msg = _(f"Scenario {scen_id} was selected")
         selected_scenarios_per_project[proj_id] = selected_scenario
@@ -660,25 +654,29 @@ def update_selected_single_scenario(request, proj_id, scen_id):
 
 @login_required
 @json_view
-@require_http_methods(["GET"])
-def update_selected_multi_scenarios(request, proj_id, scen_id):
+@require_http_methods(["POST"])
+def update_selected_multi_scenarios(request, proj_id):
     proj_id = str(proj_id)
-    scen_id = str(scen_id)
+    qs = request.POST
+    scen_ids = qs.get("scen_ids", None)
+    if scen_ids is not None:
+        scen_ids = json.loads(scen_ids)
+
+    # import pdb;pdb.set_trace()
     if request.is_ajax():
         status_code = 200
         selected_scenarios_per_project = request.session.get("selected_scenarios", {})
         selected_scenarios = selected_scenarios_per_project.get(proj_id, [])
 
-        if scen_id in selected_scenarios:
-            if len(selected_scenarios) > 1:
-                selected_scenarios.pop(selected_scenarios.index(scen_id))
-                msg = _(f"Scenario {scen_id} was deselected")
-            else:
-                msg = _(f"At least one scenario need to be selected")
-                status_code = 405
+        if len(scen_ids) > 0:
+            selected_scenarios = scen_ids
+            print(selected_scenarios)
+            print(scen_ids)
+            msg = _(f"Scenarios were updated")
         else:
-            selected_scenarios.append(scen_id)
-            msg = _(f"Scenarios {','.join(selected_scenarios)} was selected")
+            msg = _(f"At least one scenario need to be selected")
+            status_code = 405
+
         selected_scenarios_per_project[proj_id] = selected_scenarios
         request.session["selected_scenarios"] = selected_scenarios_per_project
         answer = JsonResponse(

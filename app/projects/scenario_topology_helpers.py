@@ -16,7 +16,6 @@ from projects.forms import AssetCreateForm, BusForm, StorageForm
 from django.template.loader import get_template
 
 # region sent db nodes to js
-from crispy_forms.templatetags import crispy_forms_filters
 from django.http import JsonResponse
 import logging
 
@@ -46,8 +45,11 @@ def handle_bus_form_post(request, scen_id=0, asset_type_name="", asset_uuid=None
         bus.save()
         return JsonResponse({"success": True, "asset_id": bus.id}, status=200)
     logger.warning(f"The submitted bus has erroneous field values.")
-    form_html = crispy_forms_filters.as_crispy_form(form)
-    return JsonResponse({"success": False, "form_html": form_html}, status=422)
+
+    form_html = get_template("asset/bus_create_form.html")
+    return JsonResponse(
+        {"success": False, "form_html": form_html.render({"form": form})}, status=422
+    )
 
 
 def handle_storage_unit_form_post(
@@ -163,8 +165,11 @@ def handle_asset_form_post(request, scen_id=0, asset_type_name="", asset_uuid=No
         asset.save()
         return JsonResponse({"success": True, "asset_id": asset.unique_id}, status=200)
     logger.warning(f"The submitted asset has erroneous field values.")
-    form_html = crispy_forms_filters.as_crispy_form(form)
-    return JsonResponse({"success": False, "form_html": form_html}, status=422)
+
+    form_html = get_template("asset/asset_create_form.html")
+    return JsonResponse(
+        {"success": False, "form_html": form_html.render({"form": form})}, status=422
+    )
 
 
 def load_scenario_topology_from_db(scen_id):

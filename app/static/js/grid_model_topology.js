@@ -40,36 +40,7 @@ function drop(ev) {
     ev.preventDefault();
     // corresponds to data-node defined in templates/scenario/topology_drag_items.html
     const nodeName = ev.dataTransfer.getData("node");
-    (nodeName === BUS) ? IOBusOptions(nodeName, ev.clientX, ev.clientY)
-        : addNodeToDrawFlow(nodeName, ev.clientX, ev.clientY);
-}
-
-
-function IOBusOptions(nodeName, posX, posY) {
-    const checkMinMax = (value, min, max) => (value <= min) ? min : (value >= max) ? max : value;
-    Swal.mixin({
-        input: 'number',
-        confirmButtonText: 'Next',
-        showCancelButton: true,
-        progressSteps: ['1', '2']
-    })
-        .queue([
-            {
-                title: 'Bus Inputs',
-                text: 'Provide the number of bus Inputs (default 1)',
-            },
-            {
-                title: 'Bus Outputs',
-                text: 'Provide the number of bus Outputs (default 1)',
-            }
-        ])
-        .then((result) => {
-            if (result.value) {
-                const inputs = checkMinMax(result.value[0], 1, 7);
-                const outputs = checkMinMax(result.value[1], 1, 7);
-                addNodeToDrawFlow(nodeName, posX, posY, inputs, outputs);
-            }
-        })
+    addNodeToDrawFlow(nodeName, ev.clientX, ev.clientY);
 }
 
 
@@ -117,10 +88,22 @@ async function addNodeToDrawFlow(name, pos_x, pos_y, nodeInputs = 1, nodeOutputs
     pos_x = pos_x * (editor.precanvas.clientWidth / (editor.precanvas.clientWidth * editor.zoom)) - (editor.precanvas.getBoundingClientRect().x * (editor.precanvas.clientWidth / (editor.precanvas.clientWidth * editor.zoom)));
     pos_y = pos_y * (editor.precanvas.clientHeight / (editor.precanvas.clientHeight * editor.zoom)) - (editor.precanvas.getBoundingClientRect().y * (editor.precanvas.clientHeight / (editor.precanvas.clientHeight * editor.zoom)));
     return createNodeObject(name, nodeInputs, nodeOutputs, nodeData, pos_x, pos_y);
-    // return createNodeObject(name, nodeInputs, nodeOutputs, {}, pos_x, pos_y); was like that
 }
 
-document.addEventListener("dblclick", function (e) {
+function updateInputTimeseries(){
+    //connected to the templates/asset/asset_create_form.html content
+    ts_data_div = document.getElementById("input_timeseries_data");
+    if(ts_data_div){
+        var ts_data = JSON.parse(ts_data_div.querySelector("textarea").value);
+        var ts_data = ts_data.map(String);
+        var ts_idx = [...Array(ts_data.length).keys()];
+        ts_idx = ts_idx.map(String);
+        makePlotly( ts_idx, ts_data, plot_id="timeseries_trace")
+    }
+}
+
+// one needs to add this function as event with eventListener (<some jquery div>.addEventListener("dblclick", dblClick))
+const dblClick = (e) => {
 
     const closestNode = e.target.closest('.drawflow-node');
     const nodeType = closestNode.querySelector('.box').getAttribute(ASSET_TYPE_NAME);
@@ -137,7 +120,7 @@ document.addEventListener("dblclick", function (e) {
         .then(formContent=> {
 
             // assign the content of the form to the form tag of the modal
-            guiModalDOM.querySelector('.modal-body form').innerHTML = formContent;
+            guiModalDOM.querySelector('form .modal-body').innerHTML = formContent;
 
             // set parameters which uniquely identify the asset
             guiModalDOM.setAttribute("data-node-type", nodeType);
@@ -145,26 +128,16 @@ document.addEventListener("dblclick", function (e) {
             guiModalDOM.setAttribute("data-node-df-id", topologyNodeId.split("-").pop());
             editor.editor_mode = "fixed";
 
-            //update the
-            ts_data_div = document.getElementById("input_timeseries_data");
-            if(ts_data_div){
-                var ts_data = JSON.parse(ts_data_div.querySelector("textarea").value);
-                var ts_data = ts_data.map(String);
-                var ts_idx = [...Array(ts_data.length).keys()];
-                ts_idx = ts_idx.map(String);
-                makePlotly( ts_idx, ts_data, plot_id="timeseries_trace")
-            }
-
-
+            updateInputTimeseries()
 
             guiModal.show()
             $('[data-bs-toggle="tooltip"]').tooltip()
 
         })
-        .catch(err => alert("Modal get form JS Error: " + err));
+        //.catch(err => alert("Modal get form JS Error: " + err));
 
     }
-});
+};
 // endregion
 
 
@@ -227,18 +200,34 @@ const submitForm = (e) => {
 }
 
 
+$("#guiModal").on('shown.bs.modal', function (event) {
+     var formDiv = document.getElementsByClassName("form-group");
+     var plotDiv = null;
+
+     var plotDivIds = ["flow_trace", "timeseries_trace", "soc_traces"];
+
+     for(i=0;i<plotDivIds.length;++i){
+         plotDiv = document.getElementById(plotDivIds[i]);
+         if (plotDiv){
+            Plotly.relayout(plotDiv, {width: plotDiv.clientWidth});
+         }
+     }
+ })
+
 /* Triggered before the modal opens */
 $("#guiModal").on('show.bs.modal', function (event) {
   var modal = $(event.target)
   // rename the node on the fly (to avoid the need of refreshing the page)
-  const nodeName = guiModalDOM.querySelector('input[df-name]').value;
-  modal.find('.modal-title').text(nodeName.replaceAll("_", " "));
+  const nodeName = guiModalDOM.querySelector('input[df-name]');
+  if(nodeName){
+    modal.find('.modal-title').text(nodeName.value.replaceAll("_", " "));
+  }
 })
 
 /* Triggered before the modal hides */
 $("#guiModal").on('hide.bs.modal', function (event) {
   // reset the modal form to empty
-  guiModalDOM.querySelector('.modal-body form').innerHTML = "<form></form>";
+  guiModalDOM.querySelector('form .modal-body').innerHTML = "";
   editor.editor_mode = "edit";
 })
 
@@ -282,3 +271,27 @@ async function createNodeObject(nodeName, connectionInputs = 1, connectionOutput
         "specificNodeType": nodeName
     };
 }
+
+
+/* Script to retrieve nodes (assets and busses) and links data from the backend. */
+/* Html of asset modification is provided in grid_model_topology.js:createNodeObject function */
+const addBusses = async (data) =>
+    await Promise.all(data.map(async nodeData => {
+        const result = await createNodeObject(nodeData.name, nodeData.input_ports, nodeData.output_ports, nodeData.data, nodeData.pos_x, nodeData.pos_y);
+        nodesToDB.set(`node-${result.editorNodeId}`, {uid:nodeData.data.databaseId, assetTypeName: "bus" });
+    }));
+
+const addAssets = async (data) =>
+    await Promise.all(data.map(async nodeData => {
+        const result = await createNodeObject(nodeData.name, 1, 1, nodeData.data, nodeData.pos_x, nodeData.pos_y);
+        nodesToDB.set(`node-${result.editorNodeId}`, {uid:nodeData.data.unique_id, assetTypeName: nodeData.name });
+    }));
+
+/* 'editor' is the variable name of the DrawFlow instance used here as a global variable */
+const addLinks = async (data) => data.map(async linkData => {
+    const busNodeId = [...nodesToDB.entries()].filter(([key,val])=>val.uid===linkData.bus_id).map(([k,v])=>k)[0].split("-").pop();
+    const assetNodeId = [...nodesToDB.entries()].filter(([key,val])=>val.uid===linkData.asset_id).map(([k,v])=>k)[0].split("-").pop();
+    (linkData.flow_direction === "B2A") ?
+        editor.addConnection(busNodeId, assetNodeId, linkData.bus_connection_port, 'input_1')
+        : editor.addConnection(assetNodeId, busNodeId, 'output_1', linkData.bus_connection_port);
+});

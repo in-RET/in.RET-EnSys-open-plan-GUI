@@ -1,3 +1,4 @@
+import numpy as np
 from django.core.exceptions import PermissionDenied
 from django.template.loader import get_template
 from django.db.models import Count
@@ -23,6 +24,8 @@ from projects.models import (
     Project,
     Scenario,
     Simulation,
+    Asset,
+    Bus,
     SensitivityAnalysis,
     get_project_sensitivity_analysis,
 )
@@ -30,6 +33,9 @@ from projects.services import (
     excuses_design_under_development,
     get_selected_scenarios_in_cache,
 )
+
+from projects.forms import BusForm, AssetCreateForm, StorageForm
+
 from projects.constants import COMPARE_VIEW
 from dashboard.models import (
     ReportItem,
@@ -37,7 +43,10 @@ from dashboard.models import (
     get_project_reportitems,
     get_project_sensitivity_analysis_graphs,
     REPORT_GRAPHS,
+    STORAGE_SUB_CATEGORIES,
+    OUTPUT_POWER,
 )
+from projects.scenario_topology_helpers import load_scenario_topology_from_db
 from dashboard.forms import (
     ReportItemForm,
     TimeseriesGraphForm,
@@ -51,7 +60,7 @@ import json
 import datetime
 import logging
 import traceback
-import ast
+from projects.helpers import parameters_helper
 
 logger = logging.getLogger(__name__)
 
@@ -228,8 +237,10 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
 
         selected_scenarios = get_selected_scenarios_in_cache(request, proj_id)
         user_scenarios = project.get_scenarios_with_results()
-
         if user_scenarios.exists() is False:
+            # TODO if user click on results from project before any scenario is simulated it might lead to problems
+            if scen_id is None:
+                scen_id = 0
             # There are no scenarios with results yet for this project
             answer = render(
                 request,
@@ -237,6 +248,7 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
                 {
                     "project_list": user_projects,
                     "proj_id": proj_id,
+                    "scen_id": scen_id,
                     "scenario_list": [],
                     "kpi_list": KPI_PARAMETERS,
                     "table_styles": TABLES,
@@ -278,6 +290,8 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
 
                 update_selected_scenarios_in_cache(request, proj_id, scen_id)
 
+                topology_data_list = load_scenario_topology_from_db(scen_id)
+
                 answer = render(
                     request,
                     "report/single_scenario.html",
@@ -290,6 +304,7 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
                         "report_items_data": report_items_data,
                         "kpi_list": KPI_PARAMETERS,
                         "table_styles": TABLES,
+                        "topology_data_list": json.dumps(topology_data_list),
                     },
                 )
 
@@ -728,6 +743,205 @@ def request_kpi_table(request, proj_id=None, table_style=None):
         )
 
     return answer
+
+
+@login_required
+@require_http_methods(["GET"])
+def view_asset_parameters(request, scen_id, asset_type_name, asset_uuid):
+    """Return a template to view the input parameters and results, if any"""
+    scenario = Scenario.objects.get(id=scen_id)
+
+    if asset_type_name == "bus":
+        template = "asset/bus_create_form.html"
+        existing_bus = get_object_or_404(Bus, pk=asset_uuid)
+        form = BusForm(
+            asset_type=asset_type_name, instance=existing_bus, view_only=True
+        )
+
+        context = {"form": form}
+    elif asset_type_name in ["bess", "h2ess", "gess", "hess"]:
+        template = "asset/storage_asset_create_form.html"
+        existing_ess_asset = get_object_or_404(Asset, unique_id=asset_uuid)
+        ess_asset_children = Asset.objects.filter(parent_asset=existing_ess_asset.id)
+        ess_capacity_asset = ess_asset_children.get(asset_type__asset_type="capacity")
+        ess_charging_power_asset = ess_asset_children.get(
+            asset_type__asset_type="charging_power"
+        )
+        ess_discharging_power_asset = ess_asset_children.get(
+            asset_type__asset_type="discharging_power"
+        )
+        # also get all child assets
+        form = StorageForm(
+            asset_type=asset_type_name,
+            view_only=True,
+            initial={
+                "name": existing_ess_asset.name,
+                "installed_capacity": ess_capacity_asset.installed_capacity,
+                "age_installed": ess_capacity_asset.age_installed,
+                "capex_fix": ess_capacity_asset.capex_fix,
+                "capex_var": ess_capacity_asset.capex_var,
+                "opex_fix": ess_capacity_asset.opex_fix,
+                "opex_var": ess_capacity_asset.opex_var,
+                "lifetime": ess_capacity_asset.lifetime,
+                "crate": ess_capacity_asset.crate,
+                "efficiency": ess_capacity_asset.efficiency,
+                "dispatchable": ess_capacity_asset.dispatchable,
+                "optimize_cap": ess_capacity_asset.optimize_cap,
+                "soc_max": ess_capacity_asset.soc_max,
+                "soc_min": ess_capacity_asset.soc_min,
+            },
+        )
+
+        context = {"form": form, "display_results": False}
+
+        qs = Simulation.objects.filter(scenario=scenario)
+        if qs.exists():
+            asset_results = AssetsResults.objects.get(simulation=qs.get())
+            flows = []
+            # collect optimized add cap of capacity and flow of all 3 sub assets of storage asset
+            for subasset_name in STORAGE_SUB_CATEGORIES:
+                subasset_results = asset_results.single_asset_results(
+                    asset_name=format_storage_subasset_name(
+                        existing_ess_asset.name, subasset_name
+                    ),
+                    asset_category="energy_storage",
+                )
+                # this parameter will only be present for capacity
+                result_param = "optimized_add_cap"
+                if result_param in subasset_results:
+                    context.update({result_param: subasset_results[result_param]})
+                    context.update({"display_results": True})
+                # flow is a dict with keys "value" and "unit"
+                result_param = "flow"
+                if result_param in subasset_results:
+                    if subasset_name == OUTPUT_POWER:
+
+                        subasset_results[result_param]["value"] = -1 * np.array(
+                            subasset_results[result_param]["value"]
+                        )
+                        subasset_results[result_param]["value"] = subasset_results[
+                            result_param
+                        ]["value"].tolist()
+
+                    subasset_results[result_param].update({"name": subasset_name})
+                    flows.append(subasset_results[result_param])
+            if len(flows) > 0:
+                context.update(
+                    {
+                        "soc_traces": json.dumps(
+                            {
+                                "timestamps": scenario.get_timestamps(json_format=True),
+                                "flows": flows,
+                            }
+                        )
+                    }
+                )
+                context.update({"display_results": True})
+
+    else:  # all other assets
+        template = "asset/asset_create_form.html"
+        existing_asset = get_object_or_404(Asset, unique_id=asset_uuid)
+
+        form = AssetCreateForm(
+            asset_type=asset_type_name, instance=existing_asset, view_only=True
+        )
+        input_timeseries_data = (
+            existing_asset.input_timeseries if existing_asset.input_timeseries else ""
+        )
+
+        context = {
+            "form": form,
+            "input_timeseries_data": input_timeseries_data,
+            "input_timeseries_timestamps": json.dumps(
+                scenario.get_timestamps(json_format=True)
+            ),
+            "display_results": False,
+        }
+
+        # fetch optimized capacity and flow if they exist
+        qs = Simulation.objects.filter(scenario=scenario)
+        if qs.exists():
+            asset_results = AssetsResults.objects.get(
+                simulation=qs.get()
+            ).single_asset_results(asset_name=existing_asset.name)
+
+            result_param = "optimized_add_cap"
+            if result_param in asset_results:
+                context.update({result_param: asset_results[result_param]})
+                context.update({"display_results": True})
+            else:
+                if "optimize_capacity" in asset_results:
+                    if asset_results["optimize_capacity"]["value"] is True:
+
+                        results_dict = json.loads(qs.get().results)
+                        kpi = results_dict["kpi"]["scalar_matrix"]
+                        context.update(
+                            {
+                                result_param: {
+                                    "value": kpi[existing_asset.name][result_param],
+                                    "unit": kpi[existing_asset.name]["unit"],
+                                }
+                            }
+                        )
+                        context.update({"display_results": True})
+
+            # flow is a dict with keys "value" and "unit"
+            result_param = "flow"
+            if result_param in asset_results:
+                # add key "timestamp" to the flow dict
+                asset_results[result_param].update(
+                    {"timestamps": scenario.get_timestamps(json_format=True)}
+                )
+                context.update({result_param: json.dumps(asset_results[result_param])})
+                context.update({"display_results": True})
+            else:
+                # provider have their flows under consumption and feedin
+                if existing_asset.is_provider is True:
+                    traces = []
+                    timestamps = scenario.get_timestamps(json_format=True)
+                    for fl, fl_name in zip(
+                        ("connected_consumption_sources", "connected_feedin_sink"),
+                        ("Consumption", "Feedin"),
+                    ):
+                        subasset_name = asset_results[fl]
+                        subasset_results = AssetsResults.objects.get(
+                            simulation=qs.get()
+                        ).single_asset_results(asset_name=subasset_name)
+
+                        subasset_results = subasset_results["flow"]
+                        subasset_results.update({"name": fl_name})
+
+                        # make consumption values negative
+                        if fl_name == "Consumption":
+                            subasset_results["value"] = -1 * np.array(
+                                subasset_results["value"]
+                            )
+                            subasset_results["value"] = subasset_results[
+                                "value"
+                            ].tolist()
+
+                        traces.append(subasset_results)
+
+                    # add the possibility to see the cap limit on the feedin on the result graph
+                    feedin_cap = existing_asset.feedin_cap
+                    traces.append(
+                        {
+                            "value": [feedin_cap for t in timestamps],
+                            "name": parameters_helper.get_doc_verbose("feedin_cap"),
+                            "unit": parameters_helper.get_doc_unit("feedin_cap"),
+                            "options": {"visible": "legendonly"},
+                        }
+                    )
+
+                    context.update(
+                        {
+                            "flow": json.dumps(
+                                {"timestamps": timestamps, "traces": traces}
+                            )
+                        }
+                    )
+                    context.update({"display_results": True})
+    return render(request, template, context)
 
 
 @login_required

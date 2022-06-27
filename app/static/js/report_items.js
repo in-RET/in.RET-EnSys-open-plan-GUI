@@ -1,3 +1,12 @@
+// TODO enable translation support
+
+var timeseriesFlowTitle = "Energy flow";
+var timeseriesTimeTitle = "Time";
+var timeseriesCapacityTitle = "Capacity";
+var timeseriesChargeDischargeTitle = "Charge/discharge";
+
+
+
 function addReportItemGraphToDOM(parameters, reportDOMId="report_items"){
 
 // todo: use DOMsanitize to counter XSS
@@ -160,6 +169,110 @@ function addStackedTimeseriesGraph(graphId, parameters){
     // create plot
     Plotly.newPlot(graphId, data, layout);
 };
+
+function storageResultGraph(x, ts_data, plot_id="",userLayout=null){
+
+    // get the handle of the plotly plot
+    if(plot_id == ""){
+        plot_id = PLOT_ID;
+    }
+    var plotDiv = document.getElementById(plot_id);
+    /* if the timestamps from the scenario are available, loads them
+    var ts_timestamps_div = document.getElementById("input_timeseries_timestamps");
+    if (ts_timestamps_div){
+        var ts_timestamps = JSON.parse(ts_timestamps_div.querySelector("textarea").value);
+        x = ts_timestamps
+    }
+    */
+
+    // TODO add two y axis, one for charge/discharge and the other for SoC
+
+    var plotLayout = {
+        height: 220,
+        margin:{
+            b:45,
+            l:60,
+            r:60,
+            t:15,
+        },
+        xaxis:{
+            type: "date",
+            title: timeseriesFlowTitle,
+            autorange: "true",
+        },
+        yaxis:{
+            title: timeseriesChargeDischargeTitle,
+            autorange: "true",
+        },
+        yaxis2:{
+            title: timeseriesCapacityTitle ,
+            overlaying: "y",
+            side: "right",
+            autorange: "true",
+        },
+        legend: {orientation: "h"},
+    };
+    plotLayout = {...plotLayout, ...userLayout};
+    var traces = [];
+    var plot_y_axis = "y";
+    for(var i=0; i<ts_data.length;++i){
+    // change legend layout
+        plot_y_axis = (ts_data[i].name.includes("capacity") ? "y2" : "y");
+        traces.push({type: "scatter", x: x, y: ts_data[i].value, name: ts_data[i].name + "(" + ts_data[i].unit + ")", yaxis: plot_y_axis});
+    }
+
+    Plotly.newPlot(plotDiv, traces, plotLayout, config);
+    // simulate a click on autoscale
+    plotDiv.querySelector('[data-title="Autoscale"]').click()
+};
+
+function plotTimeseries(x, ts_data, plot_id="",userLayout=null){
+
+    // get the handle of the plotly plot
+    if(plot_id == ""){
+        plot_id = PLOT_ID;
+    }
+    var plotDiv = document.getElementById(plot_id);
+
+    var plotLayout = {
+        height: 220,
+        margin:{
+            b:45,
+            l:60,
+            r:60,
+            t:15,
+        },
+        xaxis:{
+            type: "date",
+            title: timeseriesTimeTitle,
+            autorange: "true",
+        },
+        yaxis:{
+            title: timeseriesFlowTitle,
+            autorange: "true",
+        },
+        legend: {orientation: "h"},
+    };
+    plotLayout = {...plotLayout, ...userLayout};
+    var traces = [];
+    var plot_y_axis = "y";
+    var trace_label = "";
+    for(var i=0; i<ts_data.length;++i){
+        trace_label = "";
+        if(ts_data[i].name){
+            trace_label = ts_data[i].name;
+            if(ts_data[i].unit){
+                trace_label += "(" + ts_data[i].unit + ")";
+            }
+        };
+        traces.push({type: "scatter", x: x, y: ts_data[i].value, name: trace_label , yaxis: plot_y_axis, ...ts_data[i].options});
+    }
+
+    Plotly.newPlot(plotDiv, traces, plotLayout, config);
+    // simulate a click on autoscale
+    plotDiv.querySelector('[data-title="Autoscale"]').click()
+};
+
 
 
 function addCapacitiyGraph(graphId, parameters){

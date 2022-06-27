@@ -10,7 +10,6 @@
 
 {% block export-results %}
 
-        <!--<a type="button" class="btn btn-info" href="{% url 'download_timeseries_results' scen_id %}"> <span class="icon icon-export"></span>{% translate "Download Results" %}</a>-->
         <a type="button" class="btn btn-info" href="{% url 'redirect_download_timeseries_results' proj_id %}"><span class="icon icon-export"></span>{% translate "Download Timeseries" %}</a>
 {% endblock export-results %}
 
@@ -48,6 +47,7 @@
                   </button>
                 </div>
             </div>
+
             <div class="row">
                 <div class="col col-md-12">
                     <div class="chart">
@@ -79,6 +79,33 @@
                     </div>
                 </div>
             </div>
+            
+
+
+            <div class="chart" style="height: fit-content;">
+                <div class="chart__header">
+                    <div>
+                        <span class="title">{% translate "Energy system" %}</span>
+                    </div>
+                    <!--div class="dropdown">
+                        <button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuTS" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span class="icon icon-more"></span>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuTS">
+                            <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">{% translate 'some option A' %}</a></li>
+                            <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">{% translate 'some option B' %}</a></li>
+                        </ul>
+                    </div-->
+                </div>
+                <div class="chart__plot">
+                    <div id="energy-system" class="system-design" style="height:650px;margin-bottom:1rem;">
+                <div id="drawflow" class="gui chart"></div>
+                </div>
+                </div>
+            </div>
+
+
+
 
             <div class="row">
                 <div class="col" id="report_items">
@@ -150,7 +177,84 @@ function update_selected_single_scenario(target){
         });
     }
 }
+</script>>
+
+{% if scen_id > 0 %}
+    <script>
+        const csrfToken = '{{ csrf_token }}';
+        const formGetUrl = `{% url 'view_asset_parameters' scen_id %}`;
+        const formPostUrl = "";
+        const scenarioBelongsToUser = {% if scenario.project.user == request.user %}true{% else %}false{% endif %};
+    </script>
+    <script src="{% static 'js/grid_model_topology.js' %}"></script>
+
+    <script>
+        /* First retrieve the busses and assets, then draw the links */
+
+        $(window).on('load', async function () {
+            const data = JSON.parse(`{{topology_data_list| escapejs }}`);
+            Promise.all([addBusses(data['busses']), addAssets(data['assets'])])
+                .then(async () => addLinks(data['links']))
+                .catch(err=>Swal.fire('Grid Model Error', 'Could not retrieve grid nodes.', 'error'));
+        });
+
+        // assign double click on the energy system area
+        document.querySelector('.drawflow').addEventListener("dblclick", function (e) {
+
+            const closestNode = e.target.closest('.drawflow-node');
+            const nodeType = closestNode.querySelector('.box').getAttribute(ASSET_TYPE_NAME);
+
+            if (closestNode) {
+                const topologyNodeId = closestNode.id;
+                // formGetUrl is defined above
+                const getUrl = formGetUrl + nodeType +
+                    (nodesToDB.has(topologyNodeId) ? "/" + nodesToDB.get(topologyNodeId).uid : "");
+
+                // get the form of the asset of the type "nodeType" (dashboard/views.py::view_asset_parameters)
+                fetch(getUrl)
+                .then(formContent=>formContent.text())
+                .then(formContent=> {
+                    // assign the content of the form to the form tag of the modal
+                    guiModalDOM.querySelector('form .modal-body').innerHTML = formContent;
+
+                    // set parameters which uniquely identify the asset
+                    guiModalDOM.setAttribute("data-node-type", nodeType);
+                    guiModalDOM.setAttribute("data-node-topo-id", topologyNodeId);
+                    guiModalDOM.setAttribute("data-node-df-id", topologyNodeId.split("-").pop());
+                    editor.editor_mode = "fixed";
+
+                    updateInputTimeseries();
+
+                    //update the graph of the flow timeseries, if any
+                    ts_data_div = document.getElementById("flow_data");
+                    if(ts_data_div){
+                        var ts_data = JSON.parse(ts_data_div.querySelector("textarea").value);
+                        if(["bess", "h2ess", "gess", "hess"].includes(nodeType)){
+                            //storage asset
+                            storageResultGraph(ts_data.timestamps, ts_data.flows, plot_id="soc_traces")
+                        }
+                        else if(["dso", "dso_gas"].includes(nodeType)){
+                            console.log("Hihihi")
+                            plotTimeseries(ts_data.timestamps, ts_data.traces, plot_id="flow_trace")
+                        }
+                        else{
+                            // all other assets
+                            // var ts_data_value = ts_data.value.map(String);
+                            var plotLayout = {
+                                "yaxis": {"title": { "text": "Energy flow " + "(" + ts_data.unit + ")" }},
+                            };
+                            plotTimeseries( ts_data.timestamps, [ts_data], plot_id="flow_trace", userLayout=plotLayout)
+                        }
+                    }
+
+                    guiModal.show()
+                    $('[data-bs-toggle="tooltip"]').tooltip()
+
+                })
+            }
+    });
 
 
-</script>
+    </script>
+{% endif %}
 {% endblock results_end_body_scripts %}

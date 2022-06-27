@@ -9,10 +9,13 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables.net-bs/1.10.23/dataTables.bootstrap.min.css" integrity="sha512-Z+BWkkwxMpBhQthPeqw2UbG1tamgkRHi1UaYyZ8mTnjt04iXqeVx/Wu4CYzPOn3E+x663DIV+SiAuKDHbTg6FQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link href="https://unpkg.com/bootstrap-table@1.19.1/dist/bootstrap-table.min.css" rel="stylesheet">
 <link href="{% static 'css/quick_fix.css' %}" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jerosoler/Drawflow/dist/drawflow.min.css">
 {% endblock head_block %}
 
 {% block start_body_scripts %}
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/1.0.21/jquery.csv.min.js" integrity="sha512-Y8iWYJDo6HiTo5xtml1g4QqHtl/PO1w+dmUpQfQSOTqKNsMhExfyPN2ncNAe9JuJUSKzwK/b6oaNPop4MXzkwg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.1.1/d3.min.js" integrity="sha512-COTaPOlz12cG4fSfcBsxZsjauBAyldqp+8FQUM/dZHm+ts/jR4AFoJhCqxy8K10Jrf3pojfsbq7fAPTb1XaVkg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="{% static 'js/traceplot.js' %}"></script>
 <script src="https://unpkg.com/bootstrap-table@1.19.1/dist/bootstrap-table.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.58.5/plotly.min.js" integrity="sha512-7wMLZxKDFvReIWPUzBfcEKsuOriDUEcWkV2bNHV2/tQUmoZj2eLpkQOF7nBbtwVG8WrSl5rTN87cqnS7ZelhzQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tippy.js/2.5.4/tippy.all.min.js" integrity="sha512-9LKXH8DIeFSdiDIWQSOJNZuwLynJNm4x/1eBRpPfRJsEXZWJL+aoH+JNDglF3DcCoQYVBHqXo8sVHOLveoaN0A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -24,7 +27,26 @@
 
 {% block content %}
 
-
+<!-- Modal -->
+<div class="modal fade modal--gui" id="guiModal" tabindex="-1" role="dialog" aria-labelledby="guiModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="guiModalLabel">New message</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form>
+                {% csrf_token %}
+                <div class="modal-body"></div>
+            </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate "Close" %}</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="modal fade modal--dashboard" id="KPIModal" tabindex="-1" aria-labelledby="KPIModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
@@ -180,6 +202,9 @@
                   </button>
                 </div>
             </div>
+            <div class="row system-design">
+                <div id="drawflow" class="gui" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+            </div>
             <div class="row">
                 <div class="col col-md-12">
                     <div class="chart">
@@ -311,7 +336,15 @@
 {% block end_body_scripts %}
 
 
+
 {{ report_items_data|json_script:"existingReportItemsData" }}
+
+<script src="https://cdn.jsdelivr.net/gh/jerosoler/Drawflow/dist/drawflow.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.serializeJSON/3.1.0/jquery.serializejson.min.js"
+        integrity="sha512-4y8bsEzrXJqRyl2dqjdKk/DetH59JcFTtYNMsy5DUpvVV8CXiSrQ1gSCL3+dFgj1Xco0ONPizsYd6wX2eAXL2g=="
+        crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
 <script>
 const urlNotImplemented = `{% url 'not_implemented' %}?url={{ request.get_full_path }}`;
@@ -339,6 +372,12 @@ const deleteReportItem = (event) => {
 };
 </script>
 <script src="{% static 'js/report_items.js' %}"></script>
+
+
+
+
+
+
 <script>
 
 function update_kpi_table_style(target){

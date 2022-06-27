@@ -562,9 +562,12 @@ class SensitivityAnalysisForm(ModelForm):
 class BusForm(OpenPlanModelForm):
     def __init__(self, *args, **kwargs):
         bus_type_name = kwargs.pop("asset_type", None)  # always = bus
+        view_only = kwargs.pop("view_only", False)
         super().__init__(*args, **kwargs)
         for field in self.fields:
             self.fields[field].widget.attrs.update({f"df-{field}": ""})
+            if view_only is True:
+                self.fields[field].disabled = True
 
     class Meta:
         model = Bus
@@ -665,6 +668,7 @@ def parse_input_timeseries(timeseries_file):
 class AssetCreateForm(OpenPlanModelForm):
     def __init__(self, *args, **kwargs):
         asset_type_name = kwargs.pop("asset_type", None)
+        view_only = kwargs.pop("view_only", False)
         self.existing_asset = kwargs.get("instance", None)
 
         super().__init__(*args, **kwargs)
@@ -676,6 +680,7 @@ class AssetCreateForm(OpenPlanModelForm):
             for field in list(self.fields)
             if field not in asset_type.asset_fields
         ]
+
         """ DrawFlow specific configuration, add a special attribute to 
             every field in order for the framework to be able to export
             the data to json.
@@ -687,6 +692,8 @@ class AssetCreateForm(OpenPlanModelForm):
             self.fields[field].widget.attrs.update({f"df-{field}": ""})
             if field == "input_timeseries":
                 self.fields[field].required = self.is_input_timeseries_empty()
+            if view_only is True:
+                self.fields[field].disabled = True
         """ ----------------------------------------------------- """
 
     def is_input_timeseries_empty(self):

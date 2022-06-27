@@ -12,13 +12,13 @@ const config = {
         'hoverCompareCartesian',
         'toggleSpikelines']
 }; //displayModeBar: true
-var layout = {
-    height: 140,
+const layout = {
+    height: 220,
     margin:{
-        b:30,
-        l:30,
-        r:0,
-        t:10,
+        b:45,
+        l:60,
+        r:60,
+        t:15,
     },
     xaxis:{
         type: "date"
@@ -26,7 +26,7 @@ var layout = {
 };
 
 
-function makePlotly( x, y, plot_id=""){
+function makePlotly( x, y, plot_id="",userLayout=null){
 
     // get the handle of the plotly plot
     if(plot_id == ""){
@@ -47,20 +47,21 @@ function makePlotly( x, y, plot_id=""){
             alert("The number of values in your uploaded timeseries (" + y.length + ") does not match the scenario timestamps (" + ts_timestamps.length + ").\nPlease change the scenario settings or upload a new timeseries")
         }
     }
+
+    var plotLayout = {...layout};
     // guess whether x is a number or a date and adjust the axis type accordingly
     if(isNaN(x[0]) == false){
-        layout.xaxis.type = "linear";
+        plotLayout.xaxis.type = "linear";
     }
     else{
-        layout.xaxis.type = "date";
+        plotLayout.xaxis.type = "date";
     }
-    layout.xaxis.autorange = "true";
-    layout["yaxis"] = {autorange: "true"};
-
-    console.log( 'X',x, 'Y',y );
+    plotLayout.xaxis.autorange = "true";
+    plotLayout["yaxis"] = {autorange: "true"};
+    plotLayout = {...plotLayout, ...userLayout};
     var traces = [{type: "scatter", x: x, y: y}];
 
-    Plotly.newPlot(plotDiv, traces, layout, config);
+    Plotly.newPlot(plotDiv, traces, plotLayout, config);
     // simulate a click on autoscale
     plotDiv.querySelector('[data-title="Autoscale"]').click()
 };

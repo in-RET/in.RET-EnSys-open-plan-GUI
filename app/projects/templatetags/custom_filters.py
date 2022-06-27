@@ -39,6 +39,36 @@ def get_item(dictionary, key):
 
 
 @register.filter
+def get_field(form, key):
+    return form.fields[key].get_bound_field(form, key)
+
+
+@register.filter
+def has_field(form, key):
+    return key in form.fields
+
+
+@register.filter
+def has_economical_parameters(form):
+    answer = False
+    for field in form.fields:
+        if is_economical_parameter(field):
+            answer = True
+            break
+    return answer
+
+
+@register.filter
+def has_technical_parameters(form):
+    answer = False
+    for field in form.fields:
+        if is_technical_parameter(field):
+            answer = True
+            break
+    return answer
+
+
+@register.filter
 def is_economical_parameter(param):
     return param in ["capex_fix", "capex_var", "opex_fix", "opex_var"]
 

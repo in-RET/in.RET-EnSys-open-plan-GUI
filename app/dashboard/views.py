@@ -340,6 +340,8 @@ def project_compare_results(request, proj_id):
         .annotate(c=Count("simulations"))
         .filter(c__gt=1)
     ]
+
+    selected_scenarios = get_selected_scenarios_in_cache(request, proj_id)
     return render(
         request,
         "report/compare_scenario.html",
@@ -347,6 +349,7 @@ def project_compare_results(request, proj_id):
             "proj_id": proj_id,
             "project_list": user_projects,
             "scenario_list": user_scenarios,
+            "selected_scenarios": selected_scenarios,
             "report_items_data": report_items_data,
             "kpi_list": KPI_PARAMETERS,
             "table_styles": TABLES,
@@ -668,14 +671,8 @@ def update_selected_multi_scenarios(request, proj_id):
         selected_scenarios_per_project = request.session.get("selected_scenarios", {})
         selected_scenarios = selected_scenarios_per_project.get(proj_id, [])
 
-        if len(scen_ids) > 0:
-            selected_scenarios = scen_ids
-            print(selected_scenarios)
-            print(scen_ids)
-            msg = _(f"Scenarios were updated")
-        else:
-            msg = _(f"At least one scenario need to be selected")
-            status_code = 405
+        selected_scenarios = scen_ids
+        msg = _(f"Scenarios were updated")
 
         selected_scenarios_per_project[proj_id] = selected_scenarios
         request.session["selected_scenarios"] = selected_scenarios_per_project

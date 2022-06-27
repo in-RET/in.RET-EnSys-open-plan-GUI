@@ -22,7 +22,7 @@
 					<label for="results-scenarios" class="form-label">{% translate "Scenario" %}</label>
 					<select name="results-single-scenario" id="results-scenarios" placeholder="This is a placeholder" onchange="update_selected_single_scenario(this.value)">
 						{% for scenario in scenario_list %}
-						<option value="scenario-{{ proj_id }}-{{ scenario.id}}">{{ scenario.name }}</option>
+						<option value="scenario-{{ proj_id }}-{{ scenario.id}}" {% if scenario.id == scen_id %} selected {% endif %} >{{ scenario.name }}</option>
 						{% empty %}
 						{% translate "You have no scenario with completed simulation, please run simulations to display results" %}
 						{% endfor %}
@@ -128,10 +128,9 @@
 document.getElementById('single-scenario-link').classList.add('active');
 
 var dropdownElement = new Choices('#results-scenarios', {
-	allowHTML: true,
+	allowHTML: false,
 	itemSelectText: '',
 });
-
 
 $(document).ready(function () {
     // add search field to the kpi info modal

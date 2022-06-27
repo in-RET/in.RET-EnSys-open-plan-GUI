@@ -17,7 +17,7 @@
 					<label for="results-scenarios" class="form-label">{% translate "Scenarios" %}</label>
 					<select name="results-scenarios" id="results-scenarios" placeholder="This is a placeholder" multiple onchange="update_selected_multi_scenarios(this)">
 						{% for scenario in scenario_list %}
-						<option value="{{ scenario.id }}">{{ scenario.name }}</option>
+						<option value="{{ scenario.id }}" {% if scenario.id in selected_scenarios %} selected {% endif %}>{{ scenario.name }}</option>
 						{% empty %}
 						{% translate "You have no scenario with completed simulation, please run simulations to display results" %}
 						{% endfor %}
@@ -56,8 +56,10 @@ $(document).ready(function () {
     $('#kpiTable').DataTable();
     // update the kpi table
     //update_kpi_table_style(document.getElementById("kpi-table-style"));
-    scenario_visualize_timeseries();
-    scenario_visualize_capacities();
+    if(fetchSelectedScenarios().length > 0 ){
+    	scenario_visualize_timeseries();
+    	scenario_visualize_capacities();
+    }
 });
 
 function update_selected_multi_scenarios(target){
@@ -76,9 +78,10 @@ function update_selected_multi_scenarios(target){
 
                 /* Update the kpi table */
                 //update_kpi_table_style(document.getElementById("kpi-table-style"));
-
-                scenario_visualize_timeseries();
-                scenario_visualize_capacities();
+                if(scen_ids.length > 0){
+                	scenario_visualize_timeseries();
+                	scenario_visualize_capacities();
+                }
             },
         });
     }
@@ -88,7 +91,7 @@ document.getElementById('compare-scenario-link').classList.add('active');
 
 var dropdownElement = new Choices('#results-scenarios', {
 	removeItemButton: true,
-	allowHTML: true
+	allowHTML: false
 });
 
 </script>

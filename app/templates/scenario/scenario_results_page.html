@@ -8,8 +8,10 @@
 {% block head_block %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables.net-bs/1.10.23/dataTables.bootstrap.min.css" integrity="sha512-Z+BWkkwxMpBhQthPeqw2UbG1tamgkRHi1UaYyZ8mTnjt04iXqeVx/Wu4CYzPOn3E+x663DIV+SiAuKDHbTg6FQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link href="https://unpkg.com/bootstrap-table@1.19.1/dist/bootstrap-table.min.css" rel="stylesheet">
-<link href="{% static 'css/quick_fix.css' %}" rel="stylesheet" type="text/css" />
+<!--link href="{% static 'css/quick_fix.css' %}" rel="stylesheet" type="text/css" /-->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jerosoler/Drawflow/dist/drawflow.min.css">
+
 {% endblock head_block %}
 
 {% block start_body_scripts %}
@@ -29,59 +31,59 @@
 
 <!-- Modal -->
 <div class="modal fade modal--gui" id="guiModal" tabindex="-1" role="dialog" aria-labelledby="guiModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="guiModalLabel">New message</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form>
-                {% csrf_token %}
-                <div class="modal-body"></div>
-            </form>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate "Close" %}</button>
-            </div>
-        </div>
-    </div>
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="guiModalLabel">New message</h5>
+				<button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<form>
+				{% csrf_token %}
+				<div class="modal-body"></div>
+			</form>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate "Close" %}</button>
+			</div>
+		</div>
+	</div>
 </div>
 
 <div class="modal fade modal--dashboard" id="KPIModal" tabindex="-1" aria-labelledby="KPIModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title" id="KPIModalLabel">{% translate "KPI Overview" %}</h4>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <table class="table" id="kpiTable">
-                    <thead>
-                    <tr>
-                        <th scope="col">{% translate "Name" %}</th>
-                        <th scope="col">{% translate "Unit" %}</th>
-                        <th scope="col">{% translate "Definition" %}</th>
-                        <th scope="col"></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for kpi_id, kpi in kpi_list.items %}
-                    <tr>
-                        <td scope="row">{% translate kpi.verbose %}</td>
-                        <td>{% translate kpi.unit %}</td>
-                        <td>{% translate kpi.definition %}</td>
-                        <td><button class="btn btn--small btn--transparent">+ {% translate "Add to results" %}</button></td>
-                    </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn--medium" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
+	<div class="modal-dialog modal-xl">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title" id="KPIModalLabel">{% translate "KPI Overview" %}</h4>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<table class="table" id="kpiTable">
+					<thead>
+					<tr>
+						<th scope="col">{% translate "Name" %}</th>
+						<th scope="col">{% translate "Unit" %}</th>
+						<th scope="col">{% translate "Definition" %}</th>
+						<th scope="col"></th>
+					</tr>
+					</thead>
+					<tbody>
+					{% for kpi_id, kpi in kpi_list.items %}
+					<tr>
+						<td scope="row">{% translate kpi.verbose %}</td>
+						<td>{% translate kpi.unit %}</td>
+						<td>{% translate kpi.definition %}</td>
+						<td><button class="btn btn--small btn--transparent">+ {% translate "Add to results" %}</button></td>
+					</tr>
+					{% endfor %}
+					</tbody>
+				</table>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn--medium" data-bs-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
 </div>
 
 
@@ -91,244 +93,88 @@
 
 <!-- Modal to create sensitivity analysis -->
 <div class="modal fade modal--dashboard" id="createSaGraphModal" tabindex="-1" role="dialog" aria-labelledby="createSaGraphModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="createSaGraphModalLabel">{% translate "Add a sensitivity analysisgraph" %}</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form method="POST" action="{% url 'sensitivity_analysis_create_graph' proj_id %}" graph-parameter-url="{% url 'ajax_get_sensitivity_analysis_parameters' %}">
-                    {% csrf_token %}
-                    {{ sa_graph_form | crispy}}
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate "Close" %}</button>
-                 <button class="btn btn--medium" onclick="javascript:submitModalForm(event, modalId='createSaGraphModal')">{% translate "Create" %}</button>
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="createSaGraphModalLabel">{% translate "Add a sensitivity analysisgraph" %}</h5>
+				<button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<form method="POST" action="{% url 'sensitivity_analysis_create_graph' proj_id %}" graph-parameter-url="{% url 'ajax_get_sensitivity_analysis_parameters' %}">
+					{% csrf_token %}
+					{{ sa_graph_form | crispy}}
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate "Close" %}</button>
+				<button class="btn btn--medium" onclick="javascript:submitModalForm(event, modalId='createSaGraphModal')">{% translate "Create" %}</button>
 
-            </div>
-        </div>
-    </div>
+			</div>
+		</div>
+	</div>
 </div>
 
-
-
-
 <main>
-    <section class="header">
-        <div>
-            <div class="header__left"></div>
-            <h1 class="header__title">{% translate "Simulation results" %}</h1>
-            <div class="header__back">
-                    <a href="{% url 'back_to_scenario_review' proj_id %}">{% translate "To scenario" %}</a>
-            </div>
-        </div>
-    </section>
-    <section class="header-results">
-        <div>
-            <div class="header-results__scenario">
-                <div class="project-title">
-                    {% translate "Project" %}
-                </div>
-                <div class="project-name">
-                    <form action="{% url 'result_change_project' %}" method="POST">
-                        {% csrf_token %}
-                        <select name="proj_id" class="form-select" aria-label="Default select example" onchange="this.form.submit()">
-                        {% for project in project_list %}
-                            <option value="{{ project.id }}" {% if project.id == proj_id %} selected {% endif %}> {{ project.name }}  </option>
-                        {% endfor %}
-                        </select>
-                    </form>
-                </div>
-            </div>
-            <div class="header-results__export">
-                {% block export-results %}
-                {% endblock export-results %}
-            </div>
-        </div>
-    </section>
+	<section class="header">
+		<div>
+			<div class="header__left"></div>
+			<h1 class="header__title">{% translate "Simulation results" %}</h1>
+			<div class="header__back">
+				<a href="{% url 'back_to_scenario_review' proj_id %}">{% translate "To scenario" %}</a>
+			</div>
+		</div>
+	</section>
+	<section class="header-results">
+		<div>
+			<div class="header-results__scenario">
+				<div class="project-title">
+					{% translate "Project" %}
+				</div>
+				<div class="project-name">
+					<form action="{% url 'result_change_project' %}" method="POST">
+						{% csrf_token %}
+						<select name="proj_id" class="form-select" aria-label="Default select example" onchange="this.form.submit()">
+							{% for project in project_list %}
+							<option value="{{ project.id }}" {% if project.id == proj_id %} selected {% endif %}> {{ project.name }}  </option>
+							{% endfor %}
+						</select>
+					</form>
+				</div>
+			</div>
+			<div class="header-results__export">
+				{% block export-results %}
+				{% endblock export-results %}
+			</div>
+		</div>
+	</section>
 
 
-<!-- insert tabs here -->
-    <div class="result-selector">
-    <ul class="nav nav-pills" id="results-analysis-links">
-  <li class="nav-item">
-      <a class="nav-link" id="single-scenario-link" href="{% url 'project_visualize_results' proj_id %}"><h2>{% translate "Single scenarios" %}</h2></a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" id="compare-scenario-link" href="{% url 'project_compare_results' proj_id %}"><h2>{% translate "Compare scenarios" %}</h2></a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" id="sensitivity-analysis-link" href="{% url 'project_sensitivity_analysis' proj_id %}"><h2>{% translate "Sensitivity Analysis" %}</h2></a>
-  </li>
-</ul>
-        </div>
+	<!-- insert tabs here, previous class result-selector -->
+	<section>
+		<div class=" dashboard-tabs">
+			<div>
+				<ul class="dashboard-tabs nav nav-tabs" id="results-analysis-links">
+					<li class="nav-item">
+						<a class="nav-link" id="single-scenario-link" href="{% url 'project_visualize_results' proj_id %}">{% translate "Single scenarios" %}</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" id="compare-scenario-link" href="{% url 'project_compare_results' proj_id %}">{% translate "Compare scenarios" %}</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" id="sensitivity-analysis-link" href="{% url 'project_sensitivity_analysis' proj_id %}">{% translate "Sensitivity Analysis" %}</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<div class="tab-content" id="js-db-top-section">
+			{% block dashboard %}
+			{% endblock dashboard %}
+		</div>
+	</section>
 
 
-
-{% block dashboard %}
-
-    <section class="dashboard">
-        <div>
-            <div class="row">
-                <div class="dashboard__scenarios">
-                    <h2>{% translate "My scenarios" %}</h2>
-                    <div class="scenario-select">
-                        {% for scenario in scenario_list %}
-                        {% if scenario.id|stringformat:'s' in request|get_selected_scenarios:proj_id %}
-                            {% setvar "selected" as selected %}
-                        {% else%}
-                            {% setvar "" as selected %}
-                        {% endif %}
-                            <button id="scenario-{{ proj_id }}-{{ scenario.id}}" class="scenario-select__item {{ selected }}" onclick="update_selected_single_scenario(this)">
-                                {{ scenario.name }}
-                            </button>
-                        {% empty %}
-                            {% translate "You have no scenario with completed simulation, please run simulations to display results" %}
-                        {% endfor %}
-
-                    </div>
-                </div>
-            </div>
-            {% if scenario_list %}
-            <div class="row dashboard__create">
-                <div class="col">
-                  <button class="btn btn--medium" onclick="javascript:showCreateReportItemModal(event)">
-                    <span class="icon icon-add"></span>
-                    {% translate "Create graph" %}
-                  </button>
-                </div>
-            </div>
-            <div class="row system-design">
-                <div id="drawflow" class="gui" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-            </div>
-            <div class="row">
-                <div class="col col-md-12">
-                    <div class="chart">
-                        <div class="chart__header">
-                            <div style="display: flex;gap: 10px;align-items: center;">
-                                <span class="title">Choose KPI table display</span>
-                                <span><select id="kpi-table-style" name="kpi-table-style" class="form-select" aria-label="Default select example" onchange="update_kpi_table_style(this)">
-                                    {% for style in table_styles %}
-                                    <option value="{{ style }}"> {{ style }}  </option>
-                                    {% endfor %}
-                                </select></span>
-                                <span class="view" data-bs-toggle="modal" data-bs-target="#KPIModal">
-                                    <span class="icon icon-i_arrow_right"></span> View KPIs
-                                </span>
-                            </div>
-                            <div class="dropdown">
-                                <button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuKPI" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <span class="icon icon-more"></span>
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuKPI">
-                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as .xls</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as PDF</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="chart__plot">
-                            <table class="table" id="selectedKPITable"></table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col" id="report_items">
-
-
-                    <div class="chart" style="height: fit-content;">
-                        <div class="chart__header">
-                            <div>
-                                <span class="title">All time series</span>
-                            </div>
-                            <div class="dropdown">
-                                <button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuTS" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <span class="icon icon-more"></span>
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuTS">
-                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as .xls</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as PDF</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="chart__plot">
-                            <div id="all_timeseries"></div>
-                        </div>
-                    </div>
-
-
-                    <div class="chart" style="height: fit-content;">
-                        <div class="chart__header">
-                            <div>
-                                <span class="title">Stacked time series by sector</span>
-                            </div>
-                            <div class="dropdown">
-                                <button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuTS" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <span class="icon icon-more"></span>
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuTS">
-                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as .xls</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as PDF</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="chart__plot">
-                            <div id="stacked_timeseries"></div>
-                        </div>
-                    </div>
-
-
-                    <div class="chart" style="height: fit-content;">
-                        <div class="chart__header">
-                            <div>
-                                <span class="title">Aggregated total flow over project period</span>
-                            </div>
-                            <div class="dropdown">
-                                <button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuTS" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <span class="icon icon-more"></span>
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuTS">
-                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as .xls</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as PDF</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="chart__plot">
-                            <div id="stacked_total_flow"></div>
-                        </div>
-                    </div>
-
-
-                    <div class="chart" style="height: fit-content;">
-                        <div class="chart__header">
-                            <div>
-                                <span class="title">Installed and optimized capacities</span>
-                            </div>
-                            <div class="dropdown">
-                                <button class="btn dropdown-toggle btn--transparent" type="button" id="dropdownMenuTS" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <span class="icon icon-more"></span>
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuTS">
-                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as .xls</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}">Export as PDF</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="chart__plot">
-                            <div id="capacities"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-        </div>
-    </section>
-
-{% endblock dashboard %}
 </main>
 {% endblock content %}
 
@@ -345,7 +191,7 @@
         integrity="sha512-4y8bsEzrXJqRyl2dqjdKk/DetH59JcFTtYNMsy5DUpvVV8CXiSrQ1gSCL3+dFgj1Xco0ONPizsYd6wX2eAXL2g=="
         crossorigin="anonymous"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 <script>
 const urlNotImplemented = `{% url 'not_implemented' %}?url={{ request.get_full_path }}`;
 const urlCopyReportItem = "#";
@@ -455,12 +301,16 @@ function update_kpi_table_style(target){
 /* loop over scenario selection buttons and return the ids of the selected ones */
 function fetchSelectedScenarios(){
     var selectedScenarios = [];
-    $(".scenario-select__item").map((i, item) => {
-        if(item.classList.contains("selected")){
-            selectedScenarios.push(item.id.split("-")[2])
-        }
-    });
-    return selectedScenarios
+    var scenariosDropDown = $("#results-scenarios");
+    if(scenariosDropDown){
+			if(Array.isArray(scenariosDropDown.val()) == false){
+				selectedScenarios.push(scenariosDropDown.val().split("-")[2]);
+			}
+			else{
+				selectedScenarios = scenariosDropDown.val();
+			};
+    };
+    return selectedScenarios;
 };
 
 

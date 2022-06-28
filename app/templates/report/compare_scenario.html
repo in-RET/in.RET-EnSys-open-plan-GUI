@@ -9,95 +9,90 @@
 
 
 {% block dashboard %}
-
-    <section class="dashboard">
-        <div>
-            <div class="row">
-                <div class="dashboard__scenarios">
-                    <h2>{% translate "My scenarios" %}</h2>
-                    <div class="scenario-select">
-                        {% for scenario in scenario_list %}
-                        {% if scenario.id|stringformat:'s' in request|get_selected_scenarios:proj_id %}
-                            {% setvar "selected" as selected %}
-                        {% else%}
-                            {% setvar "" as selected %}
-                        {% endif %}
-                            <button id="scenario-{{ proj_id }}-{{ scenario.id}}" class="scenario-select__item {{ selected }}" onclick="update_selected_multi_scenarios(this)">
-                                {{ scenario.name }}
-                            </button>
-                        {% empty %}
-                            {% translate "You have no scenario with completed simulation, please run simulations to display results" %}
-                        {% endfor %}
-
-                    </div>
-                </div>
-            </div>
-            {% if scenario_list %}
-                <div class="row dashboard__create">
-                    <div class="col">
-                      <button class="btn btn--medium" onclick="javascript:showCreateReportItemModal(event)">
-                        <span class="icon icon-add"></span>
-                        {% translate "Create graph" %}
-                      </button>
-                    </div>
-                </div>
-            {% endif %}
-            <div class="row">
-                <div class="col" id="report_items">
-
-                {% include "report/graph_template.html" with id="all_timeseries" title="All timeseries" %}
-                {% include "report/graph_template.html" with id="capacities" title="Installed and optimized capacities" %}
-
-                </div>
-            </div>
-        </div>
-    </section>
+<div class="dashboard-options sticky-top">
+	<div>
+		<div class="row">
+			<div class="dashboard__scenarios">
+				<div class="dashboard__select-scenarios">
+					<label for="results-scenarios" class="form-label">{% translate "Scenarios" %}</label>
+					<select name="results-scenarios" id="results-scenarios" placeholder="This is a placeholder" multiple onchange="update_selected_multi_scenarios(this)">
+						{% for scenario in scenario_list %}
+						<option value="{{ scenario.id }}" {% if scenario.id in selected_scenarios %} selected {% endif %}>{{ scenario.name }}</option>
+						{% empty %}
+						{% translate "You have no scenario with completed simulation, please run simulations to display results" %}
+						{% endfor %}
+					</select>
+				</div>
+				{% if scenario_list %}
+				<div class="dashboard__add">
+					<button class="btn btn--small btn--transparent" type="submit" onclick="javascript:showCreateReportItemModal(event)">
+						<span class="icon icon-add"></span>
+						{% translate "Add chart" %}
+					</button>
+				</div>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+</div>
+<section class="dashboard">
+	<div>
+		<div class="row">
+			<div class="col" id="report_items">
+				{% include "report/graph_template.html" with id="all_timeseries" title="All timeseries" %}
+				{% include "report/graph_template.html" with id="capacities" title="Installed and optimized capacities" %}
+			</div>
+		</div>
+	</div>
+</section>
 
 {% endblock dashboard %}
 
 
 {% block results_end_body_scripts %}
 <script>
-
 $(document).ready(function () {
     // add search field to the kpi info modal
     $('#kpiTable').DataTable();
     // update the kpi table
     //update_kpi_table_style(document.getElementById("kpi-table-style"));
-    scenario_visualize_timeseries();
-    scenario_visualize_capacities();
+    if(fetchSelectedScenarios().length > 0 ){
+    	scenario_visualize_timeseries();
+    	scenario_visualize_capacities();
+    }
 });
 
 function update_selected_multi_scenarios(target){
-    const proj_id = target.id.split("-")[1];
-    const scen_id = target.id.split("-")[2];
 
-    if(scen_id != null){
+		const scen_ids = fetchSelectedScenarios();
+		console.log(scen_ids);
+    if( scen_ids != null){
         $.ajax({
-            url: "{% url 'update_selected_multi_scenarios' proj_id %}" + scen_id,
-            type: "GET",
+        		headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            url: "{% url 'update_selected_multi_scenarios' proj_id %}",
+            type: "POST",
+            data: {"scen_ids": JSON.stringify(scen_ids)},
+            dataType: "json",
             success: async (data) => {
-                await target.classList.toggle("selected");
                 //call functions which update graphs below
 
                 /* Update the kpi table */
                 //update_kpi_table_style(document.getElementById("kpi-table-style"));
-
-                scenario_visualize_timeseries();
-                scenario_visualize_capacities();
-            },
-            error: function (xhr, errmsg) {
-                if (xhr.status != 405){
-                    console.log("backend_error!")
-                    //Show the error message
-                    $('#message-div').html("<div class='alert-error'>" +
-                        "<strong>Success: </strong> We have encountered an error: " + errmsg + "</div>");
+                if(scen_ids.length > 0){
+                	scenario_visualize_timeseries();
+                	scenario_visualize_capacities();
                 }
-            }
+            },
         });
     }
 }
 
 document.getElementById('compare-scenario-link').classList.add('active');
+
+var dropdownElement = new Choices('#results-scenarios', {
+	removeItemButton: true,
+	allowHTML: false
+});
+
 </script>
 {% endblock results_end_body_scripts %}

@@ -1,3 +1,6 @@
+@import '../abstracts/variables';
+@import '../abstracts/mixins';
+
 .project-setup.two-columns {
   @include flex-row-justify-center;
   padding-bottom: 6rem;

@@ -1,3 +1,6 @@
+@import '../abstracts/variables';
+@import '../abstracts/mixins';
+
 a.btn,
 button.btn,
 footer a.btn,
@@ -37,11 +40,15 @@ footer button.btn {
     font-size: $font-size-small;
   }
 
+  &--filled {
+    color: $white !important;
+  }
+
   &--hollow,
   &--transparent,
   &--action {
     background-color: transparent;
-    color: $primary-color-1;
+    color: $primary-color-1 !important;
 
     #{$anchor-pseudo-classes} {
       color: $primary-color-1 !important;
@@ -49,6 +56,10 @@ footer button.btn {
 
     #{$anchor-pseudo-classes-active-state} {
       background-color: $white !important;
+    }
+
+    span.icon#{$anchor-pseudo-classes-active-states} {
+      color: $white !important;
     }
   }
 

@@ -1,3 +1,6 @@
+@import '../abstracts/variables';
+@import '../abstracts/mixins';
+
 .main {
   &--padding-top {
     padding-top: $main-padding-top;
@@ -9,12 +12,31 @@
 }
 
 .standard-layout {
+  position: relative;
   padding-top: 2rem;
   padding-bottom: 4rem;
   @include flex-row-justify-center;
 
   &> div {
-    @include section-width;
+    max-width: $section-max-width-small;
+    padding-top: 10rem;
+
+    &:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      left: 0;
+      height: 10rem;
+      background-image: url('/static/assets/illustrations/computer.svg');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+  }
+
+  &--license div:before {
+    background-image: url('/static/assets/illustrations/balance.svg');
   }
 
   h2 {
@@ -23,6 +45,30 @@
 
   h3 {
     font-size: $font-size-medium;
+  }
+
+  &__paragraph {
+    padding-bottom: 1rem;
+
+    &--foreground {
+      background-color: $primary-gray-color-1;
+      background-image: url('/static/assets/illustrations/background-img.svg');
+      background-size: cover;
+      background-position: center;
+      padding: 4rem;
+      margin-top: 2rem;
+      margin-bottom: 4rem;
+    }
+
+    &--small {
+      h2 {
+        font-size: $font-size-medium;
+      }
+
+      p {
+        font-size: $font-size-small;
+      }
+    }
   }
 
   .account {

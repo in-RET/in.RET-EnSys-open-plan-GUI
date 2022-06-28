@@ -1,3 +1,5 @@
+@import '../abstracts/variables';
+
 table.table {
   box-shadow: $box-shadow-frame;
   border-radius: $button-border-radius;
@@ -31,6 +33,6 @@ table.table {
   }
 
   &>:not(caption)>*>* {
-    padding: .75rem;
+    padding: $dashboard-table-cell-padding;
   }
 }

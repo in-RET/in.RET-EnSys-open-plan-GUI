@@ -62,24 +62,17 @@
                         {% csrf_token %}
                         <input name="next" type="hidden" value="{{ redirect_to }}" />
 
-                        <select class="selectpicker " name="language" onchange="this.form.submit()" style="width: auto;border: none;margin: 0 0.05rem;color: #1F567D;background-color: #fff;padding-top: 0.5rem;">
-                            {% get_current_language as LANGUAGE_CODE %}
+                        <select class="selectpicker" name="language" onchange="this.form.submit()">
                             {% get_available_languages as LANGUAGES %}
                             {% get_language_info_list for LANGUAGES as languages %}
                             {% for language in languages %}
-
                             <option
                                     class="nav-link"
                                     value="{{ language.code }}"
                                     {% if language.code == LANGUAGE_CODE %} selected="selected"{% endif %}
-                                    data-content='<img src="/static/images/flags/{{ language.code }}.png">
-                        <span style="display:inline-block; width:100px; padding-left: 10px; text-shadow:none">
-                          {{ language.name_local }}
-                          <!-- span style="color:#999;">&nbsp;[{{ language.code }}]</span -->
-                        </span>'>
+														>
                                 {{ language.code }}
                             </option>
-
                             {% endfor %}
                         </select>
                     </form>

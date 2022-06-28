@@ -1,3 +1,6 @@
+@import '../abstracts/variables';
+@import '../abstracts/mixins';
+
 nav.navbar {
   position: fixed;
   width: 100%;
@@ -57,6 +60,15 @@ nav.navbar {
         position: absolute;
         top: 0.5rem;
         left: 1.1rem;
+      }
+
+      select {
+        width: auto;
+        border: none;
+        margin: 0.6rem 0 0 1.25rem;
+        padding-right: 0.25rem;
+        color: $primary-color-1;
+        background-color: $white;
       }
     }
 
@@ -119,8 +131,7 @@ nav.navbar {
   &__back {
     position: absolute;
     right: 2rem;
-    top: 3rem;
-    bottom: $padding-sides-normal;
+    bottom: -1.5rem;
     font-size: $font-size-small;
 
     &::before {

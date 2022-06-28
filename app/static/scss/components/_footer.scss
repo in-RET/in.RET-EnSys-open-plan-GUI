@@ -1,3 +1,6 @@
+@import '../abstracts/variables';
+@import '../abstracts/mixins';
+
 .footer {
 	background-color: $primary-gray-color-1;
 	height: $footer-height;

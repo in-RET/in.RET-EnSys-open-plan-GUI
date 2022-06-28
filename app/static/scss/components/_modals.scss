@@ -1,3 +1,6 @@
+@import '../abstracts/variables';
+@import '../abstracts/mixins';
+
 .modal {
   .modal-header {
     background-color: $primary-gray-color-1;
@@ -46,6 +49,14 @@
       position: absolute;
       display: inline-block;
       left: -1.5rem;
+    }
+  }
+}
+
+.modal-uc {
+  &__body {
+    img {
+      width: 100%;
     }
   }
 }

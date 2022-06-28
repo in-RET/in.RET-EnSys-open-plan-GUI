@@ -1,3 +1,6 @@
+@import '../abstracts/variables';
+@import '../abstracts/mixins';
+
 form {
   .form-control:focus {
     border-color: $primary-color-1;
@@ -80,6 +83,9 @@ form {
   width: 100%;
 
   .choices__inner {
+    @include flex-row;
+    align-items: center;
+    padding: 0.25rem;
     background-color: $white;
     border-radius: 0.25rem;
   }
@@ -92,6 +98,7 @@ form {
     background-color: $white;
     border-color: $primary-color-1;
     color: $primary-color-1;
+    margin-bottom: 0;
   }
 
   &[data-type*=select-multiple] .choices__inner .choices__button,

@@ -665,7 +665,6 @@ def update_selected_multi_scenarios(request, proj_id):
     if scen_ids is not None:
         scen_ids = json.loads(scen_ids)
 
-    # import pdb;pdb.set_trace()
     if request.is_ajax():
         status_code = 200
         selected_scenarios_per_project = request.session.get("selected_scenarios", {})

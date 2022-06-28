@@ -60,8 +60,7 @@ class TimeseriesGraphForm(forms.Form):
     def __init__(self, *args, **kwargs):
         scen_ids = kwargs.pop("scenario_ids", None)
         super().__init__(*args, **kwargs)
-        print("scen_ids")
-        print(scen_ids)
+
         if scen_ids is not None:
             # list available assets parameters for each simulations
             assets_results_across_simulations = AssetsResults.objects.filter(

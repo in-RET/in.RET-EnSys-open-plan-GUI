@@ -160,8 +160,6 @@ function update_selected_single_scenario(target){
             url: "{% url 'update_selected_single_scenario' proj_id %}" + scen_id,
             type: "GET",
             success: async (data) => {
-                //await console.log(data);$(".scenario-select__item").map((i, item) => {item.classList.remove("selected");});
-                //target.classList.add("selected");
                 //TODO: call functions which update graphs below
 
                 /* Update the kpi table */

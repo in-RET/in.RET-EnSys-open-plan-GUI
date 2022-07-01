@@ -1,0 +1,28 @@
+{% load static %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% comment %}
+Here is a list of the parameters one can provide to this template
+
+id:
+    the id of the modal (should be unique to the modal within same html template)
+title:
+    the text display in the title bar of the modal
+img_path:
+    the path to the image of the usecase
+{% endcomment %}
+
+<div class="modal fade modal-uc" id="es-modal-{{ id }}" tabindex="-1" aria-labelledby="es-modal-{{ id }}-label" aria-hidden="true">
+	<div class="modal-dialog modal-xl">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="es-modal-{{ id }}-label">{% translate title %}</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body modal-uc__body">
+				<img src="{{ img_path }}use-cases-bg-{{ id }}.png" alt="Energy system diagram">
+			</div>
+		</div>
+	</div>
+</div>

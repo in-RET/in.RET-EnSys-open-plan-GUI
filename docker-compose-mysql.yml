@@ -24,7 +24,7 @@ services:
     expose:
       - 8000
     volumes:
-      - ./src/cdn_static_root:/src/cdn_static_root
+      - static_volume:/src/cdn_static_root
     command: "gunicorn --workers=2 --bind=0.0.0.0:8000 epa.wsgi:application"
     depends_on:
       - db
@@ -56,16 +56,15 @@ services:
     ports:
       - "8090:80"
     volumes:
-      - ./nginx:/etc/nginx/conf.d
-      - ./src/cdn_static_root:/static
+      - ./nginx/mysql:/etc/nginx/conf.d
+      - static_volume:/static
     depends_on:
       - app
     networks:
       - open_plan_network
 volumes:
   db_data_mysql:
-# need to execute 'docker-compose run app python manage.py makemigrations'
-# and 'docker-compose run app python manage.py migrate'
+  static_volume:
 
 networks:
   open_plan_network:

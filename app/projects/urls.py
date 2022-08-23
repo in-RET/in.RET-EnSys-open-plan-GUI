@@ -39,6 +39,14 @@ urlpatterns = [
         ajax_project_viewers_form,
         name="ajax_project_viewers_form",
     ),
+    # usecases
+    path("usecase/search/", usecase_search, name="usecase_search"),
+    path("usecase/search/<int:usecase_id>", usecase_search, name="usecase_search"),
+    path(
+        "usecase/search/<int:usecase_id>/scenario/<int:scen_id>",
+        usecase_search,
+        name="usecase_search",
+    ),
     # Comment
     path("comment/create/<int:proj_id>", comment_create, name="comment_create"),
     path("comment/update/<int:com_id>", comment_update, name="comment_update"),

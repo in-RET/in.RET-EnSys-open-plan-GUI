@@ -387,7 +387,9 @@ def project_search(request, proj_id=None, scen_id=None):
     )
     project_share_form = ProjectShareForm()
     project_revoke_form = ProjectRevokeForm(proj_id=proj_id)
-    usecase_form = UseCaseForm(usecase_qs=UseCase.objects.all())
+    usecase_form = UseCaseForm(
+        usecase_qs=UseCase.objects.all(), usecase_url=reverse("usecase_search")
+    )
 
     return render(
         request,
@@ -424,6 +426,31 @@ def project_duplicate(request, proj_id):
 
 # endregion Project
 
+# region Usecase
+@login_required
+@require_http_methods(["GET"])
+def usecase_search(request, usecase_id=None, scen_id=None):
+
+    usecase_list = UseCase.objects.all()
+
+    print(usecase_list)
+
+    return render(
+        request,
+        "usecase/usecase_search.html",
+        {
+            "usecase_list": usecase_list,
+            "usecase_id": usecase_id,
+            "scen_id": scen_id,
+            "translated_text": {
+                "showScenarioText": _("Show scenarios"),
+                "hideScenarioText": _("Hide scenarios"),
+            },
+        },
+    )
+
+
+# endregion Usecase
 
 # region Comment
 

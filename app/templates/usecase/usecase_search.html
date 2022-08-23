@@ -1,0 +1,231 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% load i18n %}
+
+{% block head_block %}
+{% endblock head_block %}
+
+{% block start_body_scripts %}
+{% endblock %}
+
+{% block title %}{% translate "Usecases - open_plan" %}{% endblock title %}
+
+{% block content %}
+
+
+{% for usecase in usecase_list %}
+{% include "usecase_modal_template.html" with id=usecase.id img_path="/static/assets/illustrations/" title=usecase.name %}
+{% endfor %}
+<main>
+	<section class="header">
+		<div>
+			<div class="header__left"></div>
+			<h1 class="header__title">{% translate "Use cases" %}</h1>
+			<div class="header__back"></div>
+		</div>
+	</section>
+
+	{% for usecase in usecase_list %}
+
+	<section class="project project--uc">
+		<div>
+			<div class="project__img" aria-hidden="true">
+				<img src="/static/assets/illustrations/use-cases-bg-{{ usecase.id }}.png" alt="Illustration">
+				<span data-bs-toggle="modal" data-bs-target="#es-modal-{{ usecase.id }}">
+              <span class="icon icon-eye"></span>
+              Show
+            </span>
+			</div>
+			<div class="project__content">
+				<div class="project__top">
+					<h2 class="name">
+						{{ usecase.name }}
+					</h2>
+					<a href="{% url 'not_implemented' %}?url={{ request.get_full_path }}" class="location">
+						<span class="icon-pin" aria-hidden="true"></span>
+						{{ usecase.country }}
+					</a>
+				</div>
+				<div class="project__details">
+					<div class="details">
+						<div class="detail">
+							<span class="detail__property">Interest rate</span>
+							<span class="detail__value">99.999 EUR</span>
+						</div>
+						<div class="detail">
+							<span class="detail__property">Lifetime</span>
+							<span class="detail__value">2025-2050</span>
+						</div>
+					</div>
+					<div class="actions">
+						<a class="btn btn--filled" type="button">
+							<span class="icon icon-export" aria-hidden="true"></span>
+							Export
+						</a>
+						<a class="btn btn--action action" type="button">
+							Use as a project template
+						</a>
+					</div>
+				</div>
+				<div class="project__description">
+					{{ usecase.description }}
+				</div>
+				<!--div class="project__scenarios">
+				<div class="toggle" class="js-toggle-scenario">
+					<button class="btn btn--action" type="button" data-bs-toggle="collapse" data-bs-target="#collapseScenarios" aria-expanded="false" aria-controls="collapseScenarios">
+						<span class="icon-i_arrow_down icon icon--small js-toggle-scenario-icon" aria-hidden="true"></span>
+						<span class="js-toggle-scenario-name">Show scenarios</span>
+					</button>
+				</div>
+				<div class="collapse" id="collapseScenarios">
+					<form>
+						<div class="card card-body">
+							<ul class="list-group">
+								<li class="list-group-item list-group-item--uc">
+									<div class="list-group-item__name">
+										Scenario 1
+									</div>
+									<div class="list-group-item__description">
+										Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.
+									</div>
+								</li>
+								<li class="list-group-item list-group-item--uc">
+									<div class="list-group-item__name">
+										Scenario 2
+									</div>
+									<div class="list-group-item__description">
+										This is a description
+									</div>
+								</li>
+							</ul>
+						</div>
+					</form>
+				</div>
+			</div-->
+			<div class="project__scenarios">
+				<div class="toggle" class="js-toggle-scenario">
+					<button class="btn btn--action" type="button" data-bs-toggle="collapse" data-bs-target="#collapseScenarios{{ usecase.id }}" aria-expanded="false" aria-controls="collapseScenarios{{ usecase.id }}">
+						<span class="icon-i_arrow_down icon icon--small js-toggle-scenario-icon" aria-hidden="true"></span>
+						<span class="js-toggle-scenario-name">{% translate "Show scenarios" %}</span>
+					</button>
+				</div>
+				<div class="collapse" id="collapseScenarios{{ usecase.id }}">
+
+					<div class="card card-body">
+						<ul class="list-group">
+
+							{% for scenario in usecase|scenario_list %}
+							<form>
+								{% csrf_token %}
+								<li class="list-group-item list-group-item--uc">
+									<div class="list-group-item__name">
+										{{ scenario }}
+									</div>
+									<div class="list-group-item__description">
+										Should we have a specific description of the scenario here?.
+									</div>
+								</li>
+							</form>
+							{% empty %}
+							{% translate "There are no scenarios" %}
+							{% endfor %}
+
+
+						</ul>
+					</div>
+					<form id="exportScenarios-project-{{ usecase.id }}" action = "{% url 'scenario_export' usecase.id %}" method="post">
+						{% csrf_token %}
+						<input type="hidden" name="scenario_ids">
+					</form>
+					<button class="btn btn--action action export" type="button" onclick="javascript:export_btn_clicked({{ usecase.id }})">
+						<span class="icon icon-export" aria-hidden="true"></span>
+						{% translate "Export selected" %}
+					</button>
+
+				</div>
+			</div>
+		</div>
+		</div>
+	</section>
+
+
+
+
+
+
+	{% empty %}
+	<section class="projects-empty">
+		<div>
+			<div class="projects-empty__img">
+				<img src="{% static '/assets/illustrations/empty_folder.svg' %}" alt="Empty folder">
+			</div>
+			<div class="projects-empty__text">
+				{% translate "There are no usecase yet" %}
+			</div>
+		</div>
+	</section>
+
+	{% endfor %}
+
+
+
+</main>
+
+{% endblock content %}
+
+
+{% block end_body_scripts %}
+
+{{ translated_text|json_script:"translatedText" }}
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script>
+// toggle HIDE/SHOW SCENARIOS text (the variables showScenarioText and hideScenarioText are defined in base.html for translation purposes
+const projectWrap = document.querySelector('main');
+projectWrap.addEventListener('click', function() {
+  const collapsedScenariosBoxesExpanded = document.querySelectorAll('.btn.btn--action[aria-expanded="true"] .js-toggle-scenario-name');
+  const collapsedScenariosBoxes = document.querySelectorAll('.btn.btn--action[aria-expanded="false"] .js-toggle-scenario-name');
+
+// get the dict translated_text passed via the view project_search()
+var translatedText = JSON.parse(document.getElementById('translatedText').textContent);
+
+  collapsedScenariosBoxesExpanded.forEach(function(item) {
+    item.innerHTML = translatedText["hideScenarioText"];
+  });
+
+  collapsedScenariosBoxes.forEach(function(item) {
+    item.innerHTML = translatedText["showScenarioText"];
+  });
+})
+
+
+</script>
+<script>
+    $(document).ready(function(){
+        var projScenariosTab = "collapseScenarios" + `{{ usecase_id }}`;
+        $("button[data-bs-target='#" + projScenariosTab + "']").click();
+        var yOffset = -100;
+        var y = 0
+        console.log(`{{ scen_id }}`)
+        console.log(`{{ usecase_id }}`)
+        if(`{{ scen_id }}` == "None"){
+        		if(`{{ usecase_id }}` != "None"){
+            	y = document.getElementById('project-' + `{{ usecase_id }}`).getBoundingClientRect().top + window.pageYOffset;
+            	yOffset = 0;
+            }
+        }
+        else{
+            const elId = 'project' + `{{ usecase_id }}` + 'scenario-' + `{{ scen_id }}`;
+            y = document.getElementById(elId).getBoundingClientRect().top + window.pageYOffset;
+            yOffset = 0;
+        }
+        console.log(y+yOffset);
+        window.scrollTo(0, y + yOffset);
+    });
+</script>
+
+<script src="{% static 'js/modal_utils.js' %}"></script>
+
+{% endblock end_body_scripts %}

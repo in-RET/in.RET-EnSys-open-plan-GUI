@@ -338,13 +338,20 @@ class UploadFileForm(forms.Form):
 
 
 class UseCaseForm(forms.Form):
-    usecase = forms.ChoiceField(label=_("Select a use case"))
+    usecase = forms.ChoiceField()
 
     def __init__(self, *args, **kwargs):
         usecase_qs = kwargs.pop("usecase_qs")
+        usecase_url = kwargs.pop("usecase_url", "usecase_url")
         super().__init__(*args, **kwargs)
         if usecase_qs is not None:
             self.fields["usecase"].choices = [(uc.id, uc.name) for uc in usecase_qs]
+            self.fields["usecase"].label = (
+                _("Select a use case (or")
+                + f"<a href='{usecase_url}'>"
+                + _(" visit use cases page link")
+                + "</a>)"
+            )
 
 
 class CommentForm(ModelForm):

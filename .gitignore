@@ -9,3 +9,4 @@
 **/node_modules/
 **/cdn_static_root/
 .envs/*
+**/venv/

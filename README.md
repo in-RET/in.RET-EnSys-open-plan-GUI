@@ -28,8 +28,8 @@ SQL_ENGINE=django.db.backends.postgresql
 SQL_DATABASE=<your db name>
 SQL_USER=<your user name>
 SQL_PASSWORD=<your password>
+SQL_HOST=localhost
 SQL_PORT=5432
-DATABASE=postgres
 ```
 8. Add an environment variable `MVS_HOST_API` and set the url of the simulation server you wish to use for your models
 9. Execute the `local_setup.sh` file (`. local_setup.sh` on linux/mac `bash local_setup.sh` on windows) you might have to make it executable first. Answer yes to the question

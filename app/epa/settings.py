@@ -11,11 +11,11 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 import ast
 import os
+
 from django.contrib.messages import constants as messages
 
-
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = ast.literal_eval(os.getenv("DEBUG", "True"))
+DEBUG = ast.literal_eval(os.getenv("DEBUG", "False"))
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -40,7 +40,6 @@ SECRET_KEY = os.getenv(
     "EPA_SECRET_KEY", "v@p9^=@lc3#1u_xtx*^xhrv0l3li1(+8ik^k@g-_bzmexb0$7n"
 )
 
-
 ALLOWED_HOSTS = ["*"]
 
 # Application definition
@@ -63,7 +62,6 @@ INSTALLED_APPS = [
 
 if DEBUG is True:
     INSTALLED_APPS.append("sass_processor")
-
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -125,7 +123,6 @@ DATABASES = {
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
-
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
@@ -155,7 +152,6 @@ USE_L10N = True
 
 USE_TZ = False
 
-
 # Other configs
 
 AUTH_USER_MODEL = "users.CustomUser"
@@ -166,7 +162,10 @@ LOGOUT_REDIRECT_URL = "home"
 
 CRISPY_TEMPLATE_PACK = "bootstrap4"
 
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+if DEBUG is True:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+else:
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 MAILER_EMAIL_BACKEND = EMAIL_BACKEND
 
 DEFAULT_FROM_EMAIL = "noreply@elandh2020.eu"

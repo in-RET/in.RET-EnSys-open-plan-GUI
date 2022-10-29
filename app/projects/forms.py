@@ -1074,12 +1074,25 @@ class StorageForm(AssetCreateForm):
     def __init__(self, *args, **kwargs):
         asset_type_name = kwargs.pop("asset_type", None)
         super(StorageForm, self).__init__(*args, asset_type="capacity", **kwargs)
-
         self.fields["crate"].widget = forms.HiddenInput()
         self.fields["crate"].initial = 1
         self.fields["dispatchable"].widget = forms.HiddenInput()
         self.fields["dispatchable"].initial = True
         self.fields["installed_capacity"].label = _("Installed capacity (kWh)")
+        if asset_type_name != "hess":
+            self.fields["fixed_thermal_losses_relative"].widget = forms.HiddenInput()
+            self.fields["fixed_thermal_losses_relative"].initial = 0
+            self.fields["fixed_thermal_losses_absolute"].widget = forms.HiddenInput()
+            self.fields["fixed_thermal_losses_absolute"].initial = 0
+            self.fields["thermal_loss_rate"].widget = forms.HiddenInput()
+            self.fields["thermal_loss_rate"].initial = 0
+        else:
+            self.fields["fixed_thermal_losses_relative"] = DualNumberField(
+                default=0.1, min=0, max=1, param_name="fixed_thermal_losses_relative"
+            )
+            self.fields["fixed_thermal_losses_absolute"] = DualNumberField(
+                default=0.1, min=0, param_name="fixed_thermal_losses_absolute"
+            )
 
     field_order = [
         "name",

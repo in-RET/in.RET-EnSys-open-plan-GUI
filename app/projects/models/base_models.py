@@ -429,6 +429,9 @@ class Asset(TopologyNode):
         null=True, blank=False, validators=[MinValueValidator(0.0)]
     )
 
+    thermal_loss_rate = models.FloatField(
+        null=True, blank=False, validators=[MinValueValidator(0.0)]
+    )
     @property
     def fields(self):
         return [f.name for f in self._meta.fields + self._meta.many_to_many]

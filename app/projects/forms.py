@@ -605,7 +605,7 @@ class BusForm(OpenPlanModelForm):
 
 class AssetCreateForm(OpenPlanModelForm):
     def __init__(self, *args, **kwargs):
-        asset_type_name = kwargs.pop("asset_type", None)
+        self.asset_type_name = kwargs.pop("asset_type", None)
         view_only = kwargs.pop("view_only", False)
         self.existing_asset = kwargs.get("instance", None)
         # get the connections with busses
@@ -613,22 +613,28 @@ class AssetCreateForm(OpenPlanModelForm):
 
         super().__init__(*args, **kwargs)
         # which fields exists in the form are decided upon AssetType saved in the db
-        asset_type = AssetType.objects.get(asset_type=asset_type_name)
-
+        asset_type = AssetType.objects.get(asset_type=self.asset_type_name)
         [
             self.fields.pop(field)
             for field in list(self.fields)
-            if field not in asset_type.asset_fields
+            if field not in asset_type.visible_fields
         ]
 
         self.fields["inputs"] = forms.CharField(widget=forms.HiddenInput())
+
+        if self.asset_type_name == "heat_pump":
+            self.fields["efficiency"] = DualNumberField(
+                default=1, min=1, param_name="efficiency"
+            )
+            self.fields["efficiency"].label = "COP"
+
         """ DrawFlow specific configuration, add a special attribute to 
             every field in order for the framework to be able to export
             the data to json.
             !! This addition doesn't affect the previous behavior !!
         """
         for field in self.fields:
-            if field == "renewable_asset" and asset_type_name in RENEWABLE_ASSETS:
+            if field == "renewable_asset" and self.asset_type_name in RENEWABLE_ASSETS:
                 self.fields[field].initial = True
             self.fields[field].widget.attrs.update({f"df-{field}": ""})
             if field == "input_timeseries":
@@ -669,6 +675,34 @@ class AssetCreateForm(OpenPlanModelForm):
             raise ValidationError(str(e))
         except Exception as ex:
             raise ValidationError(_("Could not parse a file. Did you upload one?"))
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if self.asset_type_name == "heat_pump":
+            efficiency = cleaned_data["efficiency"]
+            self.timeseries_same_as_timestamps(efficiency, "efficiency")
+
+        return cleaned_data
+
+    def timeseries_same_as_timestamps(self, ts, param):
+        if isinstance(ts, np.ndarray):
+            ts = np.squeeze(ts).tolist()
+        if isinstance(ts, float) is False and isinstance(ts, int) is False:
+            if len(ts) > 1:
+                if self.timestamps is not None:
+                    if len(ts) != len(self.timestamps):
+                        # TODO look for verbose of param
+                        msg = (
+                            _("The number of values of the parameter ")
+                            + _(param)
+                            + f" ({len(ts)})"
+                            + _(" are not equal to the number of simulation timesteps")
+                            + f" ({len(self.timestamps)})"
+                            + _(
+                                ". You can change the number of timesteps in the first step of scenario creation."
+                            )
+                        )
+                        self.add_error(param, msg)
 
     class Meta:
         model = Asset

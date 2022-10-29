@@ -653,6 +653,45 @@ class AssetCreateForm(OpenPlanModelForm):
             )
             self.fields["efficiency"].label = "COP"
 
+        if self.asset_type_name == "chp":
+            self.fields["efficiency"] = DualNumberField(
+                default=1, min=0, max=1, param_name="efficiency"
+            )
+            self.fields["efficiency"].label = _(
+                "Electrical efficiency with no heat extraction"
+            )
+
+            self.fields[
+                "efficiency"
+            ].help_text = "This is the custom help text for chp efficiency"
+
+            self.fields["efficiency_multiple"] = DualNumberField(
+                default=1, min=0, max=1, param_name="efficiency_multiple"
+            )
+            self.fields["efficiency_multiple"].label = _(
+                "Thermal efficiency with maximal heat extraction"
+            )
+
+            self.fields["thermal_loss_rate"].label = _("Stromverlustkenzahl")
+
+        if self.asset_type_name == "chp_fixed_ratio":
+
+            self.fields["efficiency"].label = _("Efficiency gaz to electricity")
+
+            # TODO
+            self.fields[
+                "efficiency"
+            ].help_text = "This is the custom help text for chp efficiency"
+
+            self.fields["efficiency_multiple"].widget = forms.NumberInput(
+                attrs={
+                    "placeholder": _("eg. 0.1"),
+                    "min": 0.0,
+                    "max": 1.0,
+                    "step": "0.00001",
+                }
+            )
+            self.fields["efficiency_multiple"].label = _("Efficiency gaz to heat")
         """ DrawFlow specific configuration, add a special attribute to 
             every field in order for the framework to be able to export
             the data to json.
@@ -701,11 +740,35 @@ class AssetCreateForm(OpenPlanModelForm):
         except Exception as ex:
             raise ValidationError(_("Could not parse a file. Did you upload one?"))
 
+    def clean_efficiency_multiple(self):
+        data = self.cleaned_data["efficiency_multiple"]
+        if self.asset_type_name == "chp_fixed_ratio":
+            try:
+                data = float(data)
+            except ValueError:
+                raise ValidationError("Please enter a float value between 0.0 and 1.0")
+            if 0 <= data <= 1:
+                pass
+            else:
+                raise ValidationError("Please enter a float value between 0.0 and 1.0")
+            data = str(data)
+        return data
+
     def clean(self):
         cleaned_data = super().clean()
         if self.asset_type_name == "heat_pump":
             efficiency = cleaned_data["efficiency"]
             self.timeseries_same_as_timestamps(efficiency, "efficiency")
+
+        if self.asset_type_name == "chp_fixed_ratio":
+            if (
+                float(cleaned_data["efficiency"])
+                + float(cleaned_data["efficiency_multiple"])
+                > 1
+            ):
+                msg = _("The sum of the efficiencies should not exceed 1")
+                self.add_error("efficiency", msg)
+                self.add_error("efficiency_multiple", msg)
 
         return cleaned_data
 

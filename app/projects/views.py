@@ -1239,6 +1239,7 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
                     "soc_max": ess_capacity_asset.soc_max,
                     "soc_min": ess_capacity_asset.soc_min,
                 },
+                input_output_mapping=input_output_mapping,
             )
         else:
             form = StorageForm(
@@ -1274,6 +1275,7 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
 
         context = {
             "form": form,
+            "asset_type_name": asset_type_name,
             "input_timeseries_data": input_timeseries_data,
             "input_timeseries_timestamps": json.dumps(
                 scenario.get_timestamps(json_format=True)

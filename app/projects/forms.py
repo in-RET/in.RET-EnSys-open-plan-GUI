@@ -692,6 +692,16 @@ class AssetCreateForm(OpenPlanModelForm):
                 }
             )
             self.fields["efficiency_multiple"].label = _("Efficiency gaz to heat")
+
+        if "dso" in self.asset_type_name:
+
+            self.fields["energy_price"] = DualNumberField(
+                default=0.1, param_name="energy_price"
+            )
+            self.fields["feedin_tariff"] = DualNumberField(
+                default=0.1, param_name="feedin_tariff"
+            )
+
         """ DrawFlow specific configuration, add a special attribute to 
             every field in order for the framework to be able to export
             the data to json.
@@ -769,6 +779,18 @@ class AssetCreateForm(OpenPlanModelForm):
                 msg = _("The sum of the efficiencies should not exceed 1")
                 self.add_error("efficiency", msg)
                 self.add_error("efficiency_multiple", msg)
+
+        if "dso" in self.asset_type_name:
+            feedin_tariff = np.array([cleaned_data["feedin_tariff"]])
+            energy_price = np.array([cleaned_data["energy_price"]])
+            diff = feedin_tariff - energy_price
+            if (diff > 0).any() is True:
+                msg = _(
+                    "Feed-in tariff > energy price for some of simulation's timesteps. This would cause an unbound solution and terminate the optimization. Please reconsider your feed-in tariff and energy price."
+                )
+                self.add_error("feedin_tariff", msg)
+            self.timeseries_same_as_timestamps(feedin_tariff, "feedin_tariff")
+            self.timeseries_same_as_timestamps(energy_price, "energy_price")
 
         return cleaned_data
 

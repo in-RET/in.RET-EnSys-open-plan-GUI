@@ -261,6 +261,7 @@ class UploadTimeseriesTest(TestCase):
                 "input_timeseries": fp,
             }
             response = self.client.post(self.post_url, data, format="multipart")
+            self.assertEqual(response.status_code, 200)
             asset = Asset.objects.last()
         self.assertEqual(asset.input_timeseries_values, [1, 2, 3, 4])
 
@@ -273,6 +274,7 @@ class UploadTimeseriesTest(TestCase):
                 "input_timeseries": fp,
             }
             response = self.client.post(self.post_url, data, format="multipart")
+            self.assertEqual(response.status_code, 200)
             asset = Asset.objects.last()
         self.assertEqual(asset.input_timeseries_values, [8.5, 3.3, 4.0, 6.0])
 
@@ -285,6 +287,7 @@ class UploadTimeseriesTest(TestCase):
                 "input_timeseries": fp,
             }
             response = self.client.post(self.post_url, data, format="multipart")
+            self.assertEqual(response.status_code, 200)
             asset = Asset.objects.last()
         self.assertEqual(asset.input_timeseries_values, [1, 2, 3, 4])
 
@@ -297,6 +300,7 @@ class UploadTimeseriesTest(TestCase):
                 "input_timeseries": fp,
             }
             response = self.client.post(self.post_url, data, format="multipart")
+            self.assertEqual(response.status_code, 200)
             asset = Asset.objects.last()
         self.assertEqual(asset.input_timeseries_values, [1.2, 2, 3.0, 4])
 

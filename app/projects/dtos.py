@@ -257,7 +257,7 @@ class MVSRequestDto:
 
 
 # Function to serialize scenario topology models to JSON
-def convert_to_dto(scenario: Scenario):
+def convert_to_dto(scenario: Scenario, testing: bool = False):
     # Retrieve models
     project = Project.objects.get(scenario=scenario)
     economic_data = EconomicData.objects.get(project=project)
@@ -298,12 +298,17 @@ def convert_to_dto(scenario: Scenario):
         # to_value_type(economic_data, 'crf'),
     )
 
+    evaluated_period = to_value_type(scenario, "evaluated_period")
+    # For testing purposes the number of simulated days is restricted to 3 or less
+    if testing is True and evaluated_period.value > 3:
+        evaluated_period.value = 3
+
     simulation_settings = SimulationSettingsDto(
         scenario.start_date.strftime(
             "%Y-%m-%d %H:%M"
         ),  # datetime.combine(scenario.start_date, time()).timestamp(),
         scenario.time_step,
-        to_value_type(scenario, "evaluated_period"),
+        evaluated_period,
     )
 
     # map_to_dto(economic_data, economic_data_dto)

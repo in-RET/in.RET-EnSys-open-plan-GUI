@@ -1368,7 +1368,7 @@ def asset_cops_create_or_update(
 @json_view
 @login_required
 @require_http_methods(["GET"])
-def view_mvs_data_input(request, scen_id=0):
+def view_mvs_data_input(request, scen_id=0, testing=False):
     if scen_id == 0:
         return JsonResponse(
             {"status": "error", "error": "No scenario id provided"},
@@ -1386,7 +1386,7 @@ def view_mvs_data_input(request, scen_id=0):
         raise PermissionDenied
 
     try:
-        data_clean = format_scenario_for_mvs(scenario)
+        data_clean = format_scenario_for_mvs(scenario, testing)
     except Exception as e:
 
         logger.error(
@@ -1399,6 +1399,13 @@ def view_mvs_data_input(request, scen_id=0):
         )
 
     return JsonResponse(data_clean, status=200, content_type="application/json")
+
+
+@json_view
+@login_required
+@require_http_methods(["GET"])
+def test_mvs_data_input(request, scen_id=0):
+    return view_mvs_data_input(request, scen_id=scen_id, testing=True)
 
 
 # End-point to send MVS simulation request

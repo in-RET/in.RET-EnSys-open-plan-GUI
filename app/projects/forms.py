@@ -608,6 +608,8 @@ class AssetCreateForm(OpenPlanModelForm):
         asset_type_name = kwargs.pop("asset_type", None)
         view_only = kwargs.pop("view_only", False)
         self.existing_asset = kwargs.get("instance", None)
+        # get the connections with busses
+        self.input_output_mapping = kwargs.pop("input_output_mapping", None)
 
         super().__init__(*args, **kwargs)
         # which fields exists in the form are decided upon AssetType saved in the db
@@ -619,6 +621,7 @@ class AssetCreateForm(OpenPlanModelForm):
             if field not in asset_type.asset_fields
         ]
 
+        self.fields["inputs"] = forms.CharField(widget=forms.HiddenInput())
         """ DrawFlow specific configuration, add a special attribute to 
             every field in order for the framework to be able to export
             the data to json.

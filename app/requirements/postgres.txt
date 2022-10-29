@@ -1,5 +1,5 @@
 django-extensions==3.0.9
-Django==3.2
+Django==3.2.15
 django-bootstrap-modal-forms==2.0.0
 django-crispy-forms==1.9.2
 django-jsonview==2.0.0

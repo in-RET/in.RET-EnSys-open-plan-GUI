@@ -1,6 +1,7 @@
 import json
 from typing import List
 from django.db.models import Q
+import numpy as np
 from numpy.core import long
 from datetime import date, datetime, time
 
@@ -452,9 +453,7 @@ def convert_to_dto(scenario: Scenario):
 
             if len(efficiencies) == 0:
                 print("ERROR, a heat pump should at least have one electrical input!")
-                import pdb
 
-                pdb.set_trace()
             elif len(efficiencies) == 1:
                 efficiencies = efficiencies[0]
                 inflow_direction = inflow_direction[0]
@@ -563,7 +562,11 @@ def to_value_type(model_obj, field_name):
     value_type = ValueType.objects.filter(type=field_name).first()
     unit = value_type.unit if value_type is not None else None
     value = getattr(model_obj, field_name)
+
     if value is not None:
+        # make sure the value is not a str if the unit is "factor"
+        if unit == "factor" and isinstance(value, str):
+            value = json.loads(value)
         return ValueTypeDto(unit, value)
     else:
         return None

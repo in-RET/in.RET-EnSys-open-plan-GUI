@@ -1288,7 +1288,6 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
 @login_required
 @require_http_methods(["POST"])
 def asset_create_or_update(request, scen_id=0, asset_type_name="", asset_uuid=None):
-
     if asset_type_name == "bus":
         answer = handle_bus_form_post(request, scen_id, asset_type_name, asset_uuid)
     elif asset_type_name in ["bess", "h2ess", "gess", "hess"]:
@@ -1298,6 +1297,61 @@ def asset_create_or_update(request, scen_id=0, asset_type_name="", asset_uuid=No
     else:  # all assets
         answer = handle_asset_form_post(request, scen_id, asset_type_name, asset_uuid)
     return answer
+
+
+@login_required
+@require_http_methods(["GET"])
+def get_asset_cops_form(request, scen_id=0, asset_type_name="", asset_uuid=None):
+    opts = {}
+    if asset_uuid:
+        existing_asset = get_object_or_404(Asset, unique_id=asset_uuid)
+        existing_cop = COPCalculator.objects.filter(asset=existing_asset)
+        if existing_cop.exists():
+            opts["instance"] = existing_cop.get()
+    context = {"form": COPCalculatorForm(**opts)}
+
+    return render(request, "asset/asset_cops_form.html", context)
+
+
+@login_required
+@require_http_methods(["POST"])
+def asset_cops_create_or_update(
+    request, scen_id=0, asset_type_name="", asset_uuid=None
+):
+    # collect the information about the connected nodes in the GUI
+
+    opts = {}
+    if asset_uuid:
+        existing_asset = get_object_or_404(Asset, unique_id=asset_uuid)
+        existing_cop = COPCalculator.objects.filter(asset=existing_asset)
+        if existing_cop.exists():
+            opts["instance"] = existing_cop.get()
+    form = COPCalculatorForm(request.POST, request.FILES, **opts)
+
+    scenario = get_object_or_404(Scenario, id=scen_id)
+    if form.is_valid():
+        cop = form.save(commit=False)
+        cop.scenario = scenario
+        cop.mode = asset_type_name
+        if asset_uuid:
+            cop.asset = existing_asset
+        cop.save()
+
+        try:
+            cops = cop.calc_cops()
+            return JsonResponse(
+                {"success": True, "cop_id": cop.id, "cops": json.dumps(cops)},
+                status=200,
+            )
+        except:
+            return JsonResponse({"success": False, "cop_id": cop.id}, status=422)
+
+    logger.warning(f"The submitted asset has erroneous field values.")
+
+    form_html = get_template("asset/asset_cops_form.html")
+    return JsonResponse(
+        {"success": False, "form_html": form_html.render({"form": form})}, status=422
+    )
 
 
 # endregion Asset
@@ -1320,6 +1374,7 @@ def view_mvs_data_input(request, scen_id=0):
     scenario = Scenario.objects.get(id=scen_id)
 
     if scenario.project.user != request.user:
+
         logger.warning(
             f"Unauthorized user tried to access scenario with db id = {scen_id}."
         )

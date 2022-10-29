@@ -4,6 +4,7 @@ import json
 import io
 import csv
 from openpyxl import load_workbook
+import numpy as np
 
 from crispy_forms.bootstrap import AppendedText, PrependedText, FormActions
 from crispy_forms.helper import FormHelper
@@ -569,6 +570,21 @@ class SensitivityAnalysisForm(ModelForm):
         data = self.cleaned_data["output_parameters_names"]
         data_js = json.dumps(data)
         return data_js
+
+
+class COPCalculatorForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["temperature_high"] = DualNumberField(
+            default=60, min=-273, param_name="temperature_high"
+        )
+        self.fields["temperature_low"] = DualNumberField(
+            default=40, min=-273, param_name="temperature_low"
+        )
+
+    class Meta:
+        model = COPCalculator
+        exclude = ["id", "scenario", "asset", "mode"]
 
 
 class BusForm(OpenPlanModelForm):

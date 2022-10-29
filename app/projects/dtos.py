@@ -405,6 +405,61 @@ def convert_to_dto(scenario: Scenario):
             outflow_direction = [
                 n for n in output_connection.values_list("bus__name", flat=True)
             ]
+
+        asset_efficiency = to_value_type(asset, "efficiency")
+
+        optional_parameters = {}
+
+        if asset.asset_type.asset_type == "heat_pump":
+            cop = asset_efficiency.value
+            input_mapping = [
+                ev for ev in input_connection.values_list("bus__type", flat=True)
+            ]
+
+            efficiencies = []
+            inflow_direction = []
+            # TODO: make sure the length is equal to the number of timesteps
+            if len(input_mapping) == 1:
+                # in MVS the coefficient are applied to the output bus and not the input bus
+                # so for one unit electricity there should be "COP" unit of heat
+                if isinstance(cop, list):
+                    efficiency = np.array(cop).tolist()
+                else:
+                    efficiency = cop
+                inflow_direction.append(input_connection.get().bus.name)
+                efficiencies.append(efficiency)
+            else:
+                for energy_vector in ["Electricity", "Heat"]:
+                    if energy_vector in input_mapping:
+                        # TODO get the case where get fails
+                        inflow_direction.append(
+                            input_connection.get(bus__type=energy_vector).bus.name
+                        )
+                        if isinstance(cop, list):
+                            efficiency = (
+                                (1 / np.array(cop)).tolist()
+                                if energy_vector == "Electricity"
+                                else (1 - 1 / np.array(cop)).tolist()
+                            )
+                        else:
+                            efficiency = (
+                                (1 / cop)
+                                if energy_vector == "Electricity"
+                                else (1 - 1 / cop)
+                            )
+
+                        efficiencies.append(efficiency)
+
+            if len(efficiencies) == 0:
+                print("ERROR, a heat pump should at least have one electrical input!")
+                import pdb
+
+                pdb.set_trace()
+            elif len(efficiencies) == 1:
+                efficiencies = efficiencies[0]
+                inflow_direction = inflow_direction[0]
+
+            asset_efficiency.value = efficiencies
         asset_dto = AssetDto(
             asset.asset_type.asset_type,
             asset.name,
@@ -420,7 +475,7 @@ def convert_to_dto(scenario: Scenario):
             to_value_type(asset, "soc_min"),
             to_value_type(asset, "capex_fix"),
             to_value_type(asset, "opex_var"),
-            to_value_type(asset, "efficiency"),
+            asset_efficiency,
             to_value_type(asset, "installed_capacity"),
             to_value_type(asset, "lifetime"),
             to_value_type(asset, "maximum_capacity"),
@@ -436,6 +491,7 @@ def convert_to_dto(scenario: Scenario):
             to_value_type(asset, "opex_fix"),
             to_timeseries_data(asset, "input_timeseries"),
             asset.asset_type.unit,
+            **optional_parameters
         )
 
         # map_to_dto(asset, asset_dto)

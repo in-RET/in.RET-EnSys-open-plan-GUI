@@ -796,7 +796,8 @@ class AssetCreateForm(OpenPlanModelForm):
             feedin_tariff = np.array([cleaned_data["feedin_tariff"]])
             energy_price = np.array([cleaned_data["energy_price"]])
             diff = feedin_tariff - energy_price
-            if (diff > 0).any() is True:
+            max_capacity = cleaned_data.get("max_capacity", 0)
+            if (diff > 0).any() is True and max_capacity == 0:
                 msg = _(
                     "Feed-in tariff > energy price for some of simulation's timesteps. This would cause an unbound solution and terminate the optimization. Please reconsider your feed-in tariff and energy price."
                 )

@@ -563,6 +563,12 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
             **optional_parameters
         )
 
+        # set maximum capacity to None if it is equal to 0
+        maximum_capacity = asset_dto.maximum_capacity
+        if maximum_capacity is not None:
+            if maximum_capacity.value == 0:
+                asset_dto.maximum_capacity = None
+
         # map_to_dto(asset, asset_dto)
 
         # Get category of asset and append to appropriate category

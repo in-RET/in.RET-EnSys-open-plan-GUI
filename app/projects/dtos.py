@@ -389,6 +389,10 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
                     fixed_thermal_losses_absolute.value
                 )
                 asset_dto.fixed_thermal_losses_absolute = fixed_thermal_losses_absolute
+                efficiency = asset_dto.efficiency.value
+                asset_dto.efficiency.value = max(
+                    efficiency - asset_dto.thermal_loss_rate.value, 0
+                )
             ess_sub_assets.update({asset.asset_type.asset_type: asset_dto})
 
         ess_dto = EssDto(

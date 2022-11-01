@@ -53,3 +53,4 @@ None,60,Length of the time-steps.,,60,Can only be 60 at the moment,numeric,Minut
 None,None,The type of the component.,,demand,*demand*,str,None,0,type_asset,typeasset-label,hidden,
 None,None,"Input the type of OEMOF component. For example, a PV plant would be a source, a solar inverter would be a transformer, etc.  The `type_oemof` will later on be determined through the EPA.",,sink,*sink* or *source* or one of the other component classes of OEMOF.,str,None,0,type_oemof,typeoemof-label,conversion;storage;production;fixcost;consumption;providers,
 None,kW,Unit associated with the capacity of the component,,"Storage could have units like kW or kWh, transformer station could have kVA, and so on.",Appropriate scientific unit,str,NA,0,unit,unit-label,conversion;storage_csv;production;fixcost;consumption;providers,
+Power loss index,0,"Power loss index for CHPs, usually known as beta coefficient",0.6,Between 0 and 1,numeric,factor,beta,0,beta,Beta-label,conversion,

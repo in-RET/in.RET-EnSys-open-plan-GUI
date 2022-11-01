@@ -273,10 +273,13 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
         Q(connectionlink__asset__parent_asset__asset_type__asset_type__contains="ess")
     )
 
-    constraint_list = [
-        c.objects.get(scenario=scenario) for c in get_concrete_models(Constraint)
-    ]
-    constraint_list = [c for c in constraint_list if c.activated is True]
+    constraint_list = []
+    for c_model in get_concrete_models(Constraint):
+        qs = c_model.objects.filter(scenario=scenario)
+        if qs.exists():
+            constraint = qs.get()
+            if constraint.activated is True:
+                constraint_list.append(constraint)
 
     # Create  dto objects
     project_data_dto = ProjectDataDto(

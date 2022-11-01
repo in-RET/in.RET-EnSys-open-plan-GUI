@@ -138,6 +138,16 @@ urlpatterns = [
         asset_create_or_update,
         name="asset_create_or_update",
     ),
+    re_path(
+        r"^asset/get_cops_form/(?P<scen_id>\d+)/(?P<asset_type_name>\w+)?(/(?P<asset_uuid>[0-9a-f-]+))?$",
+        get_asset_cops_form,
+        name="get_asset_cops_form",
+    ),
+    re_path(
+        r"^asset/cops_create_or_update/(?P<scen_id>\d+)/(?P<asset_type_name>\w+)?(/(?P<asset_uuid>[0-9a-f-]+))?$",
+        asset_cops_create_or_update,
+        name="asset_cops_create_or_update",
+    ),
     # MVS Simulation
     path(
         "simulation/cancel/<int:scen_id>", simulation_cancel, name="simulation_cancel"
@@ -146,6 +156,11 @@ urlpatterns = [
         "view_mvs_data_input/<int:scen_id>",
         view_mvs_data_input,
         name="view_mvs_data_input",
+    ),
+    path(
+        "test_mvs_data_input/<int:scen_id>",
+        test_mvs_data_input,
+        name="test_mvs_data_input",
     ),
     path(
         "topology/mvs_simulation/<int:scen_id>",

@@ -63,11 +63,13 @@ def set_parameter_info(param_name, field, parameters=PARAMETERS):
     # For the storage unit
     if param_name.split("_")[0] in ("cp", "dchp", "chp"):
         param_name = "_".join(param_name.split("_")[1:])
-    param_name = MAP_EPA_MVS.get(param_name, param_name)
+
     help_text = None
     unit = None
     verbose = None
     default_value = None
+    if param_name == "optimize_cap":
+        param_name = "optimize_capacity"
     if param_name in PARAMETERS:
         help_text = PARAMETERS[param_name][":Definition_Short:"]
         unit = PARAMETERS[param_name][":Unit:"]
@@ -1074,30 +1076,7 @@ class AssetCreateForm(OpenPlanModelForm):
                 }
             ),
         }
-        labels = {
-            "name": _("Name"),
-            "optimize_cap": _("Optimize cap"),
-            "dispatchable": _("Dispatchable"),
-            "renewable_asset": _("Renewable asset"),
-            "capex_fix": _("Development costs"),
-            "capex_var": _("Specific costs"),
-            "opex_fix": _("Specific OM costs"),
-            "opex_var": _("Dispatch price"),
-            "lifetime": _("Asset Lifetime"),
-            "input_timeseries": _("Timeseries vector"),
-            "crate": _("Crate"),
-            "efficiency": _("Efficiency"),
-            "soc_max": _("SoC max"),
-            "soc_min": _("SoC min"),
-            "maximum_capacity": _("Maximum capacity"),
-            "energy_price": _("Energy price"),
-            "feedin_tariff": _("Feedin tariff"),
-            "peak_demand_pricing": _("Peak demand pricing"),
-            "peak_demand_pricing_period": _("Peak demand pricing period (times/year)"),
-            "renewable_share": _("Renewable share"),
-            "installed_capacity": _("installed capacity (kW)"),
-            "age_installed": _("Age installed"),
-        }
+        labels = {"input_timeseries": _("Timeseries vector")}
         help_texts = {
             "input_timeseries": _(
                 "You can upload your timeseries as xls(x), csv or json format. Either there is one column with the values of the timeseries matching the scenario timesteps, or there are two columns, the first one being the timestamps and the second one the values of the timeseries. If you upload a spreadsheet with more than one tab only the first tab will be considered. The timeseries in csv format is expected to be in comma separated values with dot as decimal separator."

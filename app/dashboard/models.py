@@ -341,27 +341,33 @@ class AssetsResults(models.Model):
         if "flow" in asset_results:
             # find the energy vector of the bus in case of CHP which have multiple outputs
             flow_value = asset_results["flow"]["value"]
-            if asset_results["type_oemof"] == "extractionTurbineCHP":
+            asset_type = asset_results["type_oemof"]
+            if (
+                asset_results["type_oemof"] == "extractionTurbineCHP"
+                or asset_results.get("asset_type") == "chp_fixed_ratio"
+            ):
                 if energy_vector is not None:
                     bus_name = self.energy_vector_busses(energy_vector)
                     if bus_name in flow_value:
                         flow_value = flow_value[bus_name]
                     else:
                         flow_value = None
+                    asset_name = asset_name + "_" + energy_vector
+                asset_type = "chp"
 
             if flow_value is not None:
                 answer = single_timeseries_to_json(
                     value=flow_value,
                     unit=asset_results["flow"]["unit"],
                     label=asset_name,
-                    asset_type=asset_results["type_oemof"],
+                    asset_type=asset_type,
                     asset_category=asset_results["category"],
                 )
 
         # if an energy_vector is provided return the timeseries only if the energy_vector type of the asset matches
         if energy_vector is not None:
             if (
-                energy_vector not in asset_results.get("output_busses", {}).keys()
+                energy_vector not in asset_results.get("output_busses", {}).values()
                 and asset_results["energy_vector"] != energy_vector
             ):
                 answer = None
@@ -396,7 +402,7 @@ def graph_timeseries(simulations, y_variables):
                     single_ts_json["value"] = (
                         -np.array(single_ts_json["value"])
                     ).tolist()
-                if single_ts_json["asset_type"] == "extractionTurbineCHP":
+                if single_ts_json["asset_type"] == "chp":
                     for bus in single_ts_json["value"]:
                         new_ts = single_ts_json.copy()
                         new_ts["value"] = single_ts_json["value"][bus]

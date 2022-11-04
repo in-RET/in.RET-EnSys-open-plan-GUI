@@ -122,11 +122,17 @@ def handle_storage_unit_form_post(
                 if param == "efficiency":
                     value = np.sqrt(float(value))
                 # for the charge and discharge set all costs to 0
-                if param in ["capex_fix", "capex_var", "opex_fix", "opex_var"]:
+                if param in ["capex_fix", "capex_var", "opex_fix"]:
                     value = 0
 
-                if ess_charging_power_asset.has_parameter(param):
-                    setattr(ess_charging_power_asset, param, value)
+                # set dispatch price to 0 only for charging power
+                if param == "opex_var":
+                    if ess_charging_power_asset.has_parameter(param):
+                        setattr(ess_charging_power_asset, param, 0)
+                else:
+                    if ess_charging_power_asset.has_parameter(param):
+                        setattr(ess_charging_power_asset, param, value)
+
                 if ess_discharging_power_asset.has_parameter(param):
                     setattr(ess_discharging_power_asset, param, value)
 

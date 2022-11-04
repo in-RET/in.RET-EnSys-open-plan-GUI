@@ -366,9 +366,7 @@ class Asset(TopologyNode):
         null=True, blank=False
     )  # , validators=[validate_timeseries])
     crate = models.FloatField(
-        null=True,
-        blank=False,
-        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
+        null=True, blank=False, default=1, validators=[MinValueValidator(0.0)]
     )
     efficiency = models.TextField(null=True, blank=False)
     # used in the case of transformers with one input and two outputs
@@ -389,13 +387,13 @@ class Asset(TopologyNode):
         null=True, blank=False, choices=TRUE_FALSE_CHOICES, default=None
     )
     maximum_capacity = models.FloatField(
-        null=True, blank=False, validators=[MinValueValidator(0.0)]
+        null=True, blank=True, validators=[MinValueValidator(0.0)]
     )
     energy_price = models.TextField(null=True, blank=False)
     feedin_tariff = models.TextField(null=True, blank=False)
 
     feedin_cap = models.FloatField(
-        default=None, null=True, blank=False, validators=[MinValueValidator(0.0)]
+        default=None, null=True, blank=True, validators=[MinValueValidator(0.0)]
     )
 
     peak_demand_pricing = models.FloatField(

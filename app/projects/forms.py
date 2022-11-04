@@ -1088,8 +1088,6 @@ class StorageForm(AssetCreateForm):
     def __init__(self, *args, **kwargs):
         asset_type_name = kwargs.pop("asset_type", None)
         super(StorageForm, self).__init__(*args, asset_type="capacity", **kwargs)
-        self.fields["crate"].widget = forms.HiddenInput()
-        self.fields["crate"].initial = 1
         self.fields["dispatchable"].widget = forms.HiddenInput()
         self.fields["dispatchable"].initial = True
         self.fields["installed_capacity"].label = _("Installed capacity (kWh)")

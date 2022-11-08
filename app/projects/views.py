@@ -680,30 +680,31 @@ def scenario_create_topology(request, proj_id, scen_id, step_id=2, max_step=3):
     components = {
         "providers": {
             "dso": _("Electricity DSO"),
-            "gas_dso": _("Gas DSO"),
+            # "gas_dso": _("Gas DSO"),
             "h2_dso": _("H2 DSO"),
             "heat_dso": _("Heat DSO"),
         },
         "production": {
             "pv_plant": _("PV Plant"),
             "wind_plant": _("Wind Plant"),
-            "biogas_plant": _("Biogas Plant"),
-            "geothermal_conversion": _("Geothermal Conversion"),
+            # "biogas_plant": _("Biogas Plant"),
+            # "geothermal_conversion": _("Geothermal Conversion"),
             "solar_thermal_plant": _("Solar Thermal Plant"),
+            "mysource": _("Source"),
         },
         "conversion": {
             "transformer_station_in": _("Transformer Station (in)"),  #
             "transformer_station_out": _("Transformer Station (out)"),  #
-            "storage_charge_controller_in": _("Storage Charge Controller (in)"),  #
-            "storage_charge_controller_out": _("Storage Charge Controller (out)"),  #
-            "solar_inverter": _("Solar Inverter"),  #
+            # "storage_charge_controller_in": _("Storage Charge Controller (in)"),  #
+            # "storage_charge_controller_out": _("Storage Charge Controller (out)"),  #
+            # "solar_inverter": _("Solar Inverter"),  #
             "diesel_generator": _("Diesel Generator"),
             "fuel_cell": _(" Fuel Cell"),
-            "gas_boiler": _("Gas Boiler"),
+            # "gas_boiler": _("Gas Boiler"),
             "electrolyzer": _("Electrolyzer"),
             "heat_pump": _("Heat Pump"),
             "chp": _("Combined Heat and Power"),
-            "chp_fixed_ratio": _("CHP fixed ratio"),
+            # "chp_fixed_ratio": _("CHP fixed ratio"),
         },
         "storage": {
             "bess": _("Electricity Storage"),
@@ -1206,6 +1207,40 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
             default_name = f"{asset_type_name}-{n_bus}"
             form = BusForm(asset_type=asset_type_name, initial={"name": default_name})
         return render(request, "asset/bus_create_form.html", {"form": form})
+    
+    elif asset_type_name in ["mydemand", "mysource"]:
+        print("in mydemand")
+        if asset_uuid:
+            print("mydemand in if")
+            existing_asset = get_object_or_404(Asset, unique_id=asset_uuid)
+            form = AssetCreateForm(asset_type=asset_type_name, instance=existing_asset)
+            input_timeseries_data = (
+                existing_asset.input_timeseries
+                if existing_asset.input_timeseries
+                else ""
+            )
+        else:
+            print("mydemand in else")
+            print(asset_type_name)
+            asset_list = Asset.objects.filter(
+                asset_type__asset_type=asset_type_name, scenario=scenario
+            )
+            n_asset = len(asset_list)
+            default_name = f"{asset_type_name}-{n_asset}"
+            form = AssetCreateForm(
+                asset_type=asset_type_name, initial={"name": default_name}
+            )
+            input_timeseries_data = ""
+
+        context = {
+            "form": form,
+            "input_timeseries_data": input_timeseries_data,
+            "input_timeseries_timestamps": json.dumps(
+                scenario.get_timestamps(json_format=True)
+            ),
+        }
+
+        return render(request, "asset/asset_create_form.html", context)
 
     elif asset_type_name in ["bess", "h2ess", "gess", "hess"]:
         if asset_uuid:

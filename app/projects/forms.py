@@ -906,24 +906,24 @@ class AssetCreateForm(OpenPlanModelForm):
                     "style": "font-weight:400; font-size:13px;",
                 }
             ),
-            "lifetime": forms.NumberInput(
-                attrs={
-                    "placeholder": "e.g. 10 years",
-                    "min": "0",
-                    "step": "1",
-                    "data-bs-toggle": "tooltip",
-                    "title": _(
-                        "Number of operational years of the asset until it has to be replaced."
-                    ),
-                    "style": "font-weight:400; font-size:13px;",
-                }
-            ),
-            # TODO: Try changing this to FileInput
-            "input_timeseries": forms.FileInput(
-                attrs={
-                    "onchange": "plot_file_trace(obj=this.files, plot_id='timeseries_trace')"
-                }
-            ),
+            # "lifetime": forms.NumberInput(
+            #     attrs={
+            #         "placeholder": "e.g. 10 years",
+            #         "min": "0",
+            #         "step": "1",
+            #         "data-bs-toggle": "tooltip",
+            #         "title": _(
+            #             "Number of operational years of the asset until it has to be replaced."
+            #         ),
+            #         "style": "font-weight:400; font-size:13px;",
+            #     }
+            # ),
+            # # TODO: Try changing this to FileInput
+            # "input_timeseries": forms.FileInput(
+            #     attrs={
+            #         "onchange": "plot_file_trace(obj=this.files, plot_id='timeseries_trace')"
+            #     }
+            # ),
             # 'input_timeseries': forms.Textarea(attrs={'placeholder': 'e.g. [4,3,2,5,3,...]',
             #                                           'style': 'font-weight:400; font-size:13px;'}),
             "crate": forms.NumberInput(
@@ -1072,6 +1072,169 @@ class AssetCreateForm(OpenPlanModelForm):
                     "title": _(
                         "The number of years the asset has already been in operation."
                     ),
+                    "style": "font-weight:400; font-size:13px;",
+                }
+            ),
+            #########################################################################
+            "variable_costs": forms.NumberInput(
+                attrs={
+                    "placeholder": "Currency",
+                    "min": "0.0",
+                    "step": ".01",
+                    "data-bs-toggle": "tooltip",
+                    "title": _(
+                        "Variable cost associated with a flow through/from the asset."
+                    ),
+                    "style": "font-weight:400; font-size:13px;",
+                }
+            ),
+            "nominal_value": forms.NumberInput(
+                attrs={
+                    "placeholder": "e.g. 50",
+                    "min": "0.0",
+                    "step": ".01",
+                    "data-bs-toggle": "tooltip",
+                    "title": _(
+                        "The already existing installed capacity in-place"
+                    ),
+                    "style": "font-weight:400; font-size:13px;",
+                }
+            ),
+            "_min": forms.NumberInput(
+                attrs={
+                    "placeholder": "e.g. 0.7",
+                    "min": "0.0",
+                    "max": "1.0",
+                    "step": ".0001",
+                    "data-bs-toggle": "tooltip",
+                    "title": _(
+                        "Nominal minimum value of the flow"
+                    ),
+                    "style": "font-weight:400; font-size:13px;",
+                }
+            ),
+            "_max": forms.NumberInput(
+                attrs={
+                    "placeholder": "e.g. 0.7",
+                    "min": "0.0",
+                    "max": "1.0",
+                    "step": ".0001",
+                    "data-bs-toggle": "tooltip",
+                    "title": _(
+                        "Normed maximum value of the flow"
+                    ),
+                    "style": "font-weight:400; font-size:13px;",
+                }
+            ),
+            "nonconvex": forms.Select(
+                choices=TRUE_FALSE_CHOICES,
+                attrs={
+                    "data-bs-toggle": "tooltip",
+                    "title": _("If a nonconvex flow object is added here, the flow constraints will be altered significantly as the mathematical model for the flow will be different"),
+                    "style": "font-weight:400; font-size:13px;",
+                },
+            ),
+            "summed_max": forms.NumberInput(
+                attrs={
+                    "placeholder": "e.g. 1000",
+                    "min": "0.0",
+                    "step": ".01",
+                    "data-bs-toggle": "tooltip",
+                    "title": _("Specific maximum value summed over all timesteps. Will be multiplied with the nominal_value to get the absolute limit."),
+                    "style": "font-weight:400; font-size:13px;",
+                }
+            ),
+            "summed_min": forms.NumberInput(
+                attrs={
+                    "placeholder": "e.g. 1000",
+                    "min": "0.0",
+                    "step": ".01",
+                    "data-bs-toggle": "tooltip",
+                    "title": _("Specific minimum value summed over all timesteps. Will be multiplied with the nominal_value to get the absolute limit."),
+                    "style": "font-weight:400; font-size:13px;",
+                }
+            ),
+            "lifetime": forms.NumberInput(
+                attrs={
+                    "placeholder": "e.g. 10 years",
+                    "min": "0",
+                    "step": "1",
+                    "data-bs-toggle": "tooltip",
+                    "title": _(
+                        "Number of operational years of the asset until it has to be replaced."
+                    ),
+                    "style": "font-weight:400; font-size:13px;",
+                }
+            ),
+            # TODO: Try changing this to FileInput
+            "input_timeseries": forms.FileInput(
+                attrs={
+                    "onchange": "plot_file_trace(obj=this.files, plot_id='timeseries_trace')"
+                }
+            ),
+            "capex": forms.NumberInput(
+                attrs={
+                    "placeholder": "e.g. 4000",
+                    "min": "0.0",
+                    "step": ".01",
+                    "data-bs-toggle": "tooltip",
+                    "title": _(
+                        "Actual CAPEX of the asset, i.e., specific investment costs."
+                    ),
+                    "style": "font-weight:400; font-size:13px;",
+                }
+            ),
+            "opex": forms.NumberInput(
+                attrs={
+                    "placeholder": "e.g. 0",
+                    "min": "0.0",
+                    "step": ".01",
+                    "data-bs-toggle": "tooltip",
+                    "title": _(
+                        "Actual OPEX of the asset, i.e., specific operational and maintenance costs."
+                    ),
+                    "style": "font-weight:400; font-size:13px;",
+                }
+            ),
+            "offset": forms.NumberInput(
+                attrs={
+                    "placeholder": "e.g. 10000",
+                    "min": "0.0",
+                    "step": ".01",
+                    "data-bs-toggle": "tooltip",
+                    "title": _(
+                        " A fixed cost to implement the asset, eg. planning costs which do not depend on the (optimized) asset capacity."
+                    ),
+                    "style": "font-weight:400; font-size:13px;",
+                }
+            ),
+            "maximum": forms.NumberInput(
+                attrs={
+                    "placeholder": "e.g. 1000",
+                    "min": "0.0",
+                    "step": ".01",
+                    "data-bs-toggle": "tooltip",
+                    "title": _("Maximum of the additional invested capacity/power."),
+                    "style": "font-weight:400; font-size:13px;",
+                }
+            ),
+            "minimum": forms.NumberInput(
+                attrs={
+                    "placeholder": "e.g. 1000",
+                    "min": "0.0",
+                    "step": ".01",
+                    "data-bs-toggle": "tooltip",
+                    "title": _("Minimum of the additional invested capacity/power."),
+                    "style": "font-weight:400; font-size:13px;",
+                }
+            ),
+            "existing": forms.NumberInput(
+                attrs={
+                    "placeholder": "e.g. 1000",
+                    "min": "0.0",
+                    "step": ".01",
+                    "data-bs-toggle": "tooltip",
+                    "title": _("Existing / installed capacity."),
                     "style": "font-weight:400; font-size:13px;",
                 }
             ),

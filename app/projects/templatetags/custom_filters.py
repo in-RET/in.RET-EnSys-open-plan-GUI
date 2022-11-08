@@ -77,6 +77,7 @@ def is_economical_parameter(param):
         "opex_var",
         "energy_price",
         "feedin_tariff",
+        "variable_costs", "capex", "opex", "offset"
     ]
 
 

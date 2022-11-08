@@ -11,11 +11,11 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 import ast
 import os
-
 from django.contrib.messages import constants as messages
 
+
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = ast.literal_eval(os.getenv("DEBUG", "False"))
+DEBUG = ast.literal_eval(os.getenv("DEBUG", "True"))
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -40,6 +40,7 @@ SECRET_KEY = os.getenv(
     "EPA_SECRET_KEY", "v@p9^=@lc3#1u_xtx*^xhrv0l3li1(+8ik^k@g-_bzmexb0$7n"
 )
 
+
 ALLOWED_HOSTS = ["*"]
 
 # Application definition
@@ -62,6 +63,7 @@ INSTALLED_APPS = [
 
 if DEBUG is True:
     INSTALLED_APPS.append("sass_processor")
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -102,26 +104,32 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "epa.wsgi.application"
 
+DB_CHOICE = os.environ.get("DATABASE", "postgres")
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
-# SQLite is used if no other database system is set via environment variables.
+# By default the database is postgres, if you want to use mysql make sure you pip install the mysql requirement file
 DATABASES = {
     "default": {
-        "ENGINE": os.environ.get("SQL_ENGINE"),
-        "NAME": os.environ.get("SQL_DATABASE"),
-        "USER": os.environ.get("SQL_USER"),
-        "PASSWORD": os.environ.get("SQL_PASSWORD"),
-        "HOST": os.environ.get("SQL_HOST"),
-        "PORT": os.environ.get("SQL_PORT"),
+        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
+        "NAME": os.environ.get("SQL_DATABASE", os.path.join(BASE_DIR, "db.sqlite3")),
+        "USER": os.environ.get("SQL_USER", "user"),
+        "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
+        "HOST": os.environ.get("SQL_HOST", "localhost"),
+        "PORT": os.environ.get("SQL_PORT", "5432"),
     }
-    if os.environ.get("SQL_ENGINE")
+    if DB_CHOICE == "postgres"
     else {
         "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
         "NAME": os.environ.get("SQL_DATABASE", os.path.join(BASE_DIR, "db.sqlite3")),
+        "USER": os.environ.get("SQL_USER", "user"),
+        "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
+        "HOST": os.environ.get("SQL_HOST", "localhost"),
+        "PORT": os.environ.get("SQL_PORT", "3306"),
     }
 }
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -152,6 +160,7 @@ USE_L10N = True
 
 USE_TZ = False
 
+
 # Other configs
 
 AUTH_USER_MODEL = "users.CustomUser"
@@ -162,10 +171,7 @@ LOGOUT_REDIRECT_URL = "home"
 
 CRISPY_TEMPLATE_PACK = "bootstrap4"
 
-if DEBUG is True:
-    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-else:
-    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 MAILER_EMAIL_BACKEND = EMAIL_BACKEND
 
 DEFAULT_FROM_EMAIL = "noreply@elandh2020.eu"

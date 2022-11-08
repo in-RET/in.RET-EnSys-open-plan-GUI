@@ -359,9 +359,9 @@ class Asset(TopologyNode):
     opex_var = models.FloatField(
         null=True, blank=False, validators=[MinValueValidator(0.0)]
     )  # dispatch_price
-    lifetime = models.IntegerField(
-        null=True, blank=False, validators=[MinValueValidator(0)]
-    )
+    # lifetime = models.IntegerField(
+    #     null=True, blank=False, validators=[MinValueValidator(0)]
+    # )
     input_timeseries = models.TextField(
         null=True, blank=False
     )  # , validators=[validate_timeseries])
@@ -428,6 +428,53 @@ class Asset(TopologyNode):
     )
     fixed_thermal_losses_relative = models.TextField(null=True, blank=False)
     fixed_thermal_losses_absolute = models.TextField(null=True, blank=False)
+    
+    ###########################################################################
+    variable_costs = models.FloatField(
+        null=True, validators=[MinValueValidator(0.0)]
+    )
+    nominal_value = models.FloatField(
+        null=True, validators=[MinValueValidator(0.0)]
+    )
+    _max = models.FloatField(
+        null=True,
+        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
+    )
+    _min = models.FloatField(
+        null=True,
+        # blank=False,
+        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
+    )
+    nonconvex = models.BooleanField(
+        null=True, choices=TRUE_FALSE_CHOICES, default=False
+    )
+    summed_max = models.FloatField(
+        default=None, null=True, validators=[MinValueValidator(0.0)]
+    )
+    summed_min = models.FloatField(
+        default=None, null=True, validators=[MinValueValidator(0.0)]
+    )
+    maximum = models.FloatField(
+        default=None, null=True, validators=[MinValueValidator(0.0)]
+    )
+    minimum = models.FloatField(
+        default=None, null=True, validators=[MinValueValidator(0.0)]
+    )
+    existing = models.FloatField(
+        default=None, null=True, validators=[MinValueValidator(0.0)]
+    )
+    capex = models.FloatField(
+        null=True, validators=[MinValueValidator(0.0)]
+    )
+    opex = models.FloatField(
+        null=True, validators=[MinValueValidator(0.0)]
+    )
+    offset = models.FloatField(
+        null=True, validators=[MinValueValidator(0.0)]
+    )
+    lifetime = models.IntegerField(
+        null=True, validators=[MinValueValidator(0)]
+    )
 
     @property
     def fields(self):

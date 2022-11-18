@@ -1094,9 +1094,7 @@ class AssetCreateForm(OpenPlanModelForm):
                     "min": "0.0",
                     "step": ".01",
                     "data-bs-toggle": "tooltip",
-                    "title": _(
-                        "The already existing installed capacity in-place"
-                    ),
+                    "title": _("The already existing installed capacity in-place"),
                     "style": "font-weight:400; font-size:13px;",
                 }
             ),
@@ -1107,9 +1105,7 @@ class AssetCreateForm(OpenPlanModelForm):
                     "max": "1.0",
                     "step": ".0001",
                     "data-bs-toggle": "tooltip",
-                    "title": _(
-                        "Nominal minimum value of the flow"
-                    ),
+                    "title": _("Nominal minimum value of the flow"),
                     "style": "font-weight:400; font-size:13px;",
                 }
             ),
@@ -1120,9 +1116,7 @@ class AssetCreateForm(OpenPlanModelForm):
                     "max": "1.0",
                     "step": ".0001",
                     "data-bs-toggle": "tooltip",
-                    "title": _(
-                        "Normed maximum value of the flow"
-                    ),
+                    "title": _("Normed maximum value of the flow"),
                     "style": "font-weight:400; font-size:13px;",
                 }
             ),
@@ -1130,7 +1124,9 @@ class AssetCreateForm(OpenPlanModelForm):
                 choices=TRUE_FALSE_CHOICES,
                 attrs={
                     "data-bs-toggle": "tooltip",
-                    "title": _("If a nonconvex flow object is added here, the flow constraints will be altered significantly as the mathematical model for the flow will be different"),
+                    "title": _(
+                        "If a nonconvex flow object is added here, the flow constraints will be altered significantly as the mathematical model for the flow will be different"
+                    ),
                     "style": "font-weight:400; font-size:13px;",
                 },
             ),
@@ -1140,7 +1136,9 @@ class AssetCreateForm(OpenPlanModelForm):
                     "min": "0.0",
                     "step": ".01",
                     "data-bs-toggle": "tooltip",
-                    "title": _("Specific maximum value summed over all timesteps. Will be multiplied with the nominal_value to get the absolute limit."),
+                    "title": _(
+                        "Specific maximum value summed over all timesteps. Will be multiplied with the nominal_value to get the absolute limit."
+                    ),
                     "style": "font-weight:400; font-size:13px;",
                 }
             ),
@@ -1150,7 +1148,9 @@ class AssetCreateForm(OpenPlanModelForm):
                     "min": "0.0",
                     "step": ".01",
                     "data-bs-toggle": "tooltip",
-                    "title": _("Specific minimum value summed over all timesteps. Will be multiplied with the nominal_value to get the absolute limit."),
+                    "title": _(
+                        "Specific minimum value summed over all timesteps. Will be multiplied with the nominal_value to get the absolute limit."
+                    ),
                     "style": "font-weight:400; font-size:13px;",
                 }
             ),

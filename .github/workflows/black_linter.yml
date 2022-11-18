@@ -29,6 +29,7 @@ jobs:
     - name: Analysing the code with pylint
       run: |
         black --check .
+        black app/
     - name: Run unittests
       run: |
         cd app

@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dashboard', '0002_initial'),
+        ("dashboard", "0002_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='sensitivityanalysisgraph',
-            name='y',
+            model_name="sensitivityanalysisgraph",
+            name="y",
             field=models.CharField(choices=[], max_length=50),
         ),
     ]

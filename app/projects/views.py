@@ -1207,7 +1207,7 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
             default_name = f"{asset_type_name}-{n_bus}"
             form = BusForm(asset_type=asset_type_name, initial={"name": default_name})
         return render(request, "asset/bus_create_form.html", {"form": form})
-    
+
     elif asset_type_name in ["mydemand", "mysource"]:
         print("in mydemand")
         if asset_uuid:

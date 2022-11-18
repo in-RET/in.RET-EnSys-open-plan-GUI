@@ -428,17 +428,12 @@ class Asset(TopologyNode):
     )
     fixed_thermal_losses_relative = models.TextField(null=True, blank=False)
     fixed_thermal_losses_absolute = models.TextField(null=True, blank=False)
-    
+
     ###########################################################################
-    variable_costs = models.FloatField(
-        null=True, validators=[MinValueValidator(0.0)]
-    )
-    nominal_value = models.FloatField(
-        null=True, validators=[MinValueValidator(0.0)]
-    )
+    variable_costs = models.FloatField(null=True, validators=[MinValueValidator(0.0)])
+    nominal_value = models.FloatField(null=True, validators=[MinValueValidator(0.0)])
     _max = models.FloatField(
-        null=True,
-        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
+        null=True, validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
     )
     _min = models.FloatField(
         null=True,
@@ -463,18 +458,10 @@ class Asset(TopologyNode):
     existing = models.FloatField(
         default=None, null=True, validators=[MinValueValidator(0.0)]
     )
-    capex = models.FloatField(
-        null=True, validators=[MinValueValidator(0.0)]
-    )
-    opex = models.FloatField(
-        null=True, validators=[MinValueValidator(0.0)]
-    )
-    offset = models.FloatField(
-        null=True, validators=[MinValueValidator(0.0)]
-    )
-    lifetime = models.IntegerField(
-        null=True, validators=[MinValueValidator(0)]
-    )
+    capex = models.FloatField(null=True, validators=[MinValueValidator(0.0)])
+    opex = models.FloatField(null=True, validators=[MinValueValidator(0.0)])
+    offset = models.FloatField(null=True, validators=[MinValueValidator(0.0)])
+    lifetime = models.IntegerField(null=True, validators=[MinValueValidator(0)])
 
     @property
     def fields(self):

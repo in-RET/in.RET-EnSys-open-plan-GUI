@@ -28,8 +28,8 @@ jobs:
         pip install -r app/requirements/postgres.txt
     - name: Analysing the code with pylint
       run: |
-        black --check .
         black app/
+        black --check .        
     - name: Run unittests
       run: |
         cd app

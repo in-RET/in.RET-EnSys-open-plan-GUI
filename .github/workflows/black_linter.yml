@@ -30,9 +30,3 @@ jobs:
       run: |
         black app/
         black --check .        
-    - name: Run unittests
-      run: |
-        cd app
-        python manage.py test
-      env:
-        DEBUG: "False"

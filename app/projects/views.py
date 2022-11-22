@@ -690,7 +690,7 @@ def scenario_create_topology(request, proj_id, scen_id, step_id=2, max_step=3):
             # "biogas_plant": _("Biogas Plant"),
             # "geothermal_conversion": _("Geothermal Conversion"),
             "solar_thermal_plant": _("Solar Thermal Plant"),
-            "mysource": _("Source"),
+            "mySource": _("Source"),
         },
         "conversion": {
             "transformer_station_in": _("Transformer Station (in)"),  #
@@ -698,25 +698,28 @@ def scenario_create_topology(request, proj_id, scen_id, step_id=2, max_step=3):
             # "storage_charge_controller_in": _("Storage Charge Controller (in)"),  #
             # "storage_charge_controller_out": _("Storage Charge Controller (out)"),  #
             # "solar_inverter": _("Solar Inverter"),  #
-            "diesel_generator": _("Diesel Generator"),
-            "fuel_cell": _(" Fuel Cell"),
+            # "diesel_generator": _("Diesel Generator"),
+            # "fuel_cell": _(" Fuel Cell"),
             # "gas_boiler": _("Gas Boiler"),
             "electrolyzer": _("Electrolyzer"),
             "heat_pump": _("Heat Pump"),
             "chp": _("Combined Heat and Power"),
             # "chp_fixed_ratio": _("CHP fixed ratio"),
+            "myTransformer": _("Transformer"),
         },
         "storage": {
             "bess": _("Electricity Storage"),
             # "gess": _("Gas Storage"),
             # "h2ess": _("H2 Storage"),
             "hess": _("Heat Storage"),
+            "myGenericStorage": _("GenericStorage"),
         },
         "demand": {
             "demand": _("Electricity Demand"),
             # "gas_demand": _("Gas Demand"),
             # "h2_demand": _("H2 Demand"),
-            "heat_demand": _("Heat Demand"),
+            # "heat_demand": _("Heat Demand"),
+            "mySink": _("Sink"),
         },
         "bus": {"bus": _("Bus")},
     }
@@ -1208,10 +1211,8 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
             form = BusForm(asset_type=asset_type_name, initial={"name": default_name})
         return render(request, "asset/bus_create_form.html", {"form": form})
 
-    elif asset_type_name in ["mydemand", "mysource"]:
-        print("in mydemand")
+    elif asset_type_name in ["mySource", "mySink", "myTransformer"]:
         if asset_uuid:
-            print("mydemand in if")
             existing_asset = get_object_or_404(Asset, unique_id=asset_uuid)
             form = AssetCreateForm(asset_type=asset_type_name, instance=existing_asset)
             input_timeseries_data = (
@@ -1220,7 +1221,6 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
                 else ""
             )
         else:
-            print("mydemand in else")
             print(asset_type_name)
             asset_list = Asset.objects.filter(
                 asset_type__asset_type=asset_type_name, scenario=scenario
@@ -1241,6 +1241,55 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
         }
 
         return render(request, "asset/asset_create_form.html", context)
+
+    elif asset_type_name in ["myGenericStorage"]:
+        if asset_uuid:
+            existing_ess_asset = get_object_or_404(Asset, unique_id=asset_uuid)
+            print(existing_ess_asset)
+            ess_asset_children = Asset.objects.filter(
+                parent_asset=existing_ess_asset.id
+            )
+            # ess_capacity_asset = ess_asset_children.get(
+            #     asset_type__asset_type="capacity"
+            # )
+            # ess_charging_power_asset = ess_asset_children.get(
+            #     asset_type__asset_type="charging_power"
+            # )
+            # ess_discharging_power_asset = ess_asset_children.get(
+            #     asset_type__asset_type="discharging_power"
+            # )
+            # also get all child assets
+            form = StorageForm_II(
+                asset_type=asset_type_name,
+                initial={
+                    "name": existing_ess_asset.name,
+                    "nominal_value": existing_ess_asset.nominal_value,
+                    "variable_costs": existing_ess_asset.variable_costs,
+                    "capex": existing_ess_asset.capex,
+                    "opex": existing_ess_asset.opex,
+                    "offset": existing_ess_asset.offset,
+                    "maximum": existing_ess_asset.maximum,
+                    "minimum": existing_ess_asset.minimum,
+                    "lifetime": existing_ess_asset.lifetime,
+                    "existing": existing_ess_asset.existing,
+                    "invest_relation_output_capacity": existing_ess_asset.invest_relation_output_capacity,
+                    "invest_relation_input_capacity": existing_ess_asset.invest_relation_input_capacity,
+                    "initial_storage_level": existing_ess_asset.initial_storage_level,
+                    "inflow_conversion_factor": existing_ess_asset.inflow_conversion_factor,
+                    "outflow_conversion_factor": existing_ess_asset.outflow_conversion_factor,
+                    "balanced": existing_ess_asset.balanced,
+                    "nominal_storage_capacity": existing_ess_asset.nominal_storage_capacity,
+                    "thermal_loss_rate": existing_ess_asset.thermal_loss_rate,
+                    "fixed_thermal_losses_relative": existing_ess_asset.fixed_thermal_losses_relative,
+                    "fixed_thermal_losses_absolute": existing_ess_asset.fixed_thermal_losses_absolute,
+                },
+                input_output_mapping=input_output_mapping,
+            )
+        else:
+            form = StorageForm_II(
+                asset_type=asset_type_name, input_output_mapping=input_output_mapping
+            )
+        return render(request, "asset/storage_asset_create_form.html", {"form": form})
 
     elif asset_type_name in ["bess", "h2ess", "gess", "hess"]:
         if asset_uuid:

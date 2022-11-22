@@ -714,7 +714,7 @@ class AssetCreateForm(OpenPlanModelForm):
                 self.fields[field].initial = True
             self.fields[field].widget.attrs.update({f"df-{field}": ""})
             if field == "input_timeseries":
-                self.fields[field].required = self.is_input_timeseries_empty()
+                self.fields[field].required = False  # self.is_input_timeseries_empty()
             if view_only is True:
                 self.fields[field].disabled = True
         """ ----------------------------------------------------- """
@@ -1169,7 +1169,8 @@ class AssetCreateForm(OpenPlanModelForm):
             # TODO: Try changing this to FileInput
             "input_timeseries": forms.FileInput(
                 attrs={
-                    "onchange": "plot_file_trace(obj=this.files, plot_id='timeseries_trace')"
+                    "required": False,
+                    "onchange": "plot_file_trace(obj=this.files, plot_id='timeseries_trace')",
                 }
             ),
             "capex": forms.NumberInput(
@@ -1238,6 +1239,83 @@ class AssetCreateForm(OpenPlanModelForm):
                     "style": "font-weight:400; font-size:13px;",
                 }
             ),
+            "balanced": forms.Select(
+                choices=TRUE_FALSE_CHOICES,
+                attrs={
+                    "data-bs-toggle": "tooltip",
+                    "title": _(""),
+                    "style": "font-weight:400; font-size:13px;",
+                },
+            ),
+            "nominal_storage_capacity": forms.NumberInput(
+                attrs={
+                    "placeholder": "e.g. 1000",
+                    "min": "0.0",
+                    "step": ".01",
+                    "data-bs-toggle": "tooltip",
+                    "title": _("Installed storage capacity."),
+                    "style": "font-weight:400; font-size:13px;",
+                }
+            ),
+            "inflow_conversion_factor": forms.NumberInput(
+                attrs={
+                    "placeholder": "e.g. 0.99",
+                    "data-bs-toggle": "tooltip",
+                    "title": _("Ratio of energy output/energy input."),
+                    "style": "font-weight:400; font-size:13px;",
+                    "min": "0.0",
+                    "max": "1.0",
+                    "step": ".01",
+                }
+            ),
+            "outflow_conversion_factor": forms.NumberInput(
+                attrs={
+                    "placeholder": "e.g. 0.99",
+                    "data-bs-toggle": "tooltip",
+                    "title": _("Ratio of energy output/energy input."),
+                    "style": "font-weight:400; font-size:13px;",
+                    "min": "0.0",
+                    "max": "1.0",
+                    "step": ".01",
+                }
+            ),
+            "invest_relation_input_capacity": forms.NumberInput(
+                attrs={
+                    "placeholder": "factor of total capacity (kWh), e.g. 0.7",
+                    "min": "0.0",
+                    "max": "1.0",
+                    "step": ".0001",
+                    "data-bs-toggle": "tooltip",
+                    "title": _(
+                        "C-rate is the rate at which the storage can charge or discharge relative to the nominal capacity of the storage. A c-rate of 1 implies that the battery can discharge or charge completely in a single timestep."
+                    ),
+                    "style": "font-weight:400; font-size:13px;",
+                }
+            ),
+            "invest_relation_output_capacity": forms.NumberInput(
+                attrs={
+                    "placeholder": "factor of total capacity (kWh), e.g. 0.7",
+                    "min": "0.0",
+                    "max": "1.0",
+                    "step": ".0001",
+                    "data-bs-toggle": "tooltip",
+                    "title": _(
+                        "C-rate is the rate at which the storage can charge or discharge relative to the nominal capacity of the storage. A c-rate of 1 implies that the battery can discharge or charge completely in a single timestep."
+                    ),
+                    "style": "font-weight:400; font-size:13px;",
+                }
+            ),
+            "initial_storage_level": forms.NumberInput(
+                attrs={
+                    "placeholder": "factor of total capacity (kWh), e.g. 0.7",
+                    "min": "0.0",
+                    "max": "1.0",
+                    "step": ".01",
+                    "data-bs-toggle": "tooltip",
+                    "title": _(""),
+                    "style": "font-weight:400; font-size:13px;",
+                }
+            ),
         }
         labels = {"input_timeseries": _("Timeseries vector")}
         help_texts = {
@@ -1285,3 +1363,23 @@ class StorageForm(AssetCreateForm):
         "soc_min",
         "dispatchable",
     ]
+
+
+class StorageForm_II(AssetCreateForm):
+    def __init__(self, *args, **kwargs):
+        asset_type_name = kwargs.pop("asset_type", None)
+        super(StorageForm_II, self).__init__(
+            *args, asset_type="myGenericStorage", **kwargs
+        )
+        # self.fields["dispatchable"].widget = forms.HiddenInput()
+        # self.fields["dispatchable"].initial = True
+        # self.fields["installed_capacity"].label = _("Installed capacity (kWh)")
+        self.fields["thermal_loss_rate"] = DualNumberField(
+            default=None, min=0, max=1, param_name="thermal_loss_rate"
+        )
+        self.fields["fixed_thermal_losses_relative"] = DualNumberField(
+            default=None, min=0, max=1, param_name="fixed_thermal_losses_relative"
+        )
+        self.fields["fixed_thermal_losses_absolute"] = DualNumberField(
+            default=None, min=0, param_name="fixed_thermal_losses_absolute"
+        )

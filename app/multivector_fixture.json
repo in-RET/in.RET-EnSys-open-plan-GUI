@@ -302,7 +302,7 @@
         "peak_demand_pricing_period": null,
         "renewable_share": null,
         "renewable_asset": null,
-        "asset_type": 5,
+        "asset_type": 2,
         "optimize_cap": null,
         "installed_capacity": null,
         "age_installed": null
@@ -336,7 +336,7 @@
         "peak_demand_pricing_period": null,
         "renewable_share": null,
         "renewable_asset": null,
-        "asset_type": 8,
+        "asset_type": 2,
         "optimize_cap": null,
         "installed_capacity": null,
         "age_installed": null
@@ -370,7 +370,7 @@
         "peak_demand_pricing_period": null,
         "renewable_share": null,
         "renewable_asset": null,
-        "asset_type": 18,
+        "asset_type": 3,
         "optimize_cap": false,
         "installed_capacity": 250.0,
         "age_installed": 0.0
@@ -581,11 +581,47 @@
     "model": "projects.assettype",
     "pk": 1,
     "fields": {
-        "asset_type": "mysource",
+        "asset_type": "mySource",
         "asset_category": "energy_consumption",
         "energy_vector": "Electricity",
         "mvs_type": "source",
         "asset_fields": "[name,input_timeseries,nominal_value,variable_costs,_min,_max,nonconvex,summed_max,summed_min,capex,opex,lifetime,offset,maximum,minimum,existing]",
+        "unit": "kWh"
+    }
+},
+{
+    "model": "projects.assettype",
+    "pk": 2,
+    "fields": {
+        "asset_type": "mySink",
+        "asset_category": "energy_consumption",
+        "energy_vector": "Electricity",
+        "mvs_type": "source",
+        "asset_fields": "[name,input_timeseries,nominal_value,variable_costs]",
+        "unit": "kWh"
+    }
+},
+{
+    "model": "projects.assettype",
+    "pk": 3,
+    "fields": {
+        "asset_type": "myTransformer",
+        "asset_category": "energy_consumption",
+        "energy_vector": "Electricity",
+        "mvs_type": "source",
+        "asset_fields": "[name,input_timeseries,nominal_value,variable_costs,_min,_max,nonconvex,summed_max,summed_min,capex,opex,lifetime,offset,maximum,minimum,existing,efficiency]",
+        "unit": "kWh"
+    }
+},
+{
+    "model": "projects.assettype",
+    "pk": 4,
+    "fields": {
+        "asset_type": "myGenericStorage",
+        "asset_category": "energy_consumption",
+        "energy_vector": "Electricity",
+        "mvs_type": "source",
+        "asset_fields": "[name,nominal_value,variable_costs,nonconvex,capex,opex,lifetime,offset,maximum,minimum,existing,balanced,invest_relation_input_capacity,invest_relation_output_capacity,initial_storage_level,inflow_conversion_factor,outflow_conversion_factor,nominal_storage_capacity]",
         "unit": "kWh"
     }
 }

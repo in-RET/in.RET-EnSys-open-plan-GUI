@@ -362,9 +362,7 @@ class Asset(TopologyNode):
     # lifetime = models.IntegerField(
     #     null=True, blank=False, validators=[MinValueValidator(0)]
     # )
-    input_timeseries = models.TextField(
-        null=True, blank=False
-    )  # , validators=[validate_timeseries])
+
     crate = models.FloatField(
         null=True, blank=False, default=1, validators=[MinValueValidator(0.0)]
     )
@@ -423,45 +421,92 @@ class Asset(TopologyNode):
         null=True, blank=False, validators=[MinValueValidator(0.0)]
     )
 
-    thermal_loss_rate = models.FloatField(
-        null=True, blank=False, validators=[MinValueValidator(0.0)]
-    )
-    fixed_thermal_losses_relative = models.TextField(null=True, blank=False)
-    fixed_thermal_losses_absolute = models.TextField(null=True, blank=False)
-
     ###########################################################################
-    variable_costs = models.FloatField(null=True, validators=[MinValueValidator(0.0)])
-    nominal_value = models.FloatField(null=True, validators=[MinValueValidator(0.0)])
+    input_timeseries = models.TextField(
+        null=True, blank=True
+    )  # , validators=[validate_timeseries])
+    variable_costs = models.FloatField(
+        null=True, blank=True, validators=[MinValueValidator(0.0)]
+    )
+    nominal_value = models.FloatField(
+        null=True, blank=True, validators=[MinValueValidator(0.0)]
+    )
     _max = models.FloatField(
-        null=True, validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
+        blank=True,
+        null=True,
+        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
     )
     _min = models.FloatField(
+        blank=True,
         null=True,
-        # blank=False,
         validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
     )
     nonconvex = models.BooleanField(
         null=True, choices=TRUE_FALSE_CHOICES, default=False
     )
     summed_max = models.FloatField(
-        default=None, null=True, validators=[MinValueValidator(0.0)]
+        default=None, blank=True, null=True, validators=[MinValueValidator(0.0)]
     )
     summed_min = models.FloatField(
-        default=None, null=True, validators=[MinValueValidator(0.0)]
+        default=None, blank=True, null=True, validators=[MinValueValidator(0.0)]
     )
     maximum = models.FloatField(
-        default=None, null=True, validators=[MinValueValidator(0.0)]
+        default=None, blank=True, null=True, validators=[MinValueValidator(0.0)]
     )
     minimum = models.FloatField(
-        default=None, null=True, validators=[MinValueValidator(0.0)]
+        default=None, blank=True, null=True, validators=[MinValueValidator(0.0)]
     )
     existing = models.FloatField(
-        default=None, null=True, validators=[MinValueValidator(0.0)]
+        default=None, blank=True, null=True, validators=[MinValueValidator(0.0)]
     )
-    capex = models.FloatField(null=True, validators=[MinValueValidator(0.0)])
-    opex = models.FloatField(null=True, validators=[MinValueValidator(0.0)])
-    offset = models.FloatField(null=True, validators=[MinValueValidator(0.0)])
-    lifetime = models.IntegerField(null=True, validators=[MinValueValidator(0)])
+    capex = models.FloatField(
+        null=True, blank=True, validators=[MinValueValidator(0.0)]
+    )
+    opex = models.FloatField(null=True, blank=True, validators=[MinValueValidator(0.0)])
+    offset = models.FloatField(
+        null=True, blank=True, validators=[MinValueValidator(0.0)]
+    )
+    lifetime = models.IntegerField(
+        null=True, blank=True, validators=[MinValueValidator(0)]
+    )
+
+    thermal_loss_rate = models.FloatField(
+        default=None, null=True, blank=True, validators=[MinValueValidator(0.0)]
+    )
+    fixed_thermal_losses_relative = models.TextField(
+        null=True, blank=True, default=None
+    )
+    fixed_thermal_losses_absolute = models.TextField(
+        null=True, blank=True, default=None
+    )
+
+    balanced = models.BooleanField(
+        null=True, blank=False, choices=BOOL_CHOICES, default=True
+    )
+    invest_relation_input_capacity = models.FloatField(
+        null=True, blank=True, default=1, validators=[MinValueValidator(0.0)]
+    )
+    invest_relation_output_capacity = models.FloatField(
+        null=True, blank=True, default=1, validators=[MinValueValidator(0.0)]
+    )
+    initial_storage_level = models.FloatField(
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
+    )
+    inflow_conversion_factor = models.FloatField(
+        null=True,
+        blank=False,
+        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
+    )
+    outflow_conversion_factor = models.FloatField(
+        null=True,
+        blank=False,
+        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
+    )
+    nominal_storage_capacity = models.FloatField(
+        null=True, blank=True, validators=[MinValueValidator(0.0)]
+    )
 
     @property
     def fields(self):

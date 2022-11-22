@@ -81,6 +81,10 @@ def is_economical_parameter(param):
         "capex",
         "opex",
         "offset",
+        "lifetime",
+        "maximum",
+        "minimum",
+        "existing",
     ]
 
 

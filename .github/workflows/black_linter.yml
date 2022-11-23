@@ -28,10 +28,5 @@ jobs:
         pip install -r app/requirements/postgres.txt
     - name: Analysing the code with pylint
       run: |
-        black --check .
-    - name: Run unittests
-      run: |
-        cd app
-        python manage.py test
-      env:
-        DEBUG: "False"
+        black app/
+        black --check .        

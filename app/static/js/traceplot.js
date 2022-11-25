@@ -43,8 +43,11 @@ function makePlotly( x, y, plot_id="",userLayout=null){
         if(ts_timestamps.length == y.length){
             x = ts_timestamps
         }
+		else if(y.length == 0){
+            alert(0);
+        }
         else{
-            alert("The number of values in your uploaded timeseries (" + y.length + ") does not match the scenario timestamps (" + ts_timestamps.length + ").\nPlease change the scenario settings or upload a new timeseries")
+			alert("The number of values in your uploaded timeseries (" + y.length + ") does not match the scenario timestamps (" + ts_timestamps.length + ").\nPlease change the scenario settings or upload a new timeseries")
         }
     }
 

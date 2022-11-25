@@ -83,33 +83,43 @@ class AssetDto:
         energy_vector: str,
         inflow_direction: str,
         outflow_direction: str,
-        dispatchable: bool,
-        age_installed: ValueTypeDto,
-        c_rate: ValueTypeDto,
-        soc_max: ValueTypeDto,
-        soc_min: ValueTypeDto,
-        development_costs: ValueTypeDto,
-        dispatch_price: ValueTypeDto,
-        efficiency: ValueTypeDto,
-        installed_capacity: ValueTypeDto,
+        # dispatchable: bool,
+        # age_installed: ValueTypeDto,
+        # c_rate: ValueTypeDto,
+        # soc_max: ValueTypeDto,
+        # soc_min: ValueTypeDto,
+        # development_costs: ValueTypeDto,
+        # dispatch_price: ValueTypeDto,
+        # installed_capacity: ValueTypeDto,
+        # energy_price: ValueTypeDto,
+        # feedin_tariff: ValueTypeDto,
+        # feedin_cap: ValueTypeDto,
+        # optimize_capacity: ValueTypeDto,
+        # peak_demand_pricing: ValueTypeDto,
+        # peak_demand_pricing_period: ValueTypeDto,
+        # renewable_share: ValueTypeDto,
+        # renewable_asset: ValueTypeDto,
+        capex: ValueTypeDto,
+        opex: ValueTypeDto,
+        offset: ValueTypeDto,
         lifetime: ValueTypeDto,
-        maximum_capacity: ValueTypeDto,
-        energy_price: ValueTypeDto,
-        feedin_tariff: ValueTypeDto,
-        feedin_cap: ValueTypeDto,
-        optimize_capacity: ValueTypeDto,
-        peak_demand_pricing: ValueTypeDto,
-        peak_demand_pricing_period: ValueTypeDto,
-        renewable_share: ValueTypeDto,
-        renewable_asset: ValueTypeDto,
-        specific_costs: ValueTypeDto,
-        specific_costs_om: ValueTypeDto,
+        maximum: ValueTypeDto,
+        minimum: ValueTypeDto,
+        existing: ValueTypeDto,
+        nominal_value: ValueTypeDto,
+        variable_costs: ValueTypeDto,
+        _min: ValueTypeDto,
+        _max: ValueTypeDto,
+        nonconvex: ValueTypeDto,
+        summed_max: ValueTypeDto,
+        summed_min: ValueTypeDto,
+        efficiency: ValueTypeDto,
         input_timeseries: TimeseriesDataDto,
         unit: str,
-        thermal_loss_rate: ValueTypeDto = None,
-        fixed_thermal_losses_relative: ValueTypeDto = None,
-        fixed_thermal_losses_absolute: ValueTypeDto = None,
-        beta: ValueTypeDto = None,
+        # thermal_loss_rate: ValueTypeDto = None,
+        # fixed_thermal_losses_relative: ValueTypeDto = None,
+        # fixed_thermal_losses_absolute: ValueTypeDto = None,
+        # beta: ValueTypeDto = None,
     ):
         self.asset_type = asset_type
         self.label = label
@@ -118,33 +128,43 @@ class AssetDto:
         self.energy_vector = energy_vector
         self.inflow_direction = inflow_direction
         self.outflow_direction = outflow_direction
-        self.dispatchable = dispatchable
-        self.age_installed = age_installed
-        self.c_rate = c_rate
-        self.soc_max = soc_max
-        self.soc_min = soc_min
-        self.development_costs = development_costs
-        self.dispatch_price = dispatch_price
-        self.efficiency = efficiency
-        self.installed_capacity = installed_capacity
+        # self.dispatchable = dispatchable
+        # self.age_installed = age_installed
+        # self.c_rate = c_rate
+        # self.soc_max = soc_max
+        # self.soc_min = soc_min
+        # self.development_costs = development_costs
+        # self.dispatch_price = dispatch_price
+        # self.installed_capacity = installed_capacity
+        # self.energy_price = energy_price
+        # self.feedin_tariff = feedin_tariff
+        # self.feedin_cap = feedin_cap
+        # self.optimize_capacity = optimize_capacity
+        # self.peak_demand_pricing = peak_demand_pricing
+        # self.peak_demand_pricing_period = peak_demand_pricing_period
+        # self.renewable_share = renewable_share
+        # self.renewable_asset = renewable_asset
+        self.capex = capex
+        self.opex = opex
+        self.offset = offset
         self.lifetime = lifetime
-        self.maximum_capacity = maximum_capacity
-        self.energy_price = energy_price
-        self.feedin_tariff = feedin_tariff
-        self.feedin_cap = feedin_cap
-        self.optimize_capacity = optimize_capacity
-        self.peak_demand_pricing = peak_demand_pricing
-        self.peak_demand_pricing_period = peak_demand_pricing_period
-        self.renewable_share = renewable_share
-        self.renewable_asset = renewable_asset
-        self.specific_costs = specific_costs
-        self.specific_costs_om = specific_costs_om
+        self.maximum = maximum
+        self.minimum = minimum
+        self.existing = existing
+        self.nominal_value = nominal_value
+        self.variable_costs = variable_costs
+        self._min = _min
+        self._max = _max
+        self.nonconvex = nonconvex
+        self.summed_max = summed_max
+        self.summed_min = summed_min
+        self.efficiency = efficiency
         self.input_timeseries = input_timeseries
         self.unit = unit
-        self.thermal_loss_rate = thermal_loss_rate
-        self.fixed_thermal_losses_relative = fixed_thermal_losses_relative
-        self.fixed_thermal_losses_absolute = fixed_thermal_losses_absolute
-        self.beta = beta
+        # self.thermal_loss_rate = thermal_loss_rate
+        # self.fixed_thermal_losses_relative = fixed_thermal_losses_relative
+        # self.fixed_thermal_losses_absolute = fixed_thermal_losses_absolute
+        # self.beta = beta
 
 
 class EssDto:
@@ -156,9 +176,26 @@ class EssDto:
         energy_vector: str,
         inflow_direction: str,
         outflow_direction: str,
-        input_power: AssetDto,
-        output_power: AssetDto,
-        capacity: AssetDto,
+        capex: ValueTypeDto,
+        opex: ValueTypeDto,
+        offset: ValueTypeDto,
+        lifetime: ValueTypeDto,
+        maximum: ValueTypeDto,
+        minimum: ValueTypeDto,
+        existing: ValueTypeDto,
+        nominal_value: ValueTypeDto,
+        variable_costs: ValueTypeDto,
+        
+        balanced: ValueTypeDto,
+        invest_relation_input_capacity: ValueTypeDto,
+        invest_relation_output_capacity: ValueTypeDto,
+        initial_storage_level: ValueTypeDto,
+        nominal_storage_capacity: ValueTypeDto,
+        inflow_conversion_factor: ValueTypeDto,
+        outflow_conversion_factor: ValueTypeDto,
+        # input_power: AssetDto,
+        # output_power: AssetDto,
+        # capacity: AssetDto,
     ):
         self.asset_type = asset_type
         self.label = label
@@ -166,9 +203,26 @@ class EssDto:
         self.energy_vector = energy_vector
         self.inflow_direction = inflow_direction
         self.outflow_direction = outflow_direction
-        self.input_power = input_power
-        self.output_power = output_power
-        self.capacity = capacity
+        self.capex = capex
+        self.opex = opex
+        self.offset = offset
+        self.lifetime = lifetime
+        self.maximum = maximum
+        self.minimum = minimum
+        self.existing = existing
+        self.nominal_value = nominal_value
+        self.variable_costs = variable_costs
+        
+        self.balanced = balanced
+        self.invest_relation_input_capacity = invest_relation_input_capacity
+        self.invest_relation_output_capacity = invest_relation_output_capacity
+        self.initial_storage_level = initial_storage_level
+        self.nominal_storage_capacity = nominal_storage_capacity
+        self.inflow_conversion_factor = inflow_conversion_factor
+        self.outflow_conversion_factor = outflow_conversion_factor
+        # self.input_power = input_power
+        # self.output_power = output_power
+        # self.capacity = capacity
 
 
 class BusDto:
@@ -236,7 +290,7 @@ class MVSRequestDto:
         project_data: ProjectDataDto,
         economic_data: EconomicDataDto,
         simulation_settings: SimulationSettingsDto,
-        energy_providers: List[AssetDto],
+        # energy_providers: List[AssetDto],
         energy_consumption: List[AssetDto],
         energy_conversion: List[AssetDto],
         energy_production: List[AssetDto],
@@ -247,7 +301,7 @@ class MVSRequestDto:
         self.project_data = project_data
         self.economic_data = economic_data
         self.simulation_settings = simulation_settings
-        self.energy_providers = energy_providers
+        # self.energy_providers = energy_providers
         self.energy_consumption = energy_consumption
         self.energy_conversion = energy_conversion
         self.energy_production = energy_production
@@ -262,12 +316,12 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
     project = Project.objects.get(scenario=scenario)
     economic_data = EconomicData.objects.get(project=project)
     ess_list = Asset.objects.filter(
-        Q(scenario=scenario), Q(asset_type__asset_type__contains="ess")
+        Q(scenario=scenario), Q(asset_type__asset_type__contains="myGenericStorage")
     )
     # Exclude ESS related assets
     asset_list = Asset.objects.filter(Q(scenario=scenario)).exclude(
-        Q(asset_type__asset_type__contains="ess")
-        | Q(parent_asset__asset_type__asset_type__contains="ess")
+        Q(asset_type__asset_type__contains="myGenericStorage")
+        | Q(parent_asset__asset_type__asset_type__contains="myGenericStorage")
     )
     bus_list = Bus.objects.filter(scenario=scenario).exclude(
         Q(connectionlink__asset__parent_asset__asset_type__asset_type__contains="ess")
@@ -317,7 +371,7 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
     # map_to_dto(economic_data, economic_data_dto)
 
     # Initialize asset lists depending on asset category
-    energy_providers = []
+    # energy_providers = []
     energy_production = []
     energy_consumption = []
     energy_storage = []
@@ -344,59 +398,59 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
         )
         ess_sub_assets = {}
 
-        for asset in Asset.objects.filter(parent_asset=ess):
-            asset_dto = AssetDto(
-                asset.asset_type.asset_type,
-                asset.name,
-                asset.unique_id,
-                None,
-                None,
-                None,
-                None,
-                asset.dispatchable,
-                to_value_type(asset, "age_installed"),
-                to_value_type(asset, "crate"),
-                to_value_type(asset, "soc_max"),
-                to_value_type(asset, "soc_min"),
-                to_value_type(asset, "capex_fix"),
-                to_value_type(asset, "opex_var"),
-                to_value_type(asset, "efficiency"),
-                to_value_type(asset, "installed_capacity"),
-                to_value_type(asset, "lifetime"),
-                to_value_type(asset, "maximum_capacity"),
-                to_value_type(asset, "energy_price"),
-                to_value_type(asset, "feedin_tariff"),
-                to_value_type(asset, "feedin_cap"),
-                to_value_type(asset, "optimize_cap"),
-                to_value_type(asset, "peak_demand_pricing"),
-                to_value_type(asset, "peak_demand_pricing_period"),
-                to_value_type(asset, "renewable_share"),
-                to_value_type(asset, "renewable_asset"),
-                to_value_type(asset, "capex_var"),
-                to_value_type(asset, "opex_fix"),
-                to_timeseries_data(asset, "input_timeseries"),
-                asset.asset_type.unit,
-            )
-            if (
-                ess.asset_type.asset_type == "hess"
-                and asset.asset_type.asset_type == "capacity"
-            ):
-                asset_dto.thermal_loss_rate = to_value_type(asset, "thermal_loss_rate")
-                asset_dto.fixed_thermal_losses_relative = to_value_type(
-                    asset, "fixed_thermal_losses_relative"
-                )
-                fixed_thermal_losses_absolute = to_value_type(
-                    asset, "fixed_thermal_losses_absolute"
-                )
-                fixed_thermal_losses_absolute.value = float(
-                    fixed_thermal_losses_absolute.value
-                )
-                asset_dto.fixed_thermal_losses_absolute = fixed_thermal_losses_absolute
-                efficiency = asset_dto.efficiency.value
-                asset_dto.efficiency.value = max(
-                    efficiency - asset_dto.thermal_loss_rate.value, 0
-                )
-            ess_sub_assets.update({asset.asset_type.asset_type: asset_dto})
+        # for asset in Asset.objects.filter(parent_asset=ess):
+        #     asset_dto = AssetDto(
+        #         asset.asset_type.asset_type,
+        #         asset.name,
+        #         asset.unique_id,
+        #         None,
+        #         None,
+        #         None,
+        #         None,
+        #         asset.dispatchable,
+        #         to_value_type(asset, "age_installed"),
+        #         to_value_type(asset, "crate"),
+        #         to_value_type(asset, "soc_max"),
+        #         to_value_type(asset, "soc_min"),
+        #         to_value_type(asset, "capex_fix"),
+        #         to_value_type(asset, "opex_var"),
+        #         to_value_type(asset, "efficiency"),
+        #         to_value_type(asset, "installed_capacity"),
+        #         to_value_type(asset, "lifetime"),
+        #         to_value_type(asset, "maximum_capacity"),
+        #         to_value_type(asset, "energy_price"),
+        #         to_value_type(asset, "feedin_tariff"),
+        #         to_value_type(asset, "feedin_cap"),
+        #         to_value_type(asset, "optimize_cap"),
+        #         to_value_type(asset, "peak_demand_pricing"),
+        #         to_value_type(asset, "peak_demand_pricing_period"),
+        #         to_value_type(asset, "renewable_share"),
+        #         to_value_type(asset, "renewable_asset"),
+        #         to_value_type(asset, "capex_var"),
+        #         to_value_type(asset, "opex_fix"),
+        #         to_timeseries_data(asset, "input_timeseries"),
+        #         asset.asset_type.unit,
+        #     )
+            # if (
+            #     ess.asset_type.asset_type == "hess"
+            #     and asset.asset_type.asset_type == "capacity"
+            # ):
+            #     asset_dto.thermal_loss_rate = to_value_type(asset, "thermal_loss_rate")
+            #     asset_dto.fixed_thermal_losses_relative = to_value_type(
+            #         asset, "fixed_thermal_losses_relative"
+            #     )
+            #     fixed_thermal_losses_absolute = to_value_type(
+            #         asset, "fixed_thermal_losses_absolute"
+            #     )
+            #     fixed_thermal_losses_absolute.value = float(
+            #         fixed_thermal_losses_absolute.value
+            #     )
+            #     asset_dto.fixed_thermal_losses_absolute = fixed_thermal_losses_absolute
+            #     efficiency = asset_dto.efficiency.value
+            #     asset_dto.efficiency.value = max(
+            #         efficiency - asset_dto.thermal_loss_rate.value, 0
+            #     )
+            # ess_sub_assets.update({asset.asset_type.asset_type: asset_dto})
 
         ess_dto = EssDto(
             ess.asset_type.asset_type,
@@ -405,9 +459,25 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
             ess.asset_type.energy_vector,
             inflow_direction,
             outflow_direction,
-            ess_sub_assets["charging_power"],
-            ess_sub_assets["discharging_power"],
-            ess_sub_assets["capacity"],
+            to_value_type(ess, "capex"),
+            to_value_type(ess, "opex"),
+            to_value_type(ess, "offset"),
+            to_value_type(ess, "lifetime"),
+            to_value_type(ess, "maximum"),
+            to_value_type(ess, "minimum"),
+            to_value_type(ess, "existing"),
+            to_value_type(ess, "nominal_value"),
+            to_value_type(ess, "variable_costs"),
+            to_value_type(ess, "balanced"),
+            to_value_type(ess, "invest_relation_input_capacity"),
+            to_value_type(ess, "invest_relation_output_capacity"),
+            to_value_type(ess, "initial_storage_level"),
+            to_value_type(ess, "nominal_storage_capacity"),
+            to_value_type(ess, "inflow_conversion_factor"),
+            to_value_type(ess, "outflow_conversion_factor"),
+            # ess_sub_assets["charging_power"],
+            # ess_sub_assets["discharging_power"],
+            # ess_sub_assets["capacity"],
         )
 
         energy_storage.append(ess_dto)
@@ -443,94 +513,94 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
         asset_efficiency = to_value_type(asset, "efficiency")
 
         optional_parameters = {}
-        if asset.asset_type.asset_type in ("chp", "chp_fixed_ratio"):
+        # if asset.asset_type.asset_type in ("chp", "chp_fixed_ratio"):
 
-            if asset.asset_type.asset_type == "chp":
-                optional_parameters["beta"] = to_value_type(asset, "thermal_loss_rate")
+        #     if asset.asset_type.asset_type == "chp":
+        #         optional_parameters["beta"] = to_value_type(asset, "thermal_loss_rate")
 
-            # for chp it corresponds to efficiency_el_wo_heat_extraction
-            e_el = asset_efficiency.value
-            # for chp it corresponds to efficiency_th_max_heat_extraction
-            e_th = to_value_type(asset, "efficiency_multiple").value
+        #     # for chp it corresponds to efficiency_el_wo_heat_extraction
+        #     e_el = asset_efficiency.value
+        #     # for chp it corresponds to efficiency_th_max_heat_extraction
+        #     e_th = to_value_type(asset, "efficiency_multiple").value
 
-            output_mapping = [
-                ev for ev in output_connection.values_list("bus__type", flat=True)
-            ]
+        #     output_mapping = [
+        #         ev for ev in output_connection.values_list("bus__type", flat=True)
+        #     ]
 
-            efficiencies = []
-            outflow_direction = []
-            # TODO: make sure the length is equal to the number of timesteps
-            for energy_vector in ["Electricity", "Heat"]:
-                if energy_vector in output_mapping:
-                    # TODO get the case where get fails --> projects.models.base_models.ConnectionLink.DoesNotExist: ConnectionLink matching query does not exist
-                    outflow_direction.append(
-                        output_connection.get(bus__type=energy_vector).bus.name
-                    )
+        #     efficiencies = []
+        #     outflow_direction = []
+        #     # TODO: make sure the length is equal to the number of timesteps
+        #     for energy_vector in ["Electricity", "Heat"]:
+        #         if energy_vector in output_mapping:
+        #             # TODO get the case where get fails --> projects.models.base_models.ConnectionLink.DoesNotExist: ConnectionLink matching query does not exist
+        #             outflow_direction.append(
+        #                 output_connection.get(bus__type=energy_vector).bus.name
+        #             )
 
-                    efficiency = e_el if energy_vector == "Electricity" else e_th
+        #             efficiency = e_el if energy_vector == "Electricity" else e_th
 
-                    efficiencies.append(efficiency)
+        #             efficiencies.append(efficiency)
 
-            if len(efficiencies) != 2:
-                print(
-                    "ERROR, a chp should have 1 electrical input and one heat output, thus 2 efficiencies!"
-                )
+        #     if len(efficiencies) != 2:
+        #         print(
+        #             "ERROR, a chp should have 1 electrical input and one heat output, thus 2 efficiencies!"
+        #         )
 
-            asset_efficiency.value = efficiencies
+        #     asset_efficiency.value = efficiencies
 
-        if asset.asset_type.asset_type == "heat_pump":
-            cop = asset_efficiency.value
-            input_mapping = [
-                ev for ev in input_connection.values_list("bus__type", flat=True)
-            ]
+        # if asset.asset_type.asset_type == "heat_pump":
+        #     cop = asset_efficiency.value
+        #     input_mapping = [
+        #         ev for ev in input_connection.values_list("bus__type", flat=True)
+        #     ]
 
-            efficiencies = []
-            inflow_direction = []
-            # TODO: make sure the length is equal to the number of timesteps
-            if len(input_mapping) == 1:
-                # in MVS the coefficient are applied to the output bus and not the input bus
-                # so for one unit electricity there should be "COP" unit of heat
-                if isinstance(cop, list):
-                    efficiency = np.array(cop).tolist()
-                else:
-                    efficiency = cop
-                inflow_direction.append(input_connection.get().bus.name)
-                efficiencies.append(efficiency)
-            else:
-                for energy_vector in ["Electricity", "Heat"]:
-                    if energy_vector in input_mapping:
-                        # TODO get the case where get fails
-                        inflow_direction.append(
-                            input_connection.get(bus__type=energy_vector).bus.name
-                        )
-                        if isinstance(cop, list):
-                            efficiency = (
-                                (1 / np.array(cop)).tolist()
-                                if energy_vector == "Electricity"
-                                else (1 - 1 / np.array(cop)).tolist()
-                            )
-                        else:
-                            efficiency = (
-                                (1 / cop)
-                                if energy_vector == "Electricity"
-                                else (1 - 1 / cop)
-                            )
+        #     efficiencies = []
+        #     inflow_direction = []
+        #     # TODO: make sure the length is equal to the number of timesteps
+        #     if len(input_mapping) == 1:
+        #         # in MVS the coefficient are applied to the output bus and not the input bus
+        #         # so for one unit electricity there should be "COP" unit of heat
+        #         if isinstance(cop, list):
+        #             efficiency = np.array(cop).tolist()
+        #         else:
+        #             efficiency = cop
+        #         inflow_direction.append(input_connection.get().bus.name)
+        #         efficiencies.append(efficiency)
+        #     else:
+        #         for energy_vector in ["Electricity", "Heat"]:
+        #             if energy_vector in input_mapping:
+        #                 # TODO get the case where get fails
+        #                 inflow_direction.append(
+        #                     input_connection.get(bus__type=energy_vector).bus.name
+        #                 )
+        #                 if isinstance(cop, list):
+        #                     efficiency = (
+        #                         (1 / np.array(cop)).tolist()
+        #                         if energy_vector == "Electricity"
+        #                         else (1 - 1 / np.array(cop)).tolist()
+        #                     )
+        #                 else:
+        #                     efficiency = (
+        #                         (1 / cop)
+        #                         if energy_vector == "Electricity"
+        #                         else (1 - 1 / cop)
+        #                     )
 
-                        efficiencies.append(efficiency)
+        #                 efficiencies.append(efficiency)
 
-            if len(efficiencies) == 0:
-                print("ERROR, a heat pump should at least have one electrical input!")
+        #     if len(efficiencies) == 0:
+        #         print("ERROR, a heat pump should at least have one electrical input!")
 
-            elif len(efficiencies) == 1:
-                efficiencies = efficiencies[0]
-                inflow_direction = inflow_direction[0]
+        #     elif len(efficiencies) == 1:
+        #         efficiencies = efficiencies[0]
+        #         inflow_direction = inflow_direction[0]
 
-            asset_efficiency.value = efficiencies
-        dso_energy_price = to_value_type(asset, "energy_price")
-        dso_feedin_tariff = to_value_type(asset, "feedin_tariff")
-        if "dso" in asset.asset_type.asset_type:
-            dso_energy_price.value = json.loads(dso_energy_price.value)
-            dso_feedin_tariff.value = json.loads(dso_feedin_tariff.value)
+        #     asset_efficiency.value = efficiencies
+        # dso_energy_price = to_value_type(asset, "energy_price")
+        # dso_feedin_tariff = to_value_type(asset, "feedin_tariff")
+        # if "dso" in asset.asset_type.asset_type:
+        #     dso_energy_price.value = json.loads(dso_energy_price.value)
+        #     dso_feedin_tariff.value = json.loads(dso_feedin_tariff.value)
 
         asset_dto = AssetDto(
             asset.asset_type.asset_type,
@@ -540,44 +610,55 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
             asset.asset_type.energy_vector,
             inflow_direction,
             outflow_direction,
-            asset.dispatchable,
-            to_value_type(asset, "age_installed"),
-            to_value_type(asset, "crate"),
-            to_value_type(asset, "soc_max"),
-            to_value_type(asset, "soc_min"),
-            to_value_type(asset, "capex_fix"),
-            to_value_type(asset, "opex_var"),
-            asset_efficiency,
-            to_value_type(asset, "installed_capacity"),
+            # asset.dispatchable,
+            # to_value_type(asset, "age_installed"),
+            # to_value_type(asset, "crate"),
+            # to_value_type(asset, "soc_max"),
+            # to_value_type(asset, "soc_min"),
+            # to_value_type(asset, "capex_fix"),
+            
+            # asset_efficiency,
+            # to_value_type(asset, "nominal_value"),            
+            # dso_energy_price,
+            # dso_feedin_tariff,
+            # to_value_type(asset, "feedin_cap"),
+            # to_value_type(asset, "optimize_cap"),
+            # to_value_type(asset, "peak_demand_pricing"),
+            # to_value_type(asset, "peak_demand_pricing_period"),
+            # to_value_type(asset, "renewable_share"),
+            # to_value_type(asset, "renewable_asset"),
+            to_value_type(asset, "capex"),
+            to_value_type(asset, "opex"),
+            to_value_type(asset, "offset"),
             to_value_type(asset, "lifetime"),
-            to_value_type(asset, "maximum_capacity"),
-            dso_energy_price,
-            dso_feedin_tariff,
-            to_value_type(asset, "feedin_cap"),
-            to_value_type(asset, "optimize_cap"),
-            to_value_type(asset, "peak_demand_pricing"),
-            to_value_type(asset, "peak_demand_pricing_period"),
-            to_value_type(asset, "renewable_share"),
-            to_value_type(asset, "renewable_asset"),
-            to_value_type(asset, "capex_var"),
-            to_value_type(asset, "opex_fix"),
+            to_value_type(asset, "maximum"),
+            to_value_type(asset, "minimum"),
+            to_value_type(asset, "existing"),
+            to_value_type(asset, "nominal_value"),
+            to_value_type(asset, "variable_costs"),
+            to_value_type(asset, "_min"),
+            to_value_type(asset, "_max"),
+            to_value_type(asset, "nonconvex"),
+            to_value_type(asset, "summed_max"),
+            to_value_type(asset, "summed_min"),
+            to_value_type(asset, "efficiency"),
             to_timeseries_data(asset, "input_timeseries"),
             asset.asset_type.unit,
             **optional_parameters
         )
 
         # set maximum capacity to None if it is equal to 0
-        maximum_capacity = asset_dto.maximum_capacity
-        if maximum_capacity is not None:
-            if maximum_capacity.value == 0:
-                asset_dto.maximum_capacity = None
+        maximum = asset_dto.maximum
+        if maximum is not None:
+            if maximum.value == 0:
+                asset_dto.maximum = None
 
         # map_to_dto(asset, asset_dto)
 
         # Get category of asset and append to appropriate category
-        if asset.asset_type.asset_category == "energy_provider":
-            energy_providers.append(asset_dto)
-        elif asset.asset_type.asset_category == "energy_production":
+        # if asset.asset_type.asset_category == "energy_provider":
+        #     energy_providers.append(asset_dto)
+        if asset.asset_type.asset_category == "energy_production":
             energy_production.append(asset_dto)
         elif asset.asset_type.asset_category == "energy_consumption":
             energy_consumption.append(asset_dto)
@@ -612,7 +693,7 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
         project_data_dto,
         economic_data_dto,
         simulation_settings,
-        energy_providers,
+        # energy_providers,
         energy_consumption,
         energy_conversion,
         energy_production,

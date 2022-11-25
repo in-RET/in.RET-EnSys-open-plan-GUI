@@ -36,7 +36,7 @@ from .scenario_topology_helpers import (
     load_scenario_from_dict,
     load_project_from_dict,
 )
-from projects.helpers import format_scenario_for_mvs
+from projects.helpers import format_scenario_for_mvs, epc_calc
 from .constants import DONE, PENDING, ERROR, MODIFIED
 from .services import (
     create_or_delete_simulation_scheduler,
@@ -45,6 +45,9 @@ from .services import (
     get_selected_scenarios_in_cache,
 )
 import traceback
+from oemof import solph
+from oemof.tools import economics
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -1492,11 +1495,30 @@ def test_mvs_data_input(request, scen_id=0):
     return view_mvs_data_input(request, scen_id=scen_id, testing=True)
 
 
+
+
+def myprint(d):
+    for k, v in d.items():
+        if isinstance(v, dict):
+            myprint(v)
+        else:
+            if k == "energy_production":
+                for i in v:
+                    print("{} : {}".format(k, i))
+                    print(i['maximum'])
+                    # print("{0} : {1}".format(k, v))
+
+
 # End-point to send MVS simulation request
 # @json_view
 @login_required
 @require_http_methods(["GET", "POST"])
 def request_mvs_simulation(request, scen_id=0):
+    
+    list_sources = []
+    list_busses = []
+    list_sinks = []
+    list_storages = []
     if scen_id == 0:
         answer = JsonResponse(
             {"status": "error", "error": "No scenario id provided"},
@@ -1505,8 +1527,99 @@ def request_mvs_simulation(request, scen_id=0):
         )
     # Load scenario
     scenario = Scenario.objects.get(pk=scen_id)
+    print(scenario)
     try:
         data_clean = format_scenario_for_mvs(scenario)
+        # print(data_clean)#dict
+        keysList = [key for key in data_clean]
+        print(keysList)
+        for k, v in data_clean.items():
+            for i in v:
+                if k == "energy_busses":
+                    print("\nEnergy Busses: \n")
+                    print("{} : {}".format(k, i))
+                    list_busses.append(
+                        solph.Bus(label=i['label']))
+                    
+        for k, v in data_clean.items():
+            for i in v:
+                if k == "energy_production":
+                    print("\nEnergy Production: \n")
+                    print("{} : {}".format(k, i))
+                    print(i['label'])
+                    for obj in list_busses:
+                        if obj.label == i['outflow_direction']:
+                            bus_obj=obj
+                    list_sources.append(solph.Source(
+                        label=i['label'],
+                        outputs={bus_obj: solph.Flow(fix=i['input_timeseries'],
+                                                     # investment = 
+                                                     # solph.Investment(ep_costs=epc_calc(i['capex']['value'],
+                                                     #                                     i['lifetime']['value'],
+                                                     #                                     i['opex']['value'])),
+                                                     variable_costs = i['variable_costs'] if(bool(i['variable_costs'])) else None
+                                                     )}
+                    ))
+                elif k == "energy_consumption":
+                    print("\nEnergy Consumption: \n")
+                    print("{} : {}".format(k, i))
+                    for obj in list_busses:
+                        if obj.label == i['inflow_direction']:
+                            bus_obj=obj
+                    list_sinks.append(
+                        solph.Sink(
+                            label=i['label'],
+                            inputs={bus_obj: solph.Flow(fix=i['input_timeseries'], 
+                                                        nominal_value=i['nominal_value']
+                                                        )}
+                        ))
+                elif k == "energy_storage":
+                    print("\nEnergy Storage: \n")
+                    print("{} : {}".format(k, i))
+                    for obj in list_busses:
+                        if obj.label == i['inflow_direction']:
+                            bus_obj_in=obj
+                        if obj.label == i['outflow_direction']:
+                            bus_obj_out=obj
+                    
+                    list_storages.append(
+                        solph.components.GenericStorage(
+                            label=i['label'],
+                            inputs={bus_obj_in: solph.Flow()},
+                            outputs={bus_obj_out: solph.Flow()},
+                            # loss_rate = i['loss_rate'],
+                            initial_storage_level = i['initial_storage_level'],
+                            balanced = i['balanced'],
+                            invest_relation_input_capacity = i['invest_relation_input_capacity'],
+                            invest_relation_output_capacity= i['invest_relation_output_capacity'],
+                            inflow_conversion_factor = i['inflow_conversion_factor'],
+                            outflow_conversion_factor= i['outflow_conversion_factor'],
+                            investment = solph.Investment(ep_costs=epc_calc(i['capex']['value'], 
+                                                                            i['lifetime']['value'], 
+                                                                            i['opex']['value']), 
+                                                          maximum = i['maximum'])
+                    ))
+                elif k == "energy_conversion":
+                    print("\nEnergy Conversion: \n")
+                    print("{} : {}".format(k, i))
+        
+        print(data_clean['economic_data'])
+        date_time_index = pd.date_range(
+            "1/1/2022", periods=8760, freq="H"
+        )
+        
+        energysystem = solph.EnergySystem(timeindex=date_time_index)
+        for x in list_sources:
+            energysystem.add(x)
+        for x in list_busses:
+            energysystem.add(x)
+        for x in list_sinks:
+            energysystem.add(x)
+        for x in list_storages:
+            energysystem.add(x)
+        
+        # model = solph.Model(energysystem)
+        # model.solve(solver='gurobi')
         # err = 1/0
     except Exception as e:
         error_msg = f"Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {e}."

@@ -11,6 +11,8 @@ from projects.dtos import convert_to_dto
 from projects.constants import MAP_MVS_EPA
 from dashboard.helpers import KPIFinder
 
+from oemof.tools import economics
+
 PARAMETERS = {}
 if os.path.exists(staticfiles_storage.path("MVS_parameters_list.csv")) is True:
     with open(
@@ -53,6 +55,7 @@ def remove_empty_elements(d):
 # Helper to convert Scenario data to MVS importable json
 def format_scenario_for_mvs(scenario_to_convert, testing=False):
     mvs_request_dto = convert_to_dto(scenario_to_convert, testing=testing)
+    print(mvs_request_dto)
     dumped_data = json.loads(
         json.dumps(mvs_request_dto.__dict__, default=lambda o: o.__dict__)
     )
@@ -65,7 +68,17 @@ def format_scenario_for_mvs(scenario_to_convert, testing=False):
     dumped_data["constraints"] = constraint_dict
 
     # Remove None values
-    return remove_empty_elements(dumped_data)
+    return dumped_data#remove_empty_elements
+
+
+Zinssatz=10.5
+def epc_calc(capex, Amortisierungszeit, opex):
+    investk = economics.annuity(capex=capex, 
+                                n=Amortisierungszeit, 
+                                wacc=Zinssatz/100)
+    betriebsk = capex * (opex/100)
+    epc = investk + betriebsk
+    return epc
 
 
 def sensitivity_analysis_payload(

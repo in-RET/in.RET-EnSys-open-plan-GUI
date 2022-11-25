@@ -582,7 +582,7 @@
     "pk": 1,
     "fields": {
         "asset_type": "mySource",
-        "asset_category": "energy_consumption",
+        "asset_category": "energy_production",
         "energy_vector": "Electricity",
         "mvs_type": "source",
         "asset_fields": "[name,input_timeseries,nominal_value,variable_costs,_min,_max,nonconvex,summed_max,summed_min,capex,opex,lifetime,offset,maximum,minimum,existing]",
@@ -596,7 +596,7 @@
         "asset_type": "mySink",
         "asset_category": "energy_consumption",
         "energy_vector": "Electricity",
-        "mvs_type": "source",
+        "mvs_type": "sink",
         "asset_fields": "[name,input_timeseries,nominal_value,variable_costs]",
         "unit": "kWh"
     }
@@ -606,9 +606,9 @@
     "pk": 3,
     "fields": {
         "asset_type": "myTransformer",
-        "asset_category": "energy_consumption",
+        "asset_category": "energy_conversion",
         "energy_vector": "Electricity",
-        "mvs_type": "source",
+        "mvs_type": "transformer",
         "asset_fields": "[name,input_timeseries,nominal_value,variable_costs,_min,_max,nonconvex,summed_max,summed_min,capex,opex,lifetime,offset,maximum,minimum,existing,efficiency]",
         "unit": "kWh"
     }
@@ -618,9 +618,9 @@
     "pk": 4,
     "fields": {
         "asset_type": "myGenericStorage",
-        "asset_category": "energy_consumption",
+        "asset_category": "energy_storage",
         "energy_vector": "Electricity",
-        "mvs_type": "source",
+        "mvs_type": "storage",
         "asset_fields": "[name,nominal_value,variable_costs,nonconvex,capex,opex,lifetime,offset,maximum,minimum,existing,balanced,invest_relation_input_capacity,invest_relation_output_capacity,initial_storage_level,inflow_conversion_factor,outflow_conversion_factor,nominal_storage_capacity]",
         "unit": "kWh"
     }

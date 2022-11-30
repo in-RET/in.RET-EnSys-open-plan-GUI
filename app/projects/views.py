@@ -49,6 +49,17 @@ from oemof import solph
 from oemof.tools import economics
 import pandas as pd
 
+
+from InRetEnsys.components.bus import InRetEnsysBus
+from InRetEnsys.components.constraints import InRetEnsysConstraints
+from InRetEnsys.components.genericstorage import InRetEnsysStorage
+from InRetEnsys.components.sink import InRetEnsysSink
+from InRetEnsys.components.source import InRetEnsysSource
+from InRetEnsys.components.transformer import InRetEnsysTransformer
+from InRetEnsys import InRetEnsysEnergysystem, InRetEnsysModel, InRetEnsysFlow
+from InRetEnsys.components.investment import InRetEnsysInvestment
+from InRetEnsys import Solver
+
 logger = logging.getLogger(__name__)
 
 
@@ -1495,30 +1506,17 @@ def test_mvs_data_input(request, scen_id=0):
     return view_mvs_data_input(request, scen_id=scen_id, testing=True)
 
 
-
-
-def myprint(d):
-    for k, v in d.items():
-        if isinstance(v, dict):
-            myprint(v)
-        else:
-            if k == "energy_production":
-                for i in v:
-                    print("{} : {}".format(k, i))
-                    print(i['maximum'])
-                    # print("{0} : {1}".format(k, v))
-
-
 # End-point to send MVS simulation request
 # @json_view
 @login_required
 @require_http_methods(["GET", "POST"])
 def request_mvs_simulation(request, scen_id=0):
-    
+
     list_sources = []
     list_busses = []
     list_sinks = []
     list_storages = []
+
     if scen_id == 0:
         answer = JsonResponse(
             {"status": "error", "error": "No scenario id provided"},
@@ -1530,7 +1528,7 @@ def request_mvs_simulation(request, scen_id=0):
     print(scenario)
     try:
         data_clean = format_scenario_for_mvs(scenario)
-        # print(data_clean)#dict
+
         keysList = [key for key in data_clean]
         print(keysList)
         for k, v in data_clean.items():
@@ -1538,88 +1536,112 @@ def request_mvs_simulation(request, scen_id=0):
                 if k == "energy_busses":
                     print("\nEnergy Busses: \n")
                     print("{} : {}".format(k, i))
-                    list_busses.append(
-                        solph.Bus(label=i['label']))
-                    
+                    list_busses.append(InRetEnsysBus(label=i["label"]))
+
         for k, v in data_clean.items():
             for i in v:
                 if k == "energy_production":
                     print("\nEnergy Production: \n")
                     print("{} : {}".format(k, i))
-                    print(i['label'])
-                    for obj in list_busses:
-                        if obj.label == i['outflow_direction']:
-                            bus_obj=obj
-                    list_sources.append(solph.Source(
-                        label=i['label'],
-                        outputs={bus_obj: solph.Flow(fix=i['input_timeseries'],
-                                                     # investment = 
-                                                     # solph.Investment(ep_costs=epc_calc(i['capex']['value'],
-                                                     #                                     i['lifetime']['value'],
-                                                     #                                     i['opex']['value'])),
-                                                     variable_costs = i['variable_costs'] if(bool(i['variable_costs'])) else None
-                                                     )}
-                    ))
+                    print(i["label"])
+
+                    list_sources.append(
+                        InRetEnsysSource(
+                            label=i["label"],
+                            outputs={
+                                i["outflow_direction"]: InRetEnsysFlow(
+                                    fix=i["input_timeseries"]["value"],
+                                    # investment =
+                                    # solph.Investment(ep_costs=epc_calc(i['capex']['value'],
+                                    #                                     i['lifetime']['value'],
+                                    #                                     i['opex']['value'])),
+                                    variable_costs=i["variable_costs"]["value"]
+                                    if (bool(i["variable_costs"]))
+                                    else None,
+                                )
+                            },
+                        )
+                    )
                 elif k == "energy_consumption":
                     print("\nEnergy Consumption: \n")
                     print("{} : {}".format(k, i))
-                    for obj in list_busses:
-                        if obj.label == i['inflow_direction']:
-                            bus_obj=obj
+
                     list_sinks.append(
-                        solph.Sink(
-                            label=i['label'],
-                            inputs={bus_obj: solph.Flow(fix=i['input_timeseries'], 
-                                                        nominal_value=i['nominal_value']
-                                                        )}
-                        ))
+                        InRetEnsysSink(
+                            label=i["label"],
+                            inputs={
+                                i["inflow_direction"]: InRetEnsysFlow(
+                                    fix=i["input_timeseries"]["value"],
+                                    nominal_value=i["nominal_value"]["value"],
+                                )
+                            },
+                        )
+                    )
                 elif k == "energy_storage":
                     print("\nEnergy Storage: \n")
                     print("{} : {}".format(k, i))
-                    for obj in list_busses:
-                        if obj.label == i['inflow_direction']:
-                            bus_obj_in=obj
-                        if obj.label == i['outflow_direction']:
-                            bus_obj_out=obj
-                    
+
                     list_storages.append(
-                        solph.components.GenericStorage(
-                            label=i['label'],
-                            inputs={bus_obj_in: solph.Flow()},
-                            outputs={bus_obj_out: solph.Flow()},
+                        InRetEnsysStorage(
+                            label=i["label"],
+                            inputs={i["inflow_direction"]: InRetEnsysFlow()},
+                            outputs={i["outflow_direction"]: InRetEnsysFlow()},
                             # loss_rate = i['loss_rate'],
-                            initial_storage_level = i['initial_storage_level'],
-                            balanced = i['balanced'],
-                            invest_relation_input_capacity = i['invest_relation_input_capacity'],
-                            invest_relation_output_capacity= i['invest_relation_output_capacity'],
-                            inflow_conversion_factor = i['inflow_conversion_factor'],
-                            outflow_conversion_factor= i['outflow_conversion_factor'],
-                            investment = solph.Investment(ep_costs=epc_calc(i['capex']['value'], 
-                                                                            i['lifetime']['value'], 
-                                                                            i['opex']['value']), 
-                                                          maximum = i['maximum'])
-                    ))
+                            initial_storage_level=i["initial_storage_level"]["value"],
+                            balanced=i["balanced"]["value"],
+                            invest_relation_input_capacity=i[
+                                "invest_relation_input_capacity"
+                            ]["value"],
+                            invest_relation_output_capacity=i[
+                                "invest_relation_output_capacity"
+                            ]["value"],
+                            inflow_conversion_factor=i["inflow_conversion_factor"][
+                                "value"
+                            ],
+                            outflow_conversion_factor=i["outflow_conversion_factor"][
+                                "value"
+                            ],
+                            investment=InRetEnsysInvestment(
+                                ep_costs=epc_calc(
+                                    i["capex"]["value"],
+                                    i["lifetime"]["value"],
+                                    i["opex"]["value"],
+                                ),
+                                maximum=i["maximum"]["value"],
+                            ),
+                        )
+                    )
                 elif k == "energy_conversion":
                     print("\nEnergy Conversion: \n")
                     print("{} : {}".format(k, i))
-        
-        print(data_clean['economic_data'])
-        date_time_index = pd.date_range(
-            "1/1/2022", periods=8760, freq="H"
+
+        print(data_clean["economic_data"])
+        # date_time_index = pd.date_range(
+        #     "1/1/2022", periods=8760, freq="H"
+        # )
+
+        energysystem = InRetEnsysEnergysystem(
+            busses=list_busses,
+            sinks=list_sinks,
+            sources=list_sources,
+            storages=list_storages,
+            # transformers=[],
+            # timeindex=str(date_time_index)
+            frequenz="hourly",
+            start_date="1/1/2022",
+            time_steps=8760,
         )
-        
-        energysystem = solph.EnergySystem(timeindex=date_time_index)
-        for x in list_sources:
-            energysystem.add(x)
-        for x in list_busses:
-            energysystem.add(x)
-        for x in list_sinks:
-            energysystem.add(x)
-        for x in list_storages:
-            energysystem.add(x)
-        
-        # model = solph.Model(energysystem)
-        # model.solve(solver='gurobi')
+
+        model = InRetEnsysModel(
+            energysystem=energysystem,
+            solver=Solver.gurobi,
+            # solver_verbose=False
+        )
+
+        jf = open("my_model_config.json", "wt")
+        jf.write(model.json())
+        jf.close()
+        # model.write('my_model.lp', io_options={'symbolic_solver_labels': True}) noch nicht implementiert
         # err = 1/0
     except Exception as e:
         error_msg = f"Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {e}."

@@ -185,7 +185,6 @@ class EssDto:
         existing: ValueTypeDto,
         nominal_value: ValueTypeDto,
         variable_costs: ValueTypeDto,
-        
         balanced: ValueTypeDto,
         invest_relation_input_capacity: ValueTypeDto,
         invest_relation_output_capacity: ValueTypeDto,
@@ -212,7 +211,7 @@ class EssDto:
         self.existing = existing
         self.nominal_value = nominal_value
         self.variable_costs = variable_costs
-        
+
         self.balanced = balanced
         self.invest_relation_input_capacity = invest_relation_input_capacity
         self.invest_relation_output_capacity = invest_relation_output_capacity
@@ -431,26 +430,26 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
         #         to_timeseries_data(asset, "input_timeseries"),
         #         asset.asset_type.unit,
         #     )
-            # if (
-            #     ess.asset_type.asset_type == "hess"
-            #     and asset.asset_type.asset_type == "capacity"
-            # ):
-            #     asset_dto.thermal_loss_rate = to_value_type(asset, "thermal_loss_rate")
-            #     asset_dto.fixed_thermal_losses_relative = to_value_type(
-            #         asset, "fixed_thermal_losses_relative"
-            #     )
-            #     fixed_thermal_losses_absolute = to_value_type(
-            #         asset, "fixed_thermal_losses_absolute"
-            #     )
-            #     fixed_thermal_losses_absolute.value = float(
-            #         fixed_thermal_losses_absolute.value
-            #     )
-            #     asset_dto.fixed_thermal_losses_absolute = fixed_thermal_losses_absolute
-            #     efficiency = asset_dto.efficiency.value
-            #     asset_dto.efficiency.value = max(
-            #         efficiency - asset_dto.thermal_loss_rate.value, 0
-            #     )
-            # ess_sub_assets.update({asset.asset_type.asset_type: asset_dto})
+        # if (
+        #     ess.asset_type.asset_type == "hess"
+        #     and asset.asset_type.asset_type == "capacity"
+        # ):
+        #     asset_dto.thermal_loss_rate = to_value_type(asset, "thermal_loss_rate")
+        #     asset_dto.fixed_thermal_losses_relative = to_value_type(
+        #         asset, "fixed_thermal_losses_relative"
+        #     )
+        #     fixed_thermal_losses_absolute = to_value_type(
+        #         asset, "fixed_thermal_losses_absolute"
+        #     )
+        #     fixed_thermal_losses_absolute.value = float(
+        #         fixed_thermal_losses_absolute.value
+        #     )
+        #     asset_dto.fixed_thermal_losses_absolute = fixed_thermal_losses_absolute
+        #     efficiency = asset_dto.efficiency.value
+        #     asset_dto.efficiency.value = max(
+        #         efficiency - asset_dto.thermal_loss_rate.value, 0
+        #     )
+        # ess_sub_assets.update({asset.asset_type.asset_type: asset_dto})
 
         ess_dto = EssDto(
             ess.asset_type.asset_type,
@@ -616,9 +615,8 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
             # to_value_type(asset, "soc_max"),
             # to_value_type(asset, "soc_min"),
             # to_value_type(asset, "capex_fix"),
-            
             # asset_efficiency,
-            # to_value_type(asset, "nominal_value"),            
+            # to_value_type(asset, "nominal_value"),
             # dso_energy_price,
             # dso_feedin_tariff,
             # to_value_type(asset, "feedin_cap"),

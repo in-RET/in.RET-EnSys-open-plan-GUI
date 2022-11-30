@@ -68,15 +68,15 @@ def format_scenario_for_mvs(scenario_to_convert, testing=False):
     dumped_data["constraints"] = constraint_dict
 
     # Remove None values
-    return dumped_data#remove_empty_elements
+    return dumped_data  # remove_empty_elements
 
 
-Zinssatz=10.5
+Zinssatz = 10.5
+
+
 def epc_calc(capex, Amortisierungszeit, opex):
-    investk = economics.annuity(capex=capex, 
-                                n=Amortisierungszeit, 
-                                wacc=Zinssatz/100)
-    betriebsk = capex * (opex/100)
+    investk = economics.annuity(capex=capex, n=Amortisierungszeit, wacc=Zinssatz / 100)
+    betriebsk = capex * (opex / 100)
     epc = investk + betriebsk
     return epc
 

@@ -85,6 +85,8 @@ def is_economical_parameter(param):
         "maximum",
         "minimum",
         "existing",
+        "invest_relation_input_capacity",
+        "invest_relation_output_capacity",
     ]
 
 

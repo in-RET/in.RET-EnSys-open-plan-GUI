@@ -83,6 +83,7 @@ class AssetDto:
         energy_vector: str,
         inflow_direction: str,
         outflow_direction: str,
+        choice_load_profile: str,
         # dispatchable: bool,
         # age_installed: ValueTypeDto,
         # c_rate: ValueTypeDto,
@@ -116,9 +117,6 @@ class AssetDto:
         efficiency: ValueTypeDto,
         input_timeseries: TimeseriesDataDto,
         unit: str,
-        # thermal_loss_rate: ValueTypeDto = None,
-        # fixed_thermal_losses_relative: ValueTypeDto = None,
-        # fixed_thermal_losses_absolute: ValueTypeDto = None,
         # beta: ValueTypeDto = None,
     ):
         self.asset_type = asset_type
@@ -128,6 +126,7 @@ class AssetDto:
         self.energy_vector = energy_vector
         self.inflow_direction = inflow_direction
         self.outflow_direction = outflow_direction
+        self.choice_load_profile = choice_load_profile
         # self.dispatchable = dispatchable
         # self.age_installed = age_installed
         # self.c_rate = c_rate
@@ -161,9 +160,7 @@ class AssetDto:
         self.efficiency = efficiency
         self.input_timeseries = input_timeseries
         self.unit = unit
-        # self.thermal_loss_rate = thermal_loss_rate
-        # self.fixed_thermal_losses_relative = fixed_thermal_losses_relative
-        # self.fixed_thermal_losses_absolute = fixed_thermal_losses_absolute
+
         # self.beta = beta
 
 
@@ -185,6 +182,7 @@ class EssDto:
         existing: ValueTypeDto,
         nominal_value: ValueTypeDto,
         variable_costs: ValueTypeDto,
+        nonconvex: ValueTypeDto,
         balanced: ValueTypeDto,
         invest_relation_input_capacity: ValueTypeDto,
         invest_relation_output_capacity: ValueTypeDto,
@@ -192,6 +190,9 @@ class EssDto:
         nominal_storage_capacity: ValueTypeDto,
         inflow_conversion_factor: ValueTypeDto,
         outflow_conversion_factor: ValueTypeDto,
+        thermal_loss_rate: ValueTypeDto = ValueTypeDto,
+        fixed_thermal_losses_relative: ValueTypeDto = ValueTypeDto,
+        fixed_thermal_losses_absolute: ValueTypeDto = ValueTypeDto,
         # input_power: AssetDto,
         # output_power: AssetDto,
         # capacity: AssetDto,
@@ -211,6 +212,7 @@ class EssDto:
         self.existing = existing
         self.nominal_value = nominal_value
         self.variable_costs = variable_costs
+        self.nonconvex = nonconvex
 
         self.balanced = balanced
         self.invest_relation_input_capacity = invest_relation_input_capacity
@@ -219,6 +221,9 @@ class EssDto:
         self.nominal_storage_capacity = nominal_storage_capacity
         self.inflow_conversion_factor = inflow_conversion_factor
         self.outflow_conversion_factor = outflow_conversion_factor
+        self.thermal_loss_rate = thermal_loss_rate
+        self.fixed_thermal_losses_relative = fixed_thermal_losses_relative
+        self.fixed_thermal_losses_absolute = fixed_thermal_losses_absolute
         # self.input_power = input_power
         # self.output_power = output_power
         # self.capacity = capacity
@@ -467,6 +472,7 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
             to_value_type(ess, "existing"),
             to_value_type(ess, "nominal_value"),
             to_value_type(ess, "variable_costs"),
+            to_value_type(ess, "nonconvex"),
             to_value_type(ess, "balanced"),
             to_value_type(ess, "invest_relation_input_capacity"),
             to_value_type(ess, "invest_relation_output_capacity"),
@@ -474,6 +480,9 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
             to_value_type(ess, "nominal_storage_capacity"),
             to_value_type(ess, "inflow_conversion_factor"),
             to_value_type(ess, "outflow_conversion_factor"),
+            to_value_type(ess, "thermal_loss_rate"),
+            to_value_type(ess, "fixed_thermal_losses_relative"),
+            to_value_type(ess, "fixed_thermal_losses_absolute"),
             # ess_sub_assets["charging_power"],
             # ess_sub_assets["discharging_power"],
             # ess_sub_assets["capacity"],
@@ -609,6 +618,7 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
             asset.asset_type.energy_vector,
             inflow_direction,
             outflow_direction,
+            asset.choice_load_profile,
             # asset.dispatchable,
             # to_value_type(asset, "age_installed"),
             # to_value_type(asset, "crate"),
@@ -650,6 +660,14 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
         if maximum is not None:
             if maximum.value == 0:
                 asset_dto.maximum = None
+
+        choice_load_profile = asset_dto.choice_load_profile
+        if asset.asset_type.asset_type == "myPredefinedSink":
+            if choice_load_profile is not None:
+                print(choice_load_profile)
+                asset_dto.input_timeseries = to_timeseries_data_for_predefined_profile(
+                    asset, "input_timeseries", choice_load_profile
+                )
 
         # map_to_dto(asset, asset_dto)
 
@@ -738,6 +756,23 @@ def to_timeseries_data(model_obj, field_name):
         if getattr(model_obj, field_name) is not None
         else None
     )
+    if value_list is not None:
+        return TimeseriesDataDto(unit, value_list)
+    else:
+        return None
+
+
+def to_timeseries_data_for_predefined_profile(
+    model_obj, field_name, choice_load_profile
+):
+    value_type = ValueType.objects.filter(type=field_name).first()
+    unit = value_type.unit if value_type is not None else None
+    if choice_load_profile == "load_profile_1":
+        value_list = [5] * 8760
+    elif choice_load_profile == "load_profile_2":
+        value_list = [6] * 8760
+    elif choice_load_profile == "load_profile_3":
+        value_list = [7] * 8760
     if value_list is not None:
         return TimeseriesDataDto(unit, value_list)
     else:

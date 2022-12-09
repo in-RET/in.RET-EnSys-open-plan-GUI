@@ -1374,12 +1374,27 @@ class StorageForm_II(AssetCreateForm):
         # self.fields["dispatchable"].widget = forms.HiddenInput()
         # self.fields["dispatchable"].initial = True
         # self.fields["installed_capacity"].label = _("Installed capacity (kWh)")
-        self.fields["thermal_loss_rate"] = DualNumberField(
-            default=None, min=0, max=1, param_name="thermal_loss_rate"
+        self.fields["thermal_loss_rate"].widget = forms.NumberInput(
+            attrs={
+                "placeholder": _("eg. 0.1"),
+                "min": 0.0,
+                "max": 1.0,
+                "step": "0.00001",
+            }
         )
-        self.fields["fixed_thermal_losses_relative"] = DualNumberField(
-            default=None, min=0, max=1, param_name="fixed_thermal_losses_relative"
+        self.fields["fixed_thermal_losses_relative"].widget = forms.NumberInput(
+            attrs={
+                "placeholder": _("eg. 0.1"),
+                "min": 0.0,
+                "max": 1.0,
+                "step": "0.00001",
+            }
         )
-        self.fields["fixed_thermal_losses_absolute"] = DualNumberField(
-            default=None, min=0, param_name="fixed_thermal_losses_absolute"
+        self.fields["fixed_thermal_losses_absolute"].widget = forms.NumberInput(
+            attrs={
+                "placeholder": _("eg. 0.1"),
+                "min": 0.0,
+                "max": 1.0,
+                "step": "0.00001",
+            }
         )

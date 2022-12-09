@@ -271,6 +271,15 @@ ENERGY_VECTOR = (
     # ('Diesel', 'Diesel'),
 )
 
+
+LOAD_PROFILE_CHOICE = (
+    ("", "Choose..."),
+    ("load_profile_1", "load profile 1"),
+    ("load_profile_2", "load profile 2"),
+    ("load_profile_3", "load profile 3"),
+)
+
+
 COP_MODES = (("Heat pump", "heat_pump"), ("Chiller", "chiller"))
 
 

@@ -24,6 +24,7 @@ from projects.constants import (
     TRUE_FALSE_CHOICES,
     BOOL_CHOICES,
     USER_RATING,
+    LOAD_PROFILE_CHOICE,
 )
 
 
@@ -442,7 +443,7 @@ class Asset(TopologyNode):
         validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
     )
     nonconvex = models.BooleanField(
-        null=True, choices=TRUE_FALSE_CHOICES, default=False
+        null=True, blank=False, choices=TRUE_FALSE_CHOICES, default=False
     )
     summed_max = models.FloatField(
         default=None, blank=True, null=True, validators=[MinValueValidator(0.0)]
@@ -484,10 +485,10 @@ class Asset(TopologyNode):
         null=True, blank=False, choices=BOOL_CHOICES, default=True
     )
     invest_relation_input_capacity = models.FloatField(
-        null=True, blank=True, default=1, validators=[MinValueValidator(0.0)]
+        null=True, blank=True, default=None, validators=[MinValueValidator(0.0)]
     )
     invest_relation_output_capacity = models.FloatField(
-        null=True, blank=True, default=1, validators=[MinValueValidator(0.0)]
+        null=True, blank=True, default=None, validators=[MinValueValidator(0.0)]
     )
     initial_storage_level = models.FloatField(
         null=True,
@@ -506,6 +507,9 @@ class Asset(TopologyNode):
     )
     nominal_storage_capacity = models.FloatField(
         null=True, blank=True, validators=[MinValueValidator(0.0)]
+    )
+    choice_load_profile = models.CharField(
+        null=True, blank=False, choices=LOAD_PROFILE_CHOICE, max_length=20
     )
 
     @property

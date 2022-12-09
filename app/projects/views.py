@@ -58,7 +58,8 @@ from InRetEnsys.components.source import InRetEnsysSource
 from InRetEnsys.components.transformer import InRetEnsysTransformer
 from InRetEnsys import InRetEnsysEnergysystem, InRetEnsysModel, InRetEnsysFlow
 from InRetEnsys.components.investment import InRetEnsysInvestment
-from InRetEnsys import Solver
+from InRetEnsys import Solver, ModelBuilder, InRetEnsysNonConvex
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -692,23 +693,23 @@ def scenario_create_parameters(request, proj_id, scen_id=None, step_id=1, max_st
 def scenario_create_topology(request, proj_id, scen_id, step_id=2, max_step=3):
 
     components = {
-        "providers": {
-            "dso": _("Electricity DSO"),
-            # "gas_dso": _("Gas DSO"),
-            "h2_dso": _("H2 DSO"),
-            "heat_dso": _("Heat DSO"),
-        },
+        # "providers": {
+        #     "dso": _("Electricity DSO"),
+        #     # "gas_dso": _("Gas DSO"),
+        #     "h2_dso": _("H2 DSO"),
+        #     "heat_dso": _("Heat DSO"),
+        # },
         "production": {
-            "pv_plant": _("PV Plant"),
+            # "pv_plant": _("PV Plant"),
             "wind_plant": _("Wind Plant"),
             # "biogas_plant": _("Biogas Plant"),
             # "geothermal_conversion": _("Geothermal Conversion"),
-            "solar_thermal_plant": _("Solar Thermal Plant"),
+            # "solar_thermal_plant": _("Solar Thermal Plant"),
             "mySource": _("Source"),
         },
         "conversion": {
-            "transformer_station_in": _("Transformer Station (in)"),  #
-            "transformer_station_out": _("Transformer Station (out)"),  #
+            # "transformer_station_in": _("Transformer Station (in)"),  #
+            # "transformer_station_out": _("Transformer Station (out)"),  #
             # "storage_charge_controller_in": _("Storage Charge Controller (in)"),  #
             # "storage_charge_controller_out": _("Storage Charge Controller (out)"),  #
             # "solar_inverter": _("Solar Inverter"),  #
@@ -716,8 +717,8 @@ def scenario_create_topology(request, proj_id, scen_id, step_id=2, max_step=3):
             # "fuel_cell": _(" Fuel Cell"),
             # "gas_boiler": _("Gas Boiler"),
             "electrolyzer": _("Electrolyzer"),
-            "heat_pump": _("Heat Pump"),
-            "chp": _("Combined Heat and Power"),
+            # "heat_pump": _("Heat Pump"),
+            # "chp": _("Combined Heat and Power"),
             # "chp_fixed_ratio": _("CHP fixed ratio"),
             "myTransformer": _("Transformer"),
         },
@@ -725,15 +726,17 @@ def scenario_create_topology(request, proj_id, scen_id, step_id=2, max_step=3):
             "bess": _("Electricity Storage"),
             # "gess": _("Gas Storage"),
             # "h2ess": _("H2 Storage"),
-            "hess": _("Heat Storage"),
+            # "hess": _("Heat Storage"),
             "myGenericStorage": _("GenericStorage"),
         },
         "demand": {
-            "demand": _("Electricity Demand"),
+            # "demand": _("Electricity Demand"),
             # "gas_demand": _("Gas Demand"),
             # "h2_demand": _("H2 Demand"),
             # "heat_demand": _("Heat Demand"),
             "mySink": _("Sink"),
+            "myExcess": _("Excess"),
+            "myPredefinedSink": _("Predefined Load Profile"),
         },
         "bus": {"bus": _("Bus")},
     }
@@ -1225,7 +1228,13 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
             form = BusForm(asset_type=asset_type_name, initial={"name": default_name})
         return render(request, "asset/bus_create_form.html", {"form": form})
 
-    elif asset_type_name in ["mySource", "mySink", "myTransformer"]:
+    elif asset_type_name in [
+        "mySource",
+        "mySink",
+        "myTransformer",
+        "myExcess",
+        "myPredefinedSink",
+    ]:
         if asset_uuid:
             existing_asset = get_object_or_404(Asset, unique_id=asset_uuid)
             form = AssetCreateForm(asset_type=asset_type_name, instance=existing_asset)
@@ -1292,6 +1301,7 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
                     "inflow_conversion_factor": existing_ess_asset.inflow_conversion_factor,
                     "outflow_conversion_factor": existing_ess_asset.outflow_conversion_factor,
                     "balanced": existing_ess_asset.balanced,
+                    "nonconvex": existing_ess_asset.nonconvex,
                     "nominal_storage_capacity": existing_ess_asset.nominal_storage_capacity,
                     "thermal_loss_rate": existing_ess_asset.thermal_loss_rate,
                     "fixed_thermal_losses_relative": existing_ess_asset.fixed_thermal_losses_relative,
@@ -1545,18 +1555,58 @@ def request_mvs_simulation(request, scen_id=0):
                     print("{} : {}".format(k, i))
                     print(i["label"])
 
+                    if bool(i["capex"]):
+                        ep_costs = epc_calc(
+                            i["capex"]["value"],
+                            i["lifetime"]["value"],
+                            i["opex"]["value"],
+                        )
+                        print(ep_costs)
+                    else:
+                        ep_costs = None
+
                     list_sources.append(
                         InRetEnsysSource(
                             label=i["label"],
                             outputs={
                                 i["outflow_direction"]: InRetEnsysFlow(
-                                    fix=i["input_timeseries"]["value"],
-                                    # investment =
-                                    # solph.Investment(ep_costs=epc_calc(i['capex']['value'],
-                                    #                                     i['lifetime']['value'],
-                                    #                                     i['opex']['value'])),
+                                    fix=i["input_timeseries"]["value"]
+                                    if i["input_timeseries"]["value"]
+                                    else None,
                                     variable_costs=i["variable_costs"]["value"]
-                                    if (bool(i["variable_costs"]))
+                                    if i["variable_costs"]
+                                    else None,
+                                    nominal_value=i["nominal_value"]["value"]
+                                    if i["nominal_value"]
+                                    else None,
+                                    summed_max=i["summed_max"]["value"]
+                                    if i["summed_max"]
+                                    else None,
+                                    summed_min=i["summed_min"]["value"]
+                                    if i["summed_min"]
+                                    else None,
+                                    nonconvex=InRetEnsysNonConvex()
+                                    if i["nonconvex"]["value"] == True
+                                    else None,
+                                    _min=i["_min"]["value"] if i["_min"] else None,
+                                    _max=i["_max"]["value"] if i["_max"] else None,
+                                    investment=InRetEnsysInvestment(
+                                        ep_costs=ep_costs,
+                                        maximum=i["maximum"]["value"]
+                                        if i["maximum"]
+                                        else 1000000,
+                                        minimum=i["minimum"]["value"]
+                                        if i["minimum"]
+                                        else 0,
+                                        existing=i["existing"]["value"]
+                                        if i["existing"]
+                                        else 0,
+                                        offset=i["offset"]["value"]
+                                        if i["offset"]
+                                        else 0,
+                                        nonconvex=True if i["offset"] else False,
+                                    )
+                                    if bool(ep_costs)
                                     else None,
                                 )
                             },
@@ -1571,44 +1621,124 @@ def request_mvs_simulation(request, scen_id=0):
                             label=i["label"],
                             inputs={
                                 i["inflow_direction"]: InRetEnsysFlow(
-                                    fix=i["input_timeseries"]["value"],
-                                    nominal_value=i["nominal_value"]["value"],
+                                    fix=i["input_timeseries"]["value"]
+                                    if i["input_timeseries"]["value"]
+                                    else None,
+                                    nominal_value=i["nominal_value"]["value"]
+                                    if i["nominal_value"]
+                                    else None,
+                                    variable_costs=i["variable_costs"]["value"]
+                                    if i["variable_costs"]
+                                    else None,
                                 )
                             },
                         )
                     )
+
                 elif k == "energy_storage":
                     print("\nEnergy Storage: \n")
                     print("{} : {}".format(k, i))
+                    if bool(i["capex"]):
+                        ep_costs = epc_calc(
+                            i["capex"]["value"],
+                            i["lifetime"]["value"],
+                            i["opex"]["value"],
+                        )
+                        print(ep_costs)
+
+                    else:
+                        ep_costs = None
+                        print(ep_costs)
+
+                    print(
+                        i["fixed_thermal_losses_relative"]["value"]
+                        if i["fixed_thermal_losses_relative"]["value"] != ""
+                        else None
+                    )
 
                     list_storages.append(
                         InRetEnsysStorage(
                             label=i["label"],
-                            inputs={i["inflow_direction"]: InRetEnsysFlow()},
-                            outputs={i["outflow_direction"]: InRetEnsysFlow()},
-                            # loss_rate = i['loss_rate'],
-                            initial_storage_level=i["initial_storage_level"]["value"],
+                            inputs={
+                                i["inflow_direction"]: InRetEnsysFlow(
+                                    nonconvex=InRetEnsysNonConvex()
+                                    if i["nonconvex"]["value"] == True
+                                    else None,
+                                    nominal_value=i["nominal_value"]["value"]
+                                    if bool(i["nominal_value"])
+                                    else None,
+                                    variable_costs=i["variable_costs"]["value"]
+                                    if bool(i["variable_costs"])
+                                    else None,
+                                )
+                            },
+                            outputs={
+                                i["outflow_direction"]: InRetEnsysFlow(
+                                    nonconvex=InRetEnsysNonConvex()
+                                    if i["nonconvex"]["value"] == True
+                                    else None,
+                                    nominal_value=i["nominal_value"]["value"]
+                                    if bool(i["nominal_value"])
+                                    else None,
+                                    variable_costs=i["variable_costs"]["value"]
+                                    if bool(i["variable_costs"])
+                                    else None,
+                                )
+                            },
+                            thermal_loss_rate=i["thermal_loss_rate"]["value"]
+                            if i["thermal_loss_rate"]["value"] != ""
+                            else None,
+                            fixed_thermal_losses_relative=i[
+                                "fixed_thermal_losses_relative"
+                            ]["value"]
+                            if i["fixed_thermal_losses_relative"]["value"] != ""
+                            else None,
+                            fixed_thermal_losses_absolute=i[
+                                "fixed_thermal_losses_absolute"
+                            ]["value"]
+                            if i["fixed_thermal_losses_absolute"]["value"] != ""
+                            else None,
+                            initial_storage_level=i["initial_storage_level"]["value"]
+                            if bool(i["initial_storage_level"])
+                            else None,
                             balanced=i["balanced"]["value"],
                             invest_relation_input_capacity=i[
                                 "invest_relation_input_capacity"
-                            ]["value"],
+                            ]["value"]
+                            if bool(i["invest_relation_input_capacity"])
+                            else None,
                             invest_relation_output_capacity=i[
                                 "invest_relation_output_capacity"
-                            ]["value"],
+                            ]["value"]
+                            if bool(i["invest_relation_output_capacity"])
+                            else None,
                             inflow_conversion_factor=i["inflow_conversion_factor"][
                                 "value"
                             ],
                             outflow_conversion_factor=i["outflow_conversion_factor"][
                                 "value"
                             ],
+                            nominal_storage_capacity=i["nominal_storage_capacity"][
+                                "value"
+                            ]
+                            if bool(i["nominal_storage_capacity"])
+                            else None,
                             investment=InRetEnsysInvestment(
-                                ep_costs=epc_calc(
-                                    i["capex"]["value"],
-                                    i["lifetime"]["value"],
-                                    i["opex"]["value"],
-                                ),
-                                maximum=i["maximum"]["value"],
-                            ),
+                                ep_costs=ep_costs,
+                                maximum=i["maximum"]["value"]
+                                if bool(i["maximum"])
+                                else 1000000,
+                                minimum=i["minimum"]["value"]
+                                if bool(i["minimum"])
+                                else 0,
+                                existing=i["existing"]["value"]
+                                if bool(i["existing"])
+                                else 0,
+                                offset=i["offset"]["value"] if bool(i["offset"]) else 0,
+                                nonconvex=True if bool(i["offset"]) else False,
+                            )
+                            if bool(ep_costs)
+                            else None,
                         )
                     )
                 elif k == "energy_conversion":
@@ -1641,6 +1771,15 @@ def request_mvs_simulation(request, scen_id=0):
         jf = open("my_model_config.json", "wt")
         jf.write(model.json())
         jf.close()
+        my_path = os.path.abspath(os.path.dirname(__file__))
+        results = ModelBuilder(
+            ConfigFile="my_model_config.json",
+            DumpFile="../dumps/my_model_config.dump",
+            wdir=os.path.join(my_path, "../dumps"),
+            logdir=os.path.join(my_path, "../dumps"),
+            dumpdir=os.path.join(my_path, "../dumps"),
+        )
+
         # model.write('my_model.lp', io_options={'symbolic_solver_labels': True}) noch nicht implementiert
         # err = 1/0
     except Exception as e:

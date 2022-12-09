@@ -9,5 +9,5 @@ Created on Tue Nov 29 14:24:18 2022
 
 from gurobipy import *
 
-model = read("my_model.lp")
+model = read("dumps/my_model_config.lp")
 model.optimize()

@@ -44,7 +44,7 @@ function makePlotly( x, y, plot_id="",userLayout=null){
             x = ts_timestamps
         }
 		else if(y.length == 0){
-            alert(0);
+            alert("Note: You have not uploaded a time series for this Source! But you don't have to.");
         }
         else{
 			alert("The number of values in your uploaded timeseries (" + y.length + ") does not match the scenario timestamps (" + ts_timestamps.length + ").\nPlease change the scenario settings or upload a new timeseries")

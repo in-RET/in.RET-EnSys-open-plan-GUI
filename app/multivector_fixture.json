@@ -597,7 +597,7 @@
         "asset_category": "energy_consumption",
         "energy_vector": "Electricity",
         "mvs_type": "sink",
-        "asset_fields": "[name,input_timeseries,nominal_value,variable_costs]",
+        "asset_fields": "[name,input_timeseries,nominal_value]",
         "unit": "kWh"
     }
 },
@@ -621,7 +621,31 @@
         "asset_category": "energy_storage",
         "energy_vector": "Electricity",
         "mvs_type": "storage",
-        "asset_fields": "[name,nominal_value,variable_costs,nonconvex,capex,opex,lifetime,offset,maximum,minimum,existing,balanced,invest_relation_input_capacity,invest_relation_output_capacity,initial_storage_level,inflow_conversion_factor,outflow_conversion_factor,nominal_storage_capacity]",
+        "asset_fields": "[name,nominal_value,variable_costs,nonconvex,capex,opex,lifetime,offset,maximum,minimum,existing,balanced,invest_relation_input_capacity,invest_relation_output_capacity,initial_storage_level,inflow_conversion_factor,outflow_conversion_factor,nominal_storage_capacity,thermal_loss_rate,fixed_thermal_losses_relative,fixed_thermal_losses_absolute]",
+        "unit": "kWh"
+    }
+},
+{
+    "model": "projects.assettype",
+    "pk": 5,
+    "fields": {
+        "asset_type": "myExcess",
+        "asset_category": "energy_consumption",
+        "energy_vector": "Electricity",
+        "mvs_type": "sink",
+        "asset_fields": "[name,variable_costs]",
+        "unit": "kWh"
+    }
+},
+{
+    "model": "projects.assettype",
+    "pk": 6,
+    "fields": {
+        "asset_type": "myPredefinedSink",
+        "asset_category": "energy_consumption",
+        "energy_vector": "Electricity",
+        "mvs_type": "sink",
+        "asset_fields": "[name,choice_load_profile,nominal_value]",
         "unit": "kWh"
     }
 }

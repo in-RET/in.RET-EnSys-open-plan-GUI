@@ -585,7 +585,7 @@
         "asset_category": "energy_production",
         "energy_vector": "Electricity",
         "mvs_type": "source",
-        "asset_fields": "[name,input_timeseries,nominal_value,variable_costs,_min,_max,nonconvex,summed_max,summed_min,capex,opex,lifetime,offset,maximum,minimum,existing]",
+        "asset_fields": "[name,input_timeseries,nominal_value,variable_costs,_min,_max,nonconvex,summed_max,summed_min,capex,opex,lifetime,offset,maximum,minimum,existing,emission_factor]",
         "unit": "kWh"
     }
 },
@@ -597,7 +597,7 @@
         "asset_category": "energy_consumption",
         "energy_vector": "Electricity",
         "mvs_type": "sink",
-        "asset_fields": "[name,input_timeseries,nominal_value]",
+        "asset_fields": "[name,input_timeseries,nominal_value,emission_factor]",
         "unit": "kWh"
     }
 },
@@ -609,7 +609,7 @@
         "asset_category": "energy_conversion",
         "energy_vector": "Electricity",
         "mvs_type": "transformer",
-        "asset_fields": "[name,input_timeseries,nominal_value,variable_costs,_min,_max,nonconvex,summed_max,summed_min,capex,opex,lifetime,offset,maximum,minimum,existing,efficiency]",
+        "asset_fields": "[name,input_timeseries,nominal_value,variable_costs,_min,_max,nonconvex,summed_max,summed_min,capex,opex,lifetime,offset,maximum,minimum,existing,efficiency,emission_factor,eco_params_flow_choice,tec_params_flow_choice]",
         "unit": "kWh"
     }
 },
@@ -645,7 +645,7 @@
         "asset_category": "energy_consumption",
         "energy_vector": "Electricity",
         "mvs_type": "sink",
-        "asset_fields": "[name,choice_load_profile,nominal_value]",
+        "asset_fields": "[name,choice_load_profile,nominal_value,emission_factor]",
         "unit": "kWh"
     }
 }

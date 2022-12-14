@@ -410,6 +410,14 @@ scenario_widgets = {
             ),
         }
     ),
+    "emission_limit": forms.NumberInput(
+        attrs={
+            "placeholder": "e.g. 10000t",
+            "min": "0",
+            "data-bs-toggle": "tooltip",
+            "title": _(""),
+        }
+    ),
 }
 
 scenario_labels = {
@@ -419,6 +427,7 @@ scenario_labels = {
     "time_step": _("Time Step"),
     "start_date": _("Start Date"),
     "capex_fix": _("Development costs"),
+    "emission_limit": _("Emission Limit"),
 }
 
 scenario_field_order = [
@@ -428,6 +437,7 @@ scenario_field_order = [
     "time_step",
     "start_date",
     "capex_fix",
+    "emission_limit",
 ]
 
 
@@ -648,6 +658,14 @@ class AssetCreateForm(OpenPlanModelForm):
                 self.timestamps = qs.get().get_timestamps()
 
         self.fields["inputs"] = forms.CharField(widget=forms.HiddenInput())
+
+        if self.asset_type_name == "myTransformer":
+            self.fields[
+                "eco_params_flow_choice"
+            ].label = "Flow selection for economical parameters"
+            self.fields[
+                "tec_params_flow_choice"
+            ].label = "Flow selection for technical parameters"
 
         if self.asset_type_name == "heat_pump":
             self.fields["efficiency"] = DualNumberField(
@@ -1315,6 +1333,26 @@ class AssetCreateForm(OpenPlanModelForm):
                     "title": _(""),
                     "style": "font-weight:400; font-size:13px;",
                 }
+            ),
+            "eco_params_flow_choice": forms.Select(
+                choices=FLOW_CHOICE,
+                attrs={
+                    "data-bs-toggle": "tooltip",
+                    "title": _(
+                        "This parameter specifies whether the economic parameters should refer to the transformer input or the transformer output."
+                    ),
+                    "style": "font-weight:400; font-size:13px;",
+                },
+            ),
+            "tec_params_flow_choice": forms.Select(
+                choices=FLOW_CHOICE,
+                attrs={
+                    "data-bs-toggle": "tooltip",
+                    "title": _(
+                        "This parameter specifies whether the technical parameters should refer to the transformer input or the transformer output."
+                    ),
+                    "style": "font-weight:400; font-size:13px;",
+                },
             ),
         }
         labels = {"input_timeseries": _("Timeseries vector")}

@@ -1526,6 +1526,7 @@ def request_mvs_simulation(request, scen_id=0):
     list_busses = []
     list_sinks = []
     list_storages = []
+    list_transformers = []
 
     if scen_id == 0:
         answer = JsonResponse(
@@ -1565,75 +1566,92 @@ def request_mvs_simulation(request, scen_id=0):
                     else:
                         ep_costs = None
 
-                    list_sources.append(
-                        InRetEnsysSource(
-                            label=i["label"],
-                            outputs={
-                                i["outflow_direction"]: InRetEnsysFlow(
-                                    fix=i["input_timeseries"]["value"]
-                                    if i["input_timeseries"]["value"]
-                                    else None,
-                                    variable_costs=i["variable_costs"]["value"]
-                                    if i["variable_costs"]
-                                    else None,
-                                    nominal_value=i["nominal_value"]["value"]
-                                    if i["nominal_value"]
-                                    else None,
-                                    summed_max=i["summed_max"]["value"]
-                                    if i["summed_max"]
-                                    else None,
-                                    summed_min=i["summed_min"]["value"]
-                                    if i["summed_min"]
-                                    else None,
-                                    nonconvex=InRetEnsysNonConvex()
-                                    if i["nonconvex"]["value"] == True
-                                    else None,
-                                    _min=i["_min"]["value"] if i["_min"] else None,
-                                    _max=i["_max"]["value"] if i["_max"] else None,
-                                    investment=InRetEnsysInvestment(
-                                        ep_costs=ep_costs,
-                                        maximum=i["maximum"]["value"]
-                                        if i["maximum"]
-                                        else 1000000,
-                                        minimum=i["minimum"]["value"]
-                                        if i["minimum"]
-                                        else 0,
-                                        existing=i["existing"]["value"]
-                                        if i["existing"]
-                                        else 0,
-                                        offset=i["offset"]["value"]
-                                        if i["offset"]
-                                        else 0,
-                                        nonconvex=True if i["offset"] else False,
+                    try:
+                        list_sources.append(
+                            InRetEnsysSource(
+                                label=i["label"],
+                                outputs={
+                                    i["outflow_direction"]: InRetEnsysFlow(
+                                        fix=i["input_timeseries"]["value"]
+                                        if i["input_timeseries"]["value"]
+                                        else None,
+                                        variable_costs=i["variable_costs"]["value"]
+                                        if i["variable_costs"]
+                                        else None,
+                                        nominal_value=i["nominal_value"]["value"]
+                                        if i["nominal_value"]
+                                        else None,
+                                        summed_max=i["summed_max"]["value"]
+                                        if i["summed_max"]
+                                        else None,
+                                        summed_min=i["summed_min"]["value"]
+                                        if i["summed_min"]
+                                        else None,
+                                        nonconvex=InRetEnsysNonConvex()
+                                        if i["nonconvex"]["value"] == True
+                                        else None,
+                                        _min=i["_min"]["value"] if i["_min"] else None,
+                                        _max=i["_max"]["value"] if i["_max"] else None,
+                                        emission_factor=i["emission_factor"]["value"]
+                                        if i["emission_factor"]
+                                        else None,
+                                        investment=InRetEnsysInvestment(
+                                            ep_costs=ep_costs,
+                                            maximum=i["maximum"]["value"]
+                                            if i["maximum"]
+                                            else 1000000,
+                                            minimum=i["minimum"]["value"]
+                                            if i["minimum"]
+                                            else 0,
+                                            existing=i["existing"]["value"]
+                                            if i["existing"]
+                                            else 0,
+                                            offset=i["offset"]["value"]
+                                            if i["offset"]
+                                            else 0,
+                                            nonconvex=True if i["offset"] else False,
+                                        )
+                                        if bool(ep_costs)
+                                        else None,
                                     )
-                                    if bool(ep_costs)
-                                    else None,
-                                )
-                            },
+                                },
+                            )
                         )
-                    )
+
+                    except Exception as e:
+                        error_msg = f"Source Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {e}."
+                        logger.error(error_msg)
+
                 elif k == "energy_consumption":
                     print("\nEnergy Consumption: \n")
                     print("{} : {}".format(k, i))
 
-                    list_sinks.append(
-                        InRetEnsysSink(
-                            label=i["label"],
-                            inputs={
-                                i["inflow_direction"]: InRetEnsysFlow(
-                                    fix=i["input_timeseries"]["value"]
-                                    if i["input_timeseries"]["value"]
-                                    else None,
-                                    nominal_value=i["nominal_value"]["value"]
-                                    if i["nominal_value"]
-                                    else None,
-                                    variable_costs=i["variable_costs"]["value"]
-                                    if i["variable_costs"]
-                                    else None,
-                                )
-                            },
+                    try:
+                        list_sinks.append(
+                            InRetEnsysSink(
+                                label=i["label"],
+                                inputs={
+                                    i["inflow_direction"]: InRetEnsysFlow(
+                                        fix=i["input_timeseries"]["value"]
+                                        if i["input_timeseries"]["value"]
+                                        else None,
+                                        nominal_value=i["nominal_value"]["value"]
+                                        if i["nominal_value"]
+                                        else None,
+                                        variable_costs=i["variable_costs"]["value"]
+                                        if i["variable_costs"]
+                                        else None,
+                                        emission_factor=i["emission_factor"]["value"]
+                                        if i["emission_factor"]
+                                        else None,
+                                    )
+                                },
+                            )
                         )
-                    )
+
+                    except Exception as e:
+                        error_msg = f"Sink Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {e}."
+                        logger.error(error_msg)
 
                 elif k == "energy_storage":
                     print("\nEnergy Storage: \n")
@@ -1650,100 +1668,251 @@ def request_mvs_simulation(request, scen_id=0):
                         ep_costs = None
                         print(ep_costs)
 
-                    print(
-                        i["fixed_thermal_losses_relative"]["value"]
-                        if i["fixed_thermal_losses_relative"]["value"] != ""
-                        else None
-                    )
+                    # print(
+                    #     i["fixed_thermal_losses_relative"]["value"]
+                    #     if i["fixed_thermal_losses_relative"]["value"] != ""
+                    #     else None
+                    # )
 
-                    list_storages.append(
-                        InRetEnsysStorage(
-                            label=i["label"],
-                            inputs={
-                                i["inflow_direction"]: InRetEnsysFlow(
-                                    nonconvex=InRetEnsysNonConvex()
-                                    if i["nonconvex"]["value"] == True
-                                    else None,
-                                    nominal_value=i["nominal_value"]["value"]
-                                    if bool(i["nominal_value"])
-                                    else None,
-                                    variable_costs=i["variable_costs"]["value"]
-                                    if bool(i["variable_costs"])
-                                    else None,
+                    try:
+                        list_storages.append(
+                            InRetEnsysStorage(
+                                label=i["label"],
+                                inputs={
+                                    i["inflow_direction"]: InRetEnsysFlow(
+                                        nonconvex=InRetEnsysNonConvex()
+                                        if i["nonconvex"]["value"] == True
+                                        else None,
+                                        nominal_value=i["nominal_value"]["value"]
+                                        if bool(i["nominal_value"])
+                                        else None,
+                                        variable_costs=i["variable_costs"]["value"]
+                                        if bool(i["variable_costs"])
+                                        else None,
+                                    )
+                                },
+                                outputs={
+                                    i["outflow_direction"]: InRetEnsysFlow(
+                                        nonconvex=InRetEnsysNonConvex()
+                                        if i["nonconvex"]["value"] == True
+                                        else None,
+                                        nominal_value=i["nominal_value"]["value"]
+                                        if bool(i["nominal_value"])
+                                        else None,
+                                        variable_costs=i["variable_costs"]["value"]
+                                        if bool(i["variable_costs"])
+                                        else None,
+                                    )
+                                },
+                                thermal_loss_rate=i["thermal_loss_rate"]["value"]
+                                if i["thermal_loss_rate"]
+                                else None,
+                                fixed_thermal_losses_relative=i[
+                                    "fixed_thermal_losses_relative"
+                                ]["value"]
+                                if i["fixed_thermal_losses_relative"]
+                                else None,
+                                fixed_thermal_losses_absolute=i[
+                                    "fixed_thermal_losses_absolute"
+                                ]["value"]
+                                if i["fixed_thermal_losses_absolute"]
+                                else None,
+                                initial_storage_level=i["initial_storage_level"][
+                                    "value"
+                                ]
+                                if bool(i["initial_storage_level"])
+                                else None,
+                                balanced=i["balanced"]["value"],
+                                invest_relation_input_capacity=i[
+                                    "invest_relation_input_capacity"
+                                ]["value"]
+                                if bool(i["invest_relation_input_capacity"])
+                                else None,
+                                invest_relation_output_capacity=i[
+                                    "invest_relation_output_capacity"
+                                ]["value"]
+                                if bool(i["invest_relation_output_capacity"])
+                                else None,
+                                inflow_conversion_factor=i["inflow_conversion_factor"][
+                                    "value"
+                                ],
+                                outflow_conversion_factor=i[
+                                    "outflow_conversion_factor"
+                                ]["value"],
+                                nominal_storage_capacity=i["nominal_storage_capacity"][
+                                    "value"
+                                ]
+                                if bool(i["nominal_storage_capacity"])
+                                else None,
+                                investment=InRetEnsysInvestment(
+                                    ep_costs=ep_costs,
+                                    maximum=i["maximum"]["value"]
+                                    if bool(i["maximum"])
+                                    else 1000000,
+                                    minimum=i["minimum"]["value"]
+                                    if bool(i["minimum"])
+                                    else 0,
+                                    existing=i["existing"]["value"]
+                                    if bool(i["existing"])
+                                    else 0,
+                                    offset=i["offset"]["value"]
+                                    if bool(i["offset"])
+                                    else 0,
+                                    nonconvex=True if bool(i["offset"]) else False,
                                 )
-                            },
-                            outputs={
-                                i["outflow_direction"]: InRetEnsysFlow(
-                                    nonconvex=InRetEnsysNonConvex()
-                                    if i["nonconvex"]["value"] == True
-                                    else None,
-                                    nominal_value=i["nominal_value"]["value"]
-                                    if bool(i["nominal_value"])
-                                    else None,
-                                    variable_costs=i["variable_costs"]["value"]
-                                    if bool(i["variable_costs"])
-                                    else None,
-                                )
-                            },
-                            thermal_loss_rate=i["thermal_loss_rate"]["value"]
-                            if i["thermal_loss_rate"]["value"] != ""
-                            else None,
-                            fixed_thermal_losses_relative=i[
-                                "fixed_thermal_losses_relative"
-                            ]["value"]
-                            if i["fixed_thermal_losses_relative"]["value"] != ""
-                            else None,
-                            fixed_thermal_losses_absolute=i[
-                                "fixed_thermal_losses_absolute"
-                            ]["value"]
-                            if i["fixed_thermal_losses_absolute"]["value"] != ""
-                            else None,
-                            initial_storage_level=i["initial_storage_level"]["value"]
-                            if bool(i["initial_storage_level"])
-                            else None,
-                            balanced=i["balanced"]["value"],
-                            invest_relation_input_capacity=i[
-                                "invest_relation_input_capacity"
-                            ]["value"]
-                            if bool(i["invest_relation_input_capacity"])
-                            else None,
-                            invest_relation_output_capacity=i[
-                                "invest_relation_output_capacity"
-                            ]["value"]
-                            if bool(i["invest_relation_output_capacity"])
-                            else None,
-                            inflow_conversion_factor=i["inflow_conversion_factor"][
-                                "value"
-                            ],
-                            outflow_conversion_factor=i["outflow_conversion_factor"][
-                                "value"
-                            ],
-                            nominal_storage_capacity=i["nominal_storage_capacity"][
-                                "value"
-                            ]
-                            if bool(i["nominal_storage_capacity"])
-                            else None,
-                            investment=InRetEnsysInvestment(
-                                ep_costs=ep_costs,
-                                maximum=i["maximum"]["value"]
-                                if bool(i["maximum"])
-                                else 1000000,
-                                minimum=i["minimum"]["value"]
-                                if bool(i["minimum"])
-                                else 0,
-                                existing=i["existing"]["value"]
-                                if bool(i["existing"])
-                                else 0,
-                                offset=i["offset"]["value"] if bool(i["offset"]) else 0,
-                                nonconvex=True if bool(i["offset"]) else False,
+                                if bool(ep_costs)
+                                else None,
                             )
-                            if bool(ep_costs)
-                            else None,
                         )
-                    )
+
+                    except Exception as e:
+                        error_msg = f"Storage Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {e}."
+                        logger.error(error_msg)
+
                 elif k == "energy_conversion":
                     print("\nEnergy Conversion: \n")
                     print("{} : {}".format(k, i))
+
+                    if bool(i["capex"]):
+                        ep_costs = epc_calc(
+                            i["capex"]["value"],
+                            i["lifetime"]["value"],
+                            i["opex"]["value"],
+                        )
+                        print(ep_costs)
+                    else:
+                        ep_costs = None
+
+                    if i["maximum"] and i["eco_params_flow_choice"] == "outputs":
+                        print("yes")
+
+                    try:
+                        list_transformers.append(
+                            InRetEnsysTransformer(
+                                label=i["label"],
+                                inputs={
+                                    i["inflow_direction"]: InRetEnsysFlow(
+                                        fix=i["input_timeseries"][
+                                            "value"
+                                        ]  # We first assume that it is a base load.
+                                        if i["input_timeseries"]["value"]
+                                        else None,
+                                        variable_costs=i["variable_costs"]["value"]
+                                        if i["variable_costs"]
+                                        and i["eco_params_flow_choice"] == "inputs"
+                                        else None,
+                                        nominal_value=i["nominal_value"]["value"]
+                                        if i["nominal_value"]
+                                        and i["tec_params_flow_choice"] == "inputs"
+                                        else None,
+                                        summed_max=i["summed_max"]["value"]
+                                        if i["summed_max"]
+                                        and i["tec_params_flow_choice"] == "inputs"
+                                        else None,
+                                        summed_min=i["summed_min"]["value"]
+                                        if i["summed_min"]
+                                        and i["tec_params_flow_choice"] == "inputs"
+                                        else None,
+                                        nonconvex=InRetEnsysNonConvex()
+                                        if i["nonconvex"]["value"] == True
+                                        and i["tec_params_flow_choice"] == "inputs"
+                                        else None,
+                                        _min=i["_min"]["value"]
+                                        if i["_min"]
+                                        and i["tec_params_flow_choice"] == "inputs"
+                                        else None,
+                                        _max=i["_max"]["value"]
+                                        if i["_max"]
+                                        and i["tec_params_flow_choice"] == "inputs"
+                                        else None,
+                                        investment=InRetEnsysInvestment(
+                                            ep_costs=ep_costs,
+                                            maximum=i["maximum"]["value"]
+                                            if i["maximum"]
+                                            else 1000000,
+                                            minimum=i["minimum"]["value"]
+                                            if i["minimum"]
+                                            else 0,
+                                            existing=i["existing"]["value"]
+                                            if i["existing"]
+                                            else 0,
+                                            offset=i["offset"]["value"]
+                                            if i["offset"]
+                                            else 0,
+                                            nonconvex=True if i["offset"] else False,
+                                        )
+                                        if bool(ep_costs)
+                                        and i["eco_params_flow_choice"] == "inputs"
+                                        else None,
+                                    )
+                                },
+                                outputs={
+                                    i["outflow_direction"]: InRetEnsysFlow(
+                                        fix=i["input_timeseries"][
+                                            "value"
+                                        ]  # We first assume that it is a base load.
+                                        if i["input_timeseries"]["value"]
+                                        else None,
+                                        variable_costs=i["variable_costs"]["value"]
+                                        if i["variable_costs"]
+                                        and i["eco_params_flow_choice"] == "outputs"
+                                        else None,
+                                        nominal_value=i["nominal_value"]["value"]
+                                        if i["nominal_value"]
+                                        and i["tec_params_flow_choice"] == "outputs"
+                                        else None,
+                                        summed_max=i["summed_max"]["value"]
+                                        if i["summed_max"]
+                                        and i["tec_params_flow_choice"] == "outputs"
+                                        else None,
+                                        summed_min=i["summed_min"]["value"]
+                                        if i["summed_min"]
+                                        and i["tec_params_flow_choice"] == "outputs"
+                                        else None,
+                                        nonconvex=InRetEnsysNonConvex()
+                                        if i["nonconvex"]["value"] == True
+                                        and i["tec_params_flow_choice"] == "outputs"
+                                        else None,
+                                        _min=i["_min"]["value"]
+                                        if i["_min"]
+                                        and i["tec_params_flow_choice"] == "outputs"
+                                        else None,
+                                        _max=i["_max"]["value"]
+                                        if i["_max"]
+                                        and i["tec_params_flow_choice"] == "outputs"
+                                        else None,
+                                        emission_factor=i["emission_factor"]["value"]
+                                        if i["emission_factor"]
+                                        else None,
+                                        investment=InRetEnsysInvestment(
+                                            ep_costs=ep_costs,
+                                            maximum=i["maximum"]["value"]
+                                            if i["maximum"]
+                                            else 1000000,
+                                            minimum=i["minimum"]["value"]
+                                            if i["minimum"]
+                                            else 0,
+                                            existing=i["existing"]["value"]
+                                            if i["existing"]
+                                            else 0,
+                                            offset=i["offset"]["value"]
+                                            if i["offset"]
+                                            else 0,
+                                            nonconvex=True if i["offset"] else False,
+                                        )
+                                        if bool(ep_costs)
+                                        and i["eco_params_flow_choice"] == "outputs"
+                                        else None,
+                                    )
+                                },
+                                conversion_factors={
+                                    i["outflow_direction"]: i["efficiency"]["value"]
+                                },
+                            )
+                        )
+                    except Exception as e:
+                        error_msg = f"Trafo Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {e}."
+                        logger.error(error_msg)
 
         print(data_clean["economic_data"])
         # date_time_index = pd.date_range(
@@ -1755,7 +1924,7 @@ def request_mvs_simulation(request, scen_id=0):
             sinks=list_sinks,
             sources=list_sources,
             storages=list_storages,
-            # transformers=[],
+            transformers=list_transformers,
             # timeindex=str(date_time_index)
             frequenz="hourly",
             start_date="1/1/2022",
@@ -1766,6 +1935,10 @@ def request_mvs_simulation(request, scen_id=0):
             energysystem=energysystem,
             solver=Solver.gurobi,
             # solver_verbose=False
+        )
+
+        InRetEnsysConstraints(
+            typ="emission_limit", keyword="emission_factor", limit=500
         )
 
         jf = open("my_model_config.json", "wt")
@@ -1798,7 +1971,7 @@ def request_mvs_simulation(request, scen_id=0):
             data_clean["simulation_settings"]["output_lp_file"] = "true"
 
     # Make simulation request to MVS
-    results = mvs_simulation_request(data_clean)
+    # results = mvs_simulation_request(data_clean)
 
     if results is None:
         error_msg = "Could not communicate with the simulation server."

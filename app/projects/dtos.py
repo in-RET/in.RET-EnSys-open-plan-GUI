@@ -84,6 +84,8 @@ class AssetDto:
         inflow_direction: str,
         outflow_direction: str,
         choice_load_profile: str,
+        eco_params_flow_choice: str,
+        tec_params_flow_choice: str,
         # dispatchable: bool,
         # age_installed: ValueTypeDto,
         # c_rate: ValueTypeDto,
@@ -115,6 +117,7 @@ class AssetDto:
         summed_max: ValueTypeDto,
         summed_min: ValueTypeDto,
         efficiency: ValueTypeDto,
+        emission_factor: ValueTypeDto,
         input_timeseries: TimeseriesDataDto,
         unit: str,
         # beta: ValueTypeDto = None,
@@ -127,6 +130,8 @@ class AssetDto:
         self.inflow_direction = inflow_direction
         self.outflow_direction = outflow_direction
         self.choice_load_profile = choice_load_profile
+        self.eco_params_flow_choice = eco_params_flow_choice
+        self.tec_params_flow_choice = tec_params_flow_choice
         # self.dispatchable = dispatchable
         # self.age_installed = age_installed
         # self.c_rate = c_rate
@@ -158,6 +163,7 @@ class AssetDto:
         self.summed_max = summed_max
         self.summed_min = summed_min
         self.efficiency = efficiency
+        self.emission_factor = emission_factor
         self.input_timeseries = input_timeseries
         self.unit = unit
 
@@ -619,6 +625,8 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
             inflow_direction,
             outflow_direction,
             asset.choice_load_profile,
+            asset.eco_params_flow_choice,
+            asset.tec_params_flow_choice,
             # asset.dispatchable,
             # to_value_type(asset, "age_installed"),
             # to_value_type(asset, "crate"),
@@ -650,6 +658,7 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
             to_value_type(asset, "summed_max"),
             to_value_type(asset, "summed_min"),
             to_value_type(asset, "efficiency"),
+            to_value_type(asset, "emission_factor"),
             to_timeseries_data(asset, "input_timeseries"),
             asset.asset_type.unit,
             **optional_parameters

@@ -279,6 +279,12 @@ LOAD_PROFILE_CHOICE = (
     ("load_profile_3", "load profile 3"),
 )
 
+FLOW_CHOICE = (
+    ("", "Choose..."),
+    ("inputs", "Relate parameters to the Input-Flow"),
+    ("outputs", "Relate parameters to the Output-Flow"),
+)
+
 
 COP_MODES = (("Heat pump", "heat_pump"), ("Chiller", "chiller"))
 

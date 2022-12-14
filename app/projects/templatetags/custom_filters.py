@@ -87,6 +87,7 @@ def is_economical_parameter(param):
         "existing",
         "invest_relation_input_capacity",
         "invest_relation_output_capacity",
+        "eco_params_flow_choice",
     ]
 
 

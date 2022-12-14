@@ -25,6 +25,7 @@ from projects.constants import (
     BOOL_CHOICES,
     USER_RATING,
     LOAD_PROFILE_CHOICE,
+    FLOW_CHOICE,
 )
 
 
@@ -474,10 +475,10 @@ class Asset(TopologyNode):
     thermal_loss_rate = models.FloatField(
         default=None, null=True, blank=True, validators=[MinValueValidator(0.0)]
     )
-    fixed_thermal_losses_relative = models.TextField(
+    fixed_thermal_losses_relative = models.FloatField(
         null=True, blank=True, default=None
     )
-    fixed_thermal_losses_absolute = models.TextField(
+    fixed_thermal_losses_absolute = models.FloatField(
         null=True, blank=True, default=None
     )
 
@@ -511,6 +512,13 @@ class Asset(TopologyNode):
     choice_load_profile = models.CharField(
         null=True, blank=False, choices=LOAD_PROFILE_CHOICE, max_length=20
     )
+    eco_params_flow_choice = models.CharField(
+        null=True, blank=False, choices=FLOW_CHOICE, max_length=40
+    )
+    tec_params_flow_choice = models.CharField(
+        null=True, blank=False, choices=FLOW_CHOICE, max_length=40
+    )
+    emission_factor = models.FloatField(default=None, blank=True, null=True)
 
     @property
     def fields(self):

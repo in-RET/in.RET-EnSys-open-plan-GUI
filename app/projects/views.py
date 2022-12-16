@@ -1945,7 +1945,7 @@ def request_mvs_simulation(request, scen_id=0):
 
     # Make simulation request to FastAPI    
     INRETENSYS_API_HOST = "localhost:8001"
-    requests.post("http://"+INRETENSYS_API_HOST+"/uploadJson/", json=model.json())
+    requests.post(url="http://"+INRETENSYS_API_HOST+"/uploadJson/", json=model.json(), params={'username': '', 'password': '', 'docker': True})
     results = None
 
     if results is None:

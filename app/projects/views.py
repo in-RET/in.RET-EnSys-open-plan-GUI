@@ -60,6 +60,7 @@ from InRetEnsys import InRetEnsysEnergysystem, InRetEnsysModel, InRetEnsysFlow
 from InRetEnsys.components.investment import InRetEnsysInvestment
 from InRetEnsys import Solver, ModelBuilder, InRetEnsysNonConvex
 import os
+import requests
 
 logger = logging.getLogger(__name__)
 
@@ -701,11 +702,11 @@ def scenario_create_topology(request, proj_id, scen_id, step_id=2, max_step=3):
         # },
         "production": {
             # "pv_plant": _("PV Plant"),
-            "wind_plant": _("Wind Plant"),
+            # "wind_plant": _("Wind Plant"),
             # "biogas_plant": _("Biogas Plant"),
             # "geothermal_conversion": _("Geothermal Conversion"),
             # "solar_thermal_plant": _("Solar Thermal Plant"),
-            "mySource": _("Source"),
+            "mySource": _("Source")
         },
         "conversion": {
             # "transformer_station_in": _("Transformer Station (in)"),  #
@@ -716,18 +717,18 @@ def scenario_create_topology(request, proj_id, scen_id, step_id=2, max_step=3):
             # "diesel_generator": _("Diesel Generator"),
             # "fuel_cell": _(" Fuel Cell"),
             # "gas_boiler": _("Gas Boiler"),
-            "electrolyzer": _("Electrolyzer"),
+            # "electrolyzer": _("Electrolyzer"),
             # "heat_pump": _("Heat Pump"),
             # "chp": _("Combined Heat and Power"),
             # "chp_fixed_ratio": _("CHP fixed ratio"),
-            "myTransformer": _("Transformer"),
+            "myTransformer": _("Transformer")
         },
         "storage": {
-            "bess": _("Electricity Storage"),
+            # "bess": _("Electricity Storage"),
             # "gess": _("Gas Storage"),
             # "h2ess": _("H2 Storage"),
             # "hess": _("Heat Storage"),
-            "myGenericStorage": _("GenericStorage"),
+            "myGenericStorage": _("GenericStorage")
         },
         "demand": {
             # "demand": _("Electricity Demand"),
@@ -796,23 +797,25 @@ def scenario_create_topology(request, proj_id, scen_id, step_id=2, max_step=3):
 def scenario_create_constraints(request, proj_id, scen_id, step_id=3, max_step=4):
 
     constraints_labels = {
-        "minimal_degree_of_autonomy": _("Minimal degree of autonomy"),
-        "minimal_renewable_factor": _("Minimal share of renewables"),
+        # "minimal_degree_of_autonomy": _("Minimal degree of autonomy"),
+        "minimal_renewable_factor": _(
+            "'Bilanziell erneuerbar'/Bilanzielle Autarkie [MWh] the (in)equation looks like this: -(Erzeugung) <= -(Last) OR -(Erzeugung) + Last <= 0"
+        ),
         "maximum_emissions": _("Maximal CO2 emissions"),
-        "net_zero_energy": _("Net zero energy system"),
+        # "net_zero_energy": _("Net zero energy system"),
     }
     constraints_forms = {
-        "minimal_degree_of_autonomy": MinDOAConstraintForm,
+        # "minimal_degree_of_autonomy": MinDOAConstraintForm,
         "minimal_renewable_factor": MinRenewableConstraintForm,
         "maximum_emissions": MaxEmissionConstraintForm,
-        "net_zero_energy": NZEConstraintForm,
+        # "net_zero_energy": NZEConstraintForm,
     }
 
     constraints_models = {
-        "minimal_degree_of_autonomy": MinDOAConstraint,
+        # "minimal_degree_of_autonomy": MinDOAConstraint,
         "minimal_renewable_factor": MinRenewableConstraint,
         "maximum_emissions": MaxEmissionConstraint,
-        "net_zero_energy": NZEConstraint,
+        # "net_zero_energy": NZEConstraint,
     }
 
     scenario = get_object_or_404(Scenario, pk=scen_id)
@@ -1527,6 +1530,7 @@ def request_mvs_simulation(request, scen_id=0):
     list_sinks = []
     list_storages = []
     list_transformers = []
+    list_constraints = []
 
     if scen_id == 0:
         answer = JsonResponse(
@@ -1595,6 +1599,9 @@ def request_mvs_simulation(request, scen_id=0):
                                         emission_factor=i["emission_factor"]["value"]
                                         if i["emission_factor"]
                                         else None,
+                                        renewable_factor=i["renewable_factor"]["value"]
+                                        if i["renewable_factor"]
+                                        else None,
                                         investment=InRetEnsysInvestment(
                                             ep_costs=ep_costs,
                                             maximum=i["maximum"]["value"]
@@ -1641,8 +1648,8 @@ def request_mvs_simulation(request, scen_id=0):
                                         variable_costs=i["variable_costs"]["value"]
                                         if i["variable_costs"]
                                         else None,
-                                        emission_factor=i["emission_factor"]["value"]
-                                        if i["emission_factor"]
+                                        renewable_factor=i["renewable_factor"]["value"]
+                                        if i["renewable_factor"]
                                         else None,
                                     )
                                 },
@@ -1667,12 +1674,6 @@ def request_mvs_simulation(request, scen_id=0):
                     else:
                         ep_costs = None
                         print(ep_costs)
-
-                    # print(
-                    #     i["fixed_thermal_losses_relative"]["value"]
-                    #     if i["fixed_thermal_losses_relative"]["value"] != ""
-                    #     else None
-                    # )
 
                     try:
                         list_storages.append(
@@ -1881,8 +1882,8 @@ def request_mvs_simulation(request, scen_id=0):
                                         if i["_max"]
                                         and i["tec_params_flow_choice"] == "outputs"
                                         else None,
-                                        emission_factor=i["emission_factor"]["value"]
-                                        if i["emission_factor"]
+                                        renewable_factor=i["renewable_factor"]["value"]
+                                        if i["renewable_factor"]
                                         else None,
                                         investment=InRetEnsysInvestment(
                                             ep_costs=ep_costs,
@@ -1915,6 +1916,8 @@ def request_mvs_simulation(request, scen_id=0):
                         logger.error(error_msg)
 
         print(data_clean["economic_data"])
+        print(data_clean["simulation_settings"])
+        print(data_clean["constraints"])
         # date_time_index = pd.date_range(
         #     "1/1/2022", periods=8760, freq="H"
         # )
@@ -1931,19 +1934,46 @@ def request_mvs_simulation(request, scen_id=0):
             time_steps=8760,
         )
 
+        (
+            list_constraints.append(
+                InRetEnsysConstraints(
+                    typ="emission_limit",
+                    keyword="emission_factor",
+                    limit=data_clean["constraints"]["maximum_emissions"]["value"],
+                )
+            )
+            if "maximum_emissions" in data_clean["constraints"]
+            else None
+        )
+
+        (
+            list_constraints.append(
+                InRetEnsysConstraints(
+                    typ="generic_integral_limit",
+                    keyword="renewable_factor",
+                    limit=data_clean["constraints"]["minimal_renewable_factor"][
+                        "value"
+                    ],
+                )
+            )
+            if "minimal_renewable_factor" in data_clean["constraints"]
+            else None
+        )
+
         model = InRetEnsysModel(
             energysystem=energysystem,
             solver=Solver.gurobi,
             # solver_verbose=False
-        )
-
-        InRetEnsysConstraints(
-            typ="emission_limit", keyword="emission_factor", limit=500
+            constraints=list_constraints,
         )
 
         jf = open("my_model_config.json", "wt")
         jf.write(model.json())
         jf.close()
+
+        # requests.post("http://172.19.98.191:8001/",
+        #               json=model.json())
+
         my_path = os.path.abspath(os.path.dirname(__file__))
         results = ModelBuilder(
             ConfigFile="my_model_config.json",

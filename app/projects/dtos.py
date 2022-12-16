@@ -118,6 +118,7 @@ class AssetDto:
         summed_min: ValueTypeDto,
         efficiency: ValueTypeDto,
         emission_factor: ValueTypeDto,
+        renewable_factor: ValueTypeDto,
         input_timeseries: TimeseriesDataDto,
         unit: str,
         # beta: ValueTypeDto = None,
@@ -164,6 +165,7 @@ class AssetDto:
         self.summed_min = summed_min
         self.efficiency = efficiency
         self.emission_factor = emission_factor
+        self.renewable_factor = renewable_factor
         self.input_timeseries = input_timeseries
         self.unit = unit
 
@@ -659,6 +661,7 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
             to_value_type(asset, "summed_min"),
             to_value_type(asset, "efficiency"),
             to_value_type(asset, "emission_factor"),
+            to_value_type(asset, "renewable_factor"),
             to_timeseries_data(asset, "input_timeseries"),
             asset.asset_type.unit,
             **optional_parameters

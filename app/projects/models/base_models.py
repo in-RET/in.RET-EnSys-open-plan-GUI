@@ -519,6 +519,7 @@ class Asset(TopologyNode):
         null=True, blank=False, choices=FLOW_CHOICE, max_length=40
     )
     emission_factor = models.FloatField(default=None, blank=True, null=True)
+    renewable_factor = models.FloatField(default=None, blank=True, null=True)
 
     @property
     def fields(self):

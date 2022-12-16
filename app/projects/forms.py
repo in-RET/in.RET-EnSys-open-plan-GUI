@@ -410,14 +410,6 @@ scenario_widgets = {
             ),
         }
     ),
-    "emission_limit": forms.NumberInput(
-        attrs={
-            "placeholder": "e.g. 10000t",
-            "min": "0",
-            "data-bs-toggle": "tooltip",
-            "title": _(""),
-        }
-    ),
 }
 
 scenario_labels = {
@@ -427,7 +419,6 @@ scenario_labels = {
     "time_step": _("Time Step"),
     "start_date": _("Start Date"),
     "capex_fix": _("Development costs"),
-    "emission_limit": _("Emission Limit"),
 }
 
 scenario_field_order = [
@@ -437,7 +428,6 @@ scenario_field_order = [
     "time_step",
     "start_date",
     "capex_fix",
-    "emission_limit",
 ]
 
 
@@ -1354,6 +1344,28 @@ class AssetCreateForm(OpenPlanModelForm):
                     "style": "font-weight:400; font-size:13px;",
                 },
             ),
+            "emission_factor": forms.NumberInput(
+                attrs={
+                    "placeholder": "e.g. 201 in kg_CO2/MWh",
+                    "min": "0.0",
+                    "max": "1.0",
+                    "step": ".0001",
+                    "data-bs-toggle": "tooltip",
+                    "title": "",
+                    "style": "font-weight:400; font-size:13px;",
+                }
+            ),
+            "renewable_factor": forms.NumberInput(
+                attrs={
+                    "placeholder": "e.g. 1",
+                    "min": "0.0",
+                    "max": "1.0",
+                    "step": ".0001",
+                    "data-bs-toggle": "tooltip",
+                    "title": "This parameter enters into the condition 'Bilanziell Erneuerbar' and is multiplied by the amount of energy of the respective component.",
+                    "style": "font-weight:400; font-size:13px;",
+                }
+            ),
         }
         labels = {"input_timeseries": _("Timeseries vector")}
         help_texts = {
@@ -1418,6 +1430,7 @@ class StorageForm_II(AssetCreateForm):
                 "min": 0.0,
                 "max": 1.0,
                 "step": "0.00001",
+                "style": "font-weight:400; font-size:13px;",
             }
         )
         self.fields["fixed_thermal_losses_relative"].widget = forms.NumberInput(
@@ -1426,6 +1439,7 @@ class StorageForm_II(AssetCreateForm):
                 "min": 0.0,
                 "max": 1.0,
                 "step": "0.00001",
+                "style": "font-weight:400; font-size:13px;",
             }
         )
         self.fields["fixed_thermal_losses_absolute"].widget = forms.NumberInput(
@@ -1434,5 +1448,6 @@ class StorageForm_II(AssetCreateForm):
                 "min": 0.0,
                 "max": 1.0,
                 "step": "0.00001",
+                "style": "font-weight:400; font-size:13px;",
             }
         )

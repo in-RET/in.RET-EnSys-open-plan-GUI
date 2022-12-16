@@ -1926,9 +1926,6 @@ def request_mvs_simulation(request, scen_id=0):
             typ="emission_limit", keyword="emission_factor", limit=500
         )
         
-        INRET_API_HOST = "localhost:8001"
-        requests.post("http://"+INRETENSYS_API_HOST+"/uploadJson/", json=model.json())
-        
         results = None
     except Exception as e:
         error_msg = f"Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {e}."
@@ -1945,8 +1942,10 @@ def request_mvs_simulation(request, scen_id=0):
         if output_lp_file == "on":
             data_clean["simulation_settings"]["output_lp_file"] = "true"
 
-    # Make simulation request to MVS
-    # results = mvs_simulation_request(data_clean)
+    # Make simulation request to FastAPI    
+    INRET_API_HOST = "localhost:8001"
+    requests.post("http://"+INRETENSYS_API_HOST+"/uploadJson/", json=model.json())
+    results = None
 
     if results is None:
         error_msg = "Could not communicate with the simulation server."

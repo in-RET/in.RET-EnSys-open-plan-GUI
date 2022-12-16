@@ -6,6 +6,7 @@ import traceback
 from datetime import datetime
 
 import pandas as pd
+import requests
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -18,14 +19,14 @@ from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
 from epa.settings import MVS_GET_URL, MVS_LP_FILE_URL, MVS_SA_GET_URL
 from InRetEnsys import *
-from InRetEnsys.types import Solver
 from InRetEnsys.modelbuilder import ModelBuilder
+from InRetEnsys.types import Solver
+from jsonview.decorators import json_view
 from oemof import solph
 from oemof.tools import economics
 from projects.helpers import epc_calc, format_scenario_for_mvs
 from projects.models import *
 from users.models import CustomUser
-from jsonview.decorators import json_view
 
 from .constants import DONE, ERROR, MODIFIED, PENDING
 from .forms import *
@@ -1943,7 +1944,7 @@ def request_mvs_simulation(request, scen_id=0):
             data_clean["simulation_settings"]["output_lp_file"] = "true"
 
     # Make simulation request to FastAPI    
-    INRET_API_HOST = "localhost:8001"
+    INRETENSYS_API_HOST = "localhost:8001"
     requests.post("http://"+INRETENSYS_API_HOST+"/uploadJson/", json=model.json())
     results = None
 

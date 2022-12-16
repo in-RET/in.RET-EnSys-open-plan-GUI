@@ -1,65 +1,50 @@
 # from bootstrap_modal_forms.generic import BSModalCreateView
-from django.contrib.auth.decorators import login_required
 import json
 import logging
+import os
 import traceback
+from datetime import datetime
+
+import pandas as pd
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
+from django.db.models import Q
 from django.http import HttpResponseForbidden, JsonResponse
 from django.http.response import Http404
-from django.utils.translation import gettext_lazy as _
 from django.shortcuts import *
 from django.urls import reverse
-from django.core.exceptions import PermissionDenied
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
-from django.contrib import messages
-from jsonview.decorators import json_view
-from datetime import datetime
-from users.models import CustomUser
-from django.db.models import Q
 from epa.settings import MVS_GET_URL, MVS_LP_FILE_URL, MVS_SA_GET_URL
-from .forms import *
-from .requests import (
-    mvs_simulation_request,
-    fetch_mvs_simulation_results,
-    mvs_sensitivity_analysis_request,
-    fetch_mvs_sa_results,
-)
-from projects.models import *
-from .scenario_topology_helpers import (
-    handle_storage_unit_form_post,
-    handle_bus_form_post,
-    handle_asset_form_post,
-    load_scenario_topology_from_db,
-    NodeObject,
-    update_deleted_objects_from_database,
-    duplicate_scenario_objects,
-    duplicate_scenario_connections,
-    load_scenario_from_dict,
-    load_project_from_dict,
-)
-from projects.helpers import format_scenario_for_mvs, epc_calc
-from .constants import DONE, PENDING, ERROR, MODIFIED
-from .services import (
-    create_or_delete_simulation_scheduler,
-    excuses_design_under_development,
-    send_feedback_email,
-    get_selected_scenarios_in_cache,
-)
-import traceback
+from InRetEnsys import *
+from InRetEnsys.types import Solver
+from InRetEnsys.modelbuilder import ModelBuilder
 from oemof import solph
 from oemof.tools import economics
-import pandas as pd
+from projects.helpers import epc_calc, format_scenario_for_mvs
+from projects.models import *
+from users.models import CustomUser
+from jsonview.decorators import json_view
 
-
-from InRetEnsys.components.bus import InRetEnsysBus
-from InRetEnsys.components.constraints import InRetEnsysConstraints
-from InRetEnsys.components.genericstorage import InRetEnsysStorage
-from InRetEnsys.components.sink import InRetEnsysSink
-from InRetEnsys.components.source import InRetEnsysSource
-from InRetEnsys.components.transformer import InRetEnsysTransformer
-from InRetEnsys import InRetEnsysEnergysystem, InRetEnsysModel, InRetEnsysFlow
-from InRetEnsys.components.investment import InRetEnsysInvestment
-from InRetEnsys import Solver, ModelBuilder, InRetEnsysNonConvex
-import os
+from .constants import DONE, ERROR, MODIFIED, PENDING
+from .forms import *
+from .requests import (fetch_mvs_sa_results, fetch_mvs_simulation_results,
+                       mvs_sensitivity_analysis_request,
+                       mvs_simulation_request)
+from .scenario_topology_helpers import (NodeObject,
+                                        duplicate_scenario_connections,
+                                        duplicate_scenario_objects,
+                                        handle_asset_form_post,
+                                        handle_bus_form_post,
+                                        handle_storage_unit_form_post,
+                                        load_project_from_dict,
+                                        load_scenario_from_dict,
+                                        load_scenario_topology_from_db,
+                                        update_deleted_objects_from_database)
+from .services import (create_or_delete_simulation_scheduler,
+                       excuses_design_under_development,
+                       get_selected_scenarios_in_cache, send_feedback_email)
 
 logger = logging.getLogger(__name__)
 
@@ -1940,21 +1925,11 @@ def request_mvs_simulation(request, scen_id=0):
         InRetEnsysConstraints(
             typ="emission_limit", keyword="emission_factor", limit=500
         )
-
-        jf = open("my_model_config.json", "wt")
-        jf.write(model.json())
-        jf.close()
-        my_path = os.path.abspath(os.path.dirname(__file__))
-        results = ModelBuilder(
-            ConfigFile="my_model_config.json",
-            DumpFile="../dumps/my_model_config.dump",
-            wdir=os.path.join(my_path, "../dumps"),
-            logdir=os.path.join(my_path, "../dumps"),
-            dumpdir=os.path.join(my_path, "../dumps"),
-        )
-
-        # model.write('my_model.lp', io_options={'symbolic_solver_labels': True}) noch nicht implementiert
-        # err = 1/0
+        
+        INRET_API_HOST = "localhost:8001"
+        requests.post("http://"+INRETENSYS_API_HOST+"/uploadJson/", json=model.json())
+        
+        results = None
     except Exception as e:
         error_msg = f"Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {e}."
         logger.error(error_msg)

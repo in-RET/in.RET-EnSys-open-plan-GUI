@@ -26,6 +26,41 @@ const layout = {
 };
 
 
+function makePlotlyLoadProfile(value)
+{
+		var data;
+		var trace1 = {
+		  x: [...Array(8760).keys()],
+		  y: Array(8760).fill(5),
+		  type: 'scatter'
+		};
+
+		var trace2 = {
+		  x: [...Array(8760).keys()],
+		  y: Array(8760).fill(6),
+		  type: 'scatter'
+		};
+		
+		var trace3 = {
+		  x: [...Array(8760).keys()],
+		  y: Array(8760).fill(7),
+		  type: 'scatter'
+		};
+		
+		if(value == "load_profile_1"){
+			data = [trace1];			
+		}
+		else if(value == "load_profile_2"){
+			data = [trace2];
+		}
+		else if(value == "load_profile_3"){
+			data = [trace3];
+		}
+		
+		Plotly.newPlot('load_profile_trace', data);
+
+}
+
 function makePlotly( x, y, plot_id="",userLayout=null){
 
     // get the handle of the plotly plot

@@ -1246,6 +1246,16 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
                 if existing_asset.input_timeseries
                 else ""
             )
+            if asset_type_name == "myPredefinedSink":
+                if existing_asset.choice_load_profile == "load_profile_1":
+                    input_timeseries_data = [5] * 8760
+                elif existing_asset.choice_load_profile == "load_profile_2":
+                    input_timeseries_data = [6] * 8760
+                elif existing_asset.choice_load_profile == "load_profile_3":
+                    input_timeseries_data = [7] * 8760
+                else:
+                    input_timeseries_data = ""
+
         else:
             print(asset_type_name)
             asset_list = Asset.objects.filter(
@@ -1258,13 +1268,25 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
             )
             input_timeseries_data = ""
 
-        context = {
-            "form": form,
-            "input_timeseries_data": input_timeseries_data,
-            "input_timeseries_timestamps": json.dumps(
-                scenario.get_timestamps(json_format=True)
-            ),
-        }
+        if asset_type_name == "myPredefinedSink":
+
+            context = {
+                "form": form,
+                "choice_load_profile_data": input_timeseries_data,
+                "choice_load_profile_timestamps": json.dumps(
+                    scenario.get_timestamps(json_format=True)
+                ),
+            }
+
+        else:
+
+            context = {
+                "form": form,
+                "input_timeseries_data": input_timeseries_data,
+                "input_timeseries_timestamps": json.dumps(
+                    scenario.get_timestamps(json_format=True)
+                ),
+            }
 
         return render(request, "asset/asset_create_form.html", context)
 

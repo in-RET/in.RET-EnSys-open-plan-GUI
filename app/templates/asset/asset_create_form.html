@@ -88,5 +88,27 @@
 
       {% endif %}
     </div>
+	<div class="row">
+      {% if form|has_field:"choice_load_profile" %}
+
+        <div id="load_profile_trace"></div>
+		
+		{% if choice_load_profile_timestamps %}
+          <div id="choice_load_profile_timestamps" style="display:none;">
+            <textarea>{{ choice_load_profile_timestamps }}</textarea>
+          </div>
+        {% endif %}
+		
+		{% if choice_load_profile_data %}
+          <div>
+            <a data-bs-toggle="collapse" href="#choice_load_profile_data">{% translate "choosen data" %}</a>
+          </div>
+          <div id="choice_load_profile_data" class="collapse">
+            <textarea>{{ choice_load_profile_data }}</textarea>
+          </div>
+        {% endif %}
+
+      {% endif %}
+    </div>
 
 </div>

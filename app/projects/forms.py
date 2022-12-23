@@ -1181,6 +1181,12 @@ class AssetCreateForm(OpenPlanModelForm):
                     "onchange": "plot_file_trace(obj=this.files, plot_id='timeseries_trace')",
                 }
             ),
+            "choice_load_profile": forms.Select(
+                attrs={
+                    "required": False,
+                    "onchange": "makePlotlyLoadProfile(this.value)",
+                }
+            ),
             "capex": forms.NumberInput(
                 attrs={
                     "placeholder": "e.g. 4000",

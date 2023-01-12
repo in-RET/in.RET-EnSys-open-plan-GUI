@@ -1939,12 +1939,25 @@ def request_mvs_simulation(request, scen_id=0):
             content_type="application/json",
         )
     else:
-        answer = results
+
+        str_results = json.loads(results.content)
+        print(results)
+        print(str_results)
+        print(str_results["folder"])
+
+        ds = {"": item for item in str_results["folder"]}
+
+        answer = JsonResponse(
+            data=ds,
+            status=200,
+            content_type="application/json",
+        )
+
         #answer = HttpResponseRedirect(
         #    reverse("scenario_review", args=[scenario.project.id, scen_id])
         #)
-
     return answer
+
 
 
 @json_view

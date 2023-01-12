@@ -1,66 +1,44 @@
-import numpy as np
-from django.core.exceptions import PermissionDenied
-from django.template.loader import get_template
-from django.db.models import Count
-from django.http.response import Http404, HttpResponse
-from dashboard.helpers import *
-from dashboard.models import (
-    AssetsResults,
-    KPICostsMatrixResults,
-    KPIScalarResults,
-    KPI_COSTS_TOOLTIPS,
-    KPI_COSTS_UNITS,
-    KPI_SCALAR_TOOLTIPS,
-    KPI_SCALAR_UNITS,
-)
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse, HttpResponseForbidden
-from django.shortcuts import render, get_object_or_404, HttpResponseRedirect
-from django.urls import reverse
-from django.views.decorators.http import require_http_methods
-from jsonview.decorators import json_view
-from projects.models import (
-    Project,
-    Scenario,
-    Simulation,
-    Asset,
-    Bus,
-    SensitivityAnalysis,
-    get_project_sensitivity_analysis,
-)
-from projects.services import (
-    excuses_design_under_development,
-    get_selected_scenarios_in_cache,
-)
-
-from projects.forms import BusForm, AssetCreateForm, StorageForm
-
-from projects.constants import COMPARE_VIEW
-from dashboard.models import (
-    ReportItem,
-    SensitivityAnalysisGraph,
-    get_project_reportitems,
-    get_project_sensitivity_analysis_graphs,
-    REPORT_GRAPHS,
-    STORAGE_SUB_CATEGORIES,
-    OUTPUT_POWER,
-)
-from projects.scenario_topology_helpers import load_scenario_topology_from_db
-from dashboard.forms import (
-    ReportItemForm,
-    TimeseriesGraphForm,
-    graph_parameters_form_factory,
-)
-from django.utils.translation import ugettext_lazy as _
-from django.utils.safestring import mark_safe
-from io import BytesIO
-import xlsxwriter
-import json
 import datetime
+import json
 import logging
 import traceback
+from io import BytesIO
+
+import numpy as np
+import xlsxwriter
+from dashboard.forms import (ReportItemForm, TimeseriesGraphForm,
+                             graph_parameters_form_factory)
+from dashboard.helpers import *
+from dashboard.models import (KPI_COSTS_TOOLTIPS, KPI_COSTS_UNITS,
+                              KPI_SCALAR_TOOLTIPS, KPI_SCALAR_UNITS,
+                              OUTPUT_POWER, REPORT_GRAPHS,
+                              STORAGE_SUB_CATEGORIES, AssetsResults,
+                              KPICostsMatrixResults, KPIScalarResults,
+                              ReportItem, SensitivityAnalysisGraph,
+                              get_project_reportitems,
+                              get_project_sensitivity_analysis_graphs)
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
+from django.db.models import Count
+from django.http import HttpResponseForbidden, JsonResponse
+from django.http.response import Http404, HttpResponse
+from django.shortcuts import HttpResponseRedirect, get_object_or_404, render
+from django.template.loader import get_template
+from django.urls import reverse
+from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext_lazy as _
+from django.views.decorators.http import require_http_methods
+from jsonview.decorators import json_view
+from projects.constants import COMPARE_VIEW
+from projects.forms import AssetCreateForm, BusForm, StorageForm
 from projects.helpers import parameters_helper
+from projects.models import (Asset, Bus, Project, Scenario,
+                             SensitivityAnalysis, Simulation,
+                             get_project_sensitivity_analysis)
+from projects.scenario_topology_helpers import load_scenario_topology_from_db
+from projects.services import (excuses_design_under_development,
+                               get_selected_scenarios_in_cache)
 
 logger = logging.getLogger(__name__)
 

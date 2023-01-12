@@ -1,18 +1,14 @@
-from datetime import datetime
-import httpx as requests
 import json
-
-# from requests.exceptions import HTTPError
-from epa.settings import (
-    PROXY_CONFIG,
-    MVS_POST_URL,
-    MVS_GET_URL,
-    MVS_SA_POST_URL,
-    MVS_SA_GET_URL,
-)
-from dashboard.models import AssetsResults, KPICostsMatrixResults, KPIScalarResults
-from projects.constants import DONE, PENDING, ERROR
 import logging
+from datetime import datetime
+
+import httpx as requests
+from dashboard.models import (AssetsResults, KPICostsMatrixResults,
+                              KPIScalarResults)
+# from requests.exceptions import HTTPError
+from epa.settings import (MVS_GET_URL, MVS_POST_URL, MVS_SA_GET_URL,
+                          MVS_SA_POST_URL, PROXY_CONFIG)
+from projects.constants import DONE, ERROR, PENDING
 
 logger = logging.getLogger(__name__)
 

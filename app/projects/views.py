@@ -1,17 +1,15 @@
 # from bootstrap_modal_forms.generic import BSModalCreateView
 import json
 import logging
-import os
 import traceback
 from datetime import datetime
 
-import pandas as pd
 import requests
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
-from django.http import HttpResponseForbidden, JsonResponse
+from django.http import JsonResponse
 from django.http.response import Http404
 from django.shortcuts import *
 from django.urls import reverse
@@ -19,20 +17,15 @@ from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
 from epa.settings import MVS_GET_URL, MVS_LP_FILE_URL, MVS_SA_GET_URL
 from InRetEnsys import *
-from InRetEnsys.modelbuilder import ModelBuilder
 from InRetEnsys.types import Solver
 from jsonview.decorators import json_view
-from oemof import solph
-from oemof.tools import economics
 from projects.helpers import epc_calc, format_scenario_for_mvs
 from projects.models import *
-from users.models import CustomUser
 
 from .constants import DONE, ERROR, MODIFIED, PENDING
 from .forms import *
 from .requests import (fetch_mvs_sa_results, fetch_mvs_simulation_results,
-                       mvs_sensitivity_analysis_request,
-                       mvs_simulation_request)
+                       mvs_sensitivity_analysis_request)
 from .scenario_topology_helpers import (NodeObject,
                                         duplicate_scenario_connections,
                                         duplicate_scenario_objects,
@@ -1945,9 +1938,8 @@ def request_mvs_simulation(request, scen_id=0):
 
     # Make simulation request to FastAPI    
     INRETENSYS_API_HOST = "localhost:8001"
-    requests.post(url="http://"+INRETENSYS_API_HOST+"/uploadJson", json=model.json(), params={'username': '', 'password': '', 'docker': True})
-    results = None
-
+    results = requests.post(url="http://"+INRETENSYS_API_HOST+"/uploadJson", json=model.json(), params={'username': '', 'password': '', 'docker': True})
+    
     if results is None:
         error_msg = "Could not communicate with the simulation server."
         logger.error(error_msg)
@@ -1959,7 +1951,7 @@ def request_mvs_simulation(request, scen_id=0):
             content_type="application/json",
         )
     else:
-
+        print(results)
         # delete existing simulation
         Simulation.objects.filter(scenario_id=scen_id).delete()
         # Create empty Simulation model object

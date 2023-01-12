@@ -15,25 +15,25 @@
 
                 {% for field in form.visible_fields %}
 
-                    <div class="input-item">
-                        <div class="scenario-create__form">
-                            <div>
-                                <label for="id_{{ field.name }}" class="form-label">{% translate field.label %}</label>
-                                <!-- TODO: add class form-control and aria-describedby with constraint_id + "Help" -->
-                                {{ field }}
-                            </div>
-                        </div>
-                        <div class="scenario-create__description">
-                            <div>
-                                <div id="{{ field.name }}Help" class="form-text"> {% translate field.help_text %}</div>
-                            </div>
+                <div class="input-item">
+                    <div class="scenario-create__form">
+                        <div>
+                            <label for="id_{{ field.name }}" class="form-label">{% translate field.label %}</label>
+                            <!-- TODO: add class form-control and aria-describedby with constraint_id + "Help" -->
+                            {{ field }}
                         </div>
                     </div>
+                    <div class="scenario-create__description">
+                        <div>
+                            <div id="{{ field.name }}Help" class="form-text"> {% translate field.help_text %}</div>
+                        </div>
+                    </div>
+                </div>
 
                 {% endfor %}
 
             </div>
-        <button style=display:none;" type="submit" id="sumbit_scenario_btn">Send form</button>
+            <button style="display:none;" type="submit" id="sumbit_scenario_btn">Send form</button>
 
 
 
@@ -42,7 +42,6 @@
 
     </section>
 </main>
-
 {% endblock progression_content %}
 
 {% block end_body_scripts %}
@@ -50,7 +49,7 @@
 
     var form_id = $("#sumbit_scenario_btn");
 
-    function next_btn_clicked(){
+    function next_btn_clicked() {
         console.log("clicked");
         form_id.click();
     };
@@ -59,25 +58,19 @@
 <script src="{% static 'js/form_utils.js' %}"></script>
 {% endblock end_body_scripts %}
 
-
-
-
-
 {% block footer %}
-
 <footer class="step-footer">
     <div>
         <div class="step-footer__left"></div>
         <div class="step-footer__center">
-            <a onclick="javascript:next_btn_clicked()" class="btn btn--medium" >{% translate "Next" %} </a>
+            <a onclick="javascript:next_btn_clicked()" class="btn btn--medium">{% translate "Next" %} </a>
         </div>
         <div class="step-footer__right">
             {% if scen_id %}
-            <a class="btn btn--medium btn--transparent" href="{% url 'scenario_steps_edit' proj_id scen_id 4 %}">{% translate "Go to simulation" %}</a>
+            <a class="btn btn--medium btn--transparent" href="{% url 'scenario_steps_edit' proj_id scen_id 4 %}">{%
+                translate "Go to simulation" %}</a>
             {% endif %}
         </div>
     </div>
 </footer>
 {% endblock footer %}
-
-

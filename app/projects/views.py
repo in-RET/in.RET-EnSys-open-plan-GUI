@@ -88,7 +88,8 @@ def scenario_upload(request, proj_id):
             else:
                 scen["name"] = new_scenario_name
 
-        scen_id = load_scenario_from_dict(scen, user=request.user, project=project)
+        scen_id = load_scenario_from_dict(
+            scen, user=request.user, project=project)
 
     return HttpResponseRedirect(reverse("project_search", args=[proj_id, scen_id]))
 
@@ -157,7 +158,8 @@ def project_share(request, proj_id):
     form_item = ProjectShareForm(qs)
 
     if form_item.is_valid():
-        success, message = project.add_viewer_if_not_exist(**form_item.cleaned_data)
+        success, message = project.add_viewer_if_not_exist(
+            **form_item.cleaned_data)
         if success is True:
             messages.success(request, message)
         else:
@@ -217,7 +219,8 @@ def project_detail(request, proj_id):
 
     logger.info(f"Populating project and economic details in forms.")
     project_form = ProjectDetailForm(None, instance=project)
-    economic_data_form = EconomicDataDetailForm(None, instance=project.economic_data)
+    economic_data_form = EconomicDataDetailForm(
+        None, instance=project.economic_data)
 
     return render(
         request,
@@ -427,8 +430,6 @@ def usecase_search(request, usecase_id=None, scen_id=None):
 
     usecase_list = UseCase.objects.all()
 
-    print(usecase_list)
-
     return render(
         request,
         "usecase/usecase_search.html",
@@ -570,12 +571,14 @@ def scenario_select_project(request, step_id=0, max_step=1):
             )
         else:
             messages.info(
-                request, _("You have currently no projects, please create one first")
+                request, _(
+                    "You have currently no projects, please create one first")
             )
             answer = HttpResponseRedirect(reverse("project_search"))
 
     elif request.method == "POST":
-        form = ScenarioSelectProjectForm(request.POST, project_queryset=user_projects)
+        form = ScenarioSelectProjectForm(
+            request.POST, project_queryset=user_projects)
 
         if form.is_valid():
             proj_id = form.cleaned_data.get("project").id
@@ -661,7 +664,8 @@ def scenario_create_parameters(request, proj_id, scen_id=None, step_id=1, max_st
             proj_id = scenario.project.id
             scenario.save()
             answer = HttpResponseRedirect(
-                reverse("scenario_create_topology", args=[proj_id, scenario.id])
+                reverse("scenario_create_topology",
+                        args=[proj_id, scenario.id])
             )
 
     return answer
@@ -813,13 +817,15 @@ def scenario_create_constraints(request, proj_id, scen_id, step_id=3, max_step=4
         unbound_forms = {}
         for constraint_type, constraint_form in constraints_forms.items():
             # check whether the constraint is already associated to the scenario
-            qs = constraints_models[constraint_type].objects.filter(scenario=scenario)
+            qs = constraints_models[constraint_type].objects.filter(
+                scenario=scenario)
             if qs.exists():
                 unbound_forms[constraint_type] = constraint_form(
                     prefix=constraint_type, instance=qs[0]
                 )
             else:
-                unbound_forms[constraint_type] = constraint_form(prefix=constraint_type)
+                unbound_forms[constraint_type] = constraint_form(
+                    prefix=constraint_type)
         return render(
             request,
             f"scenario/scenario_step{step_id}.html",
@@ -1082,7 +1088,8 @@ def sensitivity_analysis_create(request, scen_id, sa_id=None, step_id=5):
     if request.method == "GET":
         if sa_id is not None:
             sa_item = get_object_or_404(SensitivityAnalysis, id=sa_id)
-            sa_form = SensitivityAnalysisForm(scen_id=scen_id, instance=sa_item)
+            sa_form = SensitivityAnalysisForm(
+                scen_id=scen_id, instance=sa_item)
             sa_status = sa_item.status
             mvs_token = sa_item.mvs_token
         else:
@@ -1173,10 +1180,12 @@ def sensitivity_analysis_create(request, scen_id, sa_id=None, step_id=5):
                 # TODO check it does the right thing with sensitivity analysis
                 # create_or_delete_simulation_scheduler(mvs_token=sa_item.mvs_token)
 
-            sa_item.elapsed_seconds = (datetime.now() - sa_item.start_date).seconds
+            sa_item.elapsed_seconds = (
+                datetime.now() - sa_item.start_date).seconds
             sa_item.save()
             answer = HttpResponseRedirect(
-                reverse("sensitivity_analysis_review", args=[scen_id, sa_item.id])
+                reverse("sensitivity_analysis_review",
+                        args=[scen_id, sa_item.id])
             )
 
     return answer
@@ -1204,7 +1213,8 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
             bus_list = Bus.objects.filter(scenario=scenario)
             n_bus = len(bus_list)
             default_name = f"{asset_type_name}-{n_bus}"
-            form = BusForm(asset_type=asset_type_name, initial={"name": default_name})
+            form = BusForm(asset_type=asset_type_name,
+                           initial={"name": default_name})
         return render(request, "asset/bus_create_form.html", {"form": form})
 
     elif asset_type_name in [
@@ -1216,14 +1226,14 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
     ]:
         if asset_uuid:
             existing_asset = get_object_or_404(Asset, unique_id=asset_uuid)
-            form = AssetCreateForm(asset_type=asset_type_name, instance=existing_asset)
+            form = AssetCreateForm(
+                asset_type=asset_type_name, instance=existing_asset)
             input_timeseries_data = (
                 existing_asset.input_timeseries
                 if existing_asset.input_timeseries
                 else ""
             )
         else:
-            print(asset_type_name)
             asset_list = Asset.objects.filter(
                 asset_type__asset_type=asset_type_name, scenario=scenario
             )
@@ -1247,7 +1257,6 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
     elif asset_type_name in ["myGenericStorage"]:
         if asset_uuid:
             existing_ess_asset = get_object_or_404(Asset, unique_id=asset_uuid)
-            print(existing_ess_asset)
             ess_asset_children = Asset.objects.filter(
                 parent_asset=existing_ess_asset.id
             )
@@ -1381,13 +1390,15 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
 @require_http_methods(["POST"])
 def asset_create_or_update(request, scen_id=0, asset_type_name="", asset_uuid=None):
     if asset_type_name == "bus":
-        answer = handle_bus_form_post(request, scen_id, asset_type_name, asset_uuid)
+        answer = handle_bus_form_post(
+            request, scen_id, asset_type_name, asset_uuid)
     elif asset_type_name in ["bess", "h2ess", "gess", "hess"]:
         answer = handle_storage_unit_form_post(
             request, scen_id, asset_type_name, asset_uuid
         )
     else:  # all assets
-        answer = handle_asset_form_post(request, scen_id, asset_type_name, asset_uuid)
+        answer = handle_asset_form_post(
+            request, scen_id, asset_type_name, asset_uuid)
     return answer
 
 
@@ -1515,33 +1526,23 @@ def request_mvs_simulation(request, scen_id=0):
         )
     # Load scenario
     scenario = Scenario.objects.get(pk=scen_id)
-    print(scenario)
     try:
         data_clean = format_scenario_for_mvs(scenario)
 
-        keysList = [key for key in data_clean]
-        print(keysList)
         for k, v in data_clean.items():
             for i in v:
                 if k == "energy_busses":
-                    print("\nEnergy Busses: \n")
-                    print("{} : {}".format(k, i))
                     list_busses.append(InRetEnsysBus(label=i["label"]))
 
         for k, v in data_clean.items():
             for i in v:
                 if k == "energy_production":
-                    print("\nEnergy Production: \n")
-                    print("{} : {}".format(k, i))
-                    print(i["label"])
-
                     if bool(i["capex"]):
                         ep_costs = epc_calc(
                             i["capex"]["value"],
                             i["lifetime"]["value"],
                             i["opex"]["value"],
                         )
-                        print(ep_costs)
                     else:
                         ep_costs = None
 
@@ -1602,9 +1603,6 @@ def request_mvs_simulation(request, scen_id=0):
                         logger.error(error_msg)
 
                 elif k == "energy_consumption":
-                    print("\nEnergy Consumption: \n")
-                    print("{} : {}".format(k, i))
-
                     try:
                         list_sinks.append(
                             InRetEnsysSink(
@@ -1633,19 +1631,14 @@ def request_mvs_simulation(request, scen_id=0):
                         logger.error(error_msg)
 
                 elif k == "energy_storage":
-                    print("\nEnergy Storage: \n")
-                    print("{} : {}".format(k, i))
                     if bool(i["capex"]):
                         ep_costs = epc_calc(
                             i["capex"]["value"],
                             i["lifetime"]["value"],
                             i["opex"]["value"],
                         )
-                        print(ep_costs)
-
                     else:
                         ep_costs = None
-                        print(ep_costs)
 
                     # print(
                     #     i["fixed_thermal_losses_relative"]["value"]
@@ -1737,7 +1730,8 @@ def request_mvs_simulation(request, scen_id=0):
                                     offset=i["offset"]["value"]
                                     if bool(i["offset"])
                                     else 0,
-                                    nonconvex=True if bool(i["offset"]) else False,
+                                    nonconvex=True if bool(
+                                        i["offset"]) else False,
                                 )
                                 if bool(ep_costs)
                                 else None,
@@ -1749,8 +1743,6 @@ def request_mvs_simulation(request, scen_id=0):
                         logger.error(error_msg)
 
                 elif k == "energy_conversion":
-                    print("\nEnergy Conversion: \n")
-                    print("{} : {}".format(k, i))
 
                     if bool(i["capex"]):
                         ep_costs = epc_calc(
@@ -1758,12 +1750,8 @@ def request_mvs_simulation(request, scen_id=0):
                             i["lifetime"]["value"],
                             i["opex"]["value"],
                         )
-                        print(ep_costs)
                     else:
                         ep_costs = None
-
-                    if i["maximum"] and i["eco_params_flow_choice"] == "outputs":
-                        print("yes")
 
                     try:
                         list_transformers.append(
@@ -1893,7 +1881,6 @@ def request_mvs_simulation(request, scen_id=0):
                         error_msg = f"Trafo Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {e}."
                         logger.error(error_msg)
 
-        print(data_clean["economic_data"])
         # date_time_index = pd.date_range(
         #     "1/1/2022", periods=8760, freq="H"
         # )
@@ -1919,7 +1906,7 @@ def request_mvs_simulation(request, scen_id=0):
         InRetEnsysConstraints(
             typ="emission_limit", keyword="emission_factor", limit=500
         )
-        
+
         results = None
     except Exception as e:
         error_msg = f"Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {e}."
@@ -1936,10 +1923,11 @@ def request_mvs_simulation(request, scen_id=0):
         if output_lp_file == "on":
             data_clean["simulation_settings"]["output_lp_file"] = "true"
 
-    # Make simulation request to FastAPI    
+    # Make simulation request to FastAPI
     INRETENSYS_API_HOST = "localhost:8001"
-    results = requests.post(url="http://"+INRETENSYS_API_HOST+"/uploadJson", json=model.json(), params={'username': '', 'password': '', 'docker': True})
-    
+    results = requests.post(url="http://"+INRETENSYS_API_HOST+"/uploadJson",
+                            json=model.json(), params={'username': '', 'password': '', 'docker': True})
+
     if results is None:
         error_msg = "Could not communicate with the simulation server."
         logger.error(error_msg)
@@ -1951,31 +1939,10 @@ def request_mvs_simulation(request, scen_id=0):
             content_type="application/json",
         )
     else:
-        print(results)
-        # delete existing simulation
-        Simulation.objects.filter(scenario_id=scen_id).delete()
-        # Create empty Simulation model object
-        simulation = Simulation(start_date=datetime.now(), scenario_id=scen_id)
-
-        simulation.mvs_token = results["id"] if results["id"] else None
-
-        if "status" in results.keys() and (
-            results["status"] == DONE or results["status"] == ERROR
-        ):
-            simulation.status = results["status"]
-            simulation.results = results["results"]
-            simulation.end_date = datetime.now()
-        else:  # PENDING
-            simulation.status = results["status"]
-            # create a task which will update simulation status
-            create_or_delete_simulation_scheduler(mvs_token=simulation.mvs_token)
-
-        simulation.elapsed_seconds = (datetime.now() - simulation.start_date).seconds
-        simulation.save()
-
-        answer = HttpResponseRedirect(
-            reverse("scenario_review", args=[scenario.project.id, scen_id])
-        )
+        answer = results
+        #answer = HttpResponseRedirect(
+        #    reverse("scenario_review", args=[scenario.project.id, scen_id])
+        #)
 
     return answer
 

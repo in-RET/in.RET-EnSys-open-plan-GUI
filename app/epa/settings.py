@@ -11,8 +11,8 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 import ast
 import os
-from django.contrib.messages import constants as messages
 
+from django.contrib.messages import constants as messages
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = ast.literal_eval(os.getenv("DEBUG", "True"))
@@ -170,7 +170,7 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 MAILER_EMAIL_BACKEND = EMAIL_BACKEND
 
-DEFAULT_FROM_EMAIL = "noreply@elandh2020.eu"
+DEFAULT_FROM_EMAIL = "noreply@hs-nordhausen.de"
 EMAIL_HOST = os.getenv("EMAIL_HOST_IP", "127.0.0.1")
 EMAIL_PORT = 25
 EMAIL_USE_TLS = False
@@ -197,6 +197,8 @@ MVS_GET_URL = f"{MVS_API_HOST}/check/"
 MVS_LP_FILE_URL = f"{MVS_API_HOST}/get_lp_file/"
 MVS_SA_POST_URL = f"{MVS_API_HOST}/sendjson/openplan/sensitivity-analysis"
 MVS_SA_GET_URL = f"{MVS_API_HOST}/check-sensitivity-analysis/"
+
+INRETENSYS_API_HOST = "localhost:8001"
 
 # Allow iframes to show in page
 X_FRAME_OPTIONS = "SAMEORIGIN"

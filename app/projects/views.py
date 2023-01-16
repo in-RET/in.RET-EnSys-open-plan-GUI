@@ -15,7 +15,7 @@ from django.shortcuts import *
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
-from epa.settings import MVS_GET_URL, MVS_LP_FILE_URL, MVS_SA_GET_URL
+from epa.settings import MVS_GET_URL, MVS_LP_FILE_URL, MVS_SA_GET_URL, INRETENSYS_API_HOST
 from InRetEnsys import *
 from InRetEnsys.types import Solver
 from jsonview.decorators import json_view
@@ -1924,7 +1924,6 @@ def request_mvs_simulation(request, scen_id=0):
             data_clean["simulation_settings"]["output_lp_file"] = "true"
 
     # Make simulation request to FastAPI
-    INRETENSYS_API_HOST = "localhost:8001"
     results = requests.post(url="http://"+INRETENSYS_API_HOST+"/uploadJson",
                             json=model.json(), params={'username': '', 'password': '', 'docker': True})
 

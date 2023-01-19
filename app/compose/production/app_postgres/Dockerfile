@@ -22,8 +22,4 @@ ADD . ${APP_ROOT}
 COPY ./djangoq_setup.sh /djangoq_setup.sh
 RUN chmod +x /djangoq_setup.sh
 
-RUN adduser appuser --system --no-create-home --shell /bin/sh \
-    && chown -R appuser ${APP_ROOT}
-USER appuser
-
 CMD ["python", "manage.py", "collectstatic"]

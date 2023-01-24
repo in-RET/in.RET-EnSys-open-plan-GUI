@@ -12,8 +12,8 @@ COPY requirements/postgres.txt ${CONFIG_ROOT}/requirements.txt
 RUN pip install --upgrade pip \
     && pip install --no-cache-dir -r ${CONFIG_ROOT}/requirements.txt
 
-COPY InRetEnsys-0.2a4-py3-none-any.whl InRetEnsys-0.2a4-py3-none-any.whl
-RUN pip install InRetEnsys-0.2a4-py3-none-any.whl
+COPY requirements/InRetEnsys-0.2a4-py3-none-any.whl ${CONFIG_ROOT}/InRetEnsys-0.2a4-py3-none-any.whl
+RUN pip install ${CONFIG_ROOT}/InRetEnsys-0.2a4-py3-none-any.whl
 
 WORKDIR ${APP_ROOT}
 

@@ -25,7 +25,7 @@ from projects.models import *
 from .constants import DONE, ERROR, MODIFIED, PENDING
 from .forms import *
 from .requests import (fetch_mvs_sa_results, fetch_mvs_simulation_results,
-                       mvs_sensitivity_analysis_request)
+                       mvs_sensitivity_analysis_request, mvs_simulation_request)
 from .scenario_topology_helpers import (NodeObject,
                                         duplicate_scenario_connections,
                                         duplicate_scenario_objects,
@@ -1924,8 +1924,9 @@ def request_mvs_simulation(request, scen_id=0):
             data_clean["simulation_settings"]["output_lp_file"] = "true"
 
     # Make simulation request to FastAPI
-    results = requests.post(url="http://"+INRETENSYS_API_HOST+"/uploadJson",
-                            json=model.json(), params={'username': '', 'password': '', 'docker': True})
+    #results = requests.post(url="http://"+INRETENSYS_API_HOST+"/uploadJson",
+    #                        json=model.json(), params={'username': '', 'password': '', 'docker': True})
+    results = mvs_simulation_request(data_clean)
 
     if results is None:
         error_msg = "Could not communicate with the simulation server."
@@ -1938,23 +1939,31 @@ def request_mvs_simulation(request, scen_id=0):
             content_type="application/json",
         )
     else:
+        # delete existing simulation
+        Simulation.objects.filter(scenario_id=scen_id).delete()
+        # Create empty Simulation model object
+        simulation = Simulation(start_date=datetime.now(), scenario_id=scen_id)
 
-        str_results = json.loads(results.content)
-        print(results)
-        print(str_results)
-        print(str_results["folder"])
+        simulation.mvs_token = results
 
-        ds = {"": item for item in str_results["folder"]}
+        if "status" in results.keys() and (
+            results["status"] == DONE or results["status"] == ERROR
+        ):
+            simulation.status = results["status"]
+            simulation.results = results["results"]
+            simulation.end_date = datetime.now()
+        else:  # PENDING
+            simulation.status = results["status"]
+            # create a task which will update simulation status
+            create_or_delete_simulation_scheduler(mvs_token=simulation.mvs_token)
 
-        answer = JsonResponse(
-            data=ds,
-            status=200,
-            content_type="application/json",
+        simulation.elapsed_seconds = (datetime.now() - simulation.start_date).seconds
+        simulation.save()
+
+        answer = HttpResponseRedirect(
+            reverse("scenario_review", args=[scenario.project.id, scen_id])
         )
 
-        #answer = HttpResponseRedirect(
-        #    reverse("scenario_review", args=[scenario.project.id, scen_id])
-        #)
     return answer
 
 

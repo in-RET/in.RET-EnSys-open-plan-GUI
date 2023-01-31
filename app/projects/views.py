@@ -1,66 +1,44 @@
 # from bootstrap_modal_forms.generic import BSModalCreateView
-from django.contrib.auth.decorators import login_required
 import json
 import logging
 import traceback
-from django.http import HttpResponseForbidden, JsonResponse
+from datetime import datetime
+
+import requests
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
+from django.db.models import Q
+from django.http import JsonResponse
 from django.http.response import Http404
-from django.utils.translation import gettext_lazy as _
 from django.shortcuts import *
 from django.urls import reverse
-from django.core.exceptions import PermissionDenied
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
-from django.contrib import messages
+from epa.settings import INRETENSYS_CHECK_URL, INRETENSYS_LP_FILE_URL, MVS_SA_GET_URL
+from InRetEnsys import *
+from InRetEnsys.types import Solver
 from jsonview.decorators import json_view
-from datetime import datetime
-from users.models import CustomUser
-from django.db.models import Q
-from epa.settings import MVS_GET_URL, MVS_LP_FILE_URL, MVS_SA_GET_URL
-from .forms import *
-from .requests import (
-    mvs_simulation_request,
-    fetch_mvs_simulation_results,
-    mvs_sensitivity_analysis_request,
-    fetch_mvs_sa_results,
-)
+from projects.helpers import epc_calc, format_scenario_for_mvs
 from projects.models import *
-from .scenario_topology_helpers import (
-    handle_storage_unit_form_post,
-    handle_bus_form_post,
-    handle_asset_form_post,
-    load_scenario_topology_from_db,
-    NodeObject,
-    update_deleted_objects_from_database,
-    duplicate_scenario_objects,
-    duplicate_scenario_connections,
-    load_scenario_from_dict,
-    load_project_from_dict,
-)
-from projects.helpers import format_scenario_for_mvs, epc_calc
-from .constants import DONE, PENDING, ERROR, MODIFIED
-from .services import (
-    create_or_delete_simulation_scheduler,
-    excuses_design_under_development,
-    send_feedback_email,
-    get_selected_scenarios_in_cache,
-)
-import traceback
-from oemof import solph
-from oemof.tools import economics
-import pandas as pd
 
-
-from InRetEnsys.components.bus import InRetEnsysBus
-from InRetEnsys.components.constraints import InRetEnsysConstraints
-from InRetEnsys.components.genericstorage import InRetEnsysStorage
-from InRetEnsys.components.sink import InRetEnsysSink
-from InRetEnsys.components.source import InRetEnsysSource
-from InRetEnsys.components.transformer import InRetEnsysTransformer
-from InRetEnsys import InRetEnsysEnergysystem, InRetEnsysModel, InRetEnsysFlow
-from InRetEnsys.components.investment import InRetEnsysInvestment
-from InRetEnsys import Solver, ModelBuilder, InRetEnsysNonConvex
-import os
-import requests
+from .constants import DONE, ERROR, MODIFIED, PENDING
+from .forms import *
+from .requests import (fetch_mvs_sa_results, fetch_mvs_simulation_results,
+                       mvs_sensitivity_analysis_request, mvs_simulation_request)
+from .scenario_topology_helpers import (NodeObject,
+                                        duplicate_scenario_connections,
+                                        duplicate_scenario_objects,
+                                        handle_asset_form_post,
+                                        handle_bus_form_post,
+                                        handle_storage_unit_form_post,
+                                        load_project_from_dict,
+                                        load_scenario_from_dict,
+                                        load_scenario_topology_from_db,
+                                        update_deleted_objects_from_database)
+from .services import (create_or_delete_simulation_scheduler,
+                       excuses_design_under_development,
+                       get_selected_scenarios_in_cache, send_feedback_email)
 
 logger = logging.getLogger(__name__)
 
@@ -110,7 +88,8 @@ def scenario_upload(request, proj_id):
             else:
                 scen["name"] = new_scenario_name
 
-        scen_id = load_scenario_from_dict(scen, user=request.user, project=project)
+        scen_id = load_scenario_from_dict(
+            scen, user=request.user, project=project)
 
     return HttpResponseRedirect(reverse("project_search", args=[proj_id, scen_id]))
 
@@ -179,7 +158,8 @@ def project_share(request, proj_id):
     form_item = ProjectShareForm(qs)
 
     if form_item.is_valid():
-        success, message = project.add_viewer_if_not_exist(**form_item.cleaned_data)
+        success, message = project.add_viewer_if_not_exist(
+            **form_item.cleaned_data)
         if success is True:
             messages.success(request, message)
         else:
@@ -239,7 +219,8 @@ def project_detail(request, proj_id):
 
     logger.info(f"Populating project and economic details in forms.")
     project_form = ProjectDetailForm(None, instance=project)
-    economic_data_form = EconomicDataDetailForm(None, instance=project.economic_data)
+    economic_data_form = EconomicDataDetailForm(
+        None, instance=project.economic_data)
 
     return render(
         request,
@@ -449,8 +430,6 @@ def usecase_search(request, usecase_id=None, scen_id=None):
 
     usecase_list = UseCase.objects.all()
 
-    print(usecase_list)
-
     return render(
         request,
         "usecase/usecase_search.html",
@@ -592,12 +571,14 @@ def scenario_select_project(request, step_id=0, max_step=1):
             )
         else:
             messages.info(
-                request, _("You have currently no projects, please create one first")
+                request, _(
+                    "You have currently no projects, please create one first")
             )
             answer = HttpResponseRedirect(reverse("project_search"))
 
     elif request.method == "POST":
-        form = ScenarioSelectProjectForm(request.POST, project_queryset=user_projects)
+        form = ScenarioSelectProjectForm(
+            request.POST, project_queryset=user_projects)
 
         if form.is_valid():
             proj_id = form.cleaned_data.get("project").id
@@ -683,7 +664,8 @@ def scenario_create_parameters(request, proj_id, scen_id=None, step_id=1, max_st
             proj_id = scenario.project.id
             scenario.save()
             answer = HttpResponseRedirect(
-                reverse("scenario_create_topology", args=[proj_id, scenario.id])
+                reverse("scenario_create_topology",
+                        args=[proj_id, scenario.id])
             )
 
     return answer
@@ -837,13 +819,15 @@ def scenario_create_constraints(request, proj_id, scen_id, step_id=3, max_step=4
         unbound_forms = {}
         for constraint_type, constraint_form in constraints_forms.items():
             # check whether the constraint is already associated to the scenario
-            qs = constraints_models[constraint_type].objects.filter(scenario=scenario)
+            qs = constraints_models[constraint_type].objects.filter(
+                scenario=scenario)
             if qs.exists():
                 unbound_forms[constraint_type] = constraint_form(
                     prefix=constraint_type, instance=qs[0]
                 )
             else:
-                unbound_forms[constraint_type] = constraint_form(prefix=constraint_type)
+                unbound_forms[constraint_type] = constraint_form(
+                    prefix=constraint_type)
         return render(
             request,
             f"scenario/scenario_step{step_id}.html",
@@ -910,8 +894,8 @@ def scenario_review(request, proj_id, scen_id, step_id=4, max_step=5):
             "step_id": step_id,
             "step_list": STEP_LIST,
             "max_step": max_step,
-            "MVS_GET_URL": MVS_GET_URL,
-            "MVS_LP_FILE_URL": MVS_LP_FILE_URL,
+            "MVS_GET_URL": INRETENSYS_CHECK_URL,
+            "MVS_LP_FILE_URL": INRETENSYS_LP_FILE_URL,
         }
 
         qs = Simulation.objects.filter(scenario_id=scen_id)
@@ -1106,7 +1090,8 @@ def sensitivity_analysis_create(request, scen_id, sa_id=None, step_id=5):
     if request.method == "GET":
         if sa_id is not None:
             sa_item = get_object_or_404(SensitivityAnalysis, id=sa_id)
-            sa_form = SensitivityAnalysisForm(scen_id=scen_id, instance=sa_item)
+            sa_form = SensitivityAnalysisForm(
+                scen_id=scen_id, instance=sa_item)
             sa_status = sa_item.status
             mvs_token = sa_item.mvs_token
         else:
@@ -1197,10 +1182,12 @@ def sensitivity_analysis_create(request, scen_id, sa_id=None, step_id=5):
                 # TODO check it does the right thing with sensitivity analysis
                 # create_or_delete_simulation_scheduler(mvs_token=sa_item.mvs_token)
 
-            sa_item.elapsed_seconds = (datetime.now() - sa_item.start_date).seconds
+            sa_item.elapsed_seconds = (
+                datetime.now() - sa_item.start_date).seconds
             sa_item.save()
             answer = HttpResponseRedirect(
-                reverse("sensitivity_analysis_review", args=[scen_id, sa_item.id])
+                reverse("sensitivity_analysis_review",
+                        args=[scen_id, sa_item.id])
             )
 
     return answer
@@ -1228,7 +1215,8 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
             bus_list = Bus.objects.filter(scenario=scenario)
             n_bus = len(bus_list)
             default_name = f"{asset_type_name}-{n_bus}"
-            form = BusForm(asset_type=asset_type_name, initial={"name": default_name})
+            form = BusForm(asset_type=asset_type_name,
+                           initial={"name": default_name})
         return render(request, "asset/bus_create_form.html", {"form": form})
 
     elif asset_type_name in [
@@ -1240,7 +1228,8 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
     ]:
         if asset_uuid:
             existing_asset = get_object_or_404(Asset, unique_id=asset_uuid)
-            form = AssetCreateForm(asset_type=asset_type_name, instance=existing_asset)
+            form = AssetCreateForm(
+                asset_type=asset_type_name, instance=existing_asset)
             input_timeseries_data = (
                 existing_asset.input_timeseries
                 if existing_asset.input_timeseries
@@ -1255,7 +1244,6 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
                     input_timeseries_data = [7] * 8760
                 else:
                     input_timeseries_data = ""
-
         else:
             print(asset_type_name)
             asset_list = Asset.objects.filter(
@@ -1293,7 +1281,6 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
     elif asset_type_name in ["myGenericStorage"]:
         if asset_uuid:
             existing_ess_asset = get_object_or_404(Asset, unique_id=asset_uuid)
-            print(existing_ess_asset)
             ess_asset_children = Asset.objects.filter(
                 parent_asset=existing_ess_asset.id
             )
@@ -1427,13 +1414,15 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
 @require_http_methods(["POST"])
 def asset_create_or_update(request, scen_id=0, asset_type_name="", asset_uuid=None):
     if asset_type_name == "bus":
-        answer = handle_bus_form_post(request, scen_id, asset_type_name, asset_uuid)
+        answer = handle_bus_form_post(
+            request, scen_id, asset_type_name, asset_uuid)
     elif asset_type_name in ["bess", "h2ess", "gess", "hess"]:
         answer = handle_storage_unit_form_post(
             request, scen_id, asset_type_name, asset_uuid
         )
     else:  # all assets
-        answer = handle_asset_form_post(request, scen_id, asset_type_name, asset_uuid)
+        answer = handle_asset_form_post(
+            request, scen_id, asset_type_name, asset_uuid)
     return answer
 
 
@@ -1562,33 +1551,23 @@ def request_mvs_simulation(request, scen_id=0):
         )
     # Load scenario
     scenario = Scenario.objects.get(pk=scen_id)
-    print(scenario)
     try:
         data_clean = format_scenario_for_mvs(scenario)
 
-        keysList = [key for key in data_clean]
-        print(keysList)
         for k, v in data_clean.items():
             for i in v:
                 if k == "energy_busses":
-                    print("\nEnergy Busses: \n")
-                    print("{} : {}".format(k, i))
                     list_busses.append(InRetEnsysBus(label=i["label"]))
 
         for k, v in data_clean.items():
             for i in v:
                 if k == "energy_production":
-                    print("\nEnergy Production: \n")
-                    print("{} : {}".format(k, i))
-                    print(i["label"])
-
                     if bool(i["capex"]):
                         ep_costs = epc_calc(
                             i["capex"]["value"],
                             i["lifetime"]["value"],
                             i["opex"]["value"],
                         )
-                        print(ep_costs)
                     else:
                         ep_costs = None
 
@@ -1652,9 +1631,6 @@ def request_mvs_simulation(request, scen_id=0):
                         logger.error(error_msg)
 
                 elif k == "energy_consumption":
-                    print("\nEnergy Consumption: \n")
-                    print("{} : {}".format(k, i))
-
                     try:
                         list_sinks.append(
                             InRetEnsysSink(
@@ -1683,19 +1659,14 @@ def request_mvs_simulation(request, scen_id=0):
                         logger.error(error_msg)
 
                 elif k == "energy_storage":
-                    print("\nEnergy Storage: \n")
-                    print("{} : {}".format(k, i))
                     if bool(i["capex"]):
                         ep_costs = epc_calc(
                             i["capex"]["value"],
                             i["lifetime"]["value"],
                             i["opex"]["value"],
                         )
-                        print(ep_costs)
-
                     else:
                         ep_costs = None
-                        print(ep_costs)
 
                     try:
                         list_storages.append(
@@ -1781,7 +1752,8 @@ def request_mvs_simulation(request, scen_id=0):
                                     offset=i["offset"]["value"]
                                     if bool(i["offset"])
                                     else 0,
-                                    nonconvex=True if bool(i["offset"]) else False,
+                                    nonconvex=True if bool(
+                                        i["offset"]) else False,
                                 )
                                 if bool(ep_costs)
                                 else None,
@@ -1793,8 +1765,6 @@ def request_mvs_simulation(request, scen_id=0):
                         logger.error(error_msg)
 
                 elif k == "energy_conversion":
-                    print("\nEnergy Conversion: \n")
-                    print("{} : {}".format(k, i))
 
                     if bool(i["capex"]):
                         ep_costs = epc_calc(
@@ -1802,12 +1772,8 @@ def request_mvs_simulation(request, scen_id=0):
                             i["lifetime"]["value"],
                             i["opex"]["value"],
                         )
-                        print(ep_costs)
                     else:
                         ep_costs = None
-
-                    if i["maximum"] and i["eco_params_flow_choice"] == "outputs":
-                        print("yes")
 
                     try:
                         list_transformers.append(
@@ -1989,24 +1955,7 @@ def request_mvs_simulation(request, scen_id=0):
             constraints=list_constraints,
         )
 
-        jf = open("my_model_config.json", "wt")
-        jf.write(model.json())
-        jf.close()
-
-        # requests.post("http://172.19.98.191:8001/",
-        #               json=model.json())
-
-        my_path = os.path.abspath(os.path.dirname(__file__))
-        results = ModelBuilder(
-            ConfigFile="my_model_config.json",
-            DumpFile="../dumps/my_model_config.dump",
-            wdir=os.path.join(my_path, "../dumps"),
-            logdir=os.path.join(my_path, "../dumps"),
-            dumpdir=os.path.join(my_path, "../dumps"),
-        )
-
-        # model.write('my_model.lp', io_options={'symbolic_solver_labels': True}) noch nicht implementiert
-        # err = 1/0
+        results = None
     except Exception as e:
         error_msg = f"Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {e}."
         logger.error(error_msg)
@@ -2022,8 +1971,10 @@ def request_mvs_simulation(request, scen_id=0):
         if output_lp_file == "on":
             data_clean["simulation_settings"]["output_lp_file"] = "true"
 
-    # Make simulation request to MVS
-    # results = mvs_simulation_request(data_clean)
+    # Make simulation request to FastAPI
+    #results = requests.post(url="http://"+INRETENSYS_API_HOST+"/uploadJson",
+    #                        json=model.json(), params={'username': '', 'password': '', 'docker': True})
+    results = mvs_simulation_request(model.json())
 
     if results is None:
         error_msg = "Could not communicate with the simulation server."
@@ -2036,19 +1987,17 @@ def request_mvs_simulation(request, scen_id=0):
             content_type="application/json",
         )
     else:
-
         # delete existing simulation
         Simulation.objects.filter(scenario_id=scen_id).delete()
         # Create empty Simulation model object
         simulation = Simulation(start_date=datetime.now(), scenario_id=scen_id)
-
-        simulation.mvs_token = results["id"] if results["id"] else None
+        simulation.mvs_token = results["token"]
 
         if "status" in results.keys() and (
             results["status"] == DONE or results["status"] == ERROR
         ):
             simulation.status = results["status"]
-            simulation.results = results["results"]
+            #simulation.results = results["results"]
             simulation.end_date = datetime.now()
         else:  # PENDING
             simulation.status = results["status"]
@@ -2063,6 +2012,7 @@ def request_mvs_simulation(request, scen_id=0):
         )
 
     return answer
+
 
 
 @json_view

@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block navbar %}
-    {% include "navbar.html" with user=user scenario_create=True documentation_url=documentation_url%}
+{% include "navbar.html" with user=user scenario_create=True documentation_url=documentation_url%}
 {% endblock navbar %}
 
 {% block title %} {% translate "Scenario step" %} {{ step_id }} {% endblock title%}
@@ -13,33 +13,33 @@
 <!-- WRITE HTML CODE WITHIN THESE block content TAGS -->
 {% block content %}
 
-    <section class="wizard">
-        <div>
-            <h1 class="wizard__name">
-                <span class="scenario">{% translate "New scenario" %} </span>
-            </h1>
-            <div class="wizard__steps">
-                {% translate "Please select a project first" %}
+<section class="wizard">
+    <div>
+        <h1 class="wizard__name">
+            <span class="scenario">{% translate "New scenario" %} </span>
+        </h1>
+        <div class="wizard__steps">
+            {% translate "Please select a project first" %}
+        </div>
+        <div class="wizard__back">
+            <div>
+                <a href="{% url 'project_search'%}">{% translate "My projects" %}</a>
             </div>
-            <div class="wizard__back">
-          <div>
-              <a href="{% url 'project_search'%}">{% translate "My projects" %}</a>
-          </div>
         </div>
-        </div>
-    </section>
+    </div>
+</section>
 
 <main>
 
     <section class="scenario-create">
         <form id="CreateScenarioForm" method="POST" action="{% url 'scenario_select_project' %}">
             {% csrf_token %}
-             <div class="row justify-content-center">
-                 <div class="col-4">
-                {{ form|crispy }}
+            <div class="row justify-content-center">
+                <div class="col-4">
+                    {{ form|crispy }}
                 </div>
             </div>
-        <button style=display:none;" type="submit" id="select_project_btn">Send form</button>
+            <button style="display:none;" type="submit" id="select_project_btn">Send form</button>
         </form>
     </section>
 </main>
@@ -51,7 +51,7 @@
 
     var form_id = $("#select_project_btn");
 
-    function next_btn_clicked(){
+    function next_btn_clicked() {
         console.log("clicked");
         form_id.click();
     };
@@ -65,7 +65,7 @@
     <div>
         <div class="step-footer__left"></div>
         <div class="step-footer__center">
-            <a onclick="javascript:next_btn_clicked()" class="btn btn--medium" >{% translate "Next" %} </a>
+            <a onclick="javascript:next_btn_clicked()" class="btn btn--medium">{% translate "Next" %} </a>
         </div>
         <div class="step-footer__right">
         </div>

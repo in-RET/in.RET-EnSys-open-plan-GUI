@@ -7,7 +7,7 @@ import httpx as requests
 from dashboard.models import (AssetsResults, KPICostsMatrixResults,
                               KPIScalarResults)
 # from requests.exceptions import HTTPError
-from epa.settings import (INRETENSYS_CHECK_URL, INRETENSYS_POST_URL, MVS_GET_URL, MVS_SA_GET_URL,
+from epa.settings import (INRETENSYS_CHECK_URL, INRETENSYS_POST_URL, MVS_SA_GET_URL,
                           MVS_SA_POST_URL, PROXY_CONFIG)
 from projects.constants import DONE, ERROR, PENDING
 
@@ -30,18 +30,9 @@ def mvs_simulation_request(data):
     else:
         logger.info("The simulation was sent successfully to Inretensys API.")
         str_results = json.loads(response.content)
-
-
-        folderlist = {"": item for item in str_results["folder"]}
-
-        answer = JsonResponse(
-            data=folderlist,
-            status=200,
-            content_type="application/json",
-        )
-
-        return folderlist
         
+        return {"token": str_results["folder"][0], "status": PENDING}
+
 
 def mvs_simulation_check_status(token):
     try:
@@ -56,11 +47,8 @@ def mvs_simulation_check_status(token):
     else:
         logger.info("Success!")
 
-        #TODO
-        print(response["status"])
-        print(response["path"])
-
-        return json.loads(response["status"])
+        str_results = json.loads(response.content)
+        return {"status": str_results["status"], "token": str_results["token"]}
 
 
 def mvs_sa_check_status(token):
@@ -85,17 +73,17 @@ def fetch_mvs_simulation_results(simulation):
         response = mvs_simulation_check_status(token=simulation.mvs_token)
         try:
             simulation.status = response["status"]
-            simulation.errors = (
-                json.dumps(response["results"][ERROR])
-                if simulation.status == ERROR
-                else None
-            )
-            simulation.results = (
-                parse_mvs_results(simulation, response["results"])
-                if simulation.status == DONE
-                else None
-            )
-            logger.info(f"The simulation {simulation.id} is finished")
+            #imulation.errors = (
+            #    json.dumps(response["results"][ERROR])
+            #    if simulation.status == ERROR
+            #    else None
+            #)
+            #simulation.results = (
+            #    parse_mvs_results(simulation, response["results"])
+            #    if simulation.status == DONE
+            #    else None
+            #)
+            logger.info(f"The simulation {simulation.id} is {simulation.status}.")
         except:
             simulation.status = ERROR
             simulation.results = None

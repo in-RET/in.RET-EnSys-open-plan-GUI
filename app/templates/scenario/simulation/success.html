@@ -10,7 +10,8 @@
         <div class="simulation__content">
           <h2>{% translate "Simulation successful" %}</h2>
           <div class="simulation__id">
-            <a href="{{ MVS_GET_URL }}{{ mvs_token }}">{{ mvs_token }}</a>
+            <!-- <a href="/app/working/{{ mvs_token }}">{{ mvs_token }}</a> -->
+            <h4><b>{{mvs_token}}</b></h4>
           </div>
           <div class="simulation__feedback">
             <div class="item item--successful">
@@ -30,7 +31,7 @@
 
       <div>
         <a class="btn btn--medium" href="{% url 'scenario_visualize_results' scen_id %}">{% translate "Check results dashboard" %}</a>
-        <a class="btn btn--medium btn--hollow" href="{{ MVS_LP_FILE_URL }}{{ mvs_token }}">{% translate "Download LP files" %}</a>
+        <a class="btn btn--medium btn--hollow" href="/static/working/{{ mvs_token }}/dumps/config.lp" download>{% translate "Download LP files" %}</a>
         <a class="btn btn--medium btn--hollow" href="{% url 'simulation_cancel' scen_id %}" onclick="return confirm('Are you sure?')">{% translate "Reset simulation" %}</a>
       </div>
     </footer>

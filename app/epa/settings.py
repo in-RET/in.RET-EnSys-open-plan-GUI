@@ -11,8 +11,8 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 import ast
 import os
-from django.contrib.messages import constants as messages
 
+from django.contrib.messages import constants as messages
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = ast.literal_eval(os.getenv("DEBUG", "True"))
@@ -104,27 +104,23 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "epa.wsgi.application"
 
-DB_CHOICE = os.environ.get("DATABASE", "postgres")
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 # By default the database is postgres, if you want to use mysql make sure you pip install the mysql requirement file
+
 DATABASES = {
     "default": {
-        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
-        "NAME": os.environ.get("SQL_DATABASE", os.path.join(BASE_DIR, "db.sqlite3")),
-        "USER": os.environ.get("SQL_USER", "user"),
-        "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
-        "HOST": os.environ.get("SQL_HOST", "localhost"),
-        "PORT": os.environ.get("SQL_PORT", "5432"),
+        "ENGINE": os.environ.get("SQL_ENGINE"),
+        "NAME": os.environ.get("SQL_DATABASE"),
+        "USER": os.environ.get("SQL_USER"),
+        "PASSWORD": os.environ.get("SQL_PASSWORD"),
+        "HOST": os.environ.get("SQL_HOST"),
+        "PORT": os.environ.get("SQL_PORT"),
     }
-    if DB_CHOICE == "postgres"
+    if os.environ.get("SQL_ENGINE")
     else {
         "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
         "NAME": os.environ.get("SQL_DATABASE", os.path.join(BASE_DIR, "db.sqlite3")),
-        "USER": os.environ.get("SQL_USER", "user"),
-        "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
-        "HOST": os.environ.get("SQL_HOST", "localhost"),
-        "PORT": os.environ.get("SQL_PORT", "3306"),
     }
 }
 
@@ -174,7 +170,7 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 MAILER_EMAIL_BACKEND = EMAIL_BACKEND
 
-DEFAULT_FROM_EMAIL = "noreply@elandh2020.eu"
+DEFAULT_FROM_EMAIL = "noreply@hs-nordhausen.de"
 EMAIL_HOST = os.getenv("EMAIL_HOST_IP", "127.0.0.1")
 EMAIL_PORT = 25
 EMAIL_USE_TLS = False
@@ -196,11 +192,16 @@ PROXY_CONFIG = (
 )
 
 MVS_API_HOST = os.getenv("MVS_API_HOST", "https://mvs-eland.rl-institut.de")
-MVS_POST_URL = f"{MVS_API_HOST}/sendjson/openplan"
-MVS_GET_URL = f"{MVS_API_HOST}/check/"
-MVS_LP_FILE_URL = f"{MVS_API_HOST}/get_lp_file/"
+#MVS_POST_URL = f"{MVS_API_HOST}/sendjson/openplan"
+#MVS_GET_URL = f"{MVS_API_HOST}/check/"
+#MVS_LP_FILE_URL = f"{MVS_API_HOST}/get_lp_file/"
 MVS_SA_POST_URL = f"{MVS_API_HOST}/sendjson/openplan/sensitivity-analysis"
 MVS_SA_GET_URL = f"{MVS_API_HOST}/check-sensitivity-analysis/"
+
+INRETENSYS_API_HOST = "http://fastapi:8001"
+INRETENSYS_POST_URL = f"{INRETENSYS_API_HOST}/uploadJson"
+INRETENSYS_CHECK_URL = f"{INRETENSYS_API_HOST}/check/"
+INRETENSYS_LP_FILE_URL = f"{INRETENSYS_API_HOST}/getLpFile/"
 
 # Allow iframes to show in page
 X_FRAME_OPTIONS = "SAMEORIGIN"

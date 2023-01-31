@@ -740,7 +740,6 @@ class ScenarioFile(models.Model):
 
 
 class AbstractSimulation(models.Model):
-
     start_date = models.DateTimeField(auto_now_add=True, null=False)
     end_date = models.DateTimeField(null=True)
     elapsed_seconds = models.FloatField(null=True)

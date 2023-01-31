@@ -6,23 +6,36 @@
 {% load i18n %}
 
 {% block head_block %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables.net-bs/1.10.23/dataTables.bootstrap.min.css" integrity="sha512-Z+BWkkwxMpBhQthPeqw2UbG1tamgkRHi1UaYyZ8mTnjt04iXqeVx/Wu4CYzPOn3E+x663DIV+SiAuKDHbTg6FQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/datatables.net-bs/1.10.23/dataTables.bootstrap.min.css"
+    integrity="sha512-Z+BWkkwxMpBhQthPeqw2UbG1tamgkRHi1UaYyZ8mTnjt04iXqeVx/Wu4CYzPOn3E+x663DIV+SiAuKDHbTg6FQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link href="https://unpkg.com/bootstrap-table@1.19.1/dist/bootstrap-table.min.css" rel="stylesheet">
 <!--link href="{% static 'css/quick_fix.css' %}" rel="stylesheet" type="text/css" /-->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jerosoler/Drawflow/dist/drawflow.min.css">
 
 {% endblock head_block %}
 
 {% block start_body_scripts %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/1.0.21/jquery.csv.min.js" integrity="sha512-Y8iWYJDo6HiTo5xtml1g4QqHtl/PO1w+dmUpQfQSOTqKNsMhExfyPN2ncNAe9JuJUSKzwK/b6oaNPop4MXzkwg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.1.1/d3.min.js" integrity="sha512-COTaPOlz12cG4fSfcBsxZsjauBAyldqp+8FQUM/dZHm+ts/jR4AFoJhCqxy8K10Jrf3pojfsbq7fAPTb1XaVkg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/1.0.21/jquery.csv.min.js"
+    integrity="sha512-Y8iWYJDo6HiTo5xtml1g4QqHtl/PO1w+dmUpQfQSOTqKNsMhExfyPN2ncNAe9JuJUSKzwK/b6oaNPop4MXzkwg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.1.1/d3.min.js"
+    integrity="sha512-COTaPOlz12cG4fSfcBsxZsjauBAyldqp+8FQUM/dZHm+ts/jR4AFoJhCqxy8K10Jrf3pojfsbq7fAPTb1XaVkg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script type="text/javascript" src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
 <script src="{% static 'js/traceplot.js' %}"></script>
 <script src="https://unpkg.com/bootstrap-table@1.19.1/dist/bootstrap-table.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.58.5/plotly.min.js" integrity="sha512-7wMLZxKDFvReIWPUzBfcEKsuOriDUEcWkV2bNHV2/tQUmoZj2eLpkQOF7nBbtwVG8WrSl5rTN87cqnS7ZelhzQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tippy.js/2.5.4/tippy.all.min.js" integrity="sha512-9LKXH8DIeFSdiDIWQSOJNZuwLynJNm4x/1eBRpPfRJsEXZWJL+aoH+JNDglF3DcCoQYVBHqXo8sVHOLveoaN0A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables.net/1.10.23/jquery.dataTables.min.js" integrity="sha512-coE8Qg+5Eb8e0xSXkdSJYln78NclTBgX6rducQWvi3NZooVaR1GVcVA5fRPVetzSqh9CEBv7hzwuQsZLLC0e8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.58.5/plotly.min.js"
+    integrity="sha512-7wMLZxKDFvReIWPUzBfcEKsuOriDUEcWkV2bNHV2/tQUmoZj2eLpkQOF7nBbtwVG8WrSl5rTN87cqnS7ZelhzQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tippy.js/2.5.4/tippy.all.min.js"
+    integrity="sha512-9LKXH8DIeFSdiDIWQSOJNZuwLynJNm4x/1eBRpPfRJsEXZWJL+aoH+JNDglF3DcCoQYVBHqXo8sVHOLveoaN0A=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables.net/1.10.23/jquery.dataTables.min.js"
+    integrity="sha512-coE8Qg+5Eb8e0xSXkdSJYln78NclTBgX6rducQWvi3NZooVaR1GVcVA5fRPVetzSqh9CEBv7hzwuQsZLLC0e8g=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 {% endblock start_body_scripts %}
 
@@ -31,304 +44,306 @@
 {% block content %}
 
 <!-- Modal -->
-<div class="modal fade modal--gui" id="guiModal" tabindex="-1" role="dialog" aria-labelledby="guiModalLabel" aria-hidden="true">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title" id="guiModalLabel">New message</h5>
-				<button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-			</div>
-			<form>
-				{% csrf_token %}
-				<div class="modal-body"></div>
-			</form>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate "Close" %}</button>
-			</div>
-		</div>
-	</div>
+<div class="modal fade modal--gui" id="guiModal" tabindex="-1" role="dialog" aria-labelledby="guiModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="guiModalLabel">New message</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form>
+                {% csrf_token %}
+                <div class="modal-body"></div>
+            </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate "Close" %}</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="modal fade modal--dashboard" id="KPIModal" tabindex="-1" aria-labelledby="KPIModalLabel" aria-hidden="true">
-	<div class="modal-dialog modal-xl">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h4 class="modal-title" id="KPIModalLabel">{% translate "KPI Overview" %}</h4>
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-			</div>
-			<div class="modal-body">
-				<table class="table" id="kpiTable">
-					<thead>
-					<tr>
-						<th scope="col">{% translate "Name" %}</th>
-						<th scope="col">{% translate "Unit" %}</th>
-						<th scope="col">{% translate "Definition" %}</th>
-						<th scope="col"></th>
-					</tr>
-					</thead>
-					<tbody>
-					{% for kpi_id, kpi in kpi_list.items %}
-					<tr>
-						<td scope="row">{% translate kpi.verbose %}</td>
-						<td>{% translate kpi.unit %}</td>
-						<td>{% translate kpi.definition %}</td>
-						<td><button class="btn btn--small btn--transparent">+ {% translate "Add to results" %}</button></td>
-					</tr>
-					{% endfor %}
-					</tbody>
-				</table>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn--medium" data-bs-dismiss="modal">Close</button>
-			</div>
-		</div>
-	</div>
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="KPIModalLabel">{% translate "KPI Overview" %}</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table" id="kpiTable">
+                    <thead>
+                        <tr>
+                            <th scope="col">{% translate "Name" %}</th>
+                            <th scope="col">{% translate "Unit" %}</th>
+                            <th scope="col">{% translate "Definition" %}</th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for kpi_id, kpi in kpi_list.items %}
+                        <tr>
+                            <td scope="row">{% translate kpi.verbose %}</td>
+                            <td>{% translate kpi.unit %}</td>
+                            <td>{% translate kpi.definition %}</td>
+                            <td><button class="btn btn--small btn--transparent">+ {% translate "Add to results"
+                                    %}</button></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn--medium" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 
-{% include "modal_template.html" with id="createReportItemModal" modal_style_class="modal--dashboard" submit_btn_label="Create" title="Add a new report item" custom_submit_function="createReportItem(event)" %}
+{% include "modal_template.html" with id="createReportItemModal" modal_style_class="modal--dashboard"
+submit_btn_label="Create" title="Add a new report item" custom_submit_function="createReportItem(event)" %}
 
-{% include "modal_template.html" with id="createSaGraphModal" modal_style_class="modal--dashboard" submit_btn_label="Create" title="Add a new report item" form=sa_graph_form %}
+{% include "modal_template.html" with id="createSaGraphModal" modal_style_class="modal--dashboard"
+submit_btn_label="Create" title="Add a new report item" form=sa_graph_form %}
 
 <!-- Modal to create sensitivity analysis -->
-<div class="modal fade modal--dashboard" id="createSaGraphModal" tabindex="-1" role="dialog" aria-labelledby="createSaGraphModalLabel" aria-hidden="true">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title" id="createSaGraphModalLabel">{% translate "Add a sensitivity analysisgraph" %}</h5>
-				<button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-			</div>
-			<div class="modal-body">
-				<form method="POST" action="{% url 'sensitivity_analysis_create_graph' proj_id %}" graph-parameter-url="{% url 'ajax_get_sensitivity_analysis_parameters' %}">
-					{% csrf_token %}
-					{{ sa_graph_form | crispy}}
-				</form>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate "Close" %}</button>
-				<button class="btn btn--medium" onclick="javascript:submitModalForm(event, modalId='createSaGraphModal')">{% translate "Create" %}</button>
+<div class="modal fade modal--dashboard" id="createSaGraphModal" tabindex="-1" role="dialog"
+    aria-labelledby="createSaGraphModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createSaGraphModalLabel">{% translate "Add a sensitivity analysisgraph" %}
+                </h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{% url 'sensitivity_analysis_create_graph' proj_id %}"
+                    graph-parameter-url="{% url 'ajax_get_sensitivity_analysis_parameters' %}">
+                    {% csrf_token %}
+                    {{ sa_graph_form | crispy}}
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate "Close" %}</button>
+                <button class="btn btn--medium"
+                    onclick="javascript:submitModalForm(event, modalId='createSaGraphModal')">{% translate "Create"
+                    %}</button>
 
-			</div>
-		</div>
-	</div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <main>
-	<section class="header">
-		<div>
-			<div class="header__left"></div>
-			<h1 class="header__title">{% translate "Simulation results" %}</h1>
-			<div class="header__back">
-				<a href="{% url 'back_to_scenario_review' proj_id %}">{% translate "To scenario" %}</a>
-			</div>
-		</div>
-	</section>
-	<section class="header-results">
-		<div>
-			<div class="header-results__scenario">
-				<div class="project-title">
-					{% translate "Project" %}
-				</div>
-				<div class="project-name">
-					<form action="{% url 'result_change_project' %}" method="POST">
-						{% csrf_token %}
-						<select name="proj_id" class="form-select" aria-label="Default select example" onchange="this.form.submit()">
-							{% for project in project_list %}
-							<option value="{{ project.id }}" {% if project.id == proj_id %} selected {% endif %}> {{ project.name }}  </option>
-							{% endfor %}
-						</select>
-					</form>
-				</div>
-			</div>
-			<div class="header-results__export">
-				{% block export-results %}
-				{% endblock export-results %}
-			</div>
-		</div>
-	</section>
+    <section class="header">
+        <div>
+            <div class="header__left"></div>
+            <h1 class="header__title">{% translate "Simulation results" %}</h1>
+            <div class="header__back">
+                <a href="{% url 'back_to_scenario_review' proj_id %}">{% translate "To scenario" %}</a>
+            </div>
+        </div>
+    </section>
+    <section class="header-results">
+        <div>
+            <div class="header-results__scenario">
+                <div class="project-title">
+                    {% translate "Project" %}
+                </div>
+                <div class="project-name">
+                    <form action="{% url 'result_change_project' %}" method="POST">
+                        {% csrf_token %}
+                        <select name="proj_id" class="form-select" aria-label="Default select example"
+                            onchange="this.form.submit()">
+                            {% for project in project_list %}
+                            <option value="{{ project.id }}" {% if project.id==proj_id %} selected {% endif %}> {{
+                                project.name }} </option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                </div>
+            </div>
+            <div class="header-results__export">
+                {% block export-results %}
+                {% endblock export-results %}
+            </div>
+        </div>
+    </section>
 
-
-	<!-- insert tabs here, previous class result-selector -->
-	<section>
-		<div class=" dashboard-tabs">
-			<div>
-				<ul class="dashboard-tabs nav nav-tabs" id="results-analysis-links">
-					<li class="nav-item">
-						<a class="nav-link" id="single-scenario-link" href="{% url 'project_visualize_results' proj_id %}">{% translate "Single scenarios" %}</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" id="compare-scenario-link" href="{% url 'project_compare_results' proj_id %}">{% translate "Compare scenarios" %}</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" id="sensitivity-analysis-link" href="{% url 'project_sensitivity_analysis' proj_id %}">{% translate "Sensitivity Analysis" %}</a>
-					</li>
-				</ul>
-			</div>
-		</div>
-		<div class="tab-content" id="js-db-top-section">
-			{% block dashboard %}
-			{% endblock dashboard %}
-		</div>
-	</section>
+    <!-- insert tabs here, previous class result-selector -->
+    <section>
+        <div class=" dashboard-tabs">
+            <div>
+                <ul class="dashboard-tabs nav nav-tabs" id="results-analysis-links">
+                    <li class="nav-item">
+                        <a class="nav-link" id="single-scenario-link"
+                            href="{% url 'project_visualize_results' proj_id %}">{% translate "Single scenarios" %}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="compare-scenario-link"
+                            href="{% url 'project_compare_results' proj_id %}">{% translate "Compare scenarios" %}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="sensitivity-analysis-link"
+                            href="{% url 'project_sensitivity_analysis' proj_id %}">{% translate "Sensitivity Analysis"
+                            %}</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="tab-content" id="js-db-top-section">
+            {% block dashboard %}
+            {% endblock dashboard %}
+        </div>
+    </section>
 
 
 </main>
 {% endblock content %}
-
-
 {% block end_body_scripts %}
-
-
 
 {{ report_items_data|json_script:"existingReportItemsData" }}
 
 <script src="https://cdn.jsdelivr.net/gh/jerosoler/Drawflow/dist/drawflow.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.serializeJSON/3.1.0/jquery.serializejson.min.js"
-        integrity="sha512-4y8bsEzrXJqRyl2dqjdKk/DetH59JcFTtYNMsy5DUpvVV8CXiSrQ1gSCL3+dFgj1Xco0ONPizsYd6wX2eAXL2g=="
-        crossorigin="anonymous"></script>
+    integrity="sha512-4y8bsEzrXJqRyl2dqjdKk/DetH59JcFTtYNMsy5DUpvVV8CXiSrQ1gSCL3+dFgj1Xco0ONPizsYd6wX2eAXL2g=="
+    crossorigin="anonymous"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 <script>
-const urlNotImplemented = `{% url 'not_implemented' %}?url={{ request.get_full_path }}`;
-const urlCopyReportItem = "#";
-const urlDeleteReportItem = `{% url 'report_delete_item' proj_id %}`;
+    const urlNotImplemented = `{% url 'not_implemented' %}?url={{ request.get_full_path }}`;
+    const urlCopyReportItem = "#";
+    const urlDeleteReportItem = `{% url 'report_delete_item' proj_id %}`;
 
 
-const deleteReportItem = (event) => {
-    //submit the form to delete a report item
-    const reportItemId = event.target.getAttribute("data-report-item-id");
-    if(confirm("Are you sure ? This action cannot be undone")){
-        $.ajax({
-            headers: {'X-CSRFToken': `{{ csrf_token }}` },
-            type: "POST",
-            url: urlDeleteReportItem,
-            data: {report_item_id: reportItemId},
-            success: function (jsonRes) {
-                document.getElementById(reportItemId).remove();
-            },
-            error: function (err) {
-                console.log(err);
-            },
-        })
-    }
-};
+    const deleteReportItem = (event) => {
+        //submit the form to delete a report item
+        const reportItemId = event.target.getAttribute("data-report-item-id");
+        if (confirm("Are you sure ? This action cannot be undone")) {
+            $.ajax({
+                headers: { 'X-CSRFToken': `{{ csrf_token }}` },
+                type: "POST",
+                url: urlDeleteReportItem,
+                data: { report_item_id: reportItemId },
+                success: function (jsonRes) {
+                    document.getElementById(reportItemId).remove();
+                },
+                error: function (err) {
+                    console.log(err);
+                },
+            })
+        }
+    };
 </script>
 <script src="{% static 'js/report_items.js' %}"></script>
 
-
-
-
-
-
 <script>
 
-function update_kpi_table_style(target){
-    $.ajax({
-        url: "{% url 'request_kpi_table' proj_id=proj_id %}" + target.value, // TODO add scenarios in the arguments to provide answers
-        type: "GET",
-        success: async (table_data) => {
+    function update_kpi_table_style(target) {
+        $.ajax({
+            url: "{% url 'request_kpi_table' proj_id=proj_id %}" + target.value, // TODO add scenarios in the arguments to provide answers
+            type: "GET",
+            success: async (table_data) => {
 
-        const parentDiv = document.getElementById("selectedKPITable");
-        parentDiv.innerHTML = "";
+                const parentDiv = document.getElementById("selectedKPITable");
+                parentDiv.innerHTML = "";
 
 
-        /* create KPI table headers */
-        const tableHead = document.createElement('thead');
-        const table_headers = ["Indicator", "Scen Value"]; // todo add dynamically more scenarios here
-        const table_length = table_headers.length;
-        const tableHeadContent = document.createElement('tr');
-        table_headers.map(hdr =>
-            {
-                var tableHdr = document.createElement('th');
-                tableHdr.innerHTML = `{% blocktranslate %}` + hdr + `{% endblocktranslate %}`;
-                tableHeadContent.appendChild(tableHdr);
+                /* create KPI table headers */
+                const tableHead = document.createElement('thead');
+                const table_headers = ["Indicator", "Scen Value"]; // todo add dynamically more scenarios here
+                const table_length = table_headers.length;
+                const tableHeadContent = document.createElement('tr');
+                table_headers.map(hdr => {
+                    var tableHdr = document.createElement('th');
+                    tableHdr.innerHTML = `{% blocktranslate %}` + hdr + `{% endblocktranslate %}`;
+                    tableHeadContent.appendChild(tableHdr);
+                }
+                );
+                tableHead.appendChild(tableHeadContent)
+                parentDiv.appendChild(tableHead);
+
+
+                for (subBody in table_data) {
+                    var tableBody = document.createElement('tbody');
+                    tableBody.id = subBody;
+                    /* add subtable title */
+                    const tableSubSectionTitleRow = document.createElement('tr');
+                    var tableSubSectionTitle = document.createElement('th');
+                    tableSubSectionTitle.innerHTML = subBody;
+                    tableSubSectionTitleRow.appendChild(tableSubSectionTitle);
+                    for (i = 0; i < table_length - 1; ++i) {
+                        tableSubSectionTitleRow.appendChild(document.createElement('td'));
+                    }
+
+                    //tableBody.appendChild(tableSubSectionTitle);
+
+                    /* add subtable lines for each parameter */
+                    // (param should be a json object) with keys name (type str), unit type (str) and scen_values
+                    table_data[subBody].map(param => {
+                        var tableSubSectionParamRow = document.createElement('tr');
+                        var cell = tableSubSectionParamRow.insertCell(0);
+                        cell.innerHTML = `{% blocktranslate %}` + param.name + `{% endblocktranslate %}<a data-bs-toggle="tooltip" title="" data-bs-original-title="${param.description}" data-bs-placement="right"><img style="height: 1.2rem;margin-left:.5rem" alt="info icon" src="{% static 'assets/icons/i_info.svg'%}"></a>`;
+                        //cell.setAttribute("title", param.description)
+                        //cell.append(" just to see");
+                        // todo for loop over scenario values
+                        for (i = 0; i < param.scen_values.length; ++i) {
+                            cell = tableSubSectionParamRow.insertCell(1 + i);
+                            cell.innerHTML = param.scen_values[i] + " " + param.unit
+                        };
+                        tableBody.appendChild(tableSubSectionParamRow);
+                    });
+
+
+                    parentDiv.appendChild(tableBody);
+                }
+                $('[data-bs-toggle="tooltip"]').tooltip()
+
+            },
+            error: function (xhr, errmsg) {
+                console.log("backend_error!")
+                //Show the error message
+                $('#message-div').html("<div class='alert-error'>" +
+                    "<strong>Success: </strong> We have encountered an error: " + errmsg + "</div>");
             }
-        );
-        tableHead.appendChild(tableHeadContent)
-        parentDiv.appendChild(tableHead);
+        });
 
-
-        for(subBody in table_data) {
-            var tableBody = document.createElement('tbody');
-            tableBody.id = subBody;
-            /* add subtable title */
-            const tableSubSectionTitleRow = document.createElement('tr');
-            var tableSubSectionTitle = document.createElement('th');
-            tableSubSectionTitle.innerHTML = subBody;
-            tableSubSectionTitleRow.appendChild(tableSubSectionTitle);
-            for(i=0;i<table_length-1;++i){
-                tableSubSectionTitleRow.appendChild(document.createElement('td'));
-            }
-
-            //tableBody.appendChild(tableSubSectionTitle);
-
-            /* add subtable lines for each parameter */
-            // (param should be a json object) with keys name (type str), unit type (str) and scen_values
-            table_data[subBody].map(param =>{
-                var tableSubSectionParamRow = document.createElement('tr');
-                var cell = tableSubSectionParamRow.insertCell(0);
-                cell.innerHTML = `{% blocktranslate %}` + param.name +`{% endblocktranslate %}<a data-bs-toggle="tooltip" title="" data-bs-original-title="${param.description}" data-bs-placement="right"><img style="height: 1.2rem;margin-left:.5rem" alt="info icon" src="{% static 'assets/icons/i_info.svg'%}"></a>`;
-                //cell.setAttribute("title", param.description)
-                //cell.append(" just to see");
-                // todo for loop over scenario values
-                for(i=0;i<param.scen_values.length;++i){
-                    cell = tableSubSectionParamRow.insertCell(1 + i);
-                    cell.innerHTML = param.scen_values[i] +" " + param.unit
-                };
-                tableBody.appendChild(tableSubSectionParamRow);
-            });
-
-
-            parentDiv.appendChild(tableBody);
-        }
-        $('[data-bs-toggle="tooltip"]').tooltip()
-
-        },
-        error: function (xhr, errmsg) {
-            console.log("backend_error!")
-            //Show the error message
-            $('#message-div').html("<div class='alert-error'>" +
-                "<strong>Success: </strong> We have encountered an error: " + errmsg + "</div>");
-        }
-    });
-
-};
-
-/* loop over scenario selection buttons and return the ids of the selected ones */
-function fetchSelectedScenarios(){
-    var selectedScenarios = [];
-    var scenariosDropDown = $("#results-scenarios");
-    if(scenariosDropDown){
-			if(Array.isArray(scenariosDropDown.val()) == false){
-				selectedScenarios.push(scenariosDropDown.val().split("-")[2]);
-			}
-			else{
-				selectedScenarios = scenariosDropDown.val();
-			};
     };
-    return selectedScenarios;
-};
 
+    /* loop over scenario selection buttons and return the ids of the selected ones */
+    function fetchSelectedScenarios() {
+        var selectedScenarios = [];
+        var scenariosDropDown = $("#results-scenarios");
+        if (scenariosDropDown) {
+            if (Array.isArray(scenariosDropDown.val()) == false) {
+                selectedScenarios.push(scenariosDropDown.val().split("-")[2]);
+            }
+            else {
+                selectedScenarios = scenariosDropDown.val();
+            };
+        };
+        return selectedScenarios;
+    };
 
-
-function scenario_visualize_timeseries(scen_id=""){
- $.ajax({
+    function scenario_visualize_timeseries(scen_id = "") {
+        $.ajax({
             url: "{% url 'scenario_visualize_timeseries' proj_id=proj_id %}" + scen_id,
             type: "GET",
             success: async (parameters) => {
                 await graph_type_mapping[parameters.type](parameters.id, parameters);
             }
         });
-};
+    };
 
-function scenario_visualize_stacked_timeseries(scen_id){
- $.ajax({
-            url: "{% url 'scenario_visualize_stacked_timeseries'%}" +  scen_id,
+    function scenario_visualize_stacked_timeseries(scen_id) {
+        $.ajax({
+            url: "{% url 'scenario_visualize_stacked_timeseries'%}" + scen_id,
             type: "GET",
             success: async (graphs) => {
                 const parentDiv = document.getElementById("stacked_timeseries");
@@ -340,28 +355,27 @@ function scenario_visualize_stacked_timeseries(scen_id){
                 });
             },
         });
-};
+    };
 
-
-function scenario_visualize_sankey(scen_id){
- $.ajax({
+    function scenario_visualize_sankey(scen_id) {
+        $.ajax({
             url: "{% url 'scenario_visualize_sankey' %}" + scen_id,
             type: "GET",
             success: async (parameters) => {
                 await graph_type_mapping[parameters.type](parameters.id, parameters);
             },
         });
-};
+    };
 
-function scenario_visualize_capacities(scen_id=""){
- $.ajax({
+    function scenario_visualize_capacities(scen_id = "") {
+        $.ajax({
             url: "{% url 'scenario_visualize_capacities' proj_id=proj_id %}" + scen_id,
             type: "GET",
             success: async (parameters) => {
                 await await graph_type_mapping[parameters.type](parameters.id, parameters);;
             },
         });
-};
+    };
 
 
 </script>
@@ -384,22 +398,21 @@ function scenario_visualize_capacities(scen_id=""){
     var reportItemScenariosDOM = createReportItemForm.querySelector('input[id="id_scenarios"]');
     var reportItemScenarios = [];
 
-
-    function updateReportItemParametersForm(graphType){
+    function updateReportItemParametersForm(graphType) {
         // Passes the existing text of the title to the form initials
         reportItemTitleDOM = createReportItemForm.querySelector('input[id="id_title"]');
-        if(reportItemTitleDOM){
+        if (reportItemTitleDOM) {
             reportItemTitle = reportItemTitleDOM.value
         }
         // Passes the preselected scenarios to the form initials
         reportItemScenariosDOM = createReportItemForm.querySelector('select[id="id_scenarios"]');
-        if(reportItemScenariosDOM){
+        if (reportItemScenariosDOM) {
             reportItemScenarios = [];
             Array.from(reportItemScenariosDOM.querySelectorAll('option:checked')).forEach(item => {
                 reportItemScenarios.push(item.value);
             });
         }
-        else{
+        else {
             reportItemScenarios = fetchSelectedScenarios();
         }
 
@@ -408,41 +421,41 @@ function scenario_visualize_capacities(scen_id=""){
         $.ajax({
             url: urlForm,
             type: "POST",
-            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' },
             data: {
-              'title': reportItemTitle,
-              'report_type': graphType,
-              'selected_scenarios': JSON.stringify(reportItemScenarios),
-              'multi_scenario': multipleScenarioSelection
+                'title': reportItemTitle,
+                'report_type': graphType,
+                'selected_scenarios': JSON.stringify(reportItemScenarios),
+                'multi_scenario': multipleScenarioSelection
             },
             success: function (formData) {
-               // find and keep the csrf token of the form
-               var csrfToken = createReportItemForm.querySelector('input[name="csrfmiddlewaretoken"]');
+                // find and keep the csrf token of the form
+                var csrfToken = createReportItemForm.querySelector('input[name="csrfmiddlewaretoken"]');
 
                 console.log(formData)
 
-               // update the report item graph
-               createReportItemForm.innerHTML = csrfToken.outerHTML + formData;
+                // update the report item graph
+                createReportItemForm.innerHTML = csrfToken.outerHTML + formData;
 
-               // (re)link the changing of report_item type combobox to loading new parameters form
-               // the name of the id is linked with the name of the attribute of ReportItem model in dashboard/models.py
-               $("#id_report_type").change(function (event) {
+                // (re)link the changing of report_item type combobox to loading new parameters form
+                // the name of the id is linked with the name of the attribute of ReportItem model in dashboard/models.py
+                $("#id_report_type").change(function (event) {
                     var reportItemType = $(this).val();
                     updateReportItemParametersForm(reportItemType)
-               })
-               $("#id_scenarios").change(function (event) {
+                })
+                $("#id_scenarios").change(function (event) {
                     var reportItemType = $("#id_report_type").val();
                     updateReportItemParametersForm(reportItemType)
-               })
+                })
             }
         });
     };
 
-    function showCreateReportItemModal(event){
+    function showCreateReportItemModal(event) {
         showModal(
             event,
-            modalId="createReportItemModal",
-            attrs={
+            modalId = "createReportItemModal",
+            attrs = {
                 enctype: "multipart/form-data",
                 "ajax-post-url": `{% url 'report_create_item' proj_id %}`,
                 "graph-parameter-url": `{% url 'ajax_get_graph_parameters_form' proj_id %}`
@@ -461,7 +474,7 @@ function scenario_visualize_capacities(scen_id=""){
 
         const formData = new FormData(createReportItemForm);
         $.ajax({
-            headers: {'X-CSRFToken': `{{ csrf_token }}` },
+            headers: { 'X-CSRFToken': `{{ csrf_token }}` },
             type: "POST",
             url: createReportUrl,
             data: formData,
@@ -477,10 +490,10 @@ function scenario_visualize_capacities(scen_id=""){
                 // TODO check jsonRes.report_type if it is in a mapping which has the different graph names as key and the corresponding function as values
                 // as we want to leave the door open to add other reportItem objects such as table, text, etc...
                 const graphId = addReportItemGraphToDOM(jsonRes);
-                if(jsonRes.type in graph_type_mapping){
+                if (jsonRes.type in graph_type_mapping) {
                     graph_type_mapping[jsonRes.type](graphId, jsonRes);
                 }
-                else{
+                else {
                     console.log("the report type '" + jsonRes.type + "' is not yet supported, sorry");
                 }
             },
@@ -504,7 +517,7 @@ function scenario_visualize_capacities(scen_id=""){
         })
     }
 
-document.querySelectorAll("#results-analysis-links a").forEach(el => {el.classList.remove("active")});
+    document.querySelectorAll("#results-analysis-links a").forEach(el => { el.classList.remove("active") });
 </script>
 
 {% block results_end_body_scripts %}

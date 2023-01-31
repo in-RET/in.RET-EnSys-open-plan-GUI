@@ -1,35 +1,23 @@
-from datetime import datetime
-import httpx as requests
 import json
-
-# from requests.exceptions import HTTPError
-from epa.settings import (
-    PROXY_CONFIG,
-    MVS_POST_URL,
-    MVS_GET_URL,
-    MVS_SA_POST_URL,
-    MVS_SA_GET_URL,
-)
-from dashboard.models import AssetsResults, KPICostsMatrixResults, KPIScalarResults
-from projects.constants import DONE, PENDING, ERROR
 import logging
+from datetime import datetime
+from django.http import JsonResponse
+
+import httpx as requests
+from dashboard.models import (AssetsResults, KPICostsMatrixResults,
+                              KPIScalarResults)
+# from requests.exceptions import HTTPError
+from epa.settings import (INRETENSYS_CHECK_URL, INRETENSYS_POST_URL, MVS_SA_GET_URL,
+                          MVS_SA_POST_URL, PROXY_CONFIG)
+from projects.constants import DONE, ERROR, PENDING
 
 logger = logging.getLogger(__name__)
 
 
-def mvs_simulation_request(data: dict):
-
-    headers = {"content-type": "application/json"}
-    payload = json.dumps(data)
+def mvs_simulation_request(data):
 
     try:
-        response = requests.post(
-            MVS_POST_URL,
-            data=payload,
-            headers=headers,
-            proxies=PROXY_CONFIG,
-            verify=False,
-        )
+        response = requests.post(url=INRETENSYS_POST_URL, json=data, params={'username': '', 'password': '', 'docker': True})
 
         # If the response was successful, no Exception will be raised
         response.raise_for_status()
@@ -40,13 +28,15 @@ def mvs_simulation_request(data: dict):
         logger.error(f"Other error occurred: {err}")
         return None
     else:
-        logger.info("The simulation was sent successfully to MVS API.")
-        return json.loads(response.text)
+        logger.info("The simulation was sent successfully to Inretensys API.")
+        str_results = json.loads(response.content)
+        
+        return {"token": str_results["folder"][0], "status": PENDING}
 
 
 def mvs_simulation_check_status(token):
     try:
-        response = requests.get(MVS_GET_URL + token, proxies=PROXY_CONFIG, verify=False)
+        response = requests.post(INRETENSYS_CHECK_URL + token)
         response.raise_for_status()
     except requests.HTTPError as http_err:
         logger.error(f"HTTP error occurred: {http_err}")
@@ -56,7 +46,9 @@ def mvs_simulation_check_status(token):
         return None
     else:
         logger.info("Success!")
-        return json.loads(response.text)
+
+        str_results = json.loads(response.content)
+        return {"status": str_results["status"], "token": str_results["token"]}
 
 
 def mvs_sa_check_status(token):
@@ -81,17 +73,17 @@ def fetch_mvs_simulation_results(simulation):
         response = mvs_simulation_check_status(token=simulation.mvs_token)
         try:
             simulation.status = response["status"]
-            simulation.errors = (
-                json.dumps(response["results"][ERROR])
-                if simulation.status == ERROR
-                else None
-            )
-            simulation.results = (
-                parse_mvs_results(simulation, response["results"])
-                if simulation.status == DONE
-                else None
-            )
-            logger.info(f"The simulation {simulation.id} is finished")
+            #imulation.errors = (
+            #    json.dumps(response["results"][ERROR])
+            #    if simulation.status == ERROR
+            #    else None
+            #)
+            #simulation.results = (
+            #    parse_mvs_results(simulation, response["results"])
+            #    if simulation.status == DONE
+            #    else None
+            #)
+            logger.info(f"The simulation {simulation.id} is {simulation.status}.")
         except:
             simulation.status = ERROR
             simulation.results = None

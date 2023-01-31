@@ -15,7 +15,7 @@ from django.shortcuts import *
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
-from epa.settings import MVS_GET_URL, MVS_LP_FILE_URL, MVS_SA_GET_URL, INRETENSYS_API_HOST
+from epa.settings import INRETENSYS_CHECK_URL, INRETENSYS_LP_FILE_URL, MVS_SA_GET_URL
 from InRetEnsys import *
 from InRetEnsys.types import Solver
 from jsonview.decorators import json_view
@@ -892,8 +892,8 @@ def scenario_review(request, proj_id, scen_id, step_id=4, max_step=5):
             "step_id": step_id,
             "step_list": STEP_LIST,
             "max_step": max_step,
-            "MVS_GET_URL": MVS_GET_URL,
-            "MVS_LP_FILE_URL": MVS_LP_FILE_URL,
+            "MVS_GET_URL": INRETENSYS_CHECK_URL,
+            "MVS_LP_FILE_URL": INRETENSYS_LP_FILE_URL,
         }
 
         qs = Simulation.objects.filter(scenario_id=scen_id)
@@ -1926,7 +1926,7 @@ def request_mvs_simulation(request, scen_id=0):
     # Make simulation request to FastAPI
     #results = requests.post(url="http://"+INRETENSYS_API_HOST+"/uploadJson",
     #                        json=model.json(), params={'username': '', 'password': '', 'docker': True})
-    results = mvs_simulation_request(data_clean)
+    results = mvs_simulation_request(model.json())
 
     if results is None:
         error_msg = "Could not communicate with the simulation server."
@@ -1943,14 +1943,13 @@ def request_mvs_simulation(request, scen_id=0):
         Simulation.objects.filter(scenario_id=scen_id).delete()
         # Create empty Simulation model object
         simulation = Simulation(start_date=datetime.now(), scenario_id=scen_id)
-
-        simulation.mvs_token = results
+        simulation.mvs_token = results["token"]
 
         if "status" in results.keys() and (
             results["status"] == DONE or results["status"] == ERROR
         ):
             simulation.status = results["status"]
-            simulation.results = results["results"]
+            #simulation.results = results["results"]
             simulation.end_date = datetime.now()
         else:  # PENDING
             simulation.status = results["status"]

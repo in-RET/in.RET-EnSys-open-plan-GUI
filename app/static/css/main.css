@@ -189,9 +189,11 @@ body {
   flex-direction: column; }
 
 .main {
-  flex: 1 0 auto; }
+  flex: 1 0 auto; 
+  width: 100%;
+}
 
-/**
+  /**
  * Render the `main` element consistently in IE.
  */
 main {

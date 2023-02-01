@@ -40,24 +40,15 @@ for bus in busses:
         )
     bus_figures.append(fig)
 
+
 app.layout = html.Div(
-    style={
-        #'margin': 'auto',
-        'height': '85vh',
+    style = {
+        'display': 'inline-block', 
         'width': '100%',
+        #'margin': 'auto',
+        'height': '100% !important',
     },
     children=[
-        html.H1(
-            children='Dashboard zur Darstellung von Simulationsergebnissen',
-            style={
-                'textAlign': 'center'
-            }
-        ),
-
-        html.Div(children='Institut für regnerative Energietechnik - In.RET, Nordhausen', style={
-            'textAlign': 'center'
-        }),
-        
         html.Div(
             style={
                 'float': 'left',

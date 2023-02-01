@@ -192,9 +192,18 @@ def result_change_project(request):
 @login_required
 @require_http_methods(["POST", "GET"])
 def scenario_visualize_results(request, proj_id=None, scen_id=None):
-    return render(request, "dashboard.html")
+    answer = render(
+            request,
+            "report/single_scenario.html", 
+            {
+                "proj_id": proj_id,
+                "scen_id": scen_id,
+            })
 
-
+    return answer
+     
+     
+    
 @login_required
 @require_http_methods(["POST", "GET"])
 def project_compare_results(request, proj_id):

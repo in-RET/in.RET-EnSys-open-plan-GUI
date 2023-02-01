@@ -1,12 +1,11 @@
-<!DOCTYPE html>
-<html>
-<head>
-</head>
-<body style="height: 100vh; margin: 0px">
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+    <div style="height: 100%">
     {% load plotly_dash %}
 
     {% plotly_app name="SimpleExample" %}
-</body>
-</html>
-
-
+    </div>
+{% endblock content %}

@@ -40,6 +40,11 @@ from projects.scenario_topology_helpers import load_scenario_topology_from_db
 from projects.services import (excuses_design_under_development,
                                get_selected_scenarios_in_cache)
 
+from django.shortcuts import render
+from django.http import HttpResponse
+
+from .reportdash import app 
+
 logger = logging.getLogger(__name__)
 
 
@@ -187,118 +192,7 @@ def result_change_project(request):
 @login_required
 @require_http_methods(["POST", "GET"])
 def scenario_visualize_results(request, proj_id=None, scen_id=None):
-    request.session[COMPARE_VIEW] = False
-    user_projects = request.user.project_set.all()
-
-    if proj_id is None:
-        if scen_id is not None:
-            proj_id = Scenario.objects.get(id=scen_id).project.id
-            # make sure the project id is always visible in url
-            answer = HttpResponseRedirect(
-                reverse("scenario_visualize_results", args=[proj_id, scen_id])
-            )
-        else:
-            if request.POST:
-                proj_id = int(request.POST.get("proj_id"))
-            else:
-                proj_id = request.user.project_set.first().id
-            # make sure the project id is always visible in url
-            answer = HttpResponseRedirect(
-                reverse("project_visualize_results", args=[proj_id])
-            )
-    else:
-        project = get_object_or_404(Project, id=proj_id)
-        if (project.user != request.user) and (
-            request.user not in project.viewers.all()
-        ):
-            raise PermissionDenied
-
-        selected_scenarios = get_selected_scenarios_in_cache(request, proj_id)
-        user_scenarios = project.get_scenarios_with_results()
-        if user_scenarios.exists() is False:
-            # TODO if user click on results from project before any scenario is simulated it might lead to problems
-            if scen_id is None:
-                scen_id = 0
-            # There are no scenarios with results yet for this project
-            answer = render(
-                request,
-                "report/single_scenario.html",
-                {
-                    "project_list": user_projects,
-                    "proj_id": proj_id,
-                    "scen_id": scen_id,
-                    "scenario_list": [],
-                    "kpi_list": KPI_PARAMETERS,
-                    "table_styles": TABLES,
-                    "report_items_data": [],
-                },
-            )
-        else:
-            if scen_id is None:
-                if len(selected_scenarios) == 0:
-                    scen_id = user_scenarios.first().id
-                else:
-                    # TODO here allow more than one scenario to be selected
-                    scen_id = selected_scenarios[0]
-
-            report_items_data = [
-                ri.render_json for ri in get_project_reportitems(project)
-            ]
-
-            scenario = get_object_or_404(Scenario, id=scen_id)
-            # TODO: change this when multi-scenario selection is allowed
-
-            if (scenario.project.user != request.user) and (
-                request.user not in scenario.project.viewers.all()
-            ):
-                raise PermissionDenied
-
-            qs = Simulation.objects.filter(scenario=scenario)
-            if qs.exists() and scenario in user_scenarios:
-                kpi_scalar_results_obj = KPIScalarResults.objects.get(
-                    simulation=scenario.simulation
-                )
-                kpi_scalar_values_dict = json.loads(
-                    kpi_scalar_results_obj.scalar_values
-                )
-
-                scalar_kpis_json = kpi_scalars_list(
-                    kpi_scalar_values_dict, KPI_SCALAR_UNITS, KPI_SCALAR_TOOLTIPS
-                )
-
-                update_selected_scenarios_in_cache(request, proj_id, scen_id)
-
-                topology_data_list = load_scenario_topology_from_db(scen_id)
-
-                answer = render(
-                    request,
-                    "report/single_scenario.html",
-                    {
-                        "scen_id": scen_id,
-                        "scalar_kpis": scalar_kpis_json,
-                        "proj_id": proj_id,
-                        "project_list": user_projects,
-                        "scenario_list": user_scenarios,
-                        "report_items_data": report_items_data,
-                        "kpi_list": KPI_PARAMETERS,
-                        "table_styles": TABLES,
-                        "topology_data_list": json.dumps(topology_data_list),
-                    },
-                )
-
-            else:
-                # redirect to the page where the simulation is started, or results fetched again
-                messages.error(
-                    request,
-                    _(
-                        "Your scenario was never simulated, the results are still pending or there is an error in the simulation. Please click on 'Run simulation', 'Update results' or 'Check status' button "
-                    ),
-                )
-                answer = HttpResponseRedirect(
-                    reverse("scenario_review", args=[proj_id, scen_id])
-                )
-
-    return answer
+    return render(request, "dashboard.html")
 
 
 @login_required

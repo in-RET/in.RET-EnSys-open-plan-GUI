@@ -43,7 +43,20 @@ from projects.services import (excuses_design_under_development,
 from django.shortcuts import render
 from django.http import HttpResponse
 
-from .reportdash import app 
+import dash
+from dash import dcc, html
+
+from django_plotly_dash import DjangoDash
+import plotly.graph_objects as go
+import os
+
+from .src.inret_dash.sankey import sankey
+from .src.inret_dash.plot import plot
+from .src.inret_dash.es_graph import printEsGraph
+from oemof import solph
+
+
+#from .reportdash import app 
 
 logger = logging.getLogger(__name__)
 
@@ -192,12 +205,125 @@ def result_change_project(request):
 @login_required
 @require_http_methods(["POST", "GET"])
 def scenario_visualize_results(request, proj_id=None, scen_id=None):
+    qs = Simulation.objects.filter(scenario_id=scen_id)
+
+    if qs.exists():
+        simulation = qs.first()
+
+    app = DjangoDash('SimpleExample')
+
+    # der Pfad ist funky, sollte nochmal optimiert werden
+    wpath = os.path.join(os.getcwd(), "dumps", simulation.mvs_token, "dumps")
+
+    es = solph.EnergySystem()
+    es.restore(dpath=wpath, filename="config.dump")
+
+    busses = []
+    bus_figures = []
+
+    for node in es.nodes:
+        if isinstance(node, solph.Bus):
+            busses.append(node)
+
+    for bus in busses:
+        fig = go.Figure(layout=dict(title=f"{bus} bus"))
+        for t, g in solph.views.node(es.results["main"], node=bus)["sequences"].items():
+            idx_asset = abs(t[0].index(bus) - 1)
+
+            fig.add_trace(
+                go.Scatter(
+                    x=g.index, y=g.values * pow(-1, idx_asset), name=t[0][idx_asset].label
+                )
+            )
+        bus_figures.append(fig)
+
+
+    app.layout = html.Div(
+        style = {
+            'display': 'inline-block', 
+            'width': '100%',
+            #'margin': 'auto',
+            'height': '100% !important',
+        },
+        children=[
+            html.Div(
+                style={
+                    'float': 'left',
+                    'width': '100%',
+                },
+                children=[
+                    html.H2(
+                        children='Sankey für den gesamten Zeitraum',
+                        style={
+                            'textAlign': 'center'
+                        }
+                    ),
+                    dcc.Graph(
+                        id='gesamt_sankey',
+                        figure=sankey(es, es.results["main"])
+                    )
+                ]
+            ),
+            html.Div(
+                style={
+                    'float': 'left',
+                    'width': '100%',
+                },
+                children=[
+                    html.H2(
+                        children='Sankey für einzelne Zeitschritte',
+                        style={
+                            'textAlign': 'center'
+                        }
+                    ),
+                    dcc.Graph(
+                        id='sankey',
+                        figure=sankey(es, es.results["main"])
+                    ),
+                    dcc.Slider(
+                        id='slider',
+                        value=1,
+                        min=0,
+                        max=len(es.timeindex),
+                        #marks=None,
+                        tooltip={"placement": "bottom", "always_visible": False}
+                    )
+                ]
+            ),
+            html.Div(
+                style={
+                    'float': 'left',
+                    'width': '100%',
+                },
+                children=[
+                    dcc.Graph(id=f"{bus}-id", figure=fig,)
+                    for bus, fig in zip(busses, bus_figures)
+                ]
+            ),
+        ]
+    )
+
+    @app.callback(
+        # The value of these components of the layout will be changed by this callback
+        dash.dependencies.Output(component_id="sankey", component_property="figure"),
+        # Triggers the callback when the value of one of these components of the layout is changed
+        dash.dependencies.Input(component_id="slider", component_property="value")
+    )
+    def update_figures(ts):
+        ts = int(ts)
+        # see if case changes, otherwise do not rerun this
+        date_time_index = es.timeindex
+
+        return sankey(es, es.results["main"], date_time_index[ts])
+
+
     answer = render(
             request,
             "report/single_scenario.html", 
             {
                 "proj_id": proj_id,
                 "scen_id": scen_id,
+                "workdir": simulation.mvs_token,
             })
 
     return answer

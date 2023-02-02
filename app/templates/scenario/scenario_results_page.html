@@ -6,14 +6,14 @@
 {% load i18n %}
 
 {% block head_block %}
-<link rel="stylesheet"
+<!-- <link rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/datatables.net-bs/1.10.23/dataTables.bootstrap.min.css"
     integrity="sha512-Z+BWkkwxMpBhQthPeqw2UbG1tamgkRHi1UaYyZ8mTnjt04iXqeVx/Wu4CYzPOn3E+x663DIV+SiAuKDHbTg6FQ=="
     crossorigin="anonymous" referrerpolicy="no-referrer" />
-<link href="https://unpkg.com/bootstrap-table@1.19.1/dist/bootstrap-table.min.css" rel="stylesheet">
-<!--link href="{% static 'css/quick_fix.css' %}" rel="stylesheet" type="text/css" /-->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jerosoler/Drawflow/dist/drawflow.min.css">
+<link href="https://unpkg.com/bootstrap-table@1.19.1/dist/bootstrap-table.min.css" rel="stylesheet"> --> 
+<!-- link href="{% static 'css/quick_fix.css' %}" rel="stylesheet" type="text/css" /-->
+<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jerosoler/Drawflow/dist/drawflow.min.css"> -->
 {% endblock head_block %}
 
 {% block start_body_scripts %}
@@ -28,7 +28,7 @@
     <section class="header">
         <div>
             <div class="header__left"></div>
-            <h1 class="header__title">{% translate "Simulation results" %}</h1>
+            <h1 class="header__title">{% translate "Simulation results for" %} {{ workdir }}</h1>
             <div class="header__back"></div>
         </div>
     </section>

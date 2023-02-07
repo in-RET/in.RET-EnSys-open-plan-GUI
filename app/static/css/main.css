@@ -2085,6 +2085,18 @@ nav.navbar {
       background-size: contain;
       height: 3rem;
       width: 3rem; }
+    .system-design .drawflow .drawflow-node.production {
+      border-bottom-color: #FFEF9F; }
+    .system-design .drawflow .drawflow-node.mySource .img::before {
+      content: '';
+      position: absolute;
+      top: calc(4.5rem / 2);
+      right: calc((4.5rem - 3rem) / 2);
+      transform: translateY(-50%);
+      background-image: url("/static/assets/gui/mySource.svg");
+      background-size: contain;
+      height: 3rem;
+      width: 3rem; }
     .system-design .drawflow .drawflow-node.conversion {
       border-bottom-color: #7BF1A8; }
     .system-design .drawflow .drawflow-node.transformer_station_in .img::before {
@@ -2094,6 +2106,18 @@ nav.navbar {
       right: calc((4.5rem - 3rem) / 2);
       transform: translateY(-50%);
       background-image: url("/static/assets/gui/transformer_station_in.svg");
+      background-size: contain;
+      height: 3rem;
+      width: 3rem; }
+    .system-design .drawflow .drawflow-node.conversion {
+      border-bottom-color: #7BF1A8; }
+    .system-design .drawflow .drawflow-node.myTransformer .img::before {
+      content: '';
+      position: absolute;
+      top: calc(4.5rem / 2);
+      right: calc((4.5rem - 3rem) / 2);
+      transform: translateY(-50%);
+      background-image: url("/static/assets/gui/myTransformer.svg");
       background-size: contain;
       height: 3rem;
       width: 3rem; }
@@ -2255,6 +2279,18 @@ nav.navbar {
       width: 3rem; }
     .system-design .drawflow .drawflow-node.storage {
       border-bottom-color: #90F1EF; }
+    .system-design .drawflow .drawflow-node.myGenericStorage .img::before {
+      content: '';
+      position: absolute;
+      top: calc(4.5rem / 2);
+      right: calc((4.5rem - 3rem) / 2);
+      transform: translateY(-50%);
+      background-image: url("/static/assets/gui/myGenericStorage.svg");
+      background-size: contain;
+      height: 3rem;
+      width: 3rem; }
+    .system-design .drawflow .drawflow-node.storage {
+      border-bottom-color: #90F1EF; }
     .system-design .drawflow .drawflow-node.h2ess .img::before {
       content: '';
       position: absolute;
@@ -2286,6 +2322,42 @@ nav.navbar {
       right: calc((4.5rem - 3rem) / 2);
       transform: translateY(-50%);
       background-image: url("/static/assets/gui/demand.svg");
+      background-size: contain;
+      height: 3rem;
+      width: 3rem; }
+    .system-design .drawflow .drawflow-node.demand {
+      border-bottom-color: #FFD6E0; }
+    .system-design .drawflow .drawflow-node.mySink .img::before {
+      content: '';
+      position: absolute;
+      top: calc(4.5rem / 2);
+      right: calc((4.5rem - 3rem) / 2);
+      transform: translateY(-50%);
+      background-image: url("/static/assets/gui/mySink.svg");
+      background-size: contain;
+      height: 3rem;
+      width: 3rem; }
+    .system-design .drawflow .drawflow-node.demand {
+      border-bottom-color: #FFD6E0; }
+    .system-design .drawflow .drawflow-node.myPredefinedSink .img::before {
+      content: '';
+      position: absolute;
+      top: calc(4.5rem / 2);
+      right: calc((4.5rem - 3rem) / 2);
+      transform: translateY(-50%);
+      background-image: url("/static/assets/gui/myPredefinedSink.svg");
+      background-size: contain;
+      height: 3rem;
+      width: 3rem; }
+    .system-design .drawflow .drawflow-node.demand {
+      border-bottom-color: #FFD6E0; }
+    .system-design .drawflow .drawflow-node.myExcess .img::before {
+      content: '';
+      position: absolute;
+      top: calc(4.5rem / 2);
+      right: calc((4.5rem - 3rem) / 2);
+      transform: translateY(-50%);
+      background-image: url("/static/assets/gui/myExcess.svg");
       background-size: contain;
       height: 3rem;
       width: 3rem; }

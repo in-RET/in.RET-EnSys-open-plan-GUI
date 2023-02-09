@@ -1587,10 +1587,10 @@ def request_mvs_simulation(request, scen_id=0):
                                         renewable_factor=i["renewable_factor"]["value"] if i["renewable_factor"] else None,
                                         investment=InRetEnsysInvestment(
                                             ep_costs=ep_costs,
-                                            maximum=i["maximum"]["value"] if i["maximum"] else None,
-                                            minimum=i["minimum"]["value"] if i["minimum"] else None,
-                                            existing=i["existing"]["value"] if i["existing"] else None,
-                                            offset=i["offset"]["value"] if i["offset"] else None,
+                                            maximum=i["maximum"]["value"] if bool(i["maximum"]) else 1000000,
+                                            minimum=i["minimum"]["value"] if bool(i["minimum"]) else 0,
+                                            existing=i["existing"]["value"] if bool(i["existing"]) else 0,
+                                            offset=i["offset"]["value"] if bool(i["offset"]) else 0,
                                             nonconvex=True if i["offset"] else False,
                                         )
                                         if bool(ep_costs)
@@ -1667,10 +1667,10 @@ def request_mvs_simulation(request, scen_id=0):
                                 nominal_storage_capacity=i["nominal_storage_capacity"]["value"] if bool(i["nominal_storage_capacity"]) else None, 
                                 investment=InRetEnsysInvestment(
                                     ep_costs=ep_costs,
-                                    maximum=i["maximum"]["value"] if bool(i["maximum"]) else None,
-                                    minimum=i["minimum"]["value"] if bool(i["minimum"]) else None,
-                                    existing=i["existing"]["value"] if bool(i["existing"]) else None,
-                                    offset=i["offset"]["value"] if bool(i["offset"]) else None,
+                                    maximum=i["maximum"]["value"] if bool(i["maximum"]) else 1000000,
+                                    minimum=i["minimum"]["value"] if bool(i["minimum"]) else 0,
+                                    existing=i["existing"]["value"] if bool(i["existing"]) else 0,
+                                    offset=i["offset"]["value"] if bool(i["offset"]) else 0,
                                     nonconvex=True if bool(i["offset"]) else False,
                                 )
                                 if bool(ep_costs)
@@ -1710,10 +1710,10 @@ def request_mvs_simulation(request, scen_id=0):
                                         _max=i["_max"]["value"] if i["_max"] and i["tec_params_flow_choice"] == "inputs" else None,
                                         investment=InRetEnsysInvestment(
                                             ep_costs=ep_costs,
-                                            maximum=i["maximum"]["value"] if bool(i["maximum"]) else None,
-                                            minimum=i["minimum"]["value"] if bool(i["minimum"]) else None,
-                                            existing=i["existing"]["value"] if bool(i["existing"]) else None,
-                                            offset=i["offset"]["value"] if bool(i["offset"]) else None,
+                                            maximum=i["maximum"]["value"] if bool(i["maximum"]) else 1000000,
+                                            minimum=i["minimum"]["value"] if bool(i["minimum"]) else 0,
+                                            existing=i["existing"]["value"] if bool(i["existing"]) else 0,
+                                            offset=i["offset"]["value"] if bool(i["offset"]) else 0,
                                             nonconvex=True if bool(i["offset"]) else False,
                                         ) if bool(ep_costs) and i["eco_params_flow_choice"] == "inputs" else None,
                                     )
@@ -1732,10 +1732,10 @@ def request_mvs_simulation(request, scen_id=0):
                                         renewable_factor=i["renewable_factor"]["value"] if i["renewable_factor"] else None,
                                         investment=InRetEnsysInvestment(
                                             ep_costs=ep_costs,
-                                            maximum=i["maximum"]["value"] if bool(i["maximum"]) else None,
-                                            minimum=i["minimum"]["value"] if bool(i["minimum"]) else None,
-                                            existing=i["existing"]["value"] if bool(i["existing"]) else None,
-                                            offset=i["offset"]["value"] if bool(i["offset"]) else None,
+                                            maximum=i["maximum"]["value"] if bool(i["maximum"]) else 1000000,
+                                            minimum=i["minimum"]["value"] if bool(i["minimum"]) else 0,
+                                            existing=i["existing"]["value"] if bool(i["existing"]) else 0,
+                                            offset=i["offset"]["value"] if bool(i["offset"]) else 0,
                                             nonconvex=True if bool(i["offset"]) else False,
                                         )
                                         if bool(ep_costs) and i["eco_params_flow_choice"] == "outputs" else None,
@@ -1827,6 +1827,8 @@ def request_mvs_simulation(request, scen_id=0):
     # Make simulation request to FastAPI
     #results = requests.post(url="http://"+INRETENSYS_API_HOST+"/uploadJson",
     #                        json=model.json(), params={'username': '', 'password': '', 'docker': True})
+
+    #print(model.json())
     results = mvs_simulation_request(model.json())
 
     if results is None:

@@ -4,11 +4,16 @@ from datetime import datetime
 from django.http import JsonResponse
 
 import httpx as requests
-from dashboard.models import (AssetsResults, KPICostsMatrixResults,
-                              KPIScalarResults)
+from dashboard.models import AssetsResults, KPICostsMatrixResults, KPIScalarResults
+
 # from requests.exceptions import HTTPError
-from epa.settings import (INRETENSYS_CHECK_URL, INRETENSYS_POST_URL, MVS_SA_GET_URL,
-                          MVS_SA_POST_URL, PROXY_CONFIG)
+from epa.settings import (
+    INRETENSYS_CHECK_URL,
+    INRETENSYS_POST_URL,
+    MVS_SA_GET_URL,
+    MVS_SA_POST_URL,
+    PROXY_CONFIG,
+)
 from projects.constants import DONE, ERROR, PENDING
 
 logger = logging.getLogger(__name__)
@@ -17,7 +22,11 @@ logger = logging.getLogger(__name__)
 def mvs_simulation_request(data):
 
     try:
-        response = requests.post(url=INRETENSYS_POST_URL, json=data, params={'username': '', 'password': '', 'docker': True})
+        response = requests.post(
+            url=INRETENSYS_POST_URL,
+            json=data,
+            params={"username": "", "password": "", "docker": True},
+        )
 
         # If the response was successful, no Exception will be raised
         response.raise_for_status()
@@ -30,7 +39,7 @@ def mvs_simulation_request(data):
     else:
         logger.info("The simulation was sent successfully to Inretensys API.")
         str_results = json.loads(response.content)
-        
+
         return {"token": str_results["folder"][0], "status": PENDING}
 
 
@@ -73,16 +82,16 @@ def fetch_mvs_simulation_results(simulation):
         response = mvs_simulation_check_status(token=simulation.mvs_token)
         try:
             simulation.status = response["status"]
-            #imulation.errors = (
+            # imulation.errors = (
             #    json.dumps(response["results"][ERROR])
             #    if simulation.status == ERROR
             #    else None
-            #)
-            #simulation.results = (
+            # )
+            # simulation.results = (
             #    parse_mvs_results(simulation, response["results"])
             #    if simulation.status == DONE
             #    else None
-            #)
+            # )
             logger.info(f"The simulation {simulation.id} is {simulation.status}.")
         except:
             simulation.status = ERROR

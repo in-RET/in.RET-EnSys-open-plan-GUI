@@ -192,9 +192,9 @@ PROXY_CONFIG = (
 )
 
 MVS_API_HOST = os.getenv("MVS_API_HOST", "https://mvs-eland.rl-institut.de")
-#MVS_POST_URL = f"{MVS_API_HOST}/sendjson/openplan"
-#MVS_GET_URL = f"{MVS_API_HOST}/check/"
-#MVS_LP_FILE_URL = f"{MVS_API_HOST}/get_lp_file/"
+# MVS_POST_URL = f"{MVS_API_HOST}/sendjson/openplan"
+# MVS_GET_URL = f"{MVS_API_HOST}/check/"
+# MVS_LP_FILE_URL = f"{MVS_API_HOST}/get_lp_file/"
 MVS_SA_POST_URL = f"{MVS_API_HOST}/sendjson/openplan/sensitivity-analysis"
 MVS_SA_GET_URL = f"{MVS_API_HOST}/check-sensitivity-analysis/"
 
@@ -202,6 +202,8 @@ INRETENSYS_API_HOST = "http://fastapi:8001"
 INRETENSYS_POST_URL = f"{INRETENSYS_API_HOST}/uploadJson"
 INRETENSYS_CHECK_URL = f"{INRETENSYS_API_HOST}/check/"
 INRETENSYS_LP_FILE_URL = f"{INRETENSYS_API_HOST}/getLpFile/"
+
+OEP_URL = "https://openenergy-platform.org/api/v0/schema/model_draft/tables/"
 
 # Allow iframes to show in page
 X_FRAME_OPTIONS = "SAMEORIGIN"

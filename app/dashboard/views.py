@@ -6,17 +6,28 @@ from io import BytesIO
 
 import numpy as np
 import xlsxwriter
-from dashboard.forms import (ReportItemForm, TimeseriesGraphForm,
-                             graph_parameters_form_factory)
+from dashboard.forms import (
+    ReportItemForm,
+    TimeseriesGraphForm,
+    graph_parameters_form_factory,
+)
 from dashboard.helpers import *
-from dashboard.models import (KPI_COSTS_TOOLTIPS, KPI_COSTS_UNITS,
-                              KPI_SCALAR_TOOLTIPS, KPI_SCALAR_UNITS,
-                              OUTPUT_POWER, REPORT_GRAPHS,
-                              STORAGE_SUB_CATEGORIES, AssetsResults,
-                              KPICostsMatrixResults, KPIScalarResults,
-                              ReportItem, SensitivityAnalysisGraph,
-                              get_project_reportitems,
-                              get_project_sensitivity_analysis_graphs)
+from dashboard.models import (
+    KPI_COSTS_TOOLTIPS,
+    KPI_COSTS_UNITS,
+    KPI_SCALAR_TOOLTIPS,
+    KPI_SCALAR_UNITS,
+    OUTPUT_POWER,
+    REPORT_GRAPHS,
+    STORAGE_SUB_CATEGORIES,
+    AssetsResults,
+    KPICostsMatrixResults,
+    KPIScalarResults,
+    ReportItem,
+    SensitivityAnalysisGraph,
+    get_project_reportitems,
+    get_project_sensitivity_analysis_graphs,
+)
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -33,12 +44,20 @@ from jsonview.decorators import json_view
 from projects.constants import COMPARE_VIEW
 from projects.forms import AssetCreateForm, BusForm, StorageForm
 from projects.helpers import parameters_helper
-from projects.models import (Asset, Bus, Project, Scenario,
-                             SensitivityAnalysis, Simulation,
-                             get_project_sensitivity_analysis)
+from projects.models import (
+    Asset,
+    Bus,
+    Project,
+    Scenario,
+    SensitivityAnalysis,
+    Simulation,
+    get_project_sensitivity_analysis,
+)
 from projects.scenario_topology_helpers import load_scenario_topology_from_db
-from projects.services import (excuses_design_under_development,
-                               get_selected_scenarios_in_cache)
+from projects.services import (
+    excuses_design_under_development,
+    get_selected_scenarios_in_cache,
+)
 
 logger = logging.getLogger(__name__)
 

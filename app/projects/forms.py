@@ -723,6 +723,8 @@ class AssetCreateForm(OpenPlanModelForm):
             self.fields[field].widget.attrs.update({f"df-{field}": ""})
             if field == "input_timeseries":
                 self.fields[field].required = False  # self.is_input_timeseries_empty()
+            if field == "choice_load_profile":
+                self.fields[field].required = False
             if view_only is True:
                 self.fields[field].disabled = True
         """ ----------------------------------------------------- """
@@ -1370,6 +1372,24 @@ class AssetCreateForm(OpenPlanModelForm):
                     "data-bs-toggle": "tooltip",
                     "title": "This parameter enters into the condition 'Bilanziell Erneuerbar' and is multiplied by the amount of energy of the respective component.",
                     "style": "font-weight:400; font-size:13px;",
+                }
+            ),
+            "oep_table_name": forms.TextInput(
+                attrs={
+                    "placeholder": "e.g. electricity_load_sample",
+                    "data-bs-toggle": "tooltip",
+                    "title": "This parameter specifies the Open Energy Platform table from the model draft to be used.",
+                    "style": "font-weight:400; font-size:13px;",
+                }
+            ),
+            "oep_column_name": forms.TextInput(
+                attrs={
+                    "placeholder": "e.g. electricity_load",
+                    "data-bs-toggle": "tooltip",
+                    "title": "This parameter specifies the column of the OEP table to be used.",
+                    "style": "font-weight:400; font-size:13px;",
+                    # "required": False,
+                    # "onchange": "makePlotlyLoadProfile(this.value)",
                 }
             ),
         }

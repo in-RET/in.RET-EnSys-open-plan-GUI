@@ -645,7 +645,7 @@
         "asset_category": "energy_consumption",
         "energy_vector": "Electricity",
         "mvs_type": "sink",
-        "asset_fields": "[name,choice_load_profile,nominal_value,renewable_factor]",
+        "asset_fields": "[name,choice_load_profile,nominal_value,renewable_factor,oep_table_name,oep_column_name]",
         "unit": "kWh"
     }
 }

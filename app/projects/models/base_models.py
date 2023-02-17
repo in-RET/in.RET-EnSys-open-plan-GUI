@@ -520,6 +520,8 @@ class Asset(TopologyNode):
     )
     emission_factor = models.FloatField(default=None, blank=True, null=True)
     renewable_factor = models.FloatField(default=None, blank=True, null=True)
+    oep_table_name = models.CharField(max_length=120, null=True, blank=True)
+    oep_column_name = models.CharField(max_length=120, null=True, blank=True)
 
     @property
     def fields(self):

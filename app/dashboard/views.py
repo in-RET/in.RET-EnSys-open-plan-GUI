@@ -1000,7 +1000,7 @@ def scenario_visualize_stacked_timeseries(request, scen_id):
             report_item_type=GRAPH_TIMESERIES_STACKED,
         )
         for energy_vector in scenario.energy_vectors
-    ]MOISOSISSHSHIS
+    ]
 
     return JsonResponse(
         results_json, status=200, content_type="application/json", safe=False

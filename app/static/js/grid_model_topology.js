@@ -137,83 +137,76 @@ function getInputOutputMapping(nodeId){
     return input_output_mapping;
 }
 
+// COP calculation from temperature
+function toggle_cop_modal(event){
 
+    // get the parameters which uniquely identify the asset
+    const assetTypeName = guiModalDOM.getAttribute("data-node-type");
+    const topologyNodeId = guiModalDOM.getAttribute("data-node-topo-id"); // e.g. 'node-2'
 
-	// COP calculation from temperature
-	function toggle_cop_modal(event){
+    const getUrl = copGetUrl + assetTypeName +
+        (nodesToDB.has(topologyNodeId) ? "/" + nodesToDB.get(topologyNodeId).uid : "");
 
-		// get the parameters which uniquely identify the asset
-		const assetTypeName = guiModalDOM.getAttribute("data-node-type");
-		const topologyNodeId = guiModalDOM.getAttribute("data-node-topo-id"); // e.g. 'node-2'
+    $.ajax({
+        type: "GET",
+        url: getUrl,
+        success: function (formContent) {
+                // assign the content of the form to the form tag of the modal
+                guiModalDOM.querySelector('form .modal-addendum').innerHTML = formContent;
+                //make this invisible then
+        },
+    })
+}
 
+// function to compute the COP of a heat pump linked with the button of id="btn-computeCOP" in templates/scenario//scenario_step2.html
+function computeCOP(event){
+    // get the parameters which uniquely identify the asset
+    const assetTypeName = guiModalDOM.getAttribute("data-node-type");
+    const topologyNodeId = guiModalDOM.getAttribute("data-node-topo-id"); // e.g. 'node-2'
 
-		const getUrl = copGetUrl + assetTypeName +
-			(nodesToDB.has(topologyNodeId) ? "/" + nodesToDB.get(topologyNodeId).uid : "");
+    const copForm = event.target.closest('.modal-content').querySelector('#copForm');
+    console.log(assetForm)
+    const formData = new FormData(copForm);
 
-		$.ajax({
-			type: "GET",
-			url: getUrl,
-			success: function (formContent) {
-					// assign the content of the form to the form tag of the modal
-					guiModalDOM.querySelector('form .modal-addendum').innerHTML = formContent;
-					//make this invisible then
-			},
-	 })
-	}
+    // copPostUrl is defined in scenario_step2.html
+    const postUrl = copPostUrl + assetTypeName
+            + (nodesToDB.has(topologyNodeId) ? "/" + nodesToDB.get(topologyNodeId).uid : "");
 
-    // function to compute the COP of a heat pump linked with the button of id="btn-computeCOP" in templates/scenario//scenario_step2.html
-	function computeCOP(event){
+    // send the form of the asset to be saved in database (projects/views.py::asset_cops_create_or_update)
+    $.ajax({
+        headers: {'X-CSRFToken': csrfToken },
+        type: "POST",
+        url: postUrl,
+        data: formData,
+        processData: false,  // tells jQuery not to treat the data
+        contentType: false,   // tells jQuery not to define contentType
+        success: function (jsonRes) {
+            if (jsonRes.success) {
+            console.log(jsonRes.cops);
+            console.log(jsonRes.cop_id);
+                // close the cop area
+                copCollapse.hide();
 
-		// get the parameters which uniquely identify the asset
-		const assetTypeName = guiModalDOM.getAttribute("data-node-type");
-		const topologyNodeId = guiModalDOM.getAttribute("data-node-topo-id"); // e.g. 'node-2'
-
-        const copForm = event.target.closest('.modal-content').querySelector('#copForm');
-        console.log(assetForm)
-        const formData = new FormData(copForm);
-
-	  // copPostUrl is defined in scenario_step2.html
-		const postUrl = copPostUrl + assetTypeName
-				+ (nodesToDB.has(topologyNodeId) ? "/" + nodesToDB.get(topologyNodeId).uid : "");
-
-		// send the form of the asset to be saved in database (projects/views.py::asset_cops_create_or_update)
-		$.ajax({
-            headers: {'X-CSRFToken': csrfToken },
-            type: "POST",
-            url: postUrl,
-            data: formData,
-            processData: false,  // tells jQuery not to treat the data
-            contentType: false,   // tells jQuery not to define contentType
-            success: function (jsonRes) {
-                if (jsonRes.success) {
-                console.log(jsonRes.cops);
-                console.log(jsonRes.cop_id);
-                    // close the cop area
-                    copCollapse.hide();
-
-                    efficiencyDOM = guiModalDOM.querySelector('input[name="efficiency_scalar"]');
-                    if(efficiencyDOM){
-                        efficiencyDOM.value = jsonRes.cops;
-                        efficiencyDOM.dispatchEvent(new Event('change'));
-                    }
-                    copDOM = guiModalDOM.querySelector('input[name="copId"]');
-                    if(copDOM){
-                        copDOM.value = jsonRes.cop_id
-                    }
-
-                } else {
-                        // assign the content of the form to the form tag of the modal
-                        guiModalDOM.querySelector('form .modal-addendum').innerHTML = jsonRes.form_html;
+                efficiencyDOM = guiModalDOM.querySelector('input[name="efficiency_scalar"]');
+                if(efficiencyDOM){
+                    efficiencyDOM.value = jsonRes.cops;
+                    efficiencyDOM.dispatchEvent(new Event('change'));
+                }
+                copDOM = guiModalDOM.querySelector('input[name="copId"]');
+                if(copDOM){
+                    copDOM.value = jsonRes.cop_id
                 }
 
-            },
-            error: function (err) {
-                    guiModalDOM.querySelector('form .modal-body').innerHTML = err.responseJSON.form_html;}, //err => {alert("Modal form JS Error: " + err);console.log(err);}
-		})
-	}
+            } else {
+                    // assign the content of the form to the form tag of the modal
+                    guiModalDOM.querySelector('form .modal-addendum').innerHTML = jsonRes.form_html;
+            }
 
-
-
+        },
+        error: function (err) {
+                guiModalDOM.querySelector('form .modal-body').innerHTML = err.responseJSON.form_html;}, //err => {alert("Modal form JS Error: " + err);console.log(err);}
+    })
+}
 
 // one needs to add this function as event with eventListener (<some jquery div>.addEventListener("dblclick", dblClick))
 const dblClick = (e) => {
@@ -329,8 +322,6 @@ const submitForm = (e) => {
             guiModalDOM.querySelector('form .modal-body').innerHTML = err.responseJSON.form_html;}, //err => {alert("Modal form JS Error: " + err);console.log(err);}
     })
 }
-
-
 
 $("#guiModal").on('shown.bs.modal', function (event) {
      var formDiv = document.getElementsByClassName("form-group");

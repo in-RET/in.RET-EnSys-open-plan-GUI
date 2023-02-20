@@ -13,4 +13,4 @@ SQL_USER=dummy_user
 SQL_PASSWORD=dummy_pw
 SQL_HOST=db
 SQL_PORT=5432
-DATABASE=inretensys_gui
+DATABASE=dummy_db

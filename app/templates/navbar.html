@@ -24,10 +24,12 @@
                 {% if user.is_authenticated %}
                     <!--During scenario creation the nav bar does not display all options-->
                     {% if not scenario_create %}
+                        <!--
                         <li class="nav-item">
-                            <!--results.html-->
+                        --><!--results.html--><!--
                             <a class="nav-link" href="{% url 'scenario_visualize_results' %}">{% translate "Simulation results" %}</a>
                         </li>
+                        -->
                         <li class="nav-item">
                             <!--scenario-empty.html-->
                             <a class="nav-link" href="{% url 'scenario_select_project' %}">{% translate "New scenario" %}</a>

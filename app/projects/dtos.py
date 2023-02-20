@@ -4,6 +4,7 @@ from django.db.models import Q
 import numpy as np
 from numpy.core import long
 from datetime import date, datetime, time
+import requests
 
 from projects.models import (
     ConnectionLink,
@@ -15,6 +16,8 @@ from projects.models import (
     Constraint,
     ValueType,
 )
+
+from epa.settings import OEP_URL
 
 
 class ProjectDataDto:
@@ -86,6 +89,8 @@ class AssetDto:
         choice_load_profile: str,
         eco_params_flow_choice: str,
         tec_params_flow_choice: str,
+        oep_table_name: str,
+        oep_column_name: str,
         # dispatchable: bool,
         # age_installed: ValueTypeDto,
         # c_rate: ValueTypeDto,
@@ -133,6 +138,8 @@ class AssetDto:
         self.choice_load_profile = choice_load_profile
         self.eco_params_flow_choice = eco_params_flow_choice
         self.tec_params_flow_choice = tec_params_flow_choice
+        self.oep_table_name = oep_table_name
+        self.oep_column_name = oep_column_name
         # self.dispatchable = dispatchable
         # self.age_installed = age_installed
         # self.c_rate = c_rate
@@ -629,6 +636,8 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
             asset.choice_load_profile,
             asset.eco_params_flow_choice,
             asset.tec_params_flow_choice,
+            asset.oep_table_name,
+            asset.oep_column_name,
             # asset.dispatchable,
             # to_value_type(asset, "age_installed"),
             # to_value_type(asset, "crate"),
@@ -664,7 +673,7 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
             to_value_type(asset, "renewable_factor"),
             to_timeseries_data(asset, "input_timeseries"),
             asset.asset_type.unit,
-            **optional_parameters
+            **optional_parameters,
         )
 
         # set maximum capacity to None if it is equal to 0
@@ -674,11 +683,21 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
                 asset_dto.maximum = None
 
         choice_load_profile = asset_dto.choice_load_profile
+        oep_table_name = asset_dto.oep_table_name
+        oep_column_name = asset_dto.oep_column_name
         if asset.asset_type.asset_type == "myPredefinedSink":
             if choice_load_profile is not None:
                 print(choice_load_profile)
                 asset_dto.input_timeseries = to_timeseries_data_for_predefined_profile(
-                    asset, "input_timeseries", choice_load_profile
+                    asset, "input_timeseries", choice_load_profile=choice_load_profile
+                )
+            elif oep_table_name is not None:
+                print(oep_table_name, oep_column_name)
+                asset_dto.input_timeseries = to_timeseries_data_for_predefined_profile(
+                    asset,
+                    "input_timeseries",
+                    oep_table_name=oep_table_name,
+                    oep_column_name=oep_column_name,
                 )
 
         # map_to_dto(asset, asset_dto)
@@ -774,17 +793,27 @@ def to_timeseries_data(model_obj, field_name):
         return None
 
 
-def to_timeseries_data_for_predefined_profile(
-    model_obj, field_name, choice_load_profile
-):
+def to_timeseries_data_for_predefined_profile(model_obj, field_name, **kwargs):
     value_type = ValueType.objects.filter(type=field_name).first()
     unit = value_type.unit if value_type is not None else None
-    if choice_load_profile == "load_profile_1":
-        value_list = [5] * 8760
-    elif choice_load_profile == "load_profile_2":
-        value_list = [6] * 8760
-    elif choice_load_profile == "load_profile_3":
-        value_list = [7] * 8760
+    if kwargs.get("choice_load_profile"):
+        if kwargs["choice_load_profile"] == "load_profile_1":
+            value_list = [5] * 8760
+        elif kwargs["choice_load_profile"] == "load_profile_2":
+            value_list = [6] * 8760
+        elif kwargs["choice_load_profile"] == "load_profile_3":
+            value_list = [7] * 8760
+    elif kwargs.get("oep_table_name") and kwargs.get("oep_column_name"):
+        oep_table_name = kwargs.get("oep_table_name")
+        oep_column_name = kwargs.get("oep_column_name")
+        try:
+            result = requests.get(OEP_URL + oep_table_name + "/rows")
+            jsonResponse = (
+                result.json() if result and result.status_code == 200 else None
+            )
+            value_list = [item[oep_column_name] for item in jsonResponse]
+        except Exception as err:
+            print(f"An error occurred: {err}")
     if value_list is not None:
         return TimeseriesDataDto(unit, value_list)
     else:

@@ -4,6 +4,7 @@ from dash import dcc, html
 from django_plotly_dash import DjangoDash
 import plotly.graph_objects as go
 import os
+import pandas as pd
 
 from .src.inret_dash.sankey import sankey
 from .src.inret_dash.plot import plot
@@ -24,6 +25,32 @@ def createDashboard(simulation: Simulation):
 
     busses = []
     bus_figures = []
+
+    results = es.results['Main']
+
+    flows = [x for x in results.keys() if x[1] is not None]
+    nodes = [x for x in results.keys() if x[1] is None]
+
+    flows_invest = [x for x in flows if hasattr(results[x]['scalars'], 'invest') and isinstance(x[1], solph.Bus)]
+
+    investment_elements = []  
+
+    for flow in flows_invest:
+        #investment_df[flow[0].label] = results[flow]['scalars']['invest']
+        investment_elements.append(  
+            html.Tr(
+                children=[
+                    html.Td(
+                        children=flow[0].label
+                    ),
+                    html.Td(
+                        children=str(round(results[flow]['scalars']['invest'],4))
+                    )
+                ],
+                style={
+                    'background': 'white',
+                }
+            ))
 
     #my_results = electricity_bus['scalars']
 
@@ -51,36 +78,55 @@ def createDashboard(simulation: Simulation):
         bus_figures.append(fig)
         #my_results = bus['scalars']
 
+    bus_graph =[] 
+    for bus, fig in zip(busses, bus_figures):
+        bus_graph.append(dcc.Graph(id=f"{bus}-id", figure=fig))
+                    
+
+
+    
+
     app.layout = html.Div(
         style = {
             'display': 'inline-block', 
             'width': '100%',
             #'margin': 'auto',
             'height': '100% !important',
+            'font-family': 'Arial, Helvetica, sans-serif',
         },
+        className='dashboard',
         children=[
             html.Div(
-                style={},
+                style={
+                    'box-shadow': '8px 5px 5px lightgray',
+                },
                 children=[
                     html.H2(
                         children='Statische Werte',
                         style={
-                            'textAlign': 'center'
+                            'textAlign': 'center',
                         }
                     ),
-                    html.p(
-                        children='Dummy Placeholder',
+                    html.H3(
+                        children='Investments',
+                    ),
+                    html.Table(
                         style={
-                            'textAlign': 'center'
-                        }
-                    )
+                            'background': 'white',
+                            'width': '100%',
+                            'padding' : '1em',
+                        },
+                        children=investment_elements
+                    ),
                 ]
             ),
             html.Div(
                 style={
                     'float': 'left',
                     'width': '100%',
+                    'box-shadow': '8px 5px 5px lightgray',
                 },
+                className='row',
                 children=[
                     html.H2(
                         children='Sankey für den gesamten Zeitraum',
@@ -123,7 +169,9 @@ def createDashboard(simulation: Simulation):
                 style={
                     'float': 'left',
                     'width': '100%',
+                    'box-shadow': '8px 5px 5px lightgray',
                 },
+                className='row',
                 children=[
                     html.H2(
                         children='Sankey für einzelne Zeitschritte',
@@ -150,10 +198,19 @@ def createDashboard(simulation: Simulation):
                 style={
                     'float': 'left',
                     'width': '100%',
+                    'box-shadow': '8px 5px 5px lightgray',
                 },
+                className='row',
                 children=[
-                    dcc.Graph(id=f"{bus}-id", figure=fig,)
-                    for bus, fig in zip(busses, bus_figures)
+                    html.H2(
+                        children='Plots für jeden Bus',
+                        style={
+                            'textAlign': 'center',
+                        }
+                    ),
+                    html.Div(
+                        children=bus_graph
+                    )
                 ]
             ),
         ]

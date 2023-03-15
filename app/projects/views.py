@@ -1823,10 +1823,11 @@ def request_mvs_simulation(request, scen_id=0):
             #constraints=list_constraints,
         )
 
-        file = "dumps/mydump"
-        jf = open(file + ".json", 'wt')
-        jf.write(model.json())
-        jf.close()
+        # File output for debugging
+        #file = "dumps/mydump"
+        #jf = open(file + ".json", 'wt')
+        #jf.write(model.json())
+        #jf.close()
 
         results = None
     except Exception as e:
@@ -1844,11 +1845,6 @@ def request_mvs_simulation(request, scen_id=0):
         if output_lp_file == "on":
             data_clean["simulation_settings"]["output_lp_file"] = "true"
 
-    # Make simulation request to FastAPI
-    # results = requests.post(url="http://"+INRETENSYS_API_HOST+"/uploadJson",
-    #                        json=model.json(), params={'username': '', 'password': '', 'docker': True})
-
-    #print(model.json())
     results = mvs_simulation_request(model.json())
 
     if results is None:

@@ -1,7 +1,6 @@
 import json
 import logging
 from datetime import datetime
-from django.http import JsonResponse
 
 import httpx as requests
 from dashboard.models import AssetsResults, KPICostsMatrixResults, KPIScalarResults
@@ -22,6 +21,7 @@ logger = logging.getLogger(__name__)
 def mvs_simulation_request(data):
 
     try:
+        # TODO: request without docker etc.
         response = requests.post(
             url=INRETENSYS_POST_URL,
             json=data,

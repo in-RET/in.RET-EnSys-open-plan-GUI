@@ -26,6 +26,8 @@ from projects.constants import (
     USER_RATING,
     LOAD_PROFILE_CHOICE,
     FLOW_CHOICE,
+    SOURCE_CHOICE,
+    YEAR_CHOICE
 )
 
 
@@ -522,6 +524,12 @@ class Asset(TopologyNode):
     renewable_factor = models.FloatField(default=None, blank=True, null=True)
     oep_table_name = models.CharField(max_length=120, null=True, blank=True)
     oep_column_name = models.CharField(max_length=120, null=True, blank=True)
+    source_choice = models.CharField(
+        null=True, blank=False, choices=SOURCE_CHOICE, max_length=40
+    )
+    year_choice = models.CharField(
+        null=True, blank=False, choices=YEAR_CHOICE, max_length=40
+    )
 
     @property
     def fields(self):

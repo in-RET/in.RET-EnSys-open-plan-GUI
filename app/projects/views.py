@@ -55,6 +55,8 @@ from .services import (
     get_selected_scenarios_in_cache,
     send_feedback_email,
 )
+from django.template.loader import get_template
+from django.template.loader import render_to_string
 
 logger = logging.getLogger(__name__)
 
@@ -698,7 +700,8 @@ def scenario_create_topology(request, proj_id, scen_id, step_id=2, max_step=3):
             # "biogas_plant": _("Biogas Plant"),
             # "geothermal_conversion": _("Geothermal Conversion"),
             # "solar_thermal_plant": _("Solar Thermal Plant"),
-            "mySource": _("Source")
+            "mySource": _("Source"),
+            "myPredefinedSource": _("Predefined Source")
         },
         "conversion": {
             # "transformer_station_in": _("Transformer Station (in)"),  #
@@ -1200,6 +1203,35 @@ def sensitivity_analysis_create(request, scen_id, sa_id=None, step_id=5):
 
 # region Asset
 
+@login_required
+@require_http_methods(["POST", "GET"])#, "POST"
+def get_inputparameter_suggestion(request):
+    body_unicode = request.body.decode('utf-8')#for POST
+    body = json.loads(body_unicode)
+    print(body)
+    form = AssetCreateForm(
+        asset_type='myPredefinedSource', initial={"name": "what ever",
+                                                  "source_choice": body[0]['kindOfComponent'],
+                                                  "year_choice": body[1]['choosenTimestamp'],
+                                                  "capex": 600000, "opex": 2,
+                                                  "lifetime": 20}
+    )
+    
+    # form_suggestion = SuggestionForm(initial={"capex": 600000, "opex": 2,
+    #                                           "lifetime": 20})    
+    
+    # form_html = get_template("asset/asset_create_form_param_suggestion.html")
+    # return JsonResponse(
+    #     {"success": True, "form_html": form_html.render({"form_suggestion": form_suggestion})}, 
+    #     status=200
+    # )
+
+    form_html = get_template("asset/asset_create_form.html")
+    return JsonResponse(
+        {"success": True, "form_html": form_html.render({"form": form})}, 
+        status=200
+    )
+
 
 @login_required
 @require_http_methods(["GET"])
@@ -1216,6 +1248,7 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
         if asset_uuid:
             existing_bus = get_object_or_404(Bus, pk=asset_uuid)
             form = BusForm(asset_type=asset_type_name, instance=existing_bus)
+            # form.fields['name']='some bus name'
         else:
             bus_list = Bus.objects.filter(scenario=scenario)
             n_bus = len(bus_list)
@@ -1229,8 +1262,10 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
         "myTransformer",
         "myExcess",
         "myPredefinedSink",
+        "myPredefinedSource"
     ]:
         if asset_uuid:
+            print(asset_uuid)
             existing_asset = get_object_or_404(Asset, unique_id=asset_uuid)
             form = AssetCreateForm(asset_type=asset_type_name, instance=existing_asset)
             input_timeseries_data = (
@@ -1274,6 +1309,7 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
             form = AssetCreateForm(
                 asset_type=asset_type_name, initial={"name": default_name}
             )
+            # print(form.data.get('name'))
             input_timeseries_data = ""
 
         if asset_type_name == "myPredefinedSink":
@@ -1295,6 +1331,16 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
                     scenario.get_timestamps(json_format=True)
                 ),
             }
+        # if asset_type_name == "myPredefinedSource":
+            
+        #     # print(form.asset_type_name)
+        #     context = {
+        #         "form": form,
+        #         "input_timeseries_data": input_timeseries_data,
+        #         "input_timeseries_timestamps": json.dumps(
+        #             scenario.get_timestamps(json_format=True)
+        #         ),
+        #     }
 
         return render(request, "asset/asset_create_form.html", context)
 

@@ -648,5 +648,17 @@
         "asset_fields": "[name,choice_load_profile,nominal_value,renewable_factor,oep_table_name,oep_column_name]",
         "unit": "kWh"
     }
+},
+{
+    "model": "projects.assettype",
+    "pk": 7,
+    "fields": {
+        "asset_type": "myPredefinedSource",
+        "asset_category": "energy_production",
+        "energy_vector": "Electricity",
+        "mvs_type": "source",
+        "asset_fields": "[name,source_choice,year_choice,input_timeseries,nominal_value,variable_costs,_min,_max,nonconvex,summed_max,summed_min,capex,opex,lifetime,offset,maximum,minimum,existing,emission_factor,renewable_factor]",
+        "unit": "kWh"
+    }
 }
 ]

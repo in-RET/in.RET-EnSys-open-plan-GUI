@@ -619,6 +619,53 @@ class BusForm(OpenPlanModelForm):
             ),
         }
         labels = {"name": _("Name"), "type": _("Energy carrier")}
+        
+        
+class SuggestionForm(OpenPlanModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    class Meta:
+        model = Asset
+        fields = ["capex", "opex", "lifetime"]
+        widgets = {
+            "capex": forms.NumberInput(
+                attrs={
+                    "placeholder": "e.g. 4000",
+                    "min": "0.0",
+                    "step": ".01",
+                    "data-bs-toggle": "tooltip",
+                    "title": _(
+                        "Actual CAPEX of the asset, i.e., specific investment costs."
+                    ),
+                    "style": "font-weight:400; font-size:13px;",
+                }
+            ),
+            "opex": forms.NumberInput(
+                attrs={
+                    "placeholder": "e.g. 0",
+                    "min": "0.0",
+                    "step": ".01",
+                    "data-bs-toggle": "tooltip",
+                    "title": _(
+                        "Actual OPEX of the asset, i.e., specific operational and maintenance costs."
+                    ),
+                    "style": "font-weight:400; font-size:13px;",
+                }
+            ),
+            "lifetime": forms.NumberInput(
+                attrs={
+                    "placeholder": "e.g. 10 years",
+                    "min": "0",
+                    "step": "1",
+                    "data-bs-toggle": "tooltip",
+                    "title": _(
+                        "Number of operational years of the asset until it has to be replaced."
+                    ),
+                    "style": "font-weight:400; font-size:13px;",
+                }
+            ),
+        }
 
 
 class AssetCreateForm(OpenPlanModelForm):
@@ -1391,6 +1438,28 @@ class AssetCreateForm(OpenPlanModelForm):
                     # "required": False,
                     # "onchange": "makePlotlyLoadProfile(this.value)",
                 }
+            ),
+            "source_choice": forms.Select(
+                choices=SOURCE_CHOICE,
+                attrs={
+                    "data-bs-toggle": "tooltip",
+                    "title": _(
+                        ""
+                    ),
+                    "style": "font-weight:400; font-size:13px;",
+                    "onchange": "loadPredefindedDataKindofSource(this.value)",
+                },
+            ),
+            "year_choice": forms.Select(
+                choices=YEAR_CHOICE,
+                attrs={
+                    "data-bs-toggle": "tooltip",
+                    "title": _(
+                        ""
+                    ),
+                    "style": "font-weight:400; font-size:13px;",
+                    "onchange": "loadPredefindedDataYear(this.value)",
+                },
             ),
         }
         labels = {"input_timeseries": _("Timeseries vector")}

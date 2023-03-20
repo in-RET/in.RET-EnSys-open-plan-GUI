@@ -25,6 +25,64 @@ const layout = {
     }
 };
 
+var kindOfComponent = "";
+var choosenTimestamp = "";
+
+function loadPredefindedDataKindofSource(value){
+	kindOfComponent = value;
+}
+
+function loadPredefindedDataYear(value){
+	choosenTimestamp = value;
+	alert(choosenTimestamp+ ' ' + kindOfComponent);
+	fill_out_form();
+}
+
+$.ajaxSetup({ 
+     beforeSend: function(xhr, settings) {
+         function getCookie(name) {
+             var cookieValue = null;
+             if (document.cookie && document.cookie != '') {
+                 var cookies = document.cookie.split(';');
+                 for (var i = 0; i < cookies.length; i++) {
+                     var cookie = jQuery.trim(cookies[i]);
+                     // Does this cookie string begin with the name we want?
+                     if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                         cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                         break;
+                     }
+                 }
+             }
+             return cookieValue;
+         }
+         if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+             // Only send the token to relative URLs i.e. locally.
+             xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+         }
+     } 
+});
+
+
+function fill_out_form(){
+	//alert('Called');
+	var server_data = [
+		{"kindOfComponent": kindOfComponent},
+		{"choosenTimestamp": choosenTimestamp},
+	];
+			
+	$.ajax({
+		type: "POST",
+		url: "/en/asset/get_param_suggestion/",
+		data: JSON.stringify(server_data),
+		contentType: "application/json",
+		dataType: 'json',
+		success: function(response) {
+			alert("Got response from server ...");
+			//alert(response['form_html']);
+			$('#act_form_div').html(response['form_html']);
+			}
+	});
+}
 
 function makePlotlyLoadProfile(value)
 {

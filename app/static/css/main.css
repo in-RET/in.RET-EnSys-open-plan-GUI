@@ -189,9 +189,11 @@ body {
   flex-direction: column; }
 
 .main {
-  flex: 1 0 auto; }
+  flex: 1 0 auto; 
+  width: 100%;
+}
 
-/**
+  /**
  * Render the `main` element consistently in IE.
  */
 main {
@@ -1984,7 +1986,7 @@ nav.navbar {
       right: calc((4.5rem - 3rem) / 2);
       transform: translateY(-50%);
       background-image: url("/static/assets/gui/dso.svg");
-      background-size: contain;
+      background-size: cover;
       height: 3rem;
       width: 3rem; }
     .system-design .drawflow .drawflow-node.providers {
@@ -1996,7 +1998,7 @@ nav.navbar {
       right: calc((4.5rem - 3rem) / 2);
       transform: translateY(-50%);
       background-image: url("/static/assets/gui/gas_dso.svg");
-      background-size: contain;
+      background-size: cover;
       height: 3rem;
       width: 3rem; }
     .system-design .drawflow .drawflow-node.providers {
@@ -2008,7 +2010,7 @@ nav.navbar {
       right: calc((4.5rem - 3rem) / 2);
       transform: translateY(-50%);
       background-image: url("/static/assets/gui/h2_dso.svg");
-      background-size: contain;
+      background-size: cover;
       height: 3rem;
       width: 3rem; }
     .system-design .drawflow .drawflow-node.providers {
@@ -2020,7 +2022,7 @@ nav.navbar {
       right: calc((4.5rem - 3rem) / 2);
       transform: translateY(-50%);
       background-image: url("/static/assets/gui/heat_dso.svg");
-      background-size: contain;
+      background-size: cover;
       height: 3rem;
       width: 3rem; }
     .system-design .drawflow .drawflow-node.production {
@@ -2032,7 +2034,7 @@ nav.navbar {
       right: calc((4.5rem - 3rem) / 2);
       transform: translateY(-50%);
       background-image: url("/static/assets/gui/pv_plant.svg");
-      background-size: contain;
+      background-size: cover;
       height: 3rem;
       width: 3rem; }
     .system-design .drawflow .drawflow-node.production {
@@ -2044,7 +2046,7 @@ nav.navbar {
       right: calc((4.5rem - 3rem) / 2);
       transform: translateY(-50%);
       background-image: url("/static/assets/gui/wind_plant.svg");
-      background-size: contain;
+      background-size: cover;
       height: 3rem;
       width: 3rem; }
     .system-design .drawflow .drawflow-node.production {
@@ -2056,7 +2058,7 @@ nav.navbar {
       right: calc((4.5rem - 3rem) / 2);
       transform: translateY(-50%);
       background-image: url("/static/assets/gui/biogas_plant.svg");
-      background-size: contain;
+      background-size: cover;
       height: 3rem;
       width: 3rem; }
     .system-design .drawflow .drawflow-node.production {
@@ -2068,7 +2070,7 @@ nav.navbar {
       right: calc((4.5rem - 3rem) / 2);
       transform: translateY(-50%);
       background-image: url("/static/assets/gui/geothermal_conversion.svg");
-      background-size: contain;
+      background-size: cover;
       height: 3rem;
       width: 3rem; }
     .system-design .drawflow .drawflow-node.production {
@@ -2080,7 +2082,19 @@ nav.navbar {
       right: calc((4.5rem - 3rem) / 2);
       transform: translateY(-50%);
       background-image: url("/static/assets/gui/solar_thermal_plant.svg");
-      background-size: contain;
+      background-size: cover;
+      height: 3rem;
+      width: 3rem; }
+    .system-design .drawflow .drawflow-node.production {
+      border-bottom-color: #FFEF9F; }
+    .system-design .drawflow .drawflow-node.mySource .img::before {
+      content: '';
+      position: absolute;
+      top: calc(4.5rem / 2);
+      right: calc((4.5rem - 3rem) / 2);
+      transform: translateY(-50%);
+      background-image: url("/static/assets/gui/mySource.svg");
+      background-size: cover;
       height: 3rem;
       width: 3rem; }
     .system-design .drawflow .drawflow-node.conversion {
@@ -2092,7 +2106,19 @@ nav.navbar {
       right: calc((4.5rem - 3rem) / 2);
       transform: translateY(-50%);
       background-image: url("/static/assets/gui/transformer_station_in.svg");
-      background-size: contain;
+      background-size: cover;
+      height: 3rem;
+      width: 3rem; }
+    .system-design .drawflow .drawflow-node.conversion {
+      border-bottom-color: #7BF1A8; }
+    .system-design .drawflow .drawflow-node.myTransformer .img::before {
+      content: '';
+      position: absolute;
+      top: calc(4.5rem / 2);
+      right: calc((4.5rem - 3rem) / 2);
+      transform: translateY(-50%);
+      background-image: url("/static/assets/gui/myTransformer.svg");
+      background-size: cover;
       height: 3rem;
       width: 3rem; }
     .system-design .drawflow .drawflow-node.conversion {
@@ -2104,7 +2130,7 @@ nav.navbar {
       right: calc((4.5rem - 3rem) / 2);
       transform: translateY(-50%);
       background-image: url("/static/assets/gui/transformer_station_out.svg");
-      background-size: contain;
+      background-size: cover;
       height: 3rem;
       width: 3rem; }
     .system-design .drawflow .drawflow-node.conversion {
@@ -2116,7 +2142,7 @@ nav.navbar {
       right: calc((4.5rem - 3rem) / 2);
       transform: translateY(-50%);
       background-image: url("/static/assets/gui/storage_charge_controller_in.svg");
-      background-size: contain;
+      background-size: cover;
       height: 3rem;
       width: 3rem; }
     .system-design .drawflow .drawflow-node.conversion {
@@ -2128,7 +2154,7 @@ nav.navbar {
       right: calc((4.5rem - 3rem) / 2);
       transform: translateY(-50%);
       background-image: url("/static/assets/gui/storage_charge_controller_out.svg");
-      background-size: contain;
+      background-size: cover;
       height: 3rem;
       width: 3rem; }
     .system-design .drawflow .drawflow-node.conversion {
@@ -2140,7 +2166,7 @@ nav.navbar {
       right: calc((4.5rem - 3rem) / 2);
       transform: translateY(-50%);
       background-image: url("/static/assets/gui/solar_inverter.svg");
-      background-size: contain;
+      background-size: cover;
       height: 3rem;
       width: 3rem; }
     .system-design .drawflow .drawflow-node.conversion {
@@ -2152,7 +2178,7 @@ nav.navbar {
       right: calc((4.5rem - 3rem) / 2);
       transform: translateY(-50%);
       background-image: url("/static/assets/gui/diesel_generator.svg");
-      background-size: contain;
+      background-size: cover;
       height: 3rem;
       width: 3rem; }
     .system-design .drawflow .drawflow-node.conversion {
@@ -2164,7 +2190,7 @@ nav.navbar {
       right: calc((4.5rem - 3rem) / 2);
       transform: translateY(-50%);
       background-image: url("/static/assets/gui/fuel_cell.svg");
-      background-size: contain;
+      background-size: cover;
       height: 3rem;
       width: 3rem; }
     .system-design .drawflow .drawflow-node.conversion {
@@ -2176,7 +2202,7 @@ nav.navbar {
       right: calc((4.5rem - 3rem) / 2);
       transform: translateY(-50%);
       background-image: url("/static/assets/gui/gas_boiler.svg");
-      background-size: contain;
+      background-size: cover;
       height: 3rem;
       width: 3rem; }
     .system-design .drawflow .drawflow-node.conversion {
@@ -2188,7 +2214,7 @@ nav.navbar {
       right: calc((4.5rem - 3rem) / 2);
       transform: translateY(-50%);
       background-image: url("/static/assets/gui/electrolyzer.svg");
-      background-size: contain;
+      background-size: cover;
       height: 3rem;
       width: 3rem; }
     .system-design .drawflow .drawflow-node.conversion {
@@ -2200,7 +2226,7 @@ nav.navbar {
       right: calc((4.5rem - 3rem) / 2);
       transform: translateY(-50%);
       background-image: url("/static/assets/gui/heat_pump.svg");
-      background-size: contain;
+      background-size: cover;
       height: 3rem;
       width: 3rem; }
     .system-design .drawflow .drawflow-node.conversion {
@@ -2212,7 +2238,7 @@ nav.navbar {
       right: calc((4.5rem - 3rem) / 2);
       transform: translateY(-50%);
       background-image: url("/static/assets/gui/chp.svg");
-      background-size: contain;
+      background-size: cover;
       height: 3rem;
       width: 3rem; }
     .system-design .drawflow .drawflow-node.conversion {
@@ -2224,7 +2250,7 @@ nav.navbar {
       right: calc((4.5rem - 3rem) / 2);
       transform: translateY(-50%);
       background-image: url("/static/assets/gui/chp_fixed_ratio.svg");
-      background-size: contain;
+      background-size: cover;
       height: 3rem;
       width: 3rem; }
     .system-design .drawflow .drawflow-node.storage {
@@ -2236,7 +2262,7 @@ nav.navbar {
       right: calc((4.5rem - 3rem) / 2);
       transform: translateY(-50%);
       background-image: url("/static/assets/gui/bess.svg");
-      background-size: contain;
+      background-size: cover;
       height: 3rem;
       width: 3rem; }
     .system-design .drawflow .drawflow-node.storage {
@@ -2248,7 +2274,19 @@ nav.navbar {
       right: calc((4.5rem - 3rem) / 2);
       transform: translateY(-50%);
       background-image: url("/static/assets/gui/gess.svg");
-      background-size: contain;
+      background-size: cover;
+      height: 3rem;
+      width: 3rem; }
+    .system-design .drawflow .drawflow-node.storage {
+      border-bottom-color: #90F1EF; }
+    .system-design .drawflow .drawflow-node.myGenericStorage .img::before {
+      content: '';
+      position: absolute;
+      top: calc(4.5rem / 2);
+      right: calc((4.5rem - 3rem) / 2);
+      transform: translateY(-50%);
+      background-image: url("/static/assets/gui/myGenericStorage.svg");
+      background-size: cover;
       height: 3rem;
       width: 3rem; }
     .system-design .drawflow .drawflow-node.storage {
@@ -2260,7 +2298,7 @@ nav.navbar {
       right: calc((4.5rem - 3rem) / 2);
       transform: translateY(-50%);
       background-image: url("/static/assets/gui/h2ess.svg");
-      background-size: contain;
+      background-size: cover;
       height: 3rem;
       width: 3rem; }
     .system-design .drawflow .drawflow-node.storage {
@@ -2272,7 +2310,7 @@ nav.navbar {
       right: calc((4.5rem - 3rem) / 2);
       transform: translateY(-50%);
       background-image: url("/static/assets/gui/hess.svg");
-      background-size: contain;
+      background-size: cover;
       height: 3rem;
       width: 3rem; }
     .system-design .drawflow .drawflow-node.demand {
@@ -2284,7 +2322,43 @@ nav.navbar {
       right: calc((4.5rem - 3rem) / 2);
       transform: translateY(-50%);
       background-image: url("/static/assets/gui/demand.svg");
-      background-size: contain;
+      background-size: cover;
+      height: 3rem;
+      width: 3rem; }
+    .system-design .drawflow .drawflow-node.demand {
+      border-bottom-color: #FFD6E0; }
+    .system-design .drawflow .drawflow-node.mySink .img::before {
+      content: '';
+      position: absolute;
+      top: calc(4.5rem / 2);
+      right: calc((4.5rem - 3rem) / 2);
+      transform: translateY(-50%);
+      background-image: url("/static/assets/gui/mySink.svg");
+      background-size: cover;
+      height: 3rem;
+      width: 3rem; }
+    .system-design .drawflow .drawflow-node.demand {
+      border-bottom-color: #FFD6E0; }
+    .system-design .drawflow .drawflow-node.myPredefinedSink .img::before {
+      content: '';
+      position: absolute;
+      top: calc(4.5rem / 2);
+      right: calc((4.5rem - 3rem) / 2);
+      transform: translateY(-50%);
+      background-image: url("/static/assets/gui/myPredefinedSink.svg");
+      background-size: cover;
+      height: 3rem;
+      width: 3rem; }
+    .system-design .drawflow .drawflow-node.demand {
+      border-bottom-color: #FFD6E0; }
+    .system-design .drawflow .drawflow-node.myExcess .img::before {
+      content: '';
+      position: absolute;
+      top: calc(4.5rem / 2);
+      right: calc((4.5rem - 3rem) / 2);
+      transform: translateY(-50%);
+      background-image: url("/static/assets/gui/myExcess.svg");
+      background-size: cover;
       height: 3rem;
       width: 3rem; }
     .system-design .drawflow .drawflow-node.demand {
@@ -2296,7 +2370,7 @@ nav.navbar {
       right: calc((4.5rem - 3rem) / 2);
       transform: translateY(-50%);
       background-image: url("/static/assets/gui/gas_demand.svg");
-      background-size: contain;
+      background-size: cover;
       height: 3rem;
       width: 3rem; }
     .system-design .drawflow .drawflow-node.demand {
@@ -2308,7 +2382,7 @@ nav.navbar {
       right: calc((4.5rem - 3rem) / 2);
       transform: translateY(-50%);
       background-image: url("/static/assets/gui/h2_demand.svg");
-      background-size: contain;
+      background-size: cover;
       height: 3rem;
       width: 3rem; }
     .system-design .drawflow .drawflow-node.demand {
@@ -2320,7 +2394,7 @@ nav.navbar {
       right: calc((4.5rem - 3rem) / 2);
       transform: translateY(-50%);
       background-image: url("/static/assets/gui/heat_demand.svg");
-      background-size: contain;
+      background-size: cover;
       height: 3rem;
       width: 3rem; }
     .system-design .drawflow .drawflow-node.bus {
@@ -2332,7 +2406,7 @@ nav.navbar {
       right: calc((4.5rem - 3rem) / 2);
       transform: translateY(-50%);
       background-image: url("/static/assets/gui/bus.svg");
-      background-size: contain;
+      background-size: cover;
       height: 3rem;
       width: 3rem; }
 

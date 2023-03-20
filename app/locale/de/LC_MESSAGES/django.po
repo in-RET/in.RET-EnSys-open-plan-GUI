@@ -1173,7 +1173,7 @@ msgid "Thermal losses of storage independent of state of charge and independent 
 msgstr "Thermische Verluste des Speichers unabhängig vom Ladezustand und unabhängig von der nominalen Speicherkapazität zwischen zwei aufeinanderfolgenden Zeitschritten."
 
 msgid "factor"
-msgstr "Faktor MOISOSISSHSHIS"
+msgstr "Faktor"
 
 msgid "Thermal losses of storage independent of state of charge between two consecutive timesteps relative to nominal storage capacity."
 msgstr "Thermische Verluste des Speichers unabhängig vom Ladezustand zwischen zwei aufeinanderfolgenden Zeitschritten relativ zur nominalen Speicherkapazität."

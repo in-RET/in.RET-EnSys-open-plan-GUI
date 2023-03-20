@@ -1,19 +1,17 @@
-# Welcome to the open_plan gui repository
-![open_plan_logo (10X1)](https://user-images.githubusercontent.com/70587431/144256918-974fcefd-29f5-4b2f-b68b-6468327ef50b.png)
-
-Learn more about the open_plan project on our [website](https://open-plan-tool.org/).
+# Welcome to the inretensys-open-plan gui repository
+This is a modified version of the open_plan user interface to map the components from oemof.solph directly to the user interface. 
 
 ## Credits
+Learn more about the original open_plan project on their [website](https://open-plan-tool.org/).
+
 This code is based from previous open-source work done building a user interface to the [multi-vector-simulator](https://github.com/rl-institut/multi-vector-simulator) tool in the [Horizon2020](https://elandh2020.eu/) ELAND project. In open_plan project's scope a new design and more features are added, based on feedback collected in workshops held with stakeholders.
 
 ## Basic structure
-
-This repository contains the code for the user interface. The simulations are performed by [multi-vector-simulator](https://github.com/rl-institut/multi-vector-simulator) on a dedicated server (see the [open-plan-tool/simulation-server](https://github.com/open-plan-tool/simulation-server) repository). Once a simulation is over the results are sent back to the user interface were one can analyse them.
-
+This repository contains the code for the user interface. The simulations are performed by [inretensys-fastapi](https://github.com/in-RET/inretensys-fastapi) on a dedicated server (see the linked github repository). Once a simulation is over the results are stored locally on the simulation server and the user interface can access these files to create an result report. Also is it possible to download these files to create own, specific plots and reports.
 
 # Getting Started
 
-## Deploy locally using and using our open plan MVS server
+## Deploy locally using and using our inretensys-fastapi
 
 Prior to be able to develop locally, you might need to install postgres, simply google `install postgres` followed by your os name (`linux/mac/windows`)
 
@@ -32,62 +30,14 @@ SQL_HOST=localhost
 SQL_PORT=5432
 DEBUG=(True|False)
 ```
-8. Add an environment variable `MVS_HOST_API` and set the url of the simulation server you wish to use for your models
-9. Execute the `local_setup.sh` file (`. local_setup.sh` on linux/mac `bash local_setup.sh` on windows) you might have to make it executable first. Answer yes to the question
-10. Start the local server with `python manage.py runserver`
-11. You can then login with `testUser` and `ASas12,.` or create your own account
+8. Execute the `local_setup.sh` file (`. local_setup.sh` on linux/mac `bash local_setup.sh` on windows) you might have to make it executable first. Answer yes to the question
+9. Start the local server with `python manage.py runserver`
+10. You can then login with `testUser` and `ASas12,.` or create your own account
 
 ## Deploy using Docker Compose
-The following commands should get everything up and running, using the web based version of the MVS API.
-
 You need to be able to run docker-compose inside your terminal. If you can't you should install [Docker desktop](https://www.docker.com/products/docker-desktop/) first. 
 
-
-* Clone the repository locally `git clone --single-branch --branch main https://github.com/open-plan-tool/gui.git open_plan_gui`
-* Move inside the created folder (`cd open_plan_gui`)
-* Edit the `.envs/epa.postgres` and `.envs/db.postgres` environment files
-   * Change the value assigned to `EPA_SECRET_KEY` with a [randomly generated one](https://randomkeygen.com/)
-   * Make sure to replace dummy names with you preferred names
-   * The value assigned to the variables `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD` in `.envs/db.postgres` should match the ones of 
-   the variables `SQL_DATABASE`, `SQL_USER`, `SQL_PASSWORD` in `.envs/epa.postgres`, respectively
-
-   * Define an environment variable `MVS_HOST_API` in `.envs/epa.postgres` and set the url of the simulation server 
-   you wish to use for your models (for example `MVS_API_HOST="<url to your favorite simulation server>"`), you can deploy your own [simulation server](https://github.com/open-plan-tool/simulation-server) locally if you need
-
-Next you can either provide the following commands inside a terminal (with ubuntu you might have to prepend `sudo`)
-* `docker-compose --file=docker-compose-postgres.yml up -d --build` (you can replace `postgres` by `mysql` if you want to use mysql)
-* `docker-compose --file=docker-compose-postgres.yml exec -u root app_pg sh initial_setup.sh` (this will also load a default testUser account with sample scenario). 
-
-Or you can run a python script with the following command
-* `python deploy.py -db postgres`
-
-Finally
-* Open browser and navigate to http://localhost:8080 (or to http://localhost:8090 if you chose to use `mysql` instead of `postgres`): you should see the login page of the open_plan app
-* You can then login with `testUser` and `ASas12,.` or create your own account
-
-### Proxy settings (optional)
-If you use a proxy you will need to set `USE_PROXY=True` and edit `PROXY_ADDRESS=http://proxy_address:port` with your proxy settings in `.envs/epa.postgres`. 
-
->**_NOTE:_** If you wish to use mysql instead of postgres, simply replace `postgres` by `mysql` and `app_pg` by `app` in the above commands or filenames
-<hr>
-
->**_NOTE:_** Grab a cup of coffee or tea for this...
-<hr>
-
->**_NOTE:_** Grab a cup of coffee or tea for this...
-<hr>
+After this step you can follow the instructions under [inretensys-common](https://github.com/in-RET/inretensys-common). This repository contains all modules which you need to run postgres, gui and api.
 
 ## Test Account
-> You can access a preconfigured project using the following login credentials:  `testUser:ASas12,.`
-<hr>
-
-## Tear down (uninstall) docker containers
-To remove the application (including relevant images, volumes etc.), one can use the following commands in terminal:
-    
-`docker-compose down --file=docker-compose-postgres.yml -v`
-
-you can add `--rmi local` if you wish to also remove the images (this will take you a long time to rebuild the docker containers from scratch if you want to redeploy the app later then)
-
-Or you can run a python script with the following command
-
-`python deploy.py -db postgres --down`
+You can access a preconfigured project using the following login credentials:  `testUser:ASas12,.`

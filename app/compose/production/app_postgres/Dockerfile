@@ -1,4 +1,4 @@
-FROM python:3.9.5
+FROM python:3.10
 
 RUN echo POSTGRES
 ENV APP_ROOT /src
@@ -22,4 +22,4 @@ ADD . ${APP_ROOT}
 COPY ./djangoq_setup.sh /djangoq_setup.sh
 RUN chmod +x /djangoq_setup.sh
 
-CMD ["python", "manage.py", "collectstatic"]
+CMD ["python", "manage.py", "collectstatic", "--no-input"]

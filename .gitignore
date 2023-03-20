@@ -3,7 +3,6 @@
 **/__pycache__/
 **/*.py[cod]
 **/*.sqlite3
-**/src/
 !app/cdn_static_root/
 **/*.log
 **/node_modules/

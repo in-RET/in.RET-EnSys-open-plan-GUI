@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     # 3rd Party
     "crispy_forms",
     "django_q",
+    'django_plotly_dash.apps.DjangoPlotlyDashConfig',
 ]
 
 if DEBUG is True:
@@ -74,6 +75,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'django_plotly_dash.middleware.BaseMiddleware',
 ]
 
 FILE_UPLOAD_HANDLERS = [
@@ -146,7 +148,7 @@ LANGUAGE_CODE = "en"
 
 LOCALE_PATHS = (os.path.join(BASE_DIR, "locale"),)
 
-LANGUAGES = [("de", "German"), ("en", "English")]
+LANGUAGES = [("en", "English")] #("de", "German"),
 
 TIME_ZONE = "UTC"
 

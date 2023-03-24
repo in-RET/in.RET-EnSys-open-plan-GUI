@@ -1,4 +1,4 @@
-'''
+"""
 Routing for standard pipe connections
 
 Copyright (c) 2018 Gibbs Consulting and others - see CONTRIBUTIONS.md
@@ -20,7 +20,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-'''
+"""
 
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
@@ -34,15 +34,20 @@ from .util import pipe_ws_endpoint_name, http_endpoint, http_poke_endpoint_enabl
 
 # TODO document this and discuss embedding with other routes
 
-http_routes = [
-    ]
+http_routes = []
 
 if http_poke_endpoint_enabled():
     http_routes.append(re_path(http_endpoint("poke"), PokePipeConsumer))
 
-http_routes.append(re_path("^", AsgiHandler)) # AsgiHandler is 'the normal Django view handlers'
+http_routes.append(
+    re_path("^", AsgiHandler)
+)  # AsgiHandler is 'the normal Django view handlers'
 
-application = ProtocolTypeRouter({
-    'websocket': AuthMiddlewareStack(URLRouter([re_path(pipe_ws_endpoint_name(), MessageConsumer),])),
-    'http': AuthMiddlewareStack(URLRouter(http_routes)),
-    })
+application = ProtocolTypeRouter(
+    {
+        "websocket": AuthMiddlewareStack(
+            URLRouter([re_path(pipe_ws_endpoint_name(), MessageConsumer)])
+        ),
+        "http": AuthMiddlewareStack(URLRouter(http_routes)),
+    }
+)

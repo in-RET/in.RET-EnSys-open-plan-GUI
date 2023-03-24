@@ -287,18 +287,18 @@ FLOW_CHOICE = (
 
 SOURCE_CHOICE = (
     ("", "Choose..."),
-    ("wind", "Wind power plant"),
-    ("photovoltaic", "Photovoltaic"),
-    ("import_grid", "Import from the power grid")
+    ("Wind", "Wind power plant"),
+    ("Photovoltaic Free Field", "Photovoltaic Free Field"),
+    ("Import Grid", "Import from the power grid"),
 )
 
 YEAR_CHOICE = (
     ("", "Choose..."),
-    ("year_2025", "2025"),
-    ("year_2030", "2030"),
-    ("year_2035", "2035"),
-    ("year_2040", "2040"),
-    ("year_2045", "2045")
+    (2025, 2025),
+    (2030, 2030),
+    (2035, 2035),
+    (2040, 2040),
+    (2045, 2045),
 )
 
 COP_MODES = (("Heat pump", "heat_pump"), ("Chiller", "chiller"))

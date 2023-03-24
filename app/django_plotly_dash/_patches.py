@@ -1,4 +1,4 @@
-'''
+"""
 Collation of patches made to other python libraries, such as Dash itself.
 
 If/when the patches are not needed they will be removed from this file.
@@ -24,7 +24,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-'''
+"""
 
 import json
 
@@ -39,6 +39,7 @@ from django.utils.functional import Promise
 
 class DjangoPlotlyJSONEncoder(PlotlyJSONEncoder):
     """Augment the PlotlyJSONEncoder class with Django delayed processing"""
+
     def default(self, obj):
         if isinstance(obj, Promise):
             return force_str(obj)
@@ -48,7 +49,10 @@ class DjangoPlotlyJSONEncoder(PlotlyJSONEncoder):
 def promise_clean_to_json_compatible(obj):
 
     if isinstance(obj, dict):
-        return {promise_clean_to_json_compatible(k): promise_clean_to_json_compatible(v) for k, v in obj.items()}
+        return {
+            promise_clean_to_json_compatible(k): promise_clean_to_json_compatible(v)
+            for k, v in obj.items()
+        }
 
     if isinstance(obj, (list, tuple)):
         if obj:
@@ -57,9 +61,9 @@ def promise_clean_to_json_compatible(obj):
     if isinstance(obj, Promise):
         return force_str(obj)
 
-    #try:
+    # try:
     #    return obj.to_plotly_json()
-    #except AttributeError:
+    # except AttributeError:
     #    pass
 
     return obj
@@ -148,15 +152,14 @@ def to_json_django_plotly(plotly_object, pretty=False, engine=None):
             pass
 
         cleaned = clean_to_json_compatible(
-            plotly_object,
-            numpy_allowed=True,
-            datetime_allowed=True,
-            modules=modules,
+            plotly_object, numpy_allowed=True, datetime_allowed=True, modules=modules
         )
 
         cleaned = promise_clean_to_json_compatible(cleaned)
 
         return orjson.dumps(cleaned, option=opts).decode("utf8")
 
+
 import plotly.io.json
+
 plotly.io.json.to_json_plotly = to_json_django_plotly

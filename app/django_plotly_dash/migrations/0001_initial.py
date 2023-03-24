@@ -10,33 +10,54 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='DashApp',
+            name="DashApp",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('instance_name', models.CharField(blank=True, max_length=100, unique=True)),
-                ('slug', models.SlugField(blank=True, max_length=110, unique=True)),
-                ('base_state', models.TextField(default='{}')),
-                ('creation', models.DateTimeField(auto_now_add=True)),
-                ('update', models.DateTimeField(auto_now=True)),
-                ('save_on_change', models.BooleanField(default=False)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "instance_name",
+                    models.CharField(blank=True, max_length=100, unique=True),
+                ),
+                ("slug", models.SlugField(blank=True, max_length=110, unique=True)),
+                ("base_state", models.TextField(default="{}")),
+                ("creation", models.DateTimeField(auto_now_add=True)),
+                ("update", models.DateTimeField(auto_now=True)),
+                ("save_on_change", models.BooleanField(default=False)),
             ],
         ),
         migrations.CreateModel(
-            name='StatelessApp',
+            name="StatelessApp",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('app_name', models.CharField(max_length=100, unique=True)),
-                ('slug', models.SlugField(blank=True, max_length=110, unique=True)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("app_name", models.CharField(max_length=100, unique=True)),
+                ("slug", models.SlugField(blank=True, max_length=110, unique=True)),
             ],
         ),
         migrations.AddField(
-            model_name='dashapp',
-            name='stateless_app',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='django_plotly_dash.StatelessApp'),
+            model_name="dashapp",
+            name="stateless_app",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT,
+                to="django_plotly_dash.StatelessApp",
+            ),
         ),
     ]

@@ -1,4 +1,4 @@
-'''
+"""
 Django-plotly-dash middleware
 
 This middleware enables the collection of items from templates for inclusion in the header and footer
@@ -23,38 +23,45 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-'''
+"""
 
 from .util import serve_locally, static_path
 
-#pylint: disable=too-few-public-methods
+# pylint: disable=too-few-public-methods
+
 
 class EmbeddedHolder:
-    'Hold details of embedded content from processing a view'
+    "Hold details of embedded content from processing a view"
+
     def __init__(self):
         self.css = ""
         self.config = ""
         self.scripts = ""
+
     def add_css(self, css):
-        'Add css content'
+        "Add css content"
         if css:
             self.css = css
+
     def add_config(self, config):
-        'Add config content'
+        "Add config content"
         if config:
             self.config = config
+
     def add_scripts(self, scripts):
-        'Add js content'
+        "Add js content"
         if scripts:
             self.scripts += scripts
 
+
 class ContentCollector:
-    '''
+    """
     Collect content during view processing, and substitute in response by finding magic strings.
 
     This enables view functionality, such as template tags, to introduce content such as css and js
     inclusion into the header and footer.
-    '''
+    """
+
     def __init__(self):
         self.header_placeholder = "DJANGO_PLOTLY_DASH_HEADER_PLACEHOLDER"
         self.footer_placeholder = "DJANGO_PLOTLY_DASH_FOOTER_PLACEHOLDER"
@@ -63,17 +70,18 @@ class ContentCollector:
         self._encoding = "utf-8"
 
     def adjust_response(self, response):
-        'Locate placeholder magic strings and replace with content'
+        "Locate placeholder magic strings and replace with content"
 
         try:
-            c1 = self._replace(response.content,
-                               self.header_placeholder,
-                               self.embedded_holder.css)
+            c1 = self._replace(
+                response.content, self.header_placeholder, self.embedded_holder.css
+            )
 
-            response.content = self._replace(c1,
-                                             self.footer_placeholder,
-                                             "\n".join([self.embedded_holder.config,
-                                                        self.embedded_holder.scripts]))
+            response.content = self._replace(
+                c1,
+                self.footer_placeholder,
+                "\n".join([self.embedded_holder.config, self.embedded_holder.scripts]),
+            )
         except AttributeError:
             # Catch the "FileResponse instance has no `content` attribute" error when serving media files in the Django development server.
             pass
@@ -81,14 +89,17 @@ class ContentCollector:
         return response
 
     def _replace(self, content, placeholder, substitution):
-        return content.replace(self._encode(placeholder),
-                               self._encode(substitution if substitution else ""))
+        return content.replace(
+            self._encode(placeholder),
+            self._encode(substitution if substitution else ""),
+        )
 
     def _encode(self, string):
         return string.encode(self._encoding)
 
+
 class BaseMiddleware:
-    'Django-plotly-dash middleware'
+    "Django-plotly-dash middleware"
 
     def __init__(self, get_response):
         self.get_response = get_response
@@ -106,15 +117,17 @@ class BaseMiddleware:
 dpd_substitutions = []
 try:
     from dpd_static_support.mappings import substitutions as dpd_direct_substitutions
+
     dpd_substitutions += dpd_direct_substitutions
     from dpd_static_support.mappings import static_substitutions as dpd_ss_substitutions
+
     dpd_substitutions += [(x, static_path(y)) for x, y in dpd_ss_substitutions]
 except Exception as e:
     pass
 
 
 class ExternalRedirectionMiddleware:
-    'Middleware to force redirection in third-party content through rewriting'
+    "Middleware to force redirection in third-party content through rewriting"
 
     def __init__(self, get_response):
         self.get_response = get_response
@@ -126,8 +139,10 @@ class ExternalRedirectionMiddleware:
 
         self._encoding = "utf-8"
 
-        self.substitutions = [(self._encode(source),
-                               self._encode(target)) for source, target in substitutions]
+        self.substitutions = [
+            (self._encode(source), self._encode(target))
+            for source, target in substitutions
+        ]
 
     def __call__(self, request):
 
@@ -149,4 +164,3 @@ class ExternalRedirectionMiddleware:
 
     def _encode(self, string):
         return string.encode(self._encoding)
-

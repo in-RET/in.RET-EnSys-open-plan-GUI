@@ -1,6 +1,7 @@
 from oemof import solph
 import plotly.graph_objects as go
 
+
 def sankey(energy_system, results, ts=None):
     """Return a dict to a plotly sankey diagram"""
     busses = []
@@ -75,5 +76,5 @@ def sankey(energy_system, results, ts=None):
     if ts is not None:
         py_datetimeindexes = energy_system.timeindex.to_series()
         fig.update_layout(title_text=str(py_datetimeindexes[ts]), font_size=12)
-    
+
     return fig

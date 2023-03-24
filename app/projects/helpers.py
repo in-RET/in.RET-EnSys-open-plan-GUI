@@ -55,7 +55,7 @@ def remove_empty_elements(d):
 # Helper to convert Scenario data to MVS importable json
 def format_scenario_for_mvs(scenario_to_convert, testing=False):
     mvs_request_dto = convert_to_dto(scenario_to_convert, testing=testing)
-    #print(mvs_request_dto)
+    # print(mvs_request_dto)
     dumped_data = json.loads(
         json.dumps(mvs_request_dto.__dict__, default=lambda o: o.__dict__)
     )

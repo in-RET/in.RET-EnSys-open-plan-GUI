@@ -32,8 +32,8 @@ urlpatterns = (
         path("privacy/", privacy, name="privacy"),
         path("about/", about, name="about"),
         path("license/", license, name="license"),
-        #path('plotly_dash/', include('dashplots.urls')),
-        path('django_plotly_dash/', include('django_plotly_dash.urls')),
+        # path('plotly_dash/', include('dashplots.urls')),
+        path("django_plotly_dash/", include("django_plotly_dash.urls")),
     )
     + [url(r"^i18n/", include("django.conf.urls.i18n"))]
     + staticfiles_urlpatterns()

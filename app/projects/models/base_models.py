@@ -9,6 +9,8 @@ from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 import oemof.thermal.compression_heatpumps_and_chillers as cmpr_hp_chiller
 
+# import jsonfield
+
 from users.models import CustomUser
 from projects.constants import (
     ASSET_CATEGORY,
@@ -27,7 +29,7 @@ from projects.constants import (
     LOAD_PROFILE_CHOICE,
     FLOW_CHOICE,
     SOURCE_CHOICE,
-    YEAR_CHOICE
+    YEAR_CHOICE,
 )
 
 
@@ -342,6 +344,36 @@ class ValueType(models.Model):
     unit = models.CharField(max_length=30, null=True)
 
 
+class InputparameterSuggestion(models.Model):
+    unique_id = models.AutoField(
+        verbose_name="ID", serialize=False, auto_created=True, primary_key=True
+    )
+    technology = models.CharField(max_length=120, null=True, blank=False)
+
+    capex = models.FloatField(
+        null=True, blank=True, validators=[MinValueValidator(0.0)]
+    )
+    opex = models.FloatField(null=True, blank=True, validators=[MinValueValidator(0.0)])
+    lifetime = models.IntegerField(
+        null=True, blank=True, validators=[MinValueValidator(0)]
+    )
+    year = models.IntegerField(null=True, blank=False)
+    crate = models.FloatField(
+        null=True, blank=True, validators=[MinValueValidator(0.0)]
+    )
+    efficiency = models.FloatField(
+        null=True, blank=True, validators=[MinValueValidator(0.0)]
+    )
+    efficiency_el = models.FloatField(
+        null=True, blank=True, validators=[MinValueValidator(0.0)]
+    )
+    efficiency_th = models.FloatField(
+        null=True, blank=True, validators=[MinValueValidator(0.0)]
+    )
+    # input_timeseries = jsonfield.JSONField()
+    input_timeseries = models.TextField(null=True, blank=True)
+
+
 class Asset(TopologyNode):
     def save(self, *args, **kwargs):
         if self.asset_type.asset_type in ["dso", "gas_dso", "h2_dso", "heat_dso"]:
@@ -527,9 +559,7 @@ class Asset(TopologyNode):
     source_choice = models.CharField(
         null=True, blank=False, choices=SOURCE_CHOICE, max_length=40
     )
-    year_choice = models.CharField(
-        null=True, blank=False, choices=YEAR_CHOICE, max_length=40
-    )
+    year_choice = models.IntegerField(null=True, blank=False, choices=YEAR_CHOICE)
 
     @property
     def fields(self):

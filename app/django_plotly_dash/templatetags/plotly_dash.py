@@ -1,4 +1,4 @@
-'''
+"""
 Template tags for exposing dash applications in Django templates
 
 Copyright (c) 2018 Gibbs Consulting and others - see CONTRIBUTIONS.md
@@ -20,7 +20,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-'''
+"""
 
 # pylint: disable=too-many-arguments, unused-variable, unused-argument, possibly-unused-variable
 
@@ -38,13 +38,14 @@ register = template.Library()
 ws_default_url = "/%s" % pipe_ws_endpoint_name()
 
 
-SANDBOX_SETTINGS = ["allow-downloads",
-                    "allow-scripts",
-                    "allow-same-origin",
-                    "allow-modals",
-                    "allow-popups",
-                    "allow-popups-to-escape-sandbox",
-                    ]
+SANDBOX_SETTINGS = [
+    "allow-downloads",
+    "allow-scripts",
+    "allow-same-origin",
+    "allow-modals",
+    "allow-popups",
+    "allow-popups-to-escape-sandbox",
+]
 
 
 SANDBOX_STRING = " ".join(SANDBOX_SETTINGS)
@@ -65,18 +66,29 @@ def _locate_daapp(name, slug, da, cache_id=None):
 
     return da, app
 
-@register.inclusion_tag("django_plotly_dash/plotly_app.html", takes_context=True)
-def plotly_app(context, name=None, slug=None, da=None, ratio=0.1, use_frameborder=False, initial_arguments=None):
-    'Insert a dash application using a html iframe'
 
-    fbs = '1' if use_frameborder else '0'
+@register.inclusion_tag("django_plotly_dash/plotly_app.html", takes_context=True)
+def plotly_app(
+    context,
+    name=None,
+    slug=None,
+    da=None,
+    ratio=0.1,
+    use_frameborder=False,
+    initial_arguments=None,
+):
+    "Insert a dash application using a html iframe"
+
+    fbs = "1" if use_frameborder else "0"
 
     dstyle = """
     position: relative;
     padding-bottom: %s%%;
     height: 0;
     overflow:hidden;
-    """ % (ratio*100)
+    """ % (
+        ratio * 100
+    )
 
     istyle = """
     position: absolute;
@@ -86,53 +98,55 @@ def plotly_app(context, name=None, slug=None, da=None, ratio=0.1, use_frameborde
     height: 100%;
     """
 
-    cache_id = store_initial_arguments(context['request'], initial_arguments)
+    cache_id = store_initial_arguments(context["request"], initial_arguments)
 
     da, app = _locate_daapp(name, slug, da, cache_id=cache_id)
 
     sandbox_settings = SANDBOX_STRING
-    
+
     return locals()
 
 
-@register.inclusion_tag("django_plotly_dash/plotly_app_bootstrap.html", takes_context=True)
-def plotly_app_bootstrap(context, name=None, slug=None, da=None, aspect="4by3", initial_arguments=None):
-    'Insert a dash application using a html iframe'
+@register.inclusion_tag(
+    "django_plotly_dash/plotly_app_bootstrap.html", takes_context=True
+)
+def plotly_app_bootstrap(
+    context, name=None, slug=None, da=None, aspect="4by3", initial_arguments=None
+):
+    "Insert a dash application using a html iframe"
 
-    valid_ratios = ['21by9',
-                    '16by9',
-                    '4by3',
-                    '1by1',
-                    ]
+    valid_ratios = ["21by9", "16by9", "4by3", "1by1"]
 
     if aspect not in valid_ratios:
-        raise ValueError("plotly_app_bootstrap requires a valid aspect ratio from %s, but was supplied %s" % (str(valid_ratios),
-                                                                                                              aspect))
+        raise ValueError(
+            "plotly_app_bootstrap requires a valid aspect ratio from %s, but was supplied %s"
+            % (str(valid_ratios), aspect)
+        )
 
-    cache_id = store_initial_arguments(context['request'], initial_arguments)
+    cache_id = store_initial_arguments(context["request"], initial_arguments)
 
     da, app = _locate_daapp(name, slug, da, cache_id=cache_id)
 
     sandbox_settings = SANDBOX_STRING
-    
+
     return locals()
 
 
 @register.simple_tag(takes_context=True)
 def plotly_header(context):
-    'Insert placeholder for django-plotly-dash header content'
+    "Insert placeholder for django-plotly-dash header content"
     return context.request.dpd_content_handler.header_placeholder
 
 
 @register.simple_tag(takes_context=True)
 def plotly_footer(context):
-    'Insert placeholder for django-plotly-dash footer content'
+    "Insert placeholder for django-plotly-dash footer content"
     return context.request.dpd_content_handler.footer_placeholder
 
 
 @register.inclusion_tag("django_plotly_dash/plotly_direct.html", takes_context=True)
 def plotly_direct(context, name=None, slug=None, da=None):
-    'Direct insertion of a Dash app'
+    "Direct insertion of a Dash app"
 
     da, app = _locate_daapp(name, slug, da)
 
@@ -156,37 +170,39 @@ def plotly_direct(context, name=None, slug=None, da=None):
 
 @register.inclusion_tag("django_plotly_dash/plotly_messaging.html", takes_context=True)
 def plotly_message_pipe(context, url=None):
-    'Insert script for providing background websocket connection'
+    "Insert script for providing background websocket connection"
     url = url if url else ws_default_url
     return locals()
 
 
 @register.simple_tag()
 def plotly_app_identifier(name=None, slug=None, da=None, postfix=None):
-    'Return a slug-friendly identifier'
+    "Return a slug-friendly identifier"
 
     da, app = _locate_daapp(name, slug, da)
 
     slugified_id = app.slugified_id()
 
     if postfix:
-        return "%s-%s" %(slugified_id, postfix)
+        return "%s-%s" % (slugified_id, postfix)
     return slugified_id
 
 
 @register.simple_tag()
-def plotly_class(name=None, slug=None, da=None, prefix=None, postfix=None, template_type=None):
-    'Return a string of space-separated class names'
+def plotly_class(
+    name=None, slug=None, da=None, prefix=None, postfix=None, template_type=None
+):
+    "Return a string of space-separated class names"
 
     da, app = _locate_daapp(name, slug, da)
 
-    return app.extra_html_properties(prefix=prefix,
-                                     postfix=postfix,
-                                     template_type=template_type)
+    return app.extra_html_properties(
+        prefix=prefix, postfix=postfix, template_type=template_type
+    )
 
 
 @register.simple_tag(takes_context=True)
 def site_root_url(context):
-    'Provide the root url of the demo site'
+    "Provide the root url of the demo site"
     current_site_url = get_current_site(context.request)
     return current_site_url.domain

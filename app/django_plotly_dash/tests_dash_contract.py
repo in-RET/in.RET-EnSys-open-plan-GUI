@@ -99,13 +99,15 @@ def fill_in_test_app(app: Union[DjangoDash, Dash], write=False):
         app.layout.children.append(html.Div([inp1b, out1b]))
 
         @app.callback(
-            [Output(out1b.id, "href"), Output(out1b.id, "children"), ],
+            [Output(out1b.id, "href"), Output(out1b.id, "children")],
             [Input(inp1b.id, "n_clicks_timestamp")],
         )
         @log_body_response
         def test_update_output_state(n_clicks_timestamp):
-            return f"http://www.example.com/{n_clicks_timestamp}", f"http://www.example.com/{n_clicks_timestamp}"
-
+            return (
+                f"http://www.example.com/{n_clicks_timestamp}",
+                f"http://www.example.com/{n_clicks_timestamp}",
+            )
 
     def add_multi_triggered():
         """Test a callback getting more than one element in the triggered context"""
@@ -143,7 +145,9 @@ def fill_in_test_app(app: Union[DjangoDash, Dash], write=False):
 
     def add_pattern_allsmaller():
         inps = [
-            html.Button(f"Pattern ALLSMALLER {i}", id={"_id": f"inp-{i}", "_type": "btn4"})
+            html.Button(
+                f"Pattern ALLSMALLER {i}", id={"_id": f"inp-{i}", "_type": "btn4"}
+            )
             for i in range(3)
         ]
         out = html.Div(id=f"out4")

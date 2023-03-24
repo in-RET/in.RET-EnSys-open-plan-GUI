@@ -1,4 +1,4 @@
-'''
+"""
 App configuration informatipn
 
 Copyright (c) 2018 Gibbs Consulting and others - see CONTRIBUTIONS.md
@@ -20,12 +20,12 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-'''
+"""
 
 from django.apps import AppConfig
 
 
 class DjangoPlotlyDashConfig(AppConfig):
-    'Verbose name and other settings for the django-plotly-dash application'
-    name = 'django_plotly_dash'
+    "Verbose name and other settings for the django-plotly-dash application"
+    name = "django_plotly_dash"
     verbose_name = "Django Plotly Dash"

@@ -1,4 +1,4 @@
-'''
+"""
 Control url access based on user and other state
 
 Copyright (c) 2018 Gibbs Consulting and others - see CONTRIBUTIONS.md
@@ -20,25 +20,27 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-'''
+"""
 
 import importlib
 from django.conf import settings
 
 from django.contrib.auth.decorators import login_required as login_required_decorator
 
-#pylint: disable=bare-except, unused-argument
+# pylint: disable=bare-except, unused-argument
+
 
 def login_required(view_function, **kwargs):
-    'Wrap all DPD calls with login_required'
+    "Wrap all DPD calls with login_required"
     return login_required_decorator(view_function)
 
+
 try:
-    dash_view_decorator_name = settings.PLOTLY_DASH['view_decorator']
+    dash_view_decorator_name = settings.PLOTLY_DASH["view_decorator"]
     try:
         dash_view_decorator = locals()[dash_view_decorator_name]
     except:
-        mod_name, func_name = dash_view_decorator_name.rsplit('.', 1)
+        mod_name, func_name = dash_view_decorator_name.rsplit(".", 1)
         if mod_name:
             mod = importlib.import_module(mod_name)
             dash_view_decorator = getattr(mod, func_name)
@@ -47,8 +49,9 @@ try:
 except:
     dash_view_decorator = None
 
+
 def process_view_function(view_function, **kwargs):
-    'Process view function and wrap according to settings'
+    "Process view function and wrap according to settings"
 
     if dash_view_decorator:
         return dash_view_decorator(view_function, **kwargs)

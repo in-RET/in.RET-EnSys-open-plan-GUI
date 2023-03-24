@@ -25,17 +25,23 @@ const layout = {
     }
 };
 
-var kindOfComponent = "";
-var choosenTimestamp = "";
+var kindOfComponent = '';
+var choosenTimestamp = '';
 
 function loadPredefindedDataKindofSource(value){
 	kindOfComponent = value;
+	if (kindOfComponent != '' && choosenTimestamp != ''){
+		fill_out_form();
+	}
 }
 
 function loadPredefindedDataYear(value){
 	choosenTimestamp = value;
 	alert(choosenTimestamp+ ' ' + kindOfComponent);
-	fill_out_form();
+	//fill_out_form();
+	if (kindOfComponent != '' && choosenTimestamp != ''){
+		fill_out_form();
+	}
 }
 
 $.ajaxSetup({ 

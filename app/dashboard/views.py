@@ -53,7 +53,7 @@ from projects.models import (
     Simulation,
     get_project_sensitivity_analysis,
 )
-from projects.services import (get_selected_scenarios_in_cache)
+from projects.services import get_selected_scenarios_in_cache
 
 from django.shortcuts import render
 from django.http import HttpResponse
@@ -221,18 +221,14 @@ def scenario_visualize_results(request, proj_id=None, scen_id=None):
     createDashboard(simulation)
 
     answer = render(
-            request,
-            "report/single_scenario.html", 
-            {
-                "proj_id": proj_id,
-                "scen_id": scen_id,
-                "workdir": simulation.mvs_token,
-            })
+        request,
+        "report/single_scenario.html",
+        {"proj_id": proj_id, "scen_id": scen_id, "workdir": simulation.mvs_token},
+    )
 
     return answer
-     
-     
-    
+
+
 @login_required
 @require_http_methods(["POST", "GET"])
 def project_compare_results(request, proj_id):

@@ -59,3 +59,4 @@ sqlparse==0.4.3
 tenacity==8.1.0
 Werkzeug==2.2.2
 uvicorn
+jsonfield

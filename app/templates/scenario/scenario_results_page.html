@@ -27,14 +27,19 @@
 <main>
     <section class="header">
         <div>
-            <div class="header__left"></div>
+            <div class="header__left">
+                <a class="btn btn--medium" href="">{% translate "Placeholder" %}</a>
+            </div>
             <h1 class="header__title">{% translate "Simulation results for" %} {{ workdir }}</h1>
-            <div class="header__back"></div>
+            <div class="header__right">
+                <a class="btn btn--medium btn--hollow" href="/static/working/{{ workdir }}/dumps/config.dump" download>{% translate "Download dumpfile" %}</a>
+            </div>
         </div>
     </section>
     
     <!-- insert tabs here, previous class result-selector -->
     <section>
+        <!-- insert download buttons here -->
         {% block dashboard %}
         {% endblock dashboard %}
     </section>

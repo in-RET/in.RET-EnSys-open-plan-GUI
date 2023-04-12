@@ -1000,7 +1000,7 @@ a.dropdown-item:active {
     flex-direction: row;
     justify-content: space-between;
     width: 100%;
-    max-width: 82rem;
+    max-width: 90rem;
     padding-left: 1rem;
     padding-right: 1rem; }
   .footer__logo img {
@@ -1157,18 +1157,18 @@ form .btn {
   background-color: #fff;
   display: flex;
   flex-direction: row;
-  justify-content: center;
-  padding-bottom: 2rem; }
+  justify-content: center; }
   .header > div {
-    padding-top: 7rem;
+    padding-top: 4rem;
     width: 100%;
-    max-width: 82rem;
+    max-width: 90rem;
     padding-left: 1rem;
     padding-right: 1rem;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    position: relative; }
+    position: relative;
+    padding-bottom: 1rem }
   .header__left, .header__back {
     width: 10rem; }
   .header__title {
@@ -1206,7 +1206,7 @@ form .btn {
     flex-direction: row;
     justify-content: space-between;
     width: 100%;
-    max-width: 82rem;
+    max-width: 90rem;
     padding-left: 1rem;
     padding-right: 1rem;
     align-items: flex-end; }
@@ -1351,7 +1351,7 @@ nav.navbar {
   .navbar.navbar-expand-lg .navbar-collapse {
     justify-content: flex-end; }
   .navbar.navbar-expand-lg.navbar--website .container-fluid {
-    max-width: 82rem; }
+    max-width: 90rem; }
   .navbar .nav-item.locale {
     position: relative;
     padding-left: 1.5rem; }
@@ -1410,7 +1410,7 @@ nav.navbar {
     -ms-user-select: none;
     user-select: none;
     width: 100%;
-    max-width: 82rem;
+    max-width: 90rem;
     padding-left: 1rem;
     padding-right: 1rem;
     padding-top: 2rem;
@@ -1502,7 +1502,7 @@ nav.navbar {
   justify-content: center; }
   .dashboard-tabs > div {
     width: 100%;
-    max-width: 82rem;
+    max-width: 90rem;
     padding-left: 1rem;
     padding-right: 1rem; }
   .dashboard-tabs .nav-tabs {
@@ -1523,7 +1523,7 @@ nav.navbar {
   background-color: #E3EAEE; }
   .dashboard-options > div {
     width: 100%;
-    max-width: 82rem;
+    max-width: 90rem;
     padding-left: 1rem;
     padding-right: 1rem; }
   .dashboard-options.sticky-top {
@@ -1534,11 +1534,10 @@ nav.navbar {
   flex-direction: row;
   justify-content: center;
   background-color: #F4F7F9;
-  min-height: calc(100vh - 7rem - 4rem - 1rem - 4.5rem);
-  padding: 3rem 0 4rem; }
+  min-height: calc(100vh - 12.3rem);}
   .dashboard > div {
     width: 100%;
-    max-width: 82rem;
+    max-width: 90rem;
     padding-left: 1rem;
     padding-right: 1rem; }
   .dashboard__scenarios {
@@ -1652,7 +1651,7 @@ nav.navbar {
   .projects-empty > div,
   .scenario-empty > div {
     width: 100%;
-    max-width: 82rem;
+    max-width: 90rem;
     padding-left: 1rem;
     padding-right: 1rem; }
   .projects-empty__img,
@@ -2427,7 +2426,7 @@ nav.navbar {
   justify-content: center; }
   .hero > div {
     width: 100%;
-    max-width: 82rem;
+    max-width: 90rem;
     padding-left: 1rem;
     padding-right: 1rem;
     display: flex;
@@ -2449,7 +2448,7 @@ nav.navbar {
   .hero__image {
     padding-top: 4rem; }
     .hero__image img {
-      max-width: calc(82rem / 2); }
+      max-width: calc(90rem / 2); }
 
 @use 'variables' as *;
 .project {
@@ -2460,7 +2459,7 @@ nav.navbar {
   padding-left: 1rem; }
   .project > div {
     width: 100%;
-    max-width: 82rem;
+    max-width: 90rem;
     padding-left: 1rem;
     padding-right: 1rem;
     position: relative;
@@ -2680,7 +2679,7 @@ nav.navbar {
         flex: 1 1 0; } }
     .scenario-create__form > div, .scenario-create__description > div {
       width: 100%;
-      max-width: calc(82rem / 2); }
+      max-width: calc(90rem / 2); }
   .scenario-create__form {
     justify-content: flex-end; }
     .scenario-create__form > div {
@@ -2764,7 +2763,7 @@ nav.navbar {
     width: 100%; }
     @media only screen and (min-width: 992px) {
       .simulation__content {
-        width: calc(82rem / 2); } }
+        width: calc(90rem / 2); } }
     .simulation__content h2 {
       text-align: center;
       font-size: 1.25rem;
@@ -2857,7 +2856,7 @@ nav.navbar {
       @media only screen and (min-width: 1250px) {
         .project-setup.two-columns .left > div,
         .project-setup.two-columns .right > div {
-          max-width: calc(82rem / 2); } }
+          max-width: calc(90rem / 2); } }
   .project-setup.two-columns .left {
     justify-content: flex-end; }
     .project-setup.two-columns .left > div {

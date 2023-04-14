@@ -2,6 +2,7 @@
 import json
 import logging
 import traceback
+import shutil
 from datetime import datetime
 
 import requests
@@ -2184,6 +2185,12 @@ def simulation_cancel(request, scen_id):
     qs = Simulation.objects.filter(scenario=scen_id)
     if qs.exists():
         scenario.simulation.delete()
+
+    sim_folder = scenario.simulation.mvs_token
+    full_path = os.path.join(os.getcwd(), "dumps", sim_folder)
+    print(full_path)
+    #os.removedirs(full_path)
+    shutil.rmtree(full_path, ignore_errors=True)
 
     return HttpResponseRedirect(
         reverse("scenario_review", args=[scenario.project.id, scen_id])

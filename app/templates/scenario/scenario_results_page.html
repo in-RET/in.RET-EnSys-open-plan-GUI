@@ -28,14 +28,15 @@
     <section class="header">
         <div>
             <div class="header__left">
-                <a class="btn btn--medium btn--hollow" href="/static/working/{{ workdir }}/logs/config.log">{% translate "Download logfiles" %}</a>
+                <a class="btn btn--medium btn--hollow" href="/static/working/{{ workdir }}/logs/config.log" download id="config.log">{% translate "Download logfiles" %}</a>
             </div>
             <h1 class="header__title">{% translate "Simulation results for" %} {{ workdir }}</h1>
             <div class="header__right">
-                <a class="btn btn--medium btn--hollow" href="/static/working/{{ workdir }}/dumps/config.dump" download>{% translate "Download dumpfile" %}</a>
-                <a class="btn btn--medium btn--hollow" href="/static/working/{{ workdir }}/dumps/config.lp" download>{% translate "Download lp-file" %}</a>
+                <a class="btn btn--medium btn--hollow" href="/static/working/{{ workdir }}/dumps/config.dump" download id="config.dump">{% translate "Download dumpfile" %}</a>
+                <a class="btn btn--medium btn--hollow" href="/static/working/{{ workdir }}/dumps/config.lp" download id="config.lp">{% translate "Download lp-file" %}</a>
             </div>
         </div>
+
     </section>
     
     <!-- insert tabs here, previous class result-selector -->
@@ -44,12 +45,52 @@
         {% block dashboard %}
         {% endblock dashboard %}
     </section>
+    <script>
+        let dump = document.getElementById("config.dump")
+        let log = document.getElementById("config.log")
+        let lp = document.getElementById("config.lp")
+    
+        $.ajax({
+            url: dump.href,
+            type: 'HEAD',
+            success: function () {
+                dump.hidden = false;
+            },
+            error: function () {
+                dump.hidden = true;
+            },
+            })
+    
+            $.ajax({
+            url: log.href,
+            type: 'HEAD',
+            success: function () {
+                log.hidden = false;
+            },
+            error: function () {
+                log.hidden = true;
+            },
+            })
+    
+            $.ajax({
+            url: lp.href,
+            type: 'HEAD',
+            success: function () {
+                lp.hidden = false;
+            },
+            error: function () {
+                lp.hidden = true;
+            },
+        })
+    </script>
 </main>
+
 {% endblock content %}
 
 {% block end_body_scripts %}
 
 {% block results_end_body_scripts %}
+
 {% endblock results_end_body_scripts %}
 
 {% endblock end_body_scripts %}

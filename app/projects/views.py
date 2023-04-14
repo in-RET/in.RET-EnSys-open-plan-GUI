@@ -1,3 +1,4 @@
+# pylint: disable=undefined-variable, import-error, wildcard-import
 # from bootstrap_modal_forms.generic import BSModalCreateView
 import json
 import logging
@@ -2189,7 +2190,7 @@ def simulation_cancel(request, scen_id):
     sim_folder = scenario.simulation.mvs_token
     full_path = os.path.join(os.getcwd(), "dumps", sim_folder)
     print(full_path)
-    #os.removedirs(full_path)
+    # os.removedirs(full_path)
     shutil.rmtree(full_path, ignore_errors=True)
 
     return HttpResponseRedirect(

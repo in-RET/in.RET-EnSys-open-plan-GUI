@@ -56,7 +56,6 @@ try:
         outputs: Dict
         triggered: List
 
-
 except:
     # Not got python 3.7 or dataclasses yet
     class CallbackContext:
@@ -112,8 +111,7 @@ def all_apps():
 
 
 def get_local_stateless_list():
-    """Return a list of all locally registered stateless apps
-    """
+    """Return a list of all locally registered stateless apps"""
     return list(usable_apps)
 
 
@@ -758,7 +756,7 @@ class WrappedDash(Dash):
 
             class LazyJson:
                 """A class to allow delayed the evaluation of a dict (returned by `func`)
-                 till the first get(...) is called on the dict."""
+                till the first get(...) is called on the dict."""
 
                 def __init__(self, func):
                     self._root_value = func

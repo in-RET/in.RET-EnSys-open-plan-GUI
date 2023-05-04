@@ -56,6 +56,7 @@ try:
         outputs: Dict
         triggered: List
 
+
 except:
     # Not got python 3.7 or dataclasses yet
     class CallbackContext:

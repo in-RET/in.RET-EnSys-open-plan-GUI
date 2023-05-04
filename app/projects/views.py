@@ -718,14 +718,16 @@ def scenario_create_topology(request, proj_id, scen_id, step_id=2, max_step=3):
             # "heat_pump": _("Heat Pump"),
             # "chp": _("Combined Heat and Power"),
             # "chp_fixed_ratio": _("CHP fixed ratio"),
-            "myTransformer": _("Transformer")
+            "myTransformer": _("Transformer"),
+            "myPredefinedTransformer": _("Predefined Transformer"),
         },
         "storage": {
             # "bess": _("Electricity Storage"),
             # "gess": _("Gas Storage"),
             # "h2ess": _("H2 Storage"),
             # "hess": _("Heat Storage"),
-            "myGenericStorage": _("GenericStorage")
+            "myGenericStorage": _("GenericStorage"),
+            "myPredefinedStorage": _("Predefined Storage"),
         },
         "demand": {
             # "demand": _("Electricity Demand"),
@@ -1208,14 +1210,14 @@ def sensitivity_analysis_create(request, scen_id, sa_id=None, step_id=5):
 
 @login_required
 @require_http_methods(["POST", "GET"])  # , "POST"
-def get_inputparameter_suggestion(request):
+def get_inputparameter_suggestion_source(request):
     body_unicode = request.body.decode("utf-8")  # for POST
     body = json.loads(body_unicode)
     print(body)
     capex, opex, lifetime, crate, efficiency, efficiency_el, efficiency_th = (None,) * 7
     input_timeseries = ""
-    technology = body[0]["kindOfComponent"]
-    year = body[1]["choosenTimestamp"]
+    technology = body[0]["kindOfComponentSource"]
+    year = body[1]["choosenTimestampSource"]
 
     queryset = InputparameterSuggestion.objects.filter(technology=technology, year=year)
     for item in queryset:
@@ -1223,6 +1225,9 @@ def get_inputparameter_suggestion(request):
         capex = item.capex
         opex = item.opex
         lifetime = item.lifetime
+        efficiency = item.efficiency
+        efficiency_el = item.efficiency_el
+        efficiency_th = item.efficiency_th
         input_timeseries = item.input_timeseries
 
     if (
@@ -1231,18 +1236,17 @@ def get_inputparameter_suggestion(request):
         or technology == "Import Grid"
     ):
         asset_type_name = "myPredefinedSource"
-
-    form = AssetCreateForm(
-        asset_type=asset_type_name,
-        initial={
-            "name": "What ever you want",
-            "source_choice": technology,
-            "year_choice": year,
-            "capex": capex,
-            "opex": opex,
-            "lifetime": lifetime,
-        },
-    )
+        form = AssetCreateForm(
+            asset_type=asset_type_name,
+            initial={
+                "name": "What ever you like",
+                "source_choice": technology,
+                "year_choice_source": year,
+                "capex": capex,
+                "opex": opex,
+                "lifetime": lifetime,
+            },
+        )
 
     # form_suggestion = SuggestionForm(initial={"capex": 600000, "opex": 2,
     #                                           "lifetime": 20})
@@ -1253,6 +1257,92 @@ def get_inputparameter_suggestion(request):
     #     status=200
     # )
     # scenario = Scenario.objects.get(id=1)
+
+    form_html = get_template("asset/asset_create_form.html")
+    return JsonResponse(
+        {
+            "success": True,
+            "form_html": form_html.render(
+                {
+                    "form": form,
+                    "input_timeseries_data": input_timeseries,
+                    "input_timeseries_timestamps": 8760,
+                }
+            ),
+        },
+        status=200,
+    )
+
+
+@login_required
+@require_http_methods(["POST", "GET"])  # , "POST"
+def get_inputparameter_suggestion_trafo(request):
+    body_unicode = request.body.decode("utf-8")  # for POST
+    body = json.loads(body_unicode)
+    print(body)
+    capex, opex, lifetime, crate, efficiency, efficiency_el, efficiency_th = (None,) * 7
+    input_timeseries = ""
+    technology = body[0]["kindOfComponentTrafo"]
+    year = body[1]["choosenTimestampTrafo"]
+
+    queryset = InputparameterSuggestion.objects.filter(technology=technology, year=year)
+    for item in queryset:
+        print(item.unique_id, item.capex)
+        capex = item.capex
+        opex = item.opex
+        lifetime = item.lifetime
+        efficiency = item.efficiency
+        efficiency_el = item.efficiency_el
+        efficiency_th = item.efficiency_th
+        input_timeseries = item.input_timeseries
+
+    if (
+        technology == "Biogas CHP"
+        or technology == "Biogas injection (New facility)"
+        or technology == "GuD"
+        or technology == "PtL"
+        or technology == "Methanisation"
+        or technology == "Electrolysis"
+        or technology == "Fuel cell"
+        or technology == "Air source heat pump (large-scale)"
+        or technology == "Electrode heating boiler"
+    ):
+        asset_type_name = "myPredefinedTransformer"
+        form = AssetCreateForm(
+            asset_type=asset_type_name,
+            initial={
+                "name": "What ever you like",
+                "trafo_choice": technology,
+                "year_choice_trafo": year,
+                "capex": capex,
+                "opex": opex,
+                "lifetime": lifetime,
+                "efficiency": efficiency,
+                "efficiency_el": efficiency_el,
+                "efficiency_th": efficiency_th,
+            },
+        )
+        if technology == "Biogas CHP" or technology == "GuD":
+            field = form.fields["efficiency"]
+            field.widget = field.hidden_widget()
+        elif (
+            technology == "Biogas injection (New facility)"
+            or technology == "PtL"
+            or technology == "Methanisation"
+            or technology == "Electrolysis"
+            or technology == "Fuel cell"
+            or technology == "Air source heat pump (large-scale)"
+            or technology == "Electrode heating boiler"
+        ):
+
+            field1 = form.fields["efficiency_el"]
+            field2 = form.fields["efficiency_th"]
+            field1.widget = field1.hidden_widget()
+            field2.widget = field2.hidden_widget()
+            # self.fields[""] = forms.CharField(widget=forms.HiddenInput())
+
+    # form_suggestion = SuggestionForm(initial={"capex": 600000, "opex": 2,
+    #                                           "lifetime": 20})
 
     form_html = get_template("asset/asset_create_form.html")
     return JsonResponse(
@@ -1300,6 +1390,7 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
         "myExcess",
         "myPredefinedSink",
         "myPredefinedSource",
+        "myPredefinedTransformer",
     ]:
         if asset_uuid:
             print(asset_uuid)
@@ -1338,6 +1429,33 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
                         print(f"An other error occurred: {err}")
                 else:
                     input_timeseries_data = ""
+
+            elif asset_type_name == "myPredefinedTransformer":
+                if (
+                    existing_asset.trafo_choice == "Biogas CHP"
+                    or existing_asset.trafo_choice == "GuD"
+                ):
+
+                    # Biogas CHP and GuD have el + th efficiency -- so hide field general efficiency
+                    field = form.fields["efficiency"]
+                    field.widget = field.hidden_widget()
+                elif (
+                    existing_asset.trafo_choice == "Biogas injection (New facility)"
+                    or existing_asset.trafo_choice == "PtL"
+                    or existing_asset.trafo_choice == "Methanisation"
+                    or existing_asset.trafo_choice == "Electrolysis"
+                    or existing_asset.trafo_choice == "Fuel cell"
+                    or existing_asset.trafo_choice
+                    == "Air source heat pump (large-scale)"
+                    or existing_asset.trafo_choice == "Electrode heating boiler"
+                ):
+
+                    # all other trafos have just one efficiency -- so hide el + th efficiency
+                    field1 = form.fields["efficiency_el"]
+                    field2 = form.fields["efficiency_th"]
+                    field1.widget = field1.hidden_widget()
+                    field2.widget = field2.hidden_widget()
+
         else:
             print(asset_type_name)
             asset_list = Asset.objects.filter(

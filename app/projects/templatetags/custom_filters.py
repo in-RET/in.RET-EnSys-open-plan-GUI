@@ -93,7 +93,13 @@ def is_economical_parameter(param):
 
 @register.filter
 def is_technical_parameter(param):
-    if param == "name" or param == "source_choice" or param == "year_choice":
+    if (
+        param == "name"
+        or param == "source_choice"
+        or param == "year_choice_source"
+        or param == "year_choice_trafo"
+        or param == "trafo_choice"
+    ):
         return False
     else:
         return not is_economical_parameter(param)

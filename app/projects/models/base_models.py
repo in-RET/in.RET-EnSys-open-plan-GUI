@@ -30,6 +30,7 @@ from projects.constants import (
     FLOW_CHOICE,
     SOURCE_CHOICE,
     YEAR_CHOICE,
+    TRAFO_CHOICE,
 )
 
 
@@ -402,7 +403,7 @@ class Asset(TopologyNode):
     crate = models.FloatField(
         null=True, blank=False, default=1, validators=[MinValueValidator(0.0)]
     )
-    efficiency = models.TextField(null=True, blank=False)
+    efficiency = models.TextField(null=True, blank=True)
     # used in the case of transformers with one input and two outputs
     # or two inputs and one output
     efficiency_multiple = models.TextField(null=True, blank=False)
@@ -559,7 +560,19 @@ class Asset(TopologyNode):
     source_choice = models.CharField(
         null=True, blank=False, choices=SOURCE_CHOICE, max_length=40
     )
-    year_choice = models.IntegerField(null=True, blank=False, choices=YEAR_CHOICE)
+    year_choice_source = models.IntegerField(
+        null=True, blank=False, choices=YEAR_CHOICE
+    )
+    year_choice_trafo = models.IntegerField(null=True, blank=False, choices=YEAR_CHOICE)
+    trafo_choice = models.CharField(
+        null=True, blank=False, choices=TRAFO_CHOICE, max_length=40
+    )
+    efficiency_el = models.FloatField(
+        null=True, blank=True, validators=[MinValueValidator(0.0)]
+    )
+    efficiency_th = models.FloatField(
+        null=True, blank=True, validators=[MinValueValidator(0.0)]
+    )
 
     @property
     def fields(self):

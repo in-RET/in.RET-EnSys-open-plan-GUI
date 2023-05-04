@@ -292,6 +292,20 @@ SOURCE_CHOICE = (
     ("Import Grid", "Import from the power grid"),
 )
 
+TRAFO_CHOICE = (
+    ("", "Choose..."),
+    ("Biogas CHP", "Biogas CHP"),
+    ("Biogas injection (New facility)", "Biogas injection (New facility)"),
+    ("GuD", "Gas and steam power plant"),
+    ("PtL", "Power to Liquid"),
+    ("Methanisation", "Methanisation"),
+    ("Electrolysis", "Electrolysis"),
+    ("Fuel cell", "Fuel cell"),
+    ("Air source heat pump (large-scale)", "Air source heat pump (large-scale)"),
+    ("Electrode heating boiler", "Electrode heating boiler"),
+)
+
+
 YEAR_CHOICE = (
     ("", "Choose..."),
     (2025, 2025),

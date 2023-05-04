@@ -990,7 +990,7 @@ class AssetCreateForm(OpenPlanModelForm):
                     "title": _("Ratio of energy output/energy input."),
                     "style": "font-weight:400; font-size:13px;",
                     "min": "0.0",
-                    "max": "1.0",
+                    # "max": "1.0",
                     "step": ".01",
                 }
             ),
@@ -1435,14 +1435,54 @@ class AssetCreateForm(OpenPlanModelForm):
                     "onchange": "loadPredefindedDataKindofSource(this.value)",
                 },
             ),
-            "year_choice": forms.Select(
+            "year_choice_source": forms.Select(
                 choices=YEAR_CHOICE,
                 attrs={
                     "data-bs-toggle": "tooltip",
                     "title": _(""),
                     "style": "font-weight:400; font-size:13px;",
-                    "onchange": "loadPredefindedDataYear(this.value)",
+                    "onchange": "PredefindedSourceYear(this.value)",
                 },
+            ),
+            "year_choice_trafo": forms.Select(
+                choices=YEAR_CHOICE,
+                attrs={
+                    "data-bs-toggle": "tooltip",
+                    "title": _(""),
+                    "style": "font-weight:400; font-size:13px;",
+                    "onchange": "PredefindedTrafoYear(this.value)",
+                },
+            ),
+            "trafo_choice": forms.Select(
+                choices=TRAFO_CHOICE,
+                attrs={
+                    "data-bs-toggle": "tooltip",
+                    "title": _(""),
+                    "style": "font-weight:400; font-size:13px;",
+                    "onchange": "loadPredefindedDataKindofTrafo(this.value)",
+                },
+            ),
+            "efficiency_el": forms.NumberInput(
+                attrs={
+                    "placeholder": "e.g. 0.45",
+                    "data-bs-toggle": "tooltip",
+                    "title": _("Ratio of energy output/energy input."),
+                    "style": "font-weight:400; font-size:13px;",
+                    "min": "0.0",
+                    "max": "1.0",
+                    "step": ".01",
+                }
+            ),
+            "efficiency_th": forms.NumberInput(
+                attrs={
+                    "placeholder": "e.g. 0.43",
+                    "data-bs-toggle": "tooltip",
+                    "title": _("Ratio of energy output/energy input."),
+                    "style": "font-weight:400; font-size:13px;",
+                    "min": "0.0",
+                    "max": "1.0",
+                    "step": ".01",
+                }
             ),
         }
         labels = {"input_timeseries": _("Timeseries vector")}

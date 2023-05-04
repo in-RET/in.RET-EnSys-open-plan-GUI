@@ -25,22 +25,41 @@ const layout = {
     }
 };
 
-var kindOfComponent = '';
-var choosenTimestamp = '';
+var kindOfComponentSource = '';
+var choosenTimestampSource = '';
+var kindOfComponentTrafo = '';
+var choosenTimestampTrafo = '';
 
+// handling predefined sources
 function loadPredefindedDataKindofSource(value){
-	kindOfComponent = value;
-	if (kindOfComponent != '' && choosenTimestamp != ''){
-		fill_out_form();
+	kindOfComponentSource = value;
+	if (kindOfComponentSource != '' && choosenTimestampSource != ''){
+		fill_out_form_source();
 	}
 }
 
-function loadPredefindedDataYear(value){
-	choosenTimestamp = value;
-	alert(choosenTimestamp+ ' ' + kindOfComponent);
+function PredefindedSourceYear(value){
+	choosenTimestampSource = value;
+	alert(choosenTimestampSource+ ' ' + kindOfComponentSource);
 	//fill_out_form();
-	if (kindOfComponent != '' && choosenTimestamp != ''){
-		fill_out_form();
+	if (kindOfComponentSource != '' && choosenTimestampSource != ''){
+		fill_out_form_source();
+	}
+}
+
+// handling predefined transformers
+function loadPredefindedDataKindofTrafo(value){
+	kindOfComponentTrafo = value;
+	if (kindOfComponentTrafo != '' && choosenTimestampTrafo != ''){
+		fill_out_form_trafo();
+	}
+}
+
+function PredefindedTrafoYear(value){
+	choosenTimestampTrafo = value;
+	alert(choosenTimestampTrafo + ' ' + kindOfComponentTrafo);
+	if (kindOfComponentTrafo != '' && choosenTimestampTrafo != ''){
+		fill_out_form_trafo();
 	}
 }
 
@@ -69,16 +88,37 @@ $.ajaxSetup({
 });
 
 
-function fill_out_form(){
+function fill_out_form_source(){
 	//alert('Called');
 	var server_data = [
-		{"kindOfComponent": kindOfComponent},
-		{"choosenTimestamp": choosenTimestamp},
+		{"kindOfComponentSource": kindOfComponentSource},
+		{"choosenTimestampSource": choosenTimestampSource},
 	];
 			
 	$.ajax({
 		type: "POST",
-		url: "/en/asset/get_param_suggestion/",
+		url: "/en/asset/get_param_suggestion_source/",
+		data: JSON.stringify(server_data),
+		contentType: "application/json",
+		dataType: 'json',
+		success: function(response) {
+			alert("Got response from server ...");
+			//alert(response['form_html']);
+			$('#act_form_div').html(response['form_html']);
+			}
+	});
+}
+
+function fill_out_form_trafo(){
+	//alert('Called');
+	var server_data = [
+		{"kindOfComponentTrafo": kindOfComponentTrafo},
+		{"choosenTimestampTrafo": choosenTimestampTrafo},
+	];
+			
+	$.ajax({
+		type: "POST",
+		url: "/en/asset/get_param_suggestion_trafo/",
 		data: JSON.stringify(server_data),
 		contentType: "application/json",
 		dataType: 'json',

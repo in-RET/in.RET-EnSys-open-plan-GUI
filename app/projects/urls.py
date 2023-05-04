@@ -134,9 +134,14 @@ urlpatterns = [
         name="get_asset_create_form",
     ),
     re_path(
-        r"asset/get_param_suggestion/",
-        get_inputparameter_suggestion,
-        name="get_inputparameter_suggestion",
+        r"asset/get_param_suggestion_source/",
+        get_inputparameter_suggestion_source,
+        name="get_inputparameter_suggestion_source",
+    ),
+    re_path(
+        r"asset/get_param_suggestion_trafo/",
+        get_inputparameter_suggestion_trafo,
+        name="get_inputparameter_suggestion_trafo",
     ),
     re_path(
         r"^asset/create_or_update_post/(?P<scen_id>\d+)/(?P<asset_type_name>\w+)?(/(?P<asset_uuid>[0-9a-f-]+))?$",

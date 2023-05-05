@@ -2,8 +2,13 @@
 {% load crispy_forms_tags %}
 {% load custom_filters%}
 
+<div id="act_form_div">
 <div class="form-group{% if field.errors %} invalid{% endif %}" {% if display_results %} style="display:none" {% endif %}>
   {{ form.name|as_crispy_field }}
+  {% if form.asset_type_name == "myPredefinedStorage" %}
+		{{ form.storage_choice|as_crispy_field }}
+		{{ form.year_choice_storage|as_crispy_field }}
+	{% endif %}
 </div>
 
 <div class="container">
@@ -53,4 +58,5 @@
         {% endfor %}
   </div>
   </div>
+</div>
 </div>

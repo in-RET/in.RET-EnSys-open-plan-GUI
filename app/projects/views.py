@@ -1359,6 +1359,72 @@ def get_inputparameter_suggestion_trafo(request):
         status=200,
     )
 
+@login_required
+@require_http_methods(["POST", "GET"])  # , "POST"
+def get_inputparameter_suggestion_storage(request):
+    body_unicode = request.body.decode("utf-8")  # for POST
+    body = json.loads(body_unicode)
+    print(body)
+    capex, opex, lifetime, crate, efficiency, efficiency_el, efficiency_th, thermal_loss_rate = (None,) * 8
+    input_timeseries = ""
+    technology = body[0]["kindOfComponentStorage"]
+    year = body[1]["choosenTimestampStorage"]
+
+    queryset = InputparameterSuggestion.objects.filter(technology=technology, year=year)
+    for item in queryset:
+        print(item.unique_id, item.capex)
+        capex = item.capex
+        opex = item.opex
+        lifetime = item.lifetime
+        crate = item.crate
+        efficiency = item.efficiency
+        thermal_loss_rate = item.thermal_loss_rate
+        # efficiency_el = item.efficiency_el
+        # efficiency_th = item.efficiency_th
+        # input_timeseries = item.input_timeseries
+
+    asset_type_name = "myPredefinedStorage"
+    form = StorageForm_II(
+        asset_type=asset_type_name,
+        initial={
+            "name": "What ever you like",
+            "storage_choice": technology,
+            "year_choice_storage": year,
+            "capex": capex,
+            "opex": opex,
+            "lifetime": lifetime,
+            "invest_relation_input_capacity": crate,
+            "invest_relation_output_capacity": crate,
+            "inflow_conversion_factor": 1.0,
+            "outflow_conversion_factor": efficiency,
+            "thermal_loss_rate": thermal_loss_rate
+        },
+    )
+
+    # form_suggestion = SuggestionForm(initial={"capex": 600000, "opex": 2,
+    #                                           "lifetime": 20})
+
+    # form_html = get_template("asset/asset_create_form_param_suggestion.html")
+    # return JsonResponse(
+    #     {"success": True, "form_html": form_html.render({"form_suggestion": form_suggestion})},
+    #     status=200
+    # )
+    # scenario = Scenario.objects.get(id=1)
+
+    form_html = get_template("asset/storage_asset_create_form.html")
+    return JsonResponse(
+        {
+            "success": True,
+            "form_html": form_html.render(
+                {
+                    "form": form
+                }
+            ),
+        },
+        status=200,
+    )
+
+
 
 @login_required
 @require_http_methods(["GET"])
@@ -1502,7 +1568,7 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
 
         return render(request, "asset/asset_create_form.html", context)
 
-    elif asset_type_name in ["myGenericStorage"]:
+    elif asset_type_name in ["myGenericStorage", "myPredefinedStorage"]:
         if asset_uuid:
             existing_ess_asset = get_object_or_404(Asset, unique_id=asset_uuid)
             ess_asset_children = Asset.objects.filter(

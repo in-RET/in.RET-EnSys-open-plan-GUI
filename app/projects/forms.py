@@ -1484,6 +1484,24 @@ class AssetCreateForm(OpenPlanModelForm):
                     "step": ".01",
                 }
             ),
+            "year_choice_storage": forms.Select(
+                choices=YEAR_CHOICE,
+                attrs={
+                    "data-bs-toggle": "tooltip",
+                    "title": _(""),
+                    "style": "font-weight:400; font-size:13px;",
+                    "onchange": "PredefindedStorageYear(this.value)",
+                },
+            ),
+            "storage_choice": forms.Select(
+                choices=STORAGE_CHOICE,
+                attrs={
+                    "data-bs-toggle": "tooltip",
+                    "title": _(""),
+                    "style": "font-weight:400; font-size:13px;",
+                    "onchange": "loadPredefindedDataKindofStorage(this.value)",
+                },
+            ),
         }
         labels = {"input_timeseries": _("Timeseries vector")}
         help_texts = {
@@ -1537,7 +1555,7 @@ class StorageForm_II(AssetCreateForm):
     def __init__(self, *args, **kwargs):
         asset_type_name = kwargs.pop("asset_type", None)
         super(StorageForm_II, self).__init__(
-            *args, asset_type="myGenericStorage", **kwargs
+            *args, asset_type=asset_type_name, **kwargs
         )
         # self.fields["dispatchable"].widget = forms.HiddenInput()
         # self.fields["dispatchable"].initial = True

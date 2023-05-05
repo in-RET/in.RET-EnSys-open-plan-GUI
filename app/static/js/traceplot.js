@@ -29,6 +29,8 @@ var kindOfComponentSource = '';
 var choosenTimestampSource = '';
 var kindOfComponentTrafo = '';
 var choosenTimestampTrafo = '';
+var kindOfComponentStorage = '';
+var choosenTimestampStorage = '';
 
 // handling predefined sources
 function loadPredefindedDataKindofSource(value){
@@ -60,6 +62,22 @@ function PredefindedTrafoYear(value){
 	alert(choosenTimestampTrafo + ' ' + kindOfComponentTrafo);
 	if (kindOfComponentTrafo != '' && choosenTimestampTrafo != ''){
 		fill_out_form_trafo();
+	}
+}
+
+// handling predefined storages
+function loadPredefindedDataKindofStorage(value){
+	kindOfComponentStorage = value;
+	if (kindOfComponentStorage != '' && choosenTimestampStorage != ''){
+		fill_out_form_storage();
+	}
+}
+
+function PredefindedStorageYear(value){
+	choosenTimestampStorage = value;
+	alert(choosenTimestampStorage + ' ' + kindOfComponentStorage);
+	if (kindOfComponentStorage != '' && choosenTimestampStorage != ''){
+		fill_out_form_storage();
 	}
 }
 
@@ -119,6 +137,27 @@ function fill_out_form_trafo(){
 	$.ajax({
 		type: "POST",
 		url: "/en/asset/get_param_suggestion_trafo/",
+		data: JSON.stringify(server_data),
+		contentType: "application/json",
+		dataType: 'json',
+		success: function(response) {
+			alert("Got response from server ...");
+			//alert(response['form_html']);
+			$('#act_form_div').html(response['form_html']);
+			}
+	});
+}
+
+function fill_out_form_storage(){
+	//alert('Called');
+	var server_data = [
+		{"kindOfComponentStorage": kindOfComponentStorage},
+		{"choosenTimestampStorage": choosenTimestampStorage},
+	];
+			
+	$.ajax({
+		type: "POST",
+		url: "/en/asset/get_param_suggestion_storage/",
 		data: JSON.stringify(server_data),
 		contentType: "application/json",
 		dataType: 'json',

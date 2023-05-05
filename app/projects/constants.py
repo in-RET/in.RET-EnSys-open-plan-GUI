@@ -305,6 +305,16 @@ TRAFO_CHOICE = (
     ("Electrode heating boiler", "Electrode heating boiler"),
 )
 
+STORAGE_CHOICE = (
+    ("", "Choose..."),
+    ("Sodium storage", "Sodium storage"),
+    ("Lithium Ion Battery Storage", "Lithium Ion Battery Storage"),
+    ("Pumped storage power plant", "Pumped storage power plant"),
+    ("Heat storage", "Heat storage (seasonal)"),
+    ("Gas storage", "Gas storage"),
+    ("Hydrogen storage", "Hydrogen storage")
+)
+
 
 YEAR_CHOICE = (
     ("", "Choose..."),

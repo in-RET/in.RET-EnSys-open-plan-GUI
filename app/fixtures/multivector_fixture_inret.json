@@ -330,6 +330,18 @@
     }
 },
 {
+    "model": "projects.assettype",
+    "pk": 9,
+    "fields": {
+        "asset_type": "myPredefinedStorage",
+        "asset_category": "energy_storage",
+        "energy_vector": "Electricity",
+        "mvs_type": "storage",
+        "asset_fields": "[name,storage_choice,year_choice_storage,nominal_value,variable_costs,nonconvex,capex,opex,lifetime,offset,maximum,minimum,existing,balanced,invest_relation_input_capacity,invest_relation_output_capacity,initial_storage_level,inflow_conversion_factor,outflow_conversion_factor,nominal_storage_capacity,thermal_loss_rate,fixed_thermal_losses_relative,fixed_thermal_losses_absolute]",
+        "unit": null
+    }
+},
+{
     "model": "projects.inputparametersuggestion",
     "pk": 1,
     "fields": {
@@ -852,6 +864,265 @@
         "year": 2045,
         "crate": null,
 		"efficiency": 0.99,
+		"efficiency_el": null,
+		"efficiency_th": null,
+		"input_timeseries": null
+    }
+},
+{
+    "model": "projects.inputparametersuggestion",
+    "pk": 34,
+    "fields": {
+        "technology": "Sodium storage",
+        "capex": 87500,
+        "opex": 0.3,
+        "lifetime": 15,
+        "year": 2030,
+        "crate": 0.25,
+		"efficiency": 0.9,
+		"efficiency_el": null,
+		"efficiency_th": null,
+		"input_timeseries": null
+    }
+},
+{
+    "model": "projects.inputparametersuggestion",
+    "pk": 35,
+    "fields": {
+        "technology": "Sodium storage",
+        "capex": 87500,
+        "opex": 0.3,
+        "lifetime": 15,
+        "year": 2040,
+        "crate": 0.25,
+		"efficiency": 0.9,
+		"efficiency_el": null,
+		"efficiency_th": null,
+		"input_timeseries": null
+    }
+},
+{
+    "model": "projects.inputparametersuggestion",
+    "pk": 36,
+    "fields": {
+        "technology": "Sodium storage",
+        "capex": 87500,
+        "opex": 0.3,
+        "lifetime": 15,
+        "year": 2045,
+        "crate": 0.25,
+		"efficiency": 0.9,
+		"efficiency_el": null,
+		"efficiency_th": null,
+		"input_timeseries": null
+    }
+},
+{
+    "model": "projects.inputparametersuggestion",
+    "pk": 37,
+    "fields": {
+        "technology": "Lithium Ion Battery Storage",
+        "capex": 350000,
+        "opex": 3.7,
+        "lifetime": 15,
+        "year": 2045,
+        "crate": 1,
+		"efficiency": 0.9,
+		"efficiency_el": null,
+		"efficiency_th": null,
+		"input_timeseries": null
+    }
+},
+{
+    "model": "projects.inputparametersuggestion",
+    "pk": 38,
+    "fields": {
+        "technology": "Pumped storage power plant",
+        "capex": 112500,
+        "opex": 1,
+        "lifetime": 80,
+        "year": 2030,
+        "crate": 0.125,
+		"efficiency": 0.8,
+		"efficiency_el": null,
+		"efficiency_th": null,
+		"input_timeseries": null
+    }
+},
+{
+    "model": "projects.inputparametersuggestion",
+    "pk": 39,
+    "fields": {
+        "technology": "Pumped storage power plant",
+        "capex": 112500,
+        "opex": 1,
+        "lifetime": 80,
+        "year": 2040,
+        "crate": 0.125,
+		"efficiency": 0.8,
+		"efficiency_el": null,
+		"efficiency_th": null,
+		"input_timeseries": null
+    }
+},
+{
+    "model": "projects.inputparametersuggestion",
+    "pk": 40,
+    "fields": {
+        "technology": "Pumped storage power plant",
+        "capex": 112500,
+        "opex": 1,
+        "lifetime": 80,
+        "year": 2045,
+        "crate": 0.125,
+		"efficiency": 0.8,
+		"efficiency_el": null,
+		"efficiency_th": null,
+		"input_timeseries": null
+    }
+},
+{
+    "model": "projects.inputparametersuggestion",
+    "pk": 41,
+    "fields": {
+        "technology": "Heat storage",
+        "capex": 750,
+        "opex": 0.3,
+        "lifetime": 20,
+        "year": 2030,
+        "crate": 0.1,
+		"efficiency": 1,
+		"efficiency_el": null,
+		"efficiency_th": null,
+		"input_timeseries": null,
+		"thermal_loss_rate": 8.724999999999999e-05
+    }
+},
+{
+    "model": "projects.inputparametersuggestion",
+    "pk": 42,
+    "fields": {
+        "technology": "Heat storage",
+        "capex": 750,
+        "opex": 0.3,
+        "lifetime": 20,
+        "year": 2040,
+        "crate": 0.1,
+		"efficiency": 1,
+		"efficiency_el": null,
+		"efficiency_th": null,
+		"input_timeseries": null,
+		"thermal_loss_rate": 8.724999999999999e-05
+    }
+},
+{
+    "model": "projects.inputparametersuggestion",
+    "pk": 43,
+    "fields": {
+        "technology": "Heat storage",
+        "capex": 750,
+        "opex": 0.3,
+        "lifetime": 20,
+        "year": 2045,
+        "crate": 0.1,
+		"efficiency": 1,
+		"efficiency_el": null,
+		"efficiency_th": null,
+		"input_timeseries": null,
+		"thermal_loss_rate": 8.724999999999999e-05
+    }
+},
+{
+    "model": "projects.inputparametersuggestion",
+    "pk": 44,
+    "fields": {
+        "technology": "Gas storage",
+        "capex": 18,
+        "opex": 5,
+        "lifetime": 20,
+        "year": 2030,
+        "crate": 0.00125,
+		"efficiency": 0.95,
+		"efficiency_el": null,
+		"efficiency_th": null,
+		"input_timeseries": null
+    }
+},
+{
+    "model": "projects.inputparametersuggestion",
+    "pk": 45,
+    "fields": {
+        "technology": "Gas storage",
+        "capex": 18,
+        "opex": 5,
+        "lifetime": 20,
+        "year": 2040,
+        "crate": 0.00125,
+		"efficiency": 0.95,
+		"efficiency_el": null,
+		"efficiency_th": null,
+		"input_timeseries": null
+    }
+},
+{
+    "model": "projects.inputparametersuggestion",
+    "pk": 46,
+    "fields": {
+        "technology": "Gas storage",
+        "capex": 18,
+        "opex": 5,
+        "lifetime": 20,
+        "year": 2045,
+        "crate": 0.00125,
+		"efficiency": 0.95,
+		"efficiency_el": null,
+		"efficiency_th": null,
+		"input_timeseries": null
+    }
+},
+{
+    "model": "projects.inputparametersuggestion",
+    "pk": 47,
+    "fields": {
+        "technology": "Hydrogen storage",
+        "capex": 53,
+        "opex": 5.5,
+        "lifetime": 20,
+        "year": 2030,
+        "crate": 0.0007830853,
+		"efficiency": 0.6,
+		"efficiency_el": null,
+		"efficiency_th": null,
+		"input_timeseries": null
+    }
+},
+{
+    "model": "projects.inputparametersuggestion",
+    "pk": 48,
+    "fields": {
+        "technology": "Hydrogen storage",
+        "capex": 53,
+        "opex": 5.5,
+        "lifetime": 20,
+        "year": 2040,
+        "crate": 0.0007830853,
+		"efficiency": 0.6,
+		"efficiency_el": null,
+		"efficiency_th": null,
+		"input_timeseries": null
+    }
+},
+{
+    "model": "projects.inputparametersuggestion",
+    "pk": 49,
+    "fields": {
+        "technology": "Hydrogen storage",
+        "capex": 53,
+        "opex": 5.5,
+        "lifetime": 20,
+        "year": 2045,
+        "crate": 0.0007830853,
+		"efficiency": 0.6,
 		"efficiency_el": null,
 		"efficiency_th": null,
 		"input_timeseries": null

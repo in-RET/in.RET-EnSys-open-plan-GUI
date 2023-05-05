@@ -99,6 +99,8 @@ def is_technical_parameter(param):
         or param == "year_choice_source"
         or param == "year_choice_trafo"
         or param == "trafo_choice"
+        or param == "year_choice_storage"
+        or param == "storage_choice"
     ):
         return False
     else:

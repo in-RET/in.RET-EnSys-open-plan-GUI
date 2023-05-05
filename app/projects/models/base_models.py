@@ -31,6 +31,7 @@ from projects.constants import (
     SOURCE_CHOICE,
     YEAR_CHOICE,
     TRAFO_CHOICE,
+    STORAGE_CHOICE
 )
 
 
@@ -373,6 +374,9 @@ class InputparameterSuggestion(models.Model):
     )
     # input_timeseries = jsonfield.JSONField()
     input_timeseries = models.TextField(null=True, blank=True)
+    thermal_loss_rate = models.FloatField(
+        null=True, blank=True, validators=[MinValueValidator(0.0)]
+    )
 
 
 class Asset(TopologyNode):
@@ -572,6 +576,12 @@ class Asset(TopologyNode):
     )
     efficiency_th = models.FloatField(
         null=True, blank=True, validators=[MinValueValidator(0.0)]
+    )
+    storage_choice = models.CharField(
+        null=True, blank=False, choices=STORAGE_CHOICE, max_length=40
+    )
+    year_choice_storage = models.IntegerField(
+        null=True, blank=False, choices=YEAR_CHOICE
     )
 
     @property

@@ -1608,6 +1608,8 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
                     "thermal_loss_rate": existing_ess_asset.thermal_loss_rate,
                     "fixed_thermal_losses_relative": existing_ess_asset.fixed_thermal_losses_relative,
                     "fixed_thermal_losses_absolute": existing_ess_asset.fixed_thermal_losses_absolute,
+                    "storage_choice": existing_ess_asset.storage_choice,
+                    "year_choice_storage": existing_ess_asset.year_choice_storage
                 },
                 input_output_mapping=input_output_mapping,
             )

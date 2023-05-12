@@ -1883,12 +1883,10 @@ def request_mvs_simulation(request, scen_id=0):
                                         else None,
                                         _min=i["_min"]["value"] if i["_min"] else None,
                                         _max=i["_max"]["value"] if i["_max"] else None,
-                                        emission_factor=i["emission_factor"]["value"]
-                                        if i["emission_factor"]
-                                        else None,
-                                        renewable_factor=i["renewable_factor"]["value"]
-                                        if i["renewable_factor"]
-                                        else None,
+                                        custom_attributes = {
+                                            "emission_factor": i["emission_factor"]["value"] if i["emission_factor"] else None,
+                                            "renewable_factor": i["renewable_factor"]["value"] if i["renewable_factor"] else None
+                                            },
                                         investment=InRetEnsysInvestment(
                                             ep_costs=ep_costs,
                                             maximum=i["maximum"]["value"]
@@ -1925,18 +1923,12 @@ def request_mvs_simulation(request, scen_id=0):
                                 label=i["label"],
                                 inputs={
                                     i["inflow_direction"]: InRetEnsysFlow(
-                                        fix=i["input_timeseries"]["value"]
-                                        if i["input_timeseries"]["value"]
-                                        else None,
-                                        nominal_value=i["nominal_value"]["value"]
-                                        if i["nominal_value"]
-                                        else None,
-                                        variable_costs=i["variable_costs"]["value"]
-                                        if i["variable_costs"]
-                                        else None,
-                                        renewable_factor=i["renewable_factor"]["value"]
-                                        if i["renewable_factor"]
-                                        else None,
+                                        fix=i["input_timeseries"]["value"] if i["input_timeseries"]["value"] else None,
+                                        nominal_value=i["nominal_value"]["value"] if i["nominal_value"] else None,
+                                        variable_costs=i["variable_costs"]["value"] if i["variable_costs"] else None,
+                                        custom_attributes = {
+                                            "renewable_factor": i["renewable_factor"]["value"] if i["renewable_factor"] else None
+                                        }
                                     )
                                 },
                             )
@@ -1988,15 +1980,15 @@ def request_mvs_simulation(request, scen_id=0):
                                         else None,
                                     )
                                 },
-                                thermal_loss_rate=i["thermal_loss_rate"]["value"]
+                                loss_rate=i["thermal_loss_rate"]["value"]
                                 if i["thermal_loss_rate"]
                                 else None,
-                                fixed_thermal_losses_relative=i[
+                                fixed_losses_relative=i[
                                     "fixed_thermal_losses_relative"
                                 ]["value"]
                                 if i["fixed_thermal_losses_relative"]
                                 else None,
-                                fixed_thermal_losses_absolute=i[
+                                fixed_losses_absolute=i[
                                     "fixed_thermal_losses_absolute"
                                 ]["value"]
                                 if i["fixed_thermal_losses_absolute"]
@@ -2159,9 +2151,9 @@ def request_mvs_simulation(request, scen_id=0):
                                         if i["_max"]
                                         and i["tec_params_flow_choice"] == "outputs"
                                         else None,
-                                        renewable_factor=i["renewable_factor"]["value"]
-                                        if i["renewable_factor"]
-                                        else None,
+                                        custom_attributes= {
+                                            "renewable_factor": i["renewable_factor"]["value"] if i["renewable_factor"] else None
+                                        },
                                         investment=InRetEnsysInvestment(
                                             ep_costs=ep_costs,
                                             maximum=i["maximum"]["value"]

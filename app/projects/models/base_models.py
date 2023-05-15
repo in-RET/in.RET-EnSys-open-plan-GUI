@@ -31,7 +31,9 @@ from projects.constants import (
     SOURCE_CHOICE,
     YEAR_CHOICE,
     TRAFO_CHOICE,
-    STORAGE_CHOICE
+    STORAGE_CHOICE,
+    # TIME_CHOICE,
+    USER_MODE
 )
 
 
@@ -199,9 +201,9 @@ class Scenario(models.Model):
 
     start_date = models.DateTimeField()
     time_step = models.IntegerField(validators=[MinValueValidator(0)])
-    capex_fix = models.FloatField(
-        validators=[MinValueValidator(0.0)], default=0, blank=True
-    )
+    # capex_fix = models.FloatField(
+    #     validators=[MinValueValidator(0.0)], default=0, blank=True
+    # )
     # The next 3 fields make no sense for a scenario, they are asset fields.
     # Removing them caused trouble with existing database though, so default values are used instead
     # related to https://github.com/open-plan-tool/gui/issues/32
@@ -216,6 +218,14 @@ class Scenario(models.Model):
     )
     evaluated_period = models.IntegerField(validators=[MinValueValidator(0)])
     project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
+    
+    # timeframe_choice = models.CharField(
+    #     null=True, blank=False, choices=TIME_CHOICE, max_length=40
+    # )
+    
+    user_mode_choice = models.CharField(
+        null=True, blank=False, choices=USER_MODE, max_length=40
+    )
 
     def __str__(self):
         return self.name

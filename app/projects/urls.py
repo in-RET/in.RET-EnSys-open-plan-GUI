@@ -117,6 +117,11 @@ urlpatterns = [
         back_to_scenario_review,
         name="back_to_scenario_review",
     ),
+    # path(
+    #     "project/check_time_period/",
+    #     check_choosen_time_period,
+    #     name="check_choosen_time_period",
+    # ),
     path("scenario/update/<int:scen_id>", scenario_update, name="scenario_update"),
     path("scenario/delete/<int:scen_id>", scenario_delete, name="scenario_delete"),
     path(

@@ -376,45 +376,58 @@ scenario_widgets = {
             "data-bs-toggle": "tooltip",
             "title": _("Length of the time-steps."),
         },
-        choices=((60, "60 min"),),
+        choices=((60, "60 min"), (15, "15 min")),
     ),
     "evaluated_period": forms.NumberInput(
         attrs={
-            "placeholder": "eg. 10 days",
+            "placeholder": "value between 1 and 366",
             "min": "1",
+            "max": "366",
             "step": "1",
             "data-bs-toggle": "tooltip",
             "title": _("The number of days simulated with the energy system model."),
+            # "onchange": "getEvaluatedPeriod(this.value)"
         }
     ),
-    "capex_fix": forms.NumberInput(
-        attrs={
-            "placeholder": "e.g. 10000€",
-            "min": "0",
-            "data-bs-toggle": "tooltip",
-            "title": _(
-                "A fixed cost to implement the asset, eg. planning costs which do not depend on the (optimized) asset capacity."
-            ),
-        }
-    ),
+    # "timeframe_choice": forms.Select(
+    #     choices=TIME_CHOICE,
+    #     attrs={
+    #         "placeholder": "Choose your wanted time frame",
+    #         "data-bs-toggle": "tooltip",
+    #         "title": _(""),
+    #         "onchange": "getTimeframeChoice(this.value)",
+    #     }
+    # ),
+    # "capex_fix": forms.NumberInput(
+    #     attrs={
+    #         "placeholder": "e.g. 10000€",
+    #         "min": "0",
+    #         "data-bs-toggle": "tooltip",
+    #         "title": _(
+    #             "A fixed cost to implement the asset, eg. planning costs which do not depend on the (optimized) asset capacity."
+    #         ),
+    #     }
+    # ),
 }
 
 scenario_labels = {
     "project": _("Project"),
     "name": _("Scenario name"),
-    "evaluated_period": _("Evaluated Period"),
+    "evaluated_period": _("Simulation Period - Number of Days (Note that a very short simulation period can lead to unrealistic results.)"),
     "time_step": _("Time Step"),
     "start_date": _("Start Date"),
-    "capex_fix": _("Development costs"),
+    # "capex_fix": _("Development costs"),
+    # "timeframe_choice": _(""),
 }
 
 scenario_field_order = [
     "project",
     "name",
     "evaluated_period",
+    # "timeframe_choice",
     "time_step",
     "start_date",
-    "capex_fix",
+    # "capex_fix",
 ]
 
 

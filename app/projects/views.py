@@ -1424,7 +1424,55 @@ def get_inputparameter_suggestion_storage(request):
         status=200,
     )
 
+# @login_required
+# @require_http_methods(["POST", "GET"])
+# def check_choosen_time_period(request):
+#     body_unicode = request.body.decode("utf-8")  # for POST
+#     body = json.loads(body_unicode)
+#     print(body)
+#     name, timeframe_choice, evaluated_period = (None,) * 3
+#     name = body[0]["scenarioName"]
+#     timeframe_choice = body[1]["timeframeChoice"]
+#     evaluated_period = body[2]["evaluatedPeriod"]
+    
+#     queryset = Project.objects.filter(name="Benchmark test for sector coupled system and electricity price time series")
+#     for item in queryset:
+#         print(item.id)
+#         proj_id = item.id
+    
+#     project = get_object_or_404(Project, pk=proj_id)
+#     # all projects which the user is able to select (the one the user created)
+#     user_projects = request.user.project_set.all()
 
+#     form = ScenarioCreateForm(
+#         initial={"project": project,
+#                  "name": name,
+#                  "evaluated_period": evaluated_period,
+#                  "timeframe_choice": timeframe_choice}, 
+#         project_queryset=user_projects
+#     )
+    
+#     form_html = get_template("scenario/scenario_step1.html")
+    
+#     step_id=1
+#     return JsonResponse(
+#         {
+#             "success": True,
+#             "form_html": form_html.render(
+#                 {
+#                     "form": form,
+#                     "proj_id": proj_id,
+#                     "proj_name": project.name,
+#                     "scenario": None,
+#                     "scen_id": None,
+#                     "step_id": step_id,
+#                     "step_list": STEP_LIST,
+#                     "max_step": 5,
+#                 }
+#             ),
+#         },
+#         status=200,
+#     )
 
 @login_required
 @require_http_methods(["GET"])

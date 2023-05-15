@@ -325,6 +325,22 @@ YEAR_CHOICE = (
     (2045, 2045),
 )
 
+
+# TIME_CHOICE = (
+#     ("", "Choose..."),
+#     ("Hour(s)", "Hour(s)"),
+#     ("Day(s)", "Day(s)"),
+#     ("Week(s)", "Week(s)"),
+#     ("Month(s)", "Month(s)"),
+#     ("Year", "Year")
+# )
+
+USER_MODE = (
+    ("", "Choose..."),
+    ("Default User", "Default User"),
+    ("Expert", "Expert")
+)
+
 COP_MODES = (("Heat pump", "heat_pump"), ("Chiller", "chiller"))
 
 

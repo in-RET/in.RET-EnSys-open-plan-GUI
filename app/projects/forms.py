@@ -389,6 +389,14 @@ scenario_widgets = {
             # "onchange": "getEvaluatedPeriod(this.value)"
         }
     ),
+    "interest_rate": forms.NumberInput(
+        attrs={
+            "placeholder": "",
+            "min": "0",
+            "data-bs-toggle": "tooltip",
+            "title": _("interest rate in % - is used for the interest calculation of the annuities of the technologies")
+        }
+    ),
     # "timeframe_choice": forms.Select(
     #     choices=TIME_CHOICE,
     #     attrs={
@@ -418,6 +426,7 @@ scenario_labels = {
     "start_date": _("Start Date"),
     # "capex_fix": _("Development costs"),
     # "timeframe_choice": _(""),
+    "interest_rate": _("Interest Rate"),
 }
 
 scenario_field_order = [
@@ -428,6 +437,7 @@ scenario_field_order = [
     "time_step",
     "start_date",
     # "capex_fix",
+    "interest_rate"
 ]
 
 

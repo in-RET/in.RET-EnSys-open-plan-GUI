@@ -689,58 +689,42 @@ def scenario_create_parameters(request, proj_id, scen_id=None, step_id=1, max_st
 @require_http_methods(["GET", "POST"])
 def scenario_create_topology(request, proj_id, scen_id, step_id=2, max_step=3):
 
-    components = {
-        # "providers": {
-        #     "dso": _("Electricity DSO"),
-        #     # "gas_dso": _("Gas DSO"),
-        #     "h2_dso": _("H2 DSO"),
-        #     "heat_dso": _("Heat DSO"),
-        # },
+    components_default_user = {
         "production": {
-            # "pv_plant": _("PV Plant"),
-            # "wind_plant": _("Wind Plant"),
-            # "biogas_plant": _("Biogas Plant"),
-            # "geothermal_conversion": _("Geothermal Conversion"),
-            # "solar_thermal_plant": _("Solar Thermal Plant"),
-            "mySource": _("Source"),
             "myPredefinedSource": _("Predefined Source"),
         },
         "conversion": {
-            # "transformer_station_in": _("Transformer Station (in)"),  #
-            # "transformer_station_out": _("Transformer Station (out)"),  #
-            # "storage_charge_controller_in": _("Storage Charge Controller (in)"),  #
-            # "storage_charge_controller_out": _("Storage Charge Controller (out)"),  #
-            # "solar_inverter": _("Solar Inverter"),  #
-            # "diesel_generator": _("Diesel Generator"),
-            # "fuel_cell": _(" Fuel Cell"),
-            # "gas_boiler": _("Gas Boiler"),
-            # "electrolyzer": _("Electrolyzer"),
-            # "heat_pump": _("Heat Pump"),
-            # "chp": _("Combined Heat and Power"),
-            # "chp_fixed_ratio": _("CHP fixed ratio"),
-            "myTransformer": _("Transformer"),
             "myPredefinedTransformer": _("Predefined Transformer"),
         },
         "storage": {
-            # "bess": _("Electricity Storage"),
-            # "gess": _("Gas Storage"),
-            # "h2ess": _("H2 Storage"),
-            # "hess": _("Heat Storage"),
-            "myGenericStorage": _("GenericStorage"),
             "myPredefinedStorage": _("Predefined Storage"),
         },
         "demand": {
-            # "demand": _("Electricity Demand"),
-            # "gas_demand": _("Gas Demand"),
-            # "h2_demand": _("H2 Demand"),
-            # "heat_demand": _("Heat Demand"),
-            "mySink": _("Sink"),
             "myExcess": _("Excess"),
             "myPredefinedSink": _("Predefined Load Profile"),
         },
+        "bus": {"bus": _("Connecting Line")},
+    }
+    
+    components_expert = {
+        "production": {
+            "mySource": _("Source"),
+        },
+        "conversion": {
+            "myTransformer": _("Transformer"),
+        },
+        "storage": {
+            "myGenericStorage": _("GenericStorage"),
+        },
+        "demand": {
+            "mySink": _("Sink"),
+            "myExcess": _("Excess"),
+        },
         "bus": {"bus": _("Bus")},
     }
-    group_names = {group: _(group) for group in components.keys()}
+    
+    group_names_default_user = {group: _(group) for group in components_default_user.keys()}
+    group_names_expert = {group: _(group) for group in components_expert.keys()}
 
     # TODO: if the scenario exists, load it, otherwise default form
 
@@ -765,6 +749,15 @@ def scenario_create_topology(request, proj_id, scen_id, step_id=2, max_step=3):
     else:
 
         scenario = get_object_or_404(Scenario, pk=scen_id)
+        print(scenario.user_mode_choice)
+        
+        if scenario.user_mode_choice == "Default User":
+            components = components_default_user
+            group_names = group_names_default_user
+        elif scenario.user_mode_choice == "Expert":
+            components = components_expert
+            group_names = group_names_expert
+            
 
         # if a simulation object linked to this scenario exists, all steps have been already fullfilled
         qs_sim = Simulation.objects.filter(scenario=scenario)

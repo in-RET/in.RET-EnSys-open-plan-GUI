@@ -226,6 +226,10 @@ class Scenario(models.Model):
     user_mode_choice = models.CharField(
         null=True, blank=False, choices=USER_MODE, max_length=40
     )
+    
+    interest_rate = models.FloatField(
+        null=True, blank=False, validators=[MinValueValidator(0.0)]
+    )
 
     def __str__(self):
         return self.name

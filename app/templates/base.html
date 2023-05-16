@@ -51,7 +51,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-modal/2.2.6/js/bootstrap-modalmanager.min.js" integrity="sha512-/HL24m2nmyI2+ccX+dSHphAHqLw60Oj5sK8jf59VWtFWZi9vx7jzoxbZmcBeeTeCUc7z1mTs3LfyXGuBU32t+w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 {% block start_body_scripts %}{% endblock %}
 
-{% setvar "https://open-plan.readthedocs.io/en/feature-new_documentation/" as documentation_url %}
+{% setvar "https://github.com/in-RET/in.RET-EnSys-open-plan-GUI" as documentation_url %}
+{% setvar "https://github.com/in-RET/in.RET-EnSys-open-plan-GUI" as github_url %}
 
 {% block navbar %}
     {% include "navbar.html" with user=user documentation_url=documentation_url %}
@@ -82,12 +83,13 @@
 
     <div>
         <div class="footer__logo">
-            <img src="{% static 'assets/logos/open_plan_logo_horizontal.svg' %}" alt="open_plan logo">
+            <!--<img src="{% static 'assets/logos/ensys_logo_full.png' %}" alt="ensys_logo_full">-->
         </div>
         <div class="footer__links">
             <ul>
                 <li><a href="{% url 'about' %}">{% translate "Contact" %}</a></li>
-                <li><a href="{{ documentation_url}}" target="_blank" rel="noreferrer">{% translate "Documentation" %}</a></li>
+                <li><a href="{{ documentation_url }}" target="_blank" rel="noreferrer">{% translate "Documentation" %}</a></li>
+                <li><a href="{{ github_url }}" target="_blank" rel="noreferrer">{% translate "Github" %}</a></li>
                 <li><a href="{% url 'usecase_search' %}">{% translate "Use cases" %}</a></li>
                 <li><a href="{% url 'license' %}">{% translate "License" %}</a></li>
                 <li><a href="{% url 'imprint' %}">{% translate "Imprint" %}</a></li>

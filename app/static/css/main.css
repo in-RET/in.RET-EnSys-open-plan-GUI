@@ -184,21 +184,24 @@ html {
 body {
   margin: 0;
   overflow-x: hidden;
-  height: 100%;
+  height: 100vh;
   display: flex;
-  flex-direction: column; }
+  flex-direction: column;
+  align-items: center }
 
-.main {
-  flex: 1 0 auto; 
+main {
+  display: block;
+  margin-top: 7rem;
+  height: 100%;
+  position: fixed;
   width: 100%;
 }
 
-  /**
- * Render the `main` element consistently in IE.
- */
-main {
+@use 'variables' as *;
+.legal{
   display: block;
-  flex: 1 0 auto; }
+  position: relative;
+}
 
 /**
  * Correct the font size and margin on `h1` elements within `section` and
@@ -599,7 +602,7 @@ footer a.btn,
 footer button.btn {
   display: inline-block;
   background-color: #1F567D;
-  color: #fff;
+  color: #fff !important;
   border-radius: 8px;
   letter-spacing: 0.03rem;
   font-weight: 400; }
@@ -654,7 +657,7 @@ footer button.btn {
   button.btn--medium,
   footer a.btn--medium,
   footer button.btn--medium {
-    padding: 0.55rem 0.75rem;
+    /* padding: 0.55rem 0.75rem; */
     font-size: 1rem;
     min-width: 11rem; }
   a.btn--small,
@@ -989,12 +992,14 @@ a.dropdown-item:active {
 @use 'variables' as *;
 .footer {
   background-color: #F4F7F9;
-  height: 4.5rem;
+  height: 3rem;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: center;
-  align-items: center;
-  flex-shrink: 0; }
+  }
   .footer > div {
     display: flex;
     flex-direction: row;
@@ -1003,8 +1008,14 @@ a.dropdown-item:active {
     max-width: 90rem;
     padding-left: 1rem;
     padding-right: 1rem; }
+  .footer__logo {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
   .footer__logo img {
-    height: 2rem; }
+    height: auto;
+    width: 140px; }
   .footer__links {
     display: flex;
     flex-direction: column;
@@ -1018,14 +1029,17 @@ a.dropdown-item:active {
       padding-left: 1rem; }
 
 .step-footer {
-  background-color: #fff;
-  height: 4rem;
+  background-color: #F4F7F9;
+  height: 3rem;
   border-top: 2px solid #F4F7F9;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  flex-shrink: 0; }
+  flex-shrink: 0; 
+  width: 100%;
+  position: fixed;
+  bottom: 0}
   .step-footer > div {
     display: flex;
     flex-direction: row;
@@ -1038,14 +1052,17 @@ a.dropdown-item:active {
     float: right; }
 
 .simulation-footer {
-  background-color: #fff;
-  height: 4rem;
+  background-color: #F4F7F9;
+  height: 3rem;
   border-top: 2px solid #F4F7F9;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  flex-shrink: 0; }
+  flex-shrink: 0; 
+  position: fixed;
+  width: 100%;
+  bottom: 0}
   .simulation-footer > div {
     display: flex;
     flex-direction: row;
@@ -1157,9 +1174,9 @@ form .btn {
   background-color: #fff;
   display: flex;
   flex-direction: row;
+  flex-shrink: 0;
   justify-content: center; }
   .header > div {
-    padding-top: 4rem;
     width: 100%;
     max-width: 90rem;
     padding-left: 1rem;
@@ -1167,7 +1184,6 @@ form .btn {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    position: relative;
     padding-bottom: 1rem }
   .header__left, .header__back {
     width: 10rem; }
@@ -1319,7 +1335,8 @@ nav.navbar {
   nav.navbar.navbar-light {
     background-color: #fff !important; }
   nav.navbar .navbar-brand img {
-    height: 2rem; }
+    width: 180px;
+    height: auto; }
   nav.navbar .dropdown-menu[data-bs-popper] {
     left: auto;
     right: 0; }
@@ -1392,14 +1409,17 @@ nav.navbar {
       content: ''; } }
 
 .wizard {
-  position: relative;
+  position: fixed;
   background-color: #F4F7F9;
   height: 5.5rem;
   min-height: 5.5rem;
   display: flex;
   flex-direction: row;
   justify-content: center;
-  padding-bottom: 2rem; }
+  padding-bottom: 2rem;
+  width: 100%;
+  top: 6rem; 
+  z-index: 8;}
   .wizard > div {
     display: flex;
     flex-direction: column;
@@ -1534,7 +1554,7 @@ nav.navbar {
   flex-direction: row;
   justify-content: center;
   background-color: #F4F7F9;
-  min-height: calc(100vh - 12.3rem);}
+  min-height: calc(100vh - 13.75rem);}
   .dashboard > div {
     width: 100%;
     max-width: 90rem;
@@ -1764,8 +1784,9 @@ nav.navbar {
 .system-design {
   display: flex;
   flex-direction: row;
-  height: calc(100vh - 4.5rem - 5.5rem - 4rem);
-  border-top: 2px solid #F4F7F9; }
+  height: calc(100vh - 14rem);
+  border-top: 2px solid #F4F7F9;
+  margin-top: 4rem }
   .system-design .components {
     width: 22rem;
     background-color: #F4F7F9;
@@ -2656,6 +2677,7 @@ nav.navbar {
   display: flex;
   flex-direction: row;
   justify-content: center;
+  margin-top: 4.5rem;
   border-top: 2px solid #F4F7F9; }
   .scenario-create form {
     width: 100%; }
@@ -2751,7 +2773,8 @@ nav.navbar {
 .simulation {
   display: flex;
   flex-direction: row;
-  justify-content: center; }
+  justify-content: center;
+  margin-top: 11.5rem; }
   .simulation__heading {
     height: 16.5rem;
     width: 100%;
@@ -2883,3 +2906,8 @@ nav.navbar {
       background-color: #E3EAEE; }
 
 /*# sourceMappingURL=main.css.map */
+
+.feedback{
+  max-width: 90rem;
+  position: absolute;
+}

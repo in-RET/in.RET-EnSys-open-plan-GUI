@@ -2240,6 +2240,19 @@ def request_mvs_simulation(request, scen_id=0):
         print(data_clean["simulation_settings"])
         print(data_clean["simulation_settings"]["evaluated_period"])
         print(data_clean["simulation_settings"]["evaluated_period"]["value"])
+        
+        if data_clean["simulation_settings"]["time_step"] == 60:
+            timesteps = int(
+                data_clean["simulation_settings"]["evaluated_period"]["value"] * 24
+            )
+            freq='hourly'
+        elif data_clean["simulation_settings"]["time_step"] == 15:
+            timesteps = int(
+                data_clean["simulation_settings"]["evaluated_period"]["value"] * 24 * 4
+            )
+            freq='quarter_hourly'
+            
+        print(timesteps)
 
         energysystem = InRetEnsysEnergysystem(
             busses=list_busses,
@@ -2247,11 +2260,9 @@ def request_mvs_simulation(request, scen_id=0):
             sources=list_sources,
             storages=list_storages,
             transformers=list_transformers,
-            frequenz="hourly",
-            start_date="1/1/2022",
-            time_steps=int(
-                data_clean["simulation_settings"]["evaluated_period"]["value"] * 24
-            ),
+            frequenz=freq,
+            start_date=data_clean["simulation_settings"]["start_date"],
+            time_steps=timesteps
         )
 
         (

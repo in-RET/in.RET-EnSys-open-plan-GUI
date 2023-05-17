@@ -640,7 +640,7 @@ class BusForm(OpenPlanModelForm):
 
     class Meta:
         model = Bus
-        fields = ["name", "type"]
+        fields = ["name"]
         widgets = {
             "name": forms.TextInput(
                 attrs={
@@ -648,16 +648,18 @@ class BusForm(OpenPlanModelForm):
                     "style": "font-weight:400; font-size:13px;",
                 }
             ),
-            "type": forms.Select(
-                choices=ENERGY_VECTOR,
-                attrs={
-                    "data-bs-toggle": "tooltip",
-                    "title": _("The energy Vector of the connected assets."),
-                    "style": "font-weight:400; font-size:13px;",
-                },
-            ),
+            # "type": forms.Select(
+            #     choices=ENERGY_VECTOR,
+            #     attrs={
+            #         "data-bs-toggle": "tooltip",
+            #         "title": _("The energy Vector of the connected assets."),
+            #         "style": "font-weight:400; font-size:13px;",
+            #     },
+            # ),
         }
-        labels = {"name": _("Name"), "type": _("Energy carrier")}
+        labels = {"name": _("Name"), 
+                  # "type": _("Energy carrier")
+                  }
 
 
 # class SuggestionForm(OpenPlanModelForm):

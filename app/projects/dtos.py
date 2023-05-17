@@ -50,24 +50,26 @@ class EconomicDataDto:
     def __init__(
         self,
         currency: str,
-        project_duration: ValueTypeDto,
-        discount_factor: ValueTypeDto,
-        tax: ValueTypeDto,
+        # project_duration: ValueTypeDto,
+        # discount_factor: ValueTypeDto,
+        # tax: ValueTypeDto,
     ):
         self.currency = currency
-        self.project_duration = project_duration
+        # self.project_duration = project_duration
         # self.annuity_factor = annuity_factor
-        self.discount_factor = discount_factor
-        self.tax = tax
+        # self.discount_factor = discount_factor
+        # self.tax = tax
         # self.crf = crf
 
 
 class SimulationSettingsDto:
-    def __init__(self, start_date: str, time_step: int, evaluated_period: ValueTypeDto):
+    def __init__(self, start_date: str, time_step: int, evaluated_period: ValueTypeDto,
+                 interest_rate: float):
         self.start_date = start_date
         # self.end_date = end_date
         self.time_step = time_step
         self.evaluated_period = evaluated_period
+        self.interest_rate = interest_rate
 
 
 class TimeseriesDataDto:
@@ -245,9 +247,11 @@ class EssDto:
 
 
 class BusDto:
-    def __init__(self, label: str, energy_vector: str, assets: List[AssetDto]):
+    def __init__(self, label: str, 
+                 # energy_vector: str, 
+                 assets: List[AssetDto]):
         self.label = label
-        self.energy_vector = energy_vector
+        # self.energy_vector = energy_vector
         self.assets = assets
 
 
@@ -367,14 +371,15 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
 
     economic_data_dto = EconomicDataDto(
         economic_data.currency,
-        to_value_type(economic_data, "duration"),
+        # to_value_type(economic_data, "duration"),
         # to_value_type(economic_data, 'annuity_factor'),
-        to_value_type(economic_data, "discount"),
-        to_value_type(economic_data, "tax"),
+        # to_value_type(economic_data, "discount"),
+        # to_value_type(economic_data, "tax"),
         # to_value_type(economic_data, 'crf'),
     )
 
     evaluated_period = to_value_type(scenario, "evaluated_period")
+    interest_rate = to_value_type(scenario, "interest_rate")
     # For testing purposes the number of simulated days is restricted to 3 or less
     if testing is True and evaluated_period.value > 3:
         evaluated_period.value = 3
@@ -385,6 +390,7 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
         ),  # datetime.combine(scenario.start_date, time()).timestamp(),
         scenario.time_step,
         evaluated_period,
+        interest_rate
     )
 
     # map_to_dto(economic_data, economic_data_dto)
@@ -732,7 +738,9 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
             set([connection.asset.name for connection in connections_list])
         )
 
-        bus_dto = BusDto(bus.name, bus.type, bus_asset_list)
+        bus_dto = BusDto(bus.name, 
+                         # bus.type, 
+                         bus_asset_list)
 
         bus_dto_list.append(bus_dto)
 

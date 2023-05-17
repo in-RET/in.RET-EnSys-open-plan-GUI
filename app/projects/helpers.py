@@ -71,11 +71,11 @@ def format_scenario_for_mvs(scenario_to_convert, testing=False):
     return dumped_data  # remove_empty_elements
 
 
-Zinssatz = 10.5
 
-
-def epc_calc(capex, Amortisierungszeit, opex):
-    investk = economics.annuity(capex=capex, n=Amortisierungszeit, wacc=Zinssatz / 100)
+def epc_calc(capex, Amortisierungszeit, opex, interest_rate):
+    if interest_rate == 0:
+        interest_rate = 1 * 10**-4        #to avoid division by zero error
+    investk = economics.annuity(capex=capex, n=Amortisierungszeit, wacc=interest_rate / 100)
     betriebsk = capex * (opex / 100)
     epc = investk + betriebsk
     return epc

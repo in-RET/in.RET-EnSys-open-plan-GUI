@@ -341,6 +341,18 @@ USER_MODE = (
     ("Expert", "Expert")
 )
 
+MW_KW_CHOICE = (
+    ("", "Choose..."),
+    ("kW/kWh", "kW/kWh"),
+    ("MW/MWh", "MW/MWh")
+)
+
+CO2_UNIT_CHOICE = (
+    ("", "Choose..."),
+    ("kg CO2", "kg CO2"),
+    ("t CO2", "t CO2")
+)
+
 COP_MODES = (("Heat pump", "heat_pump"), ("Chiller", "chiller"))
 
 

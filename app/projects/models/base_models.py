@@ -33,7 +33,9 @@ from projects.constants import (
     TRAFO_CHOICE,
     STORAGE_CHOICE,
     # TIME_CHOICE,
-    USER_MODE
+    USER_MODE,
+    MW_KW_CHOICE,
+    CO2_UNIT_CHOICE
 )
 
 
@@ -46,12 +48,12 @@ class Feedback(models.Model):
 
 
 class EconomicData(models.Model):
-    duration = models.PositiveSmallIntegerField()
+    # duration = models.PositiveSmallIntegerField()
     currency = models.CharField(max_length=3, choices=CURRENCY)
-    discount = models.FloatField(
-        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)]
-    )
-    tax = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(1.0)])
+    # discount = models.FloatField(
+    #     validators=[MinValueValidator(0.0), MaxValueValidator(1.0)]
+    # )
+    # tax = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(1.0)])
 
 
 class Viewer(models.Model):
@@ -79,6 +81,12 @@ class Project(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True
     )
     viewers = models.ManyToManyField(Viewer, related_name="viewer_projects")
+    unit_choice = models.CharField(
+        null=True, blank=False, choices=MW_KW_CHOICE, max_length=40
+    )
+    unit_choice_co2 = models.CharField(
+        null=True, blank=False, choices=CO2_UNIT_CHOICE, max_length=40
+    )
 
     def __str__(self):
         return self.name

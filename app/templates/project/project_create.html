@@ -59,16 +59,13 @@
                             {{ form.longitude|as_crispy_field }}
                         </div>
                         <div class="input-item">
-                            {{ form.duration|as_crispy_field }}
-                        </div>
-                        <div class="input-item">
                             {{ form.currency|as_crispy_field }}
                         </div>
                         <div class="input-item">
-                            {{ form.discount|as_crispy_field }}
+                            {{ form.unit_choice|as_crispy_field }}
                         </div>
-                        <div class="input-item">
-                            {{ form.tax|as_crispy_field }}
+						<div class="input-item">
+                            {{ form.unit_choice_co2|as_crispy_field }}
                         </div>
                         <button class="btn btn--medium" type="submit">{% translate "Save project" %}</button>
 

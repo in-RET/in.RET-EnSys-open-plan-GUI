@@ -213,21 +213,21 @@ class ProjectCreateForm(OpenPlanForm):
             }
         ),
     )
-    duration = forms.IntegerField(
-        label=_("Project Duration"),
-        widget=forms.NumberInput(
-            attrs={
-                "placeholder": "eg. 1",
-                "min": "0",
-                "max": "100",
-                "step": "1",
-                "data-bs-toggle": "tooltip",
-                "title": _(
-                    "The number of years the project is intended to be operational. The project duration also sets the installation time of the assets used in the simulation. After the project ends these assets are 'sold' and the refund is charged against the initial investment costs."
-                ),
-            }
-        ),
-    )
+    # duration = forms.IntegerField(
+    #     label=_("Project Duration"),
+    #     widget=forms.NumberInput(
+    #         attrs={
+    #             "placeholder": "eg. 1",
+    #             "min": "0",
+    #             "max": "100",
+    #             "step": "1",
+    #             "data-bs-toggle": "tooltip",
+    #             "title": _(
+    #                 "The number of years the project is intended to be operational. The project duration also sets the installation time of the assets used in the simulation. After the project ends these assets are 'sold' and the refund is charged against the initial investment costs."
+    #             ),
+    #         }
+    #     ),
+    # )
     currency = forms.ChoiceField(
         label=_("Currency"),
         choices=CURRENCY,
@@ -240,31 +240,53 @@ class ProjectCreateForm(OpenPlanForm):
             }
         ),
     )
-    discount = forms.FloatField(
-        label=_("Discount Factor"),
-        widget=forms.NumberInput(
+    # discount = forms.FloatField(
+    #     label=_("Discount Factor"),
+    #     widget=forms.NumberInput(
+    #         attrs={
+    #             "placeholder": "eg. 0.1",
+    #             "min": "0.0",
+    #             "max": "1.0",
+    #             "step": "0.0001",
+    #             "data-bs-toggle": "tooltip",
+    #             "title": _(
+    #                 "Discount factor is the factor which accounts for the depreciation in the value of money in the future, compared to the current value of the same money. The common method is to calculate the weighted average cost of capital (WACC) and use it as the discount rate."
+    #             ),
+    #         }
+    #     ),
+    # )
+    # tax = forms.FloatField(
+    #     label=_("Tax"),
+    #     widget=forms.NumberInput(
+    #         attrs={
+    #             "placeholder": "eg. 0.3",
+    #             "min": "0.0",
+    #             "max": "1.0",
+    #             "step": "0.0001",
+    #             "data-bs-toggle": "tooltip",
+    #             "title": _("Tax factor"),
+    #         }
+    #     ),
+    # )
+    unit_choice = forms.ChoiceField(
+        choices=MW_KW_CHOICE,
+        widget=forms.Select(
             attrs={
-                "placeholder": "eg. 0.1",
-                "min": "0.0",
-                "max": "1.0",
-                "step": "0.0001",
                 "data-bs-toggle": "tooltip",
                 "title": _(
-                    "Discount factor is the factor which accounts for the depreciation in the value of money in the future, compared to the current value of the same money. The common method is to calculate the weighted average cost of capital (WACC) and use it as the discount rate."
+                    ""
                 ),
             }
         ),
     )
-    tax = forms.FloatField(
-        label=_("Tax"),
-        widget=forms.NumberInput(
+    unit_choice_co2 = forms.ChoiceField(
+        choices=CO2_UNIT_CHOICE,
+        widget=forms.Select(
             attrs={
-                "placeholder": "eg. 0.3",
-                "min": "0.0",
-                "max": "1.0",
-                "step": "0.0001",
                 "data-bs-toggle": "tooltip",
-                "title": _("Tax factor"),
+                "title": _(
+                    ""
+                ),
             }
         ),
     )
@@ -281,12 +303,19 @@ class ProjectCreateForm(OpenPlanForm):
         self.helper.form_class = "form-horizontal"
         self.helper.label_class = "col-lg-8"
         self.helper.field_class = "col-lg-10"
+        self.fields['unit_choice'].label = "Unit Choice for all Scenarios of the Project - Please ensure that all technology parameters have the same unit prefix"
+        self.fields['unit_choice_co2'].label = "Unit Choice for CO2 amounts"
 
 
 class ProjectUpdateForm(OpenPlanModelForm):
     class Meta:
         model = Project
         exclude = ["date_created", "date_updated", "economic_data", "user", "viewers"]
+        
+    def __init__(self, *args, **kwargs):
+        super(ProjectUpdateForm, self).__init__(*args, **kwargs)
+        self.fields['unit_choice'].label = "Unit Choice for all Scenarios of the Project - Please ensure that all technology parameters have the same unit prefix"
+        self.fields['unit_choice_co2'].label = "Unit Choice for CO2 amounts"
 
 
 class ProjectShareForm(ModelForm):

@@ -254,10 +254,10 @@ def project_create(request):
         if form.is_valid():
             logger.info(f"Creating new project with economic data.")
             economic_data = EconomicData.objects.create(
-                duration=form.cleaned_data["duration"],
+                # duration=form.cleaned_data["duration"],
                 currency=form.cleaned_data["currency"],
-                discount=form.cleaned_data["discount"],
-                tax=form.cleaned_data["tax"],
+                # discount=form.cleaned_data["discount"],
+                # tax=form.cleaned_data["tax"],
             )
 
             project = Project.objects.create(
@@ -266,6 +266,8 @@ def project_create(request):
                 country=form.cleaned_data["country"],
                 longitude=form.cleaned_data["longitude"],
                 latitude=form.cleaned_data["latitude"],
+                unit_choice=form.cleaned_data["unit_choice"],
+                unit_choice_co2=form.cleaned_data["unit_choice_co2"],
                 user=request.user,
                 economic_data=economic_data,
             )

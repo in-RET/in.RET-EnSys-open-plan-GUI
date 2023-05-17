@@ -1886,6 +1886,7 @@ def request_mvs_simulation(request, scen_id=0):
     scenario = Scenario.objects.get(pk=scen_id)
     try:
         data_clean = format_scenario_for_mvs(scenario)
+        interest_rate = data_clean["simulation_settings"]["interest_rate"]["value"]
 
         for k, v in data_clean.items():
             for i in v:
@@ -1898,6 +1899,7 @@ def request_mvs_simulation(request, scen_id=0):
                             i["capex"]["value"],
                             i["lifetime"]["value"],
                             i["opex"]["value"],
+                            interest_rate
                         )
                     else:
                         ep_costs = None
@@ -1991,6 +1993,7 @@ def request_mvs_simulation(request, scen_id=0):
                             i["capex"]["value"],
                             i["lifetime"]["value"],
                             i["opex"]["value"],
+                            interest_rate
                         )
                     else:
                         ep_costs = None
@@ -2097,6 +2100,7 @@ def request_mvs_simulation(request, scen_id=0):
                             i["capex"]["value"],
                             i["lifetime"]["value"],
                             i["opex"]["value"],
+                            interest_rate
                         )
                     else:
                         ep_costs = None

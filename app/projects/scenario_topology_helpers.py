@@ -235,7 +235,7 @@ def db_bus_nodes_to_list(scen_id):
             "output_ports": db_bus.output_ports,
             "data": {
                 "name": db_bus.name,
-                "bustype": db_bus.type,
+                # "bustype": db_bus.type,
                 "databaseId": db_bus.id,
                 "parent_asset_id": db_bus.parent_asset_id
                 if db_bus.parent_asset_id

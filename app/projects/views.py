@@ -254,10 +254,10 @@ def project_create(request):
         if form.is_valid():
             logger.info(f"Creating new project with economic data.")
             economic_data = EconomicData.objects.create(
-                duration=form.cleaned_data["duration"],
+                # duration=form.cleaned_data["duration"],
                 currency=form.cleaned_data["currency"],
-                discount=form.cleaned_data["discount"],
-                tax=form.cleaned_data["tax"],
+                # discount=form.cleaned_data["discount"],
+                # tax=form.cleaned_data["tax"],
             )
 
             project = Project.objects.create(
@@ -266,6 +266,8 @@ def project_create(request):
                 country=form.cleaned_data["country"],
                 longitude=form.cleaned_data["longitude"],
                 latitude=form.cleaned_data["latitude"],
+                unit_choice=form.cleaned_data["unit_choice"],
+                unit_choice_co2=form.cleaned_data["unit_choice_co2"],
                 user=request.user,
                 economic_data=economic_data,
             )
@@ -1884,6 +1886,7 @@ def request_mvs_simulation(request, scen_id=0):
     scenario = Scenario.objects.get(pk=scen_id)
     try:
         data_clean = format_scenario_for_mvs(scenario)
+        interest_rate = data_clean["simulation_settings"]["interest_rate"]["value"]
 
         for k, v in data_clean.items():
             for i in v:
@@ -1896,6 +1899,7 @@ def request_mvs_simulation(request, scen_id=0):
                             i["capex"]["value"],
                             i["lifetime"]["value"],
                             i["opex"]["value"],
+                            interest_rate
                         )
                     else:
                         ep_costs = None
@@ -1994,6 +1998,7 @@ def request_mvs_simulation(request, scen_id=0):
                             i["capex"]["value"],
                             i["lifetime"]["value"],
                             i["opex"]["value"],
+                            interest_rate
                         )
                     else:
                         ep_costs = None
@@ -2048,6 +2053,7 @@ def request_mvs_simulation(request, scen_id=0):
                             i["capex"]["value"],
                             i["lifetime"]["value"],
                             i["opex"]["value"],
+                            interest_rate
                         )
                     else:
                         ep_costs = None
@@ -2182,11 +2188,24 @@ def request_mvs_simulation(request, scen_id=0):
                         error_msg = f"Trafo Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {e}."
                         logger.error(error_msg)
 
-        #print(data_clean["constraints"])
-        #print(data_clean["economic_data"])
-        #print(data_clean["simulation_settings"])
-        #print(data_clean["simulation_settings"]["evaluated_period"])
-        #print(data_clean["simulation_settings"]["evaluated_period"]["value"])
+        print(data_clean["constraints"])
+        print(data_clean["economic_data"])
+        print(data_clean["simulation_settings"])
+        print(data_clean["simulation_settings"]["evaluated_period"])
+        print(data_clean["simulation_settings"]["evaluated_period"]["value"])
+        
+        if data_clean["simulation_settings"]["time_step"] == 60:
+            timesteps = int(
+                data_clean["simulation_settings"]["evaluated_period"]["value"] * 24
+            )
+            freq='hourly'
+        elif data_clean["simulation_settings"]["time_step"] == 15:
+            timesteps = int(
+                data_clean["simulation_settings"]["evaluated_period"]["value"] * 24 * 4
+            )
+            freq='quarter_hourly'
+            
+        print(timesteps)
 
         energysystem = InRetEnsysEnergysystem(
             busses=list_busses,
@@ -2194,11 +2213,9 @@ def request_mvs_simulation(request, scen_id=0):
             sources=list_sources,
             storages=list_storages,
             transformers=list_transformers,
-            frequenz="hourly",
-            start_date="1/1/2022",
-            time_steps=int(
-                data_clean["simulation_settings"]["evaluated_period"]["value"] * 24
-            ),
+            frequenz=freq,
+            start_date=data_clean["simulation_settings"]["start_date"],
+            time_steps=timesteps
         )
 
         #print(data_clean["constraints"])

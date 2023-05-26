@@ -1,4 +1,0 @@
-POSTGRES_HOST=db
-POSTGRES_DB=dummy_db
-POSTGRES_USER=dummy_user
-POSTGRES_PASSWORD=dummy_pw

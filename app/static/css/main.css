@@ -1175,7 +1175,8 @@ form .btn {
   display: flex;
   flex-direction: row;
   flex-shrink: 0;
-  justify-content: center; }
+  justify-content: center; 
+  margin-top: 6rem}
   .header > div {
     width: 100%;
     max-width: 90rem;
@@ -2863,7 +2864,9 @@ nav.navbar {
   display: flex;
   flex-direction: row;
   justify-content: center;
-  padding-bottom: 6rem; }
+  padding-bottom: 6rem;
+  max-width: 90rem;
+  width: 100vw; }
   .project-setup.two-columns .left,
   .project-setup.two-columns .right {
     display: flex;
@@ -2896,7 +2899,8 @@ nav.navbar {
         cursor: pointer;
         vertical-align: middle; }
   .project-setup.two-columns .right {
-    justify-content: flex-start; }
+    justify-content: flex-start; 
+    z-index: 0;}
     .project-setup.two-columns .right > div {
       padding-right: 1rem; }
     .project-setup.two-columns .right .map {

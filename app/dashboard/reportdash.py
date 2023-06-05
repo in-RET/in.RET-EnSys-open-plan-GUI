@@ -19,7 +19,8 @@ def createDashboard(simulation: Simulation):
 
     try:
         wpath = os.path.join(os.getcwd(), "dumps", simulation.mvs_token, "dumps")
-
+        print(wpath)
+        
         es = solph.EnergySystem()
 
         es.restore(dpath=wpath, filename="config.dump")

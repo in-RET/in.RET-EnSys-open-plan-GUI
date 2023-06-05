@@ -817,7 +817,7 @@ class WrappedDash(Dash):
         scripts = self._generate_scripts_html()
         css = self._generate_css_dist_html()
         config = self._generate_config_html()
-        metas = self._generate_meta_html()
+        #metas = self._generate_meta_html()
         renderer = self._generate_renderer()
         title = getattr(self, "title", "Dash")
         if self._favicon:
@@ -837,7 +837,7 @@ class WrappedDash(Dash):
 </div>
 """
         index = self.interpolate_index(
-            metas=metas,
+            #metas=metas,
             title=title,
             css=css,
             config=config,

@@ -1,6 +1,5 @@
 FROM python:3.10
 
-RUN echo POSTGRES
 ENV APP_ROOT /src
 ENV CONFIG_ROOT /config
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -16,7 +15,7 @@ RUN pip install --upgrade ${CONFIG_ROOT}/InRetEnsys-0.2a5-py3-none-any.whl
 
 WORKDIR ${APP_ROOT}
 
-ADD . ${APP_ROOT}
+COPY . ${APP_ROOT}
 
 COPY ./djangoq_setup.sh /djangoq_setup.sh
 RUN chmod +x /djangoq_setup.sh

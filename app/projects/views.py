@@ -703,6 +703,7 @@ def scenario_create_topology(request, proj_id, scen_id, step_id=2, max_step=3):
         },
         "demand": {
             "myExcess": _("Excess"),
+            "myExport": _("Export"),
             "myPredefinedSink": _("Predefined Load Profile"),
         },
         "bus": {"bus": _("Connecting Line")},
@@ -1500,6 +1501,7 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
         "myPredefinedSink",
         "myPredefinedSource",
         "myPredefinedTransformer",
+        "myExport"
     ]:
         if asset_uuid:
             print(asset_uuid)
@@ -1657,8 +1659,16 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
                 input_output_mapping=input_output_mapping,
             )
         else:
+            print(asset_type_name)
+            asset_list = Asset.objects.filter(
+                asset_type__asset_type=asset_type_name, scenario=scenario
+            )
+            n_asset = len(asset_list)
+            print(n_asset)
+            default_name = f"{asset_type_name}-{n_asset}"
             form = StorageForm_II(
-                asset_type=asset_type_name, input_output_mapping=input_output_mapping
+                asset_type=asset_type_name, input_output_mapping=input_output_mapping,
+                initial={"name": default_name}
             )
         return render(request, "asset/storage_asset_create_form.html", {"form": form})
 
@@ -1963,25 +1973,43 @@ def request_mvs_simulation(request, scen_id=0):
 
                 elif k == "energy_consumption":
                     try:
-                        # print(k)
-                        # print(i)
-                        list_sinks.append(
-                            InRetEnsysSink(
-                                label=i["label"],
-                                inputs={
-                                    i["inflow_direction"]: InRetEnsysFlow(
-                                        fix=i["input_timeseries"]["value"] if i["input_timeseries"]["value"] else None,
-                                        nominal_value=i["nominal_value"]["value"] if i["nominal_value"] else None,
-                                        variable_costs=i["variable_costs"]["value"] if i["variable_costs"] else None,
-                                        custom_attributes = {
-                                            "renewable_factor": i["renewable_factor"]["value"] if i["renewable_factor"] else None
-                                        }
-                                    )
-                                },
+                        if i["asset_type"] == "myExport":
+                            # print(k)
+                            # print(i)
+                            list_sinks.append(
+                                InRetEnsysSink(
+                                    label=i["label"],
+                                    inputs={
+                                        i["inflow_direction"]: InRetEnsysFlow(
+                                            nominal_value=i["nominal_value"]["value"] if i["nominal_value"] else None,
+                                            variable_costs=i["variable_costs"]["value"]*(-1) if i["variable_costs"] else None
+                                        )
+                                    },
+                                )
                             )
-                        )
-                        # print("\nEnergy Consumption: \n")
-                        # print("{} : {}".format(k, i))
+                            # print("\nEnergy Consumption: \n")
+                            # print("{} : {}".format(k, i))
+                        else:
+                            # print(k)
+                            # print(i)
+                            list_sinks.append(
+                                InRetEnsysSink(
+                                    label=i["label"],
+                                    inputs={
+                                        i["inflow_direction"]: InRetEnsysFlow(
+                                            fix=i["input_timeseries"]["value"] if i["input_timeseries"] else None,
+                                            nominal_value=i["nominal_value"]["value"] if i["nominal_value"] else None,
+                                            variable_costs=i["variable_costs"]["value"] if i["variable_costs"] else None,
+                                            custom_attributes = {
+                                                "renewable_factor": i["renewable_factor"]["value"] if i["renewable_factor"] else None
+                                            }
+                                        )
+                                    },
+                                )
+                            )
+                            
+                            # print("\nEnergy Consumption: \n")
+                            # print("{} : {}".format(k, i))
 
                     except Exception as e:
                         error_msg = f"Sink Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {e}."

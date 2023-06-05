@@ -409,9 +409,9 @@ scenario_widgets = {
     ),
     "evaluated_period": forms.NumberInput(
         attrs={
-            "placeholder": "value between 1 and 366",
+            "placeholder": "value between 1 and 365",
             "min": "1",
-            "max": "366",
+            "max": "365",
             "step": "1",
             "data-bs-toggle": "tooltip",
             "title": _("The number of days simulated with the energy system model."),
@@ -930,6 +930,7 @@ class AssetCreateForm(OpenPlanModelForm):
     class Meta:
         model = Asset
         exclude = ["scenario"]
+        unit = "MW"
         widgets = {
             "optimize_cap": forms.Select(
                 choices=BOOL_CHOICES,
@@ -1176,7 +1177,7 @@ class AssetCreateForm(OpenPlanModelForm):
             #########################################################################
             "variable_costs": forms.NumberInput(
                 attrs={
-                    "placeholder": "Currency",
+                    "placeholder": "e. g. 50 €/"+unit+"h",
                     "min": "0.0",
                     "step": ".01",
                     "data-bs-toggle": "tooltip",
@@ -1188,7 +1189,7 @@ class AssetCreateForm(OpenPlanModelForm):
             ),
             "nominal_value": forms.NumberInput(
                 attrs={
-                    "placeholder": "e.g. 50",
+                    "placeholder": "e.g. 50 "+unit,
                     "min": "0.0",
                     "step": ".01",
                     "data-bs-toggle": "tooltip",
@@ -1198,7 +1199,7 @@ class AssetCreateForm(OpenPlanModelForm):
             ),
             "_min": forms.NumberInput(
                 attrs={
-                    "placeholder": "e.g. 0.7",
+                    "placeholder": "factor of energy flow ("+unit+"h) e.g. 0.7",
                     "min": "0.0",
                     "max": "1.0",
                     "step": ".0001",
@@ -1209,7 +1210,7 @@ class AssetCreateForm(OpenPlanModelForm):
             ),
             "_max": forms.NumberInput(
                 attrs={
-                    "placeholder": "e.g. 0.7",
+                    "placeholder": "factor of energy flow ("+unit+"h) e.g. 0.7",
                     "min": "0.0",
                     "max": "1.0",
                     "step": ".0001",
@@ -1230,7 +1231,7 @@ class AssetCreateForm(OpenPlanModelForm):
             ),
             "summed_max": forms.NumberInput(
                 attrs={
-                    "placeholder": "e.g. 1000",
+                    "placeholder": "e.g. 1000 "+unit+"h",
                     "min": "0.0",
                     "step": ".01",
                     "data-bs-toggle": "tooltip",
@@ -1242,7 +1243,7 @@ class AssetCreateForm(OpenPlanModelForm):
             ),
             "summed_min": forms.NumberInput(
                 attrs={
-                    "placeholder": "e.g. 1000",
+                    "placeholder": "e.g. 1000 "+unit+"h",
                     "min": "0.0",
                     "step": ".01",
                     "data-bs-toggle": "tooltip",
@@ -1279,7 +1280,7 @@ class AssetCreateForm(OpenPlanModelForm):
             ),
             "capex": forms.NumberInput(
                 attrs={
-                    "placeholder": "e.g. 4000",
+                    "placeholder": "e.g. 50000 €/"+unit+" resp. €/"+unit+"h for storage",
                     "min": "0.0",
                     "step": ".01",
                     "data-bs-toggle": "tooltip",
@@ -1291,7 +1292,7 @@ class AssetCreateForm(OpenPlanModelForm):
             ),
             "opex": forms.NumberInput(
                 attrs={
-                    "placeholder": "e.g. 0",
+                    "placeholder": "e.g. 5% of CAPEX",
                     "min": "0.0",
                     "step": ".01",
                     "data-bs-toggle": "tooltip",
@@ -1303,7 +1304,7 @@ class AssetCreateForm(OpenPlanModelForm):
             ),
             "offset": forms.NumberInput(
                 attrs={
-                    "placeholder": "e.g. 10000",
+                    "placeholder": "e.g. 10000 €",
                     "min": "0.0",
                     "step": ".01",
                     "data-bs-toggle": "tooltip",
@@ -1315,7 +1316,7 @@ class AssetCreateForm(OpenPlanModelForm):
             ),
             "maximum": forms.NumberInput(
                 attrs={
-                    "placeholder": "e.g. 1000",
+                    "placeholder": "e.g. 100 "+unit+" resp. "+unit+"h for storage",
                     "min": "0.0",
                     "step": ".01",
                     "data-bs-toggle": "tooltip",
@@ -1325,7 +1326,7 @@ class AssetCreateForm(OpenPlanModelForm):
             ),
             "minimum": forms.NumberInput(
                 attrs={
-                    "placeholder": "e.g. 1000",
+                    "placeholder": "e.g. 100 "+unit+" resp. "+unit+"h for storage",
                     "min": "0.0",
                     "step": ".01",
                     "data-bs-toggle": "tooltip",
@@ -1335,7 +1336,7 @@ class AssetCreateForm(OpenPlanModelForm):
             ),
             "existing": forms.NumberInput(
                 attrs={
-                    "placeholder": "e.g. 1000",
+                    "placeholder": "e.g. 100 "+unit+" resp. "+unit+"h for storage",
                     "min": "0.0",
                     "step": ".01",
                     "data-bs-toggle": "tooltip",
@@ -1353,7 +1354,7 @@ class AssetCreateForm(OpenPlanModelForm):
             ),
             "nominal_storage_capacity": forms.NumberInput(
                 attrs={
-                    "placeholder": "e.g. 1000",
+                    "placeholder": "e.g. 100 "+unit+"h",
                     "min": "0.0",
                     "step": ".01",
                     "data-bs-toggle": "tooltip",
@@ -1385,7 +1386,7 @@ class AssetCreateForm(OpenPlanModelForm):
             ),
             "invest_relation_input_capacity": forms.NumberInput(
                 attrs={
-                    "placeholder": "factor of total capacity (kWh), e.g. 0.7",
+                    "placeholder": "factor of total capacity ("+unit+"h), e.g. 0.7",
                     "min": "0.0",
                     "max": "1.0",
                     "step": ".0001",
@@ -1398,7 +1399,7 @@ class AssetCreateForm(OpenPlanModelForm):
             ),
             "invest_relation_output_capacity": forms.NumberInput(
                 attrs={
-                    "placeholder": "factor of total capacity (kWh), e.g. 0.7",
+                    "placeholder": "factor of total capacity ("+unit+"h), e.g. 0.7",
                     "min": "0.0",
                     "max": "1.0",
                     "step": ".0001",
@@ -1411,7 +1412,7 @@ class AssetCreateForm(OpenPlanModelForm):
             ),
             "initial_storage_level": forms.NumberInput(
                 attrs={
-                    "placeholder": "factor of total capacity (kWh), e.g. 0.7",
+                    "placeholder": "factor of total capacity ("+unit+"h), e.g. 0.5 means half full",
                     "min": "0.0",
                     "max": "1.0",
                     "step": ".01",
@@ -1442,7 +1443,7 @@ class AssetCreateForm(OpenPlanModelForm):
             ),
             "emission_factor": forms.NumberInput(
                 attrs={
-                    "placeholder": "e.g. 201 in kg_CO2/MWh",
+                    "placeholder": "e.g. 0.201 in t_CO2/"+unit+"h",
                     "min": "0.0",
                     "max": "1.0",
                     "step": ".0001",

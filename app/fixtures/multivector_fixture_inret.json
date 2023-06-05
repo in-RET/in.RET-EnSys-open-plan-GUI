@@ -301,7 +301,7 @@
         "asset_category": "energy_consumption",
         "energy_vector": "Electricity",
         "mvs_type": "sink",
-        "asset_fields": "[name,choice_load_profile,nominal_value,renewable_factor,oep_table_name,oep_column_name]",
+        "asset_fields": "[name,choice_load_profile,renewable_factor,oep_table_name,oep_column_name]",
         "unit": null
     }
 },
@@ -313,7 +313,7 @@
         "asset_category": "energy_production",
         "energy_vector": "Electricity",
         "mvs_type": "source",
-        "asset_fields": "[name,source_choice,year_choice_source,input_timeseries,nominal_value,variable_costs,_min,_max,nonconvex,summed_max,summed_min,capex,opex,lifetime,offset,maximum,minimum,existing,emission_factor,renewable_factor]",
+        "asset_fields": "[name,source_choice,year_choice_source,input_timeseries,variable_costs,_min,_max,nonconvex,summed_max,summed_min,capex,opex,lifetime,offset,maximum,minimum,existing,emission_factor,renewable_factor]",
         "unit": null
     }
 },
@@ -325,7 +325,7 @@
         "asset_category": "energy_conversion",
         "energy_vector": "Electricity",
         "mvs_type": "transformer",
-        "asset_fields": "[name,trafo_choice,year_choice_trafo,input_timeseries,nominal_value,variable_costs,_min,_max,nonconvex,summed_max,summed_min,capex,opex,lifetime,offset,maximum,minimum,existing,efficiency,efficiency_el,efficiency_th,renewable_factor]",
+        "asset_fields": "[name,trafo_choice,year_choice_trafo,input_timeseries,variable_costs,_min,_max,nonconvex,summed_max,summed_min,capex,opex,lifetime,offset,maximum,minimum,existing,efficiency,efficiency_el,efficiency_th,renewable_factor]",
         "unit": null
     }
 },
@@ -337,7 +337,19 @@
         "asset_category": "energy_storage",
         "energy_vector": "Electricity",
         "mvs_type": "storage",
-        "asset_fields": "[name,storage_choice,year_choice_storage,nominal_value,variable_costs,nonconvex,capex,opex,lifetime,offset,maximum,minimum,existing,balanced,invest_relation_input_capacity,invest_relation_output_capacity,initial_storage_level,inflow_conversion_factor,outflow_conversion_factor,nominal_storage_capacity,thermal_loss_rate,fixed_thermal_losses_relative,fixed_thermal_losses_absolute]",
+        "asset_fields": "[name,storage_choice,year_choice_storage,variable_costs,nonconvex,capex,opex,lifetime,offset,maximum,minimum,existing,balanced,invest_relation_input_capacity,invest_relation_output_capacity,initial_storage_level,inflow_conversion_factor,outflow_conversion_factor,thermal_loss_rate,fixed_thermal_losses_relative,fixed_thermal_losses_absolute]",
+        "unit": null
+    }
+},
+{
+    "model": "projects.assettype",
+    "pk": 10,
+    "fields": {
+        "asset_type": "myExport",
+        "asset_category": "energy_consumption",
+        "energy_vector": "Electricity",
+        "mvs_type": "sink",
+        "asset_fields": "[name,variable_costs,nominal_value]",
         "unit": null
     }
 },

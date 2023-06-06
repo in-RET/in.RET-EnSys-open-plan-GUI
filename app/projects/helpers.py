@@ -6,7 +6,7 @@ from openpyxl import load_workbook
 from django import forms
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.exceptions import ValidationError
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from projects.dtos import convert_to_dto
 from projects.constants import MAP_MVS_EPA
 from dashboard.helpers import KPIFinder

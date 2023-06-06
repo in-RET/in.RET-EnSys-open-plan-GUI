@@ -13,13 +13,15 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.conf.urls import url
-from django.conf.urls.i18n import i18n_patterns
+
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-from django.urls import include, path
+from django.conf.urls.i18n import i18n_patterns
+from django.conf.urls.static import static
+from django.urls import include, path, re_path
 
 from .views import about, imprint, license, privacy
+from .settings import STATIC_ROOT, STATIC_URL
 
 urlpatterns = (
     i18n_patterns(
@@ -35,6 +37,7 @@ urlpatterns = (
         # path('plotly_dash/', include('dashplots.urls')),
         path("django_plotly_dash/", include("django_plotly_dash.urls")),
     )
-    + [url(r"^i18n/", include("django.conf.urls.i18n"))]
-    + staticfiles_urlpatterns()
+    + [re_path(r"^i18n/", include("django.conf.urls.i18n"))]
+#    + staticfiles_urlpatterns()
+    + static(STATIC_URL, document_root=STATIC_ROOT)
 )

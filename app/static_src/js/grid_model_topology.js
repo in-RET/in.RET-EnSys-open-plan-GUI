@@ -102,7 +102,7 @@ editor.on('nodeRemoved', function (nodeID) {
 })
 
 
-async function addNodeToDrawFlow(name, pos_x, pos_y, nodeInputs = 1, nodeOutputs = 1, nodeData = {}) {
+async function addNodeToDrawFlow(name, pos_x, pos_y, nodeInputs, nodeOutputs, nodeData = {}) {
     if (editor.editor_mode === 'fixed')
         return false;
     // the following translation/transformation is required to correctly drop the nodes in the current clientScreen
@@ -231,7 +231,7 @@ window.onclick = function (e) {
 // endregion set
 
 
-async function createNodeObject(nodeName, connectionInputs = 1, connectionOutputs = 1, nodeData = {}, pos_x, pos_y) {
+async function createNodeObject(nodeName, connectionInputs, connectionOutputs, nodeData = {}, pos_x, pos_y) {
     const shownName = (typeof nodeData.name === 'undefined') ? nodeName : nodeData.name;
     const source_html = `<div class="box" ${ASSET_TYPE_NAME}="${nodeName}">
         <div class="modal" style="display:none">

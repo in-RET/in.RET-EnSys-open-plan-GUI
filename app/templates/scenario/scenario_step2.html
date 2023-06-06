@@ -62,7 +62,6 @@
                     <div class="col collapse modal-body" id="form-computeCOP">
                         <button id="btn-computeCOP" class="btn btn--medium" onclick="computeCOP(event)">{% translate
                             "compute COP" %}</button>
-
                         <form id="copForm">
                             {% csrf_token %}
                             <div class="modal-addendum">
@@ -88,44 +87,49 @@
 
 <main>
     <section class="system-design">
-        <div class="components">
-            <div class="components__title">
-                <div>
-                    <h2>{% translate "Energy components" %}</h2>
-                    <span class="icon icon-question" data-bs-toggle="tooltip" title="Lorem ipsum"></span>
+        <div style="display: flex; flex-direction: column; background-color: #F4F7F9;">
+            <div class="components">
+                <div class="components__title">
+                    <div>
+                        <h2>{% translate "General" %}</h2>
+                    </div>
+                </div>
+                <div class="clear_design">
+                    <a class="btn btn--medium btn--hollow" onclick="clearGridModel()">{% translate "Clear design" %}</a>
+                    <!--<div class="load-scenario">
+                        <select class="form-select">
+                            <option selected>{% translate "Load system design from existing scenario" %}</option>
+                            <option value="1">PV Potsdam 2025</option>
+                            <option value="2">open_plan test</option>
+                        </select>
+                    </div>-->
                 </div>
             </div>
-            <div class="components__content">
-
-                {% for group_name, group_components in components.items %}
-                <div class="section section--{{ group_name }}">
-                    <div class="section__title">
-                        <h3>{{ group_names|get_item:group_name|title }}</h3>
+            <div class="components">
+                <div class="components__title">
+                    <div>
+                        <h2>{% translate "Energy components" %}</h2>
+                        <span class="icon icon-question" data-bs-toggle="tooltip" title="Lorem ipsum"></span>
                     </div>
-                    {% for component_id, component_name in group_components.items %}
-                            {% include 'scenario/topology_drag_items.html' with name=component_name alt=component_name|add:" icon" image=component_id|add:".svg" data_node=component_id %}
+                </div>
+                <div class="components__content">
+                    {% for group_name, group_components in components.items %}
+                    <div class="section section--{{ group_name }}">
+                        <div class="section__title">
+                            <h3>{{ group_names|get_item:group_name|title }}</h3>
+                        </div>
+                        {% for component_id, component_name in group_components.items %}
+                        {% include 'scenario/topology_drag_items.html' with name=component_name alt=component_name|add:"icon" image=component_id|add:".svg" data_node=component_id %}
+                        {% endfor %}
+                    </div>
                     {% endfor %}
                 </div>
-                {% endfor %}
-
-
             </div>
         </div>
         <div id="drawflow" class="gui" ondrop="drop(event)" ondragover="allowDrop(event)">
-            <div class="gui__clear">
-                <div id="area-selection-div" hidden style="border: 1px dotted #000; position: absolute;"></div>
-                <div class="load-scenario">
-                    <select class="form-select">
-                        <option selected>{% translate "Load system design from existing scenario" %}</option>
-                        <option value="1">PV Potsdam 2025</option>
-                        <option value="2">open_plan test</option>
-                    </select>
-                </div>
-                <a class="btn btn--small btn--hollow" onclick="clearGridModel()">{% translate "Clear design" %}</a>
-            </div>
-            <!--<div class="gui__empty-text">
+            <div class="gui__empty-text">
                 <span>{% translate "Drag and drop components to build your energy system" %}</span>
-            </div>-->
+            </div>
         </div>
 
     </section>
@@ -147,7 +151,7 @@
     const csrfToken = '{{ csrf_token }}';
     const formGetUrl = `{% url 'get_asset_create_form' scenario.id %}`;
     const formPostUrl = `{% url 'asset_create_or_update' scenario.id %}`;
-        const scenarioBelongsToUser = {% if scenario.project.user == request.user %}true{% else %}false{% endif %};
+    const scenarioBelongsToUser = {% if scenario.project.user == request.user %}true{% else %} false{% endif %};
     const copGetUrl = `{% url 'get_asset_cops_form' scenario.id %}`;
     const copPostUrl = `{% url 'asset_cops_create_or_update' scenario.id %}`;
 </script>
@@ -163,14 +167,14 @@
         const data = JSON.parse(`{{topology_data_list| escapejs }}`);
         Promise.all([addBusses(data['busses']), addAssets(data['assets'])])
             .then(async () => addLinks(data['links']))
-                .catch(err=>Swal.fire('Grid Model Error', 'Could not retrieve grid nodes.', 'error'));
+            .catch(err => Swal.fire('Grid Model Error', 'Could not retrieve grid nodes.', 'error'));
     });
 </script>
 
 <script defer>
     $(document).ready(function () {
         disabled_assets = [];//["gas_dso", "h2_dso", "biogas_plant", "geothermal_conversion", "diesel_generator", "fuel_cell", "gas_boiler", "electrolyzer", "hess"];
-    disabled_assets.forEach(asset_name => {document.querySelector(`[data-node='${asset_name}']`).classList.add("greyed_out"); document.querySelector(`[data-node='${asset_name}']`).setAttribute("title", "This is disabled")});
+        disabled_assets.forEach(asset_name => { document.querySelector(`[data-node='${asset_name}']`).classList.add("greyed_out"); document.querySelector(`[data-node='${asset_name}']`).setAttribute("title", "This is disabled") });
     })
     function clearGridModel() {
         Swal.fire({
@@ -187,7 +191,7 @@
      * Export Topology to JSON and send to back-end.
      * Used by the Save and Next buttons at page footer
     */
-        function save_topology(move_step=false) {
+    function save_topology(move_step = false) {
         // Data Pre-check
         /*
         /* Check if there are duplicate node names in the model
@@ -230,15 +234,16 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (resp) {
-                    // var node = resp.data;
-                    // $.each(node, function (key, val) {
-                    //     // add database id to the node data dictionary, in order to discriminate among existing and new nodes.
-                    //     editor.drawflow.drawflow.Home.data[`${key}`].data['databaseId'] = val;
-                    // });
-                    // TODO change this to perfom these action within views.py
-                    if (move_step == true) {
-                        window.location.href = "{% url 'scenario_create_constraints' proj_id scen_id %}";
-                    }
+                    Swal.fire({
+                        text: "All data sucessfully saved.",
+                        icon: "info",
+                        showCancelButton: false,
+                        confirmButtonText: "Ok.",
+                    }).then(function () {
+                        if (move_step == true) {
+                            window.location.href = "{% url 'scenario_create_constraints' proj_id scen_id %}";
+                        }
+                    });
                 },
 
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
@@ -264,16 +269,17 @@
     <div>
         <div class="step-footer__left"></div>
         <div class="step-footer__center">
-        <a class="btn btn--medium btn--hollow btn--previous" href="{% url 'scenario_steps_edit' proj_id scen_id step_id|add:'-1' %}" aria-disabled="true">{% translate "Previous" %}</a>
+            <a class="btn btn--medium btn--hollow btn--previous"
+                href="{% url 'scenario_steps_edit' proj_id scen_id step_id|add:'-1' %}" aria-disabled="true">{% translate "Previous" %}</a>
             {% if scenario.project.user == request.user %}
-        <button class="btn btn--medium btn--transparent" onclick="javascript:save_topology()">{% translate "Save" %}</button>
+            <button class="btn btn--medium btn--transparent" onclick="javascript:save_topology()">{% translate "Save"%}</button>
             {% endif %}
-        <a onclick="javascript:save_topology(move_step=true)" id="next_btn" class="btn btn--medium" >{% translate "Next" %} </a>
+            <a onclick="javascript:save_topology(move_step=true)" id="next_btn" class="btn btn--medium">{% translate "Next" %} </a>
         </div>
         <div class="step-footer__right">
 
             {% if scen_id %}
-        <a class="btn btn--medium btn--transparent" href="{% url 'scenario_steps_edit' proj_id scen_id 4 %}">{% translate "Go to simulation" %}</a>
+            <a class="btn btn--medium btn--transparent" href="{% url 'scenario_steps_edit' proj_id scen_id 4 %}">{% translate "Go to simulation" %}</a>
             {% endif %}
         </div>
     </div>

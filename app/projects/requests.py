@@ -9,8 +9,6 @@ from dashboard.models import AssetsResults, KPICostsMatrixResults, KPIScalarResu
 from epa.settings import (
     INRETENSYS_CHECK_URL,
     INRETENSYS_POST_URL,
-    MVS_SA_GET_URL,
-    MVS_SA_POST_URL,
     PROXY_CONFIG,
 )
 from projects.constants import DONE, ERROR, PENDING
@@ -60,23 +58,6 @@ def mvs_simulation_check_status(token):
         return {"status": str_results["status"], "token": str_results["token"]}
 
 
-def mvs_sa_check_status(token):
-    try:
-        response = requests.get(
-            MVS_SA_GET_URL + token, proxies=PROXY_CONFIG, verify=False
-        )
-        response.raise_for_status()
-    except requests.HTTPError as http_err:
-        logger.error(f"HTTP error occurred: {http_err}")
-        return None
-    except Exception as err:
-        logger.error(f"Other error occurred: {err}")
-        return None
-    else:
-        logger.info("Success!")
-        return json.loads(response.text)
-
-
 def fetch_mvs_simulation_results(simulation):
     if simulation.status == PENDING:
         response = mvs_simulation_check_status(token=simulation.mvs_token)
@@ -102,18 +83,6 @@ def fetch_mvs_simulation_results(simulation):
             datetime.now() if response["status"] in [ERROR, DONE] else None
         )
         simulation.save()
-
-    return simulation.status != PENDING
-
-
-def fetch_mvs_sa_results(simulation):
-    if simulation.status == PENDING:
-        response = mvs_sa_check_status(token=simulation.mvs_token)
-
-        simulation.parse_server_response(response)
-
-        if simulation.status == DONE:
-            logger.info(f"The simulation {simulation.id} is finished")
 
     return simulation.status != PENDING
 
@@ -188,29 +157,3 @@ def parse_mvs_results(simulation, response_results):
         )
     return response_results
 
-
-def mvs_sensitivity_analysis_request(data: dict):
-
-    headers = {"content-type": "application/json"}
-    payload = json.dumps(data)
-
-    try:
-        response = requests.post(
-            MVS_SA_POST_URL,
-            data=payload,
-            headers=headers,
-            proxies=PROXY_CONFIG,
-            verify=False,
-        )
-
-        # If the response was successful, no Exception will be raised
-        response.raise_for_status()
-    except requests.HTTPError as http_err:
-        logger.error(f"HTTP error occurred: {http_err}")
-        return None
-    except Exception as err:
-        logger.error(f"Other error occurred: {err}")
-        return None
-    else:
-        logger.info("The simulation was sent successfully to MVS API.")
-        return json.loads(response.text)

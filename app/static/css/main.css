@@ -1782,6 +1782,11 @@ nav.navbar {
       justify-content: center; }
 
 @use 'variables' as *;
+.clear_design {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+}
 .system-design {
   display: flex;
   flex-direction: row;
@@ -1858,6 +1863,7 @@ nav.navbar {
     height: 100%; }
     .system-design .gui__clear {
       display: flex;
+      z-index: 99;
       flex-direction: row;
       position: absolute;
       top: 0;
@@ -1891,7 +1897,7 @@ nav.navbar {
     .system-design .gui__empty-text {
       display: inline-block;
       position: absolute;
-      top: 50%;
+      top: 2rem;
       transform: translateY(-50%);
       left: 50%;
       transform: translateX(-50%); }
@@ -1899,7 +1905,7 @@ nav.navbar {
         color: #343434;
         font-weight: 300; }
   .system-design .drawflow .connection .main-path {
-    width: 2px; }
+    width: 20px; }
   .system-design .parent-node .drawflow-delete {
     content: 'X';
     position: absolute;
@@ -1930,7 +1936,8 @@ nav.navbar {
     padding: 0 0.5rem 0.5rem;
     /* section colors */ }
     .system-design .drawflow .drawflow-node:hover {
-      background-color: #edf2f5; }
+      background-color: #edf2f5;
+      box-shadow: 0 0 1rem 0.3rem #d4d4d4; }
     .system-design .drawflow .drawflow-node.selected {
       background-color: #E3EAEE; }
     .system-design .drawflow .drawflow-node .drawflow_content_node {
@@ -1966,149 +1973,17 @@ nav.navbar {
       .system-design .drawflow .drawflow-node .outputs .output {
         background-color: #C46A4E;
         right: -10px; }
-    .system-design .drawflow .drawflow-node.dso .input {
-      display: none; }
-    .system-design .drawflow .drawflow-node.gas_dso .input {
-      display: none; }
-    .system-design .drawflow .drawflow-node.h2_dso .input {
-      display: none; }
-    .system-design .drawflow .drawflow-node.heat_dso .input {
-      display: none; }
-    .system-design .drawflow .drawflow-node.pv_plant .input {
-      display: none; }
-    .system-design .drawflow .drawflow-node.wind_plant .input {
-      display: none; }
-    .system-design .drawflow .drawflow-node.biogas_plant .input {
-      display: none; }
-    .system-design .drawflow .drawflow-node.geothermal_conversion .input {
-      display: none; }
-    .system-design .drawflow .drawflow-node.solar_thermal_plant .input {
-      display: none; }
-    .system-design .drawflow .drawflow-node.demand .output {
-      display: none; }
-    .system-design .drawflow .drawflow-node.gas_demand .output {
-      display: none; }
-    .system-design .drawflow .drawflow-node.h2_demand .output {
-      display: none; }
-    .system-design .drawflow .drawflow-node.heat_demand .output {
-      display: none; }
     .system-design .drawflow .drawflow-node .img {
       position: relative;
       width: 4.5rem;
       height: 4.5rem;
       background-color: #fff;
       border-radius: 100%; }
-    .system-design .drawflow .drawflow-node.providers {
-      border-bottom-color: #A4ADFB; }
-    .system-design .drawflow .drawflow-node.dso .img::before {
-      content: '';
-      position: absolute;
-      top: calc(4.5rem / 2);
-      right: calc((4.5rem - 3rem) / 2);
-      transform: translateY(-50%);
-      background-image: url("/static/assets/gui/dso.svg");
-      background-size: cover;
-      height: 3rem;
-      width: 3rem; }
-    .system-design .drawflow .drawflow-node.providers {
-      border-bottom-color: #A4ADFB; }
-    .system-design .drawflow .drawflow-node.gas_dso .img::before {
-      content: '';
-      position: absolute;
-      top: calc(4.5rem / 2);
-      right: calc((4.5rem - 3rem) / 2);
-      transform: translateY(-50%);
-      background-image: url("/static/assets/gui/gas_dso.svg");
-      background-size: cover;
-      height: 3rem;
-      width: 3rem; }
-    .system-design .drawflow .drawflow-node.providers {
-      border-bottom-color: #A4ADFB; }
-    .system-design .drawflow .drawflow-node.h2_dso .img::before {
-      content: '';
-      position: absolute;
-      top: calc(4.5rem / 2);
-      right: calc((4.5rem - 3rem) / 2);
-      transform: translateY(-50%);
-      background-image: url("/static/assets/gui/h2_dso.svg");
-      background-size: cover;
-      height: 3rem;
-      width: 3rem; }
-    .system-design .drawflow .drawflow-node.providers {
-      border-bottom-color: #A4ADFB; }
-    .system-design .drawflow .drawflow-node.heat_dso .img::before {
-      content: '';
-      position: absolute;
-      top: calc(4.5rem / 2);
-      right: calc((4.5rem - 3rem) / 2);
-      transform: translateY(-50%);
-      background-image: url("/static/assets/gui/heat_dso.svg");
-      background-size: cover;
-      height: 3rem;
-      width: 3rem; }
-    .system-design .drawflow .drawflow-node.production {
+    .system-design .drawflow .drawflow-node.mySource,
+    .system-design .drawflow .drawflow-node.myPredefinedSource {
       border-bottom-color: #FFEF9F; }
-    .system-design .drawflow .drawflow-node.pv_plant .img::before {
-      content: '';
-      position: absolute;
-      top: calc(4.5rem / 2);
-      right: calc((4.5rem - 3rem) / 2);
-      transform: translateY(-50%);
-      background-image: url("/static/assets/gui/pv_plant.svg");
-      background-size: cover;
-      height: 3rem;
-      width: 3rem; }
-    .system-design .drawflow .drawflow-node.production {
-      border-bottom-color: #FFEF9F; }
-    .system-design .drawflow .drawflow-node.wind_plant .img::before {
-      content: '';
-      position: absolute;
-      top: calc(4.5rem / 2);
-      right: calc((4.5rem - 3rem) / 2);
-      transform: translateY(-50%);
-      background-image: url("/static/assets/gui/wind_plant.svg");
-      background-size: cover;
-      height: 3rem;
-      width: 3rem; }
-    .system-design .drawflow .drawflow-node.production {
-      border-bottom-color: #FFEF9F; }
-    .system-design .drawflow .drawflow-node.biogas_plant .img::before {
-      content: '';
-      position: absolute;
-      top: calc(4.5rem / 2);
-      right: calc((4.5rem - 3rem) / 2);
-      transform: translateY(-50%);
-      background-image: url("/static/assets/gui/biogas_plant.svg");
-      background-size: cover;
-      height: 3rem;
-      width: 3rem; }
-    .system-design .drawflow .drawflow-node.production {
-      border-bottom-color: #FFEF9F; }
-    .system-design .drawflow .drawflow-node.geothermal_conversion .img::before {
-      content: '';
-      position: absolute;
-      top: calc(4.5rem / 2);
-      right: calc((4.5rem - 3rem) / 2);
-      transform: translateY(-50%);
-      background-image: url("/static/assets/gui/geothermal_conversion.svg");
-      background-size: cover;
-      height: 3rem;
-      width: 3rem; }
-    .system-design .drawflow .drawflow-node.production {
-      border-bottom-color: #FFEF9F; }
-    .system-design .drawflow .drawflow-node.solar_thermal_plant .img::before {
-      content: '';
-      position: absolute;
-      top: calc(4.5rem / 2);
-      right: calc((4.5rem - 3rem) / 2);
-      transform: translateY(-50%);
-      background-image: url("/static/assets/gui/solar_thermal_plant.svg");
-      background-size: cover;
-      height: 3rem;
-      width: 3rem; }
-    .system-design .drawflow .drawflow-node.production {
-      border-bottom-color: #FFEF9F; }
-    .system-design .drawflow .drawflow-node.mySource .img::before {
+    .system-design .drawflow .drawflow-node.mySource .img::before,
+    .system-design .drawflow .drawflow-node.myPredefinedSource .img::before {
       content: '';
       position: absolute;
       top: calc(4.5rem / 2);
@@ -2118,21 +1993,11 @@ nav.navbar {
       background-size: cover;
       height: 3rem;
       width: 3rem; }
-    .system-design .drawflow .drawflow-node.conversion {
+    .system-design .drawflow .drawflow-node.myTransformer,
+    .system-design .drawflow .drawflow-node.myPredefinedTransformer {
       border-bottom-color: #7BF1A8; }
-    .system-design .drawflow .drawflow-node.transformer_station_in .img::before {
-      content: '';
-      position: absolute;
-      top: calc(4.5rem / 2);
-      right: calc((4.5rem - 3rem) / 2);
-      transform: translateY(-50%);
-      background-image: url("/static/assets/gui/transformer_station_in.svg");
-      background-size: cover;
-      height: 3rem;
-      width: 3rem; }
-    .system-design .drawflow .drawflow-node.conversion {
-      border-bottom-color: #7BF1A8; }
-    .system-design .drawflow .drawflow-node.myTransformer .img::before {
+    .system-design .drawflow .drawflow-node.myTransformer .img::before,
+    .system-design .drawflow .drawflow-node.myPredefinedTransformer .img::before {
       content: '';
       position: absolute;
       top: calc(4.5rem / 2);
@@ -2142,165 +2007,11 @@ nav.navbar {
       background-size: cover;
       height: 3rem;
       width: 3rem; }
-    .system-design .drawflow .drawflow-node.conversion {
-      border-bottom-color: #7BF1A8; }
-    .system-design .drawflow .drawflow-node.transformer_station_out .img::before {
-      content: '';
-      position: absolute;
-      top: calc(4.5rem / 2);
-      right: calc((4.5rem - 3rem) / 2);
-      transform: translateY(-50%);
-      background-image: url("/static/assets/gui/transformer_station_out.svg");
-      background-size: cover;
-      height: 3rem;
-      width: 3rem; }
-    .system-design .drawflow .drawflow-node.conversion {
-      border-bottom-color: #7BF1A8; }
-    .system-design .drawflow .drawflow-node.storage_charge_controller_in .img::before {
-      content: '';
-      position: absolute;
-      top: calc(4.5rem / 2);
-      right: calc((4.5rem - 3rem) / 2);
-      transform: translateY(-50%);
-      background-image: url("/static/assets/gui/storage_charge_controller_in.svg");
-      background-size: cover;
-      height: 3rem;
-      width: 3rem; }
-    .system-design .drawflow .drawflow-node.conversion {
-      border-bottom-color: #7BF1A8; }
-    .system-design .drawflow .drawflow-node.storage_charge_controller_out .img::before {
-      content: '';
-      position: absolute;
-      top: calc(4.5rem / 2);
-      right: calc((4.5rem - 3rem) / 2);
-      transform: translateY(-50%);
-      background-image: url("/static/assets/gui/storage_charge_controller_out.svg");
-      background-size: cover;
-      height: 3rem;
-      width: 3rem; }
-    .system-design .drawflow .drawflow-node.conversion {
-      border-bottom-color: #7BF1A8; }
-    .system-design .drawflow .drawflow-node.solar_inverter .img::before {
-      content: '';
-      position: absolute;
-      top: calc(4.5rem / 2);
-      right: calc((4.5rem - 3rem) / 2);
-      transform: translateY(-50%);
-      background-image: url("/static/assets/gui/solar_inverter.svg");
-      background-size: cover;
-      height: 3rem;
-      width: 3rem; }
-    .system-design .drawflow .drawflow-node.conversion {
-      border-bottom-color: #7BF1A8; }
-    .system-design .drawflow .drawflow-node.diesel_generator .img::before {
-      content: '';
-      position: absolute;
-      top: calc(4.5rem / 2);
-      right: calc((4.5rem - 3rem) / 2);
-      transform: translateY(-50%);
-      background-image: url("/static/assets/gui/diesel_generator.svg");
-      background-size: cover;
-      height: 3rem;
-      width: 3rem; }
-    .system-design .drawflow .drawflow-node.conversion {
-      border-bottom-color: #7BF1A8; }
-    .system-design .drawflow .drawflow-node.fuel_cell .img::before {
-      content: '';
-      position: absolute;
-      top: calc(4.5rem / 2);
-      right: calc((4.5rem - 3rem) / 2);
-      transform: translateY(-50%);
-      background-image: url("/static/assets/gui/fuel_cell.svg");
-      background-size: cover;
-      height: 3rem;
-      width: 3rem; }
-    .system-design .drawflow .drawflow-node.conversion {
-      border-bottom-color: #7BF1A8; }
-    .system-design .drawflow .drawflow-node.gas_boiler .img::before {
-      content: '';
-      position: absolute;
-      top: calc(4.5rem / 2);
-      right: calc((4.5rem - 3rem) / 2);
-      transform: translateY(-50%);
-      background-image: url("/static/assets/gui/gas_boiler.svg");
-      background-size: cover;
-      height: 3rem;
-      width: 3rem; }
-    .system-design .drawflow .drawflow-node.conversion {
-      border-bottom-color: #7BF1A8; }
-    .system-design .drawflow .drawflow-node.electrolyzer .img::before {
-      content: '';
-      position: absolute;
-      top: calc(4.5rem / 2);
-      right: calc((4.5rem - 3rem) / 2);
-      transform: translateY(-50%);
-      background-image: url("/static/assets/gui/electrolyzer.svg");
-      background-size: cover;
-      height: 3rem;
-      width: 3rem; }
-    .system-design .drawflow .drawflow-node.conversion {
-      border-bottom-color: #7BF1A8; }
-    .system-design .drawflow .drawflow-node.heat_pump .img::before {
-      content: '';
-      position: absolute;
-      top: calc(4.5rem / 2);
-      right: calc((4.5rem - 3rem) / 2);
-      transform: translateY(-50%);
-      background-image: url("/static/assets/gui/heat_pump.svg");
-      background-size: cover;
-      height: 3rem;
-      width: 3rem; }
-    .system-design .drawflow .drawflow-node.conversion {
-      border-bottom-color: #7BF1A8; }
-    .system-design .drawflow .drawflow-node.chp .img::before {
-      content: '';
-      position: absolute;
-      top: calc(4.5rem / 2);
-      right: calc((4.5rem - 3rem) / 2);
-      transform: translateY(-50%);
-      background-image: url("/static/assets/gui/chp.svg");
-      background-size: cover;
-      height: 3rem;
-      width: 3rem; }
-    .system-design .drawflow .drawflow-node.conversion {
-      border-bottom-color: #7BF1A8; }
-    .system-design .drawflow .drawflow-node.chp_fixed_ratio .img::before {
-      content: '';
-      position: absolute;
-      top: calc(4.5rem / 2);
-      right: calc((4.5rem - 3rem) / 2);
-      transform: translateY(-50%);
-      background-image: url("/static/assets/gui/chp_fixed_ratio.svg");
-      background-size: cover;
-      height: 3rem;
-      width: 3rem; }
-    .system-design .drawflow .drawflow-node.storage {
+    .system-design .drawflow .drawflow-node.myGenericStorage,
+    .system-design .drawflow .drawflow-node.myPredefinedStorage {
       border-bottom-color: #90F1EF; }
-    .system-design .drawflow .drawflow-node.bess .img::before {
-      content: '';
-      position: absolute;
-      top: calc(4.5rem / 2);
-      right: calc((4.5rem - 3rem) / 2);
-      transform: translateY(-50%);
-      background-image: url("/static/assets/gui/bess.svg");
-      background-size: cover;
-      height: 3rem;
-      width: 3rem; }
-    .system-design .drawflow .drawflow-node.storage {
-      border-bottom-color: #90F1EF; }
-    .system-design .drawflow .drawflow-node.gess .img::before {
-      content: '';
-      position: absolute;
-      top: calc(4.5rem / 2);
-      right: calc((4.5rem - 3rem) / 2);
-      transform: translateY(-50%);
-      background-image: url("/static/assets/gui/gess.svg");
-      background-size: cover;
-      height: 3rem;
-      width: 3rem; }
-    .system-design .drawflow .drawflow-node.storage {
-      border-bottom-color: #90F1EF; }
-    .system-design .drawflow .drawflow-node.myGenericStorage .img::before {
+    .system-design .drawflow .drawflow-node.myGenericStorage .img::before,
+    .system-design .drawflow .drawflow-node.myPredefinedStorage .img::before {
       content: '';
       position: absolute;
       top: calc(4.5rem / 2);
@@ -2310,111 +2021,21 @@ nav.navbar {
       background-size: cover;
       height: 3rem;
       width: 3rem; }
-    .system-design .drawflow .drawflow-node.storage {
-      border-bottom-color: #90F1EF; }
-    .system-design .drawflow .drawflow-node.h2ess .img::before {
-      content: '';
-      position: absolute;
-      top: calc(4.5rem / 2);
-      right: calc((4.5rem - 3rem) / 2);
-      transform: translateY(-50%);
-      background-image: url("/static/assets/gui/h2ess.svg");
-      background-size: cover;
-      height: 3rem;
-      width: 3rem; }
-    .system-design .drawflow .drawflow-node.storage {
-      border-bottom-color: #90F1EF; }
-    .system-design .drawflow .drawflow-node.hess .img::before {
-      content: '';
-      position: absolute;
-      top: calc(4.5rem / 2);
-      right: calc((4.5rem - 3rem) / 2);
-      transform: translateY(-50%);
-      background-image: url("/static/assets/gui/hess.svg");
-      background-size: cover;
-      height: 3rem;
-      width: 3rem; }
-    .system-design .drawflow .drawflow-node.demand {
+    .system-design .drawflow .drawflow-node.mySink,
+    .system-design .drawflow .drawflow-node.myPredefinedSink,
+    .system-design .drawflow .drawflow-node.myExcess,
+    .system-design .drawflow .drawflow-node.myExport {
       border-bottom-color: #FFD6E0; }
-    .system-design .drawflow .drawflow-node.demand .img::before {
-      content: '';
-      position: absolute;
-      top: calc(4.5rem / 2);
-      right: calc((4.5rem - 3rem) / 2);
-      transform: translateY(-50%);
-      background-image: url("/static/assets/gui/demand.svg");
-      background-size: cover;
-      height: 3rem;
-      width: 3rem; }
-    .system-design .drawflow .drawflow-node.demand {
-      border-bottom-color: #FFD6E0; }
-    .system-design .drawflow .drawflow-node.mySink .img::before {
+    .system-design .drawflow .drawflow-node.mySink .img,
+    .system-design .drawflow .drawflow-node.myPredefinedSink .img::before,
+    .system-design .drawflow .drawflow-node.myExcess .img::before,
+    .system-design .drawflow .drawflow-node.myExport .img::before {
       content: '';
       position: absolute;
       top: calc(4.5rem / 2);
       right: calc((4.5rem - 3rem) / 2);
       transform: translateY(-50%);
       background-image: url("/static/assets/gui/mySink.svg");
-      background-size: cover;
-      height: 3rem;
-      width: 3rem; }
-    .system-design .drawflow .drawflow-node.demand {
-      border-bottom-color: #FFD6E0; }
-    .system-design .drawflow .drawflow-node.myPredefinedSink .img::before {
-      content: '';
-      position: absolute;
-      top: calc(4.5rem / 2);
-      right: calc((4.5rem - 3rem) / 2);
-      transform: translateY(-50%);
-      background-image: url("/static/assets/gui/myPredefinedSink.svg");
-      background-size: cover;
-      height: 3rem;
-      width: 3rem; }
-    .system-design .drawflow .drawflow-node.demand {
-      border-bottom-color: #FFD6E0; }
-    .system-design .drawflow .drawflow-node.myExcess .img::before {
-      content: '';
-      position: absolute;
-      top: calc(4.5rem / 2);
-      right: calc((4.5rem - 3rem) / 2);
-      transform: translateY(-50%);
-      background-image: url("/static/assets/gui/myExcess.svg");
-      background-size: cover;
-      height: 3rem;
-      width: 3rem; }
-    .system-design .drawflow .drawflow-node.demand {
-      border-bottom-color: #FFD6E0; }
-    .system-design .drawflow .drawflow-node.gas_demand .img::before {
-      content: '';
-      position: absolute;
-      top: calc(4.5rem / 2);
-      right: calc((4.5rem - 3rem) / 2);
-      transform: translateY(-50%);
-      background-image: url("/static/assets/gui/gas_demand.svg");
-      background-size: cover;
-      height: 3rem;
-      width: 3rem; }
-    .system-design .drawflow .drawflow-node.demand {
-      border-bottom-color: #FFD6E0; }
-    .system-design .drawflow .drawflow-node.h2_demand .img::before {
-      content: '';
-      position: absolute;
-      top: calc(4.5rem / 2);
-      right: calc((4.5rem - 3rem) / 2);
-      transform: translateY(-50%);
-      background-image: url("/static/assets/gui/h2_demand.svg");
-      background-size: cover;
-      height: 3rem;
-      width: 3rem; }
-    .system-design .drawflow .drawflow-node.demand {
-      border-bottom-color: #FFD6E0; }
-    .system-design .drawflow .drawflow-node.heat_demand .img::before {
-      content: '';
-      position: absolute;
-      top: calc(4.5rem / 2);
-      right: calc((4.5rem - 3rem) / 2);
-      transform: translateY(-50%);
-      background-image: url("/static/assets/gui/heat_demand.svg");
       background-size: cover;
       height: 3rem;
       width: 3rem; }
@@ -2441,6 +2062,19 @@ nav.navbar {
   margin-bottom: 1rem; }
 
 @use 'variables' as *;
+.sponsors {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  bottom: 5rem;
+  width: 100%;
+  position: fixed;
+}
+.sponsors img {
+  padding: 20px;
+  max-height: 100px;
+}
 .hero {
   padding-top: 4.5rem;
   display: flex;

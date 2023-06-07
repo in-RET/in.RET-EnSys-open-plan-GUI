@@ -2549,3 +2549,11 @@ nav.navbar {
   max-width: 90rem;
   position: absolute;
 }
+
+.help {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+
+}

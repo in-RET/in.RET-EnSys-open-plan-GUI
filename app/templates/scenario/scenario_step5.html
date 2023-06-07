@@ -1,0 +1,82 @@
+{% extends 'scenario/scenario_progression.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load custom_filters %}
+{% load i18n %}
+
+{% block head_block %}
+
+{% endblock head_block %}
+
+<!-- WRITE HTML CODE WITHIN THESE block content TAGS -->
+{% block progression_content %}
+<main>
+  <section class="header">
+      <div>
+          <div class="header__left">
+              <a class="btn btn--medium btn--hollow" href="/static/working/{{ workdir }}/logs/config.log" download id="config.log">{% translate "Download logfiles" %}</a>
+          </div>
+          <h1 class="header__title">{% translate "Simulation results for" %} {{ workdir }}</h1>
+          <div class="header__right">
+              <a class="btn btn--medium btn--hollow" href="/static/working/{{ workdir }}/dumps/config.dump" download id="config.dump">{% translate "Download dumpfile" %}</a>
+              <a class="btn btn--medium btn--hollow" href="/static/working/{{ workdir }}/dumps/config.lp" download id="config.lp">{% translate "Download lp-file" %}</a>
+          </div>
+      </div>
+
+  </section>
+  
+  <!-- insert tabs here, previous class result-selector -->
+  <section>
+      <!-- insert download buttons here -->
+      {% block dashboard %}
+      {% endblock dashboard %}
+  </section>
+  <script>
+      let dump = document.getElementById("config.dump")
+      let log = document.getElementById("config.log")
+      let lp = document.getElementById("config.lp")
+  
+      $.ajax({
+          url: dump.href,
+          type: 'HEAD',
+          success: function () {
+              dump.hidden = false;
+          },
+          error: function () {
+              dump.hidden = true;
+          },
+          })
+  
+          $.ajax({
+          url: log.href,
+          type: 'HEAD',
+          success: function () {
+              log.hidden = false;
+          },
+          error: function () {
+              log.hidden = true;
+          },
+          })
+  
+          $.ajax({
+          url: lp.href,
+          type: 'HEAD',
+          success: function () {
+              lp.hidden = false;
+          },
+          error: function () {
+              lp.hidden = true;
+          },
+      })
+  </script>
+</main>
+{% endblock progression_content %}
+
+
+{% block end_body_scripts %}
+{% endblock end_body_scripts %}
+
+{% block footer %}
+    <footer class="simulation-footer">
+    </footer>
+{% endblock footer %}

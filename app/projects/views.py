@@ -564,6 +564,7 @@ STEP_LIST = [
     _("Energy system design"),
     _("Constraints"),
     _("Simulation"),
+    _("Results")
 ]
 
 
@@ -937,6 +938,62 @@ def scenario_review(request, proj_id, scen_id, step_id=4, max_step=5):
 
         return render(request, html_template, context)
 
+@login_required
+@require_http_methods(["GET", "POST"])
+def scenario_results(request, proj_id, scen_id, step_id=4, max_step=5):
+
+    scenario = get_object_or_404(Scenario, pk=scen_id)
+
+    if (scenario.project.user != request.user) and (
+        request.user not in scenario.project.viewers.all()
+    ):
+        raise PermissionDenied
+
+    if request.method == "GET":
+        html_template = f"scenario/simulation/no-status.html"
+        context = {
+            "scenario": scenario,
+            "scen_id": scen_id,
+            "proj_id": scenario.project.id,
+            "proj_name": scenario.project.name,
+            "step_id": step_id,
+            "step_list": STEP_LIST,
+            "max_step": max_step,
+            "MVS_GET_URL": INRETENSYS_CHECK_URL,
+            "MVS_LP_FILE_URL": INRETENSYS_LP_FILE_URL,
+        }
+
+        qs = Simulation.objects.filter(scenario_id=scen_id)
+
+        if qs.exists():
+            simulation = qs.first()
+
+            if simulation.status == PENDING:
+                fetch_mvs_simulation_results(simulation)
+
+            context.update(
+                {
+                    "sim_id": simulation.id,
+                    "simulation_status": simulation.status,
+                    "secondsElapsed": simulation.elapsed_seconds,
+                    "rating": simulation.user_rating,
+                    "mvs_token": simulation.mvs_token,
+                }
+            )
+
+            if simulation.status == ERROR:
+                context.update({"simulation_error_msg": simulation.errors})
+                html_template = "scenario/simulation/error.html"
+            elif simulation.status == PENDING:
+                html_template = "scenario/simulation/pending.html"
+            elif simulation.status == DONE:
+                html_template = "scenario/simulation/success.html"
+
+        else:
+            print("no simulation existing")
+
+        return render(request, html_template, context)
+
 
 @login_required
 @require_http_methods(["GET"])
@@ -964,6 +1021,7 @@ SCENARIOS_STEPS = [
     scenario_create_topology,
     scenario_create_constraints,
     scenario_review,
+    scenario_results
 ]
 
 
@@ -2165,6 +2223,8 @@ def request_mvs_simulation(request, scen_id=0):
         #jf.close()
 
         results = None
+
+        print("Model:", model)
     except Exception as e:
         error_msg = f"Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {e}."
         logger.error(error_msg)

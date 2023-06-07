@@ -235,10 +235,13 @@
                 dataType: "json",
                 success: function (resp) {
                     Swal.fire({
-                        text: "All data sucessfully saved.",
-                        icon: "info",
+                        title: "All data sucessfully saved.",
+                        icon: "success",
+                        toast: true,
+                        //position: 'bottom-end',
+                        timer: 1200,
                         showCancelButton: false,
-                        confirmButtonText: "Ok.",
+                        showConfirmButton: false,
                     }).then(function () {
                         if (move_step == true) {
                             window.location.href = "{% url 'scenario_create_constraints' proj_id scen_id %}";

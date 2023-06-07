@@ -128,6 +128,7 @@ class AssetDto:
         renewable_factor: ValueTypeDto,
         input_timeseries: TimeseriesDataDto,
         unit: str,
+        annual_energy_consumption: ValueTypeDto,
         # beta: ValueTypeDto = None,
     ):
         self.asset_type = asset_type
@@ -177,6 +178,7 @@ class AssetDto:
         self.renewable_factor = renewable_factor
         self.input_timeseries = input_timeseries
         self.unit = unit
+        self.annual_energy_consumption = annual_energy_consumption
 
         # self.beta = beta
 
@@ -338,13 +340,18 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
     # Retrieve models
     project = Project.objects.get(scenario=scenario)
     economic_data = EconomicData.objects.get(project=project)
-    ess_list = Asset.objects.filter(
+    ess_list_I = Asset.objects.filter(
         Q(scenario=scenario), Q(asset_type__asset_type__contains="myGenericStorage")
     )
+    ess_list_II = Asset.objects.filter(
+        Q(scenario=scenario), Q(asset_type__asset_type__contains="myPredefinedStorage")
+    )
+    
     # Exclude ESS related assets
     asset_list = Asset.objects.filter(Q(scenario=scenario)).exclude(
         Q(asset_type__asset_type__contains="myGenericStorage")
         | Q(parent_asset__asset_type__asset_type__contains="myGenericStorage")
+        | Q(asset_type__asset_type__contains="myPredefinedStorage")
     )
     bus_list = Bus.objects.filter(scenario=scenario).exclude(
         Q(connectionlink__asset__parent_asset__asset_type__asset_type__contains="ess")
@@ -406,7 +413,7 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
     bus_dto_list = []
 
     # Iterate over ess_assets
-    for ess in ess_list:
+    for ess in ess_list_I:
         # Find all connections to ess
         input_connection = ConnectionLink.objects.filter(
             asset=ess, flow_direction="B2A"
@@ -476,6 +483,58 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
         #         efficiency - asset_dto.thermal_loss_rate.value, 0
         #     )
         # ess_sub_assets.update({asset.asset_type.asset_type: asset_dto})
+
+        ess_dto = EssDto(
+            ess.asset_type.asset_type,
+            ess.name,
+            ess.asset_type.mvs_type,
+            ess.asset_type.energy_vector,
+            inflow_direction,
+            outflow_direction,
+            to_value_type(ess, "capex"),
+            to_value_type(ess, "opex"),
+            to_value_type(ess, "offset"),
+            to_value_type(ess, "lifetime"),
+            to_value_type(ess, "maximum"),
+            to_value_type(ess, "minimum"),
+            to_value_type(ess, "existing"),
+            to_value_type(ess, "nominal_value"),
+            to_value_type(ess, "variable_costs"),
+            to_value_type(ess, "nonconvex"),
+            to_value_type(ess, "balanced"),
+            to_value_type(ess, "invest_relation_input_capacity"),
+            to_value_type(ess, "invest_relation_output_capacity"),
+            to_value_type(ess, "initial_storage_level"),
+            to_value_type(ess, "nominal_storage_capacity"),
+            to_value_type(ess, "inflow_conversion_factor"),
+            to_value_type(ess, "outflow_conversion_factor"),
+            to_value_type(ess, "thermal_loss_rate"),
+            to_value_type(ess, "fixed_thermal_losses_relative"),
+            to_value_type(ess, "fixed_thermal_losses_absolute"),
+            # ess_sub_assets["charging_power"],
+            # ess_sub_assets["discharging_power"],
+            # ess_sub_assets["capacity"],
+        )
+
+        energy_storage.append(ess_dto)
+        
+        
+    for ess in ess_list_II:
+        # Find all connections to ess
+        input_connection = ConnectionLink.objects.filter(
+            asset=ess, flow_direction="B2A"
+        ).first()
+        output_connection = ConnectionLink.objects.filter(
+            asset=ess, flow_direction="A2B"
+        ).first()
+
+        inflow_direction = (
+            input_connection.bus.name if input_connection is not None else None
+        )
+        outflow_direction = (
+            output_connection.bus.name if output_connection is not None else None
+        )
+        ess_sub_assets = {}
 
         ess_dto = EssDto(
             ess.asset_type.asset_type,
@@ -679,6 +738,7 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
             to_value_type(asset, "renewable_factor"),
             to_timeseries_data(asset, "input_timeseries"),
             asset.asset_type.unit,
+            to_value_type(asset, "annual_energy_consumption"),
             **optional_parameters,
         )
 
@@ -691,7 +751,7 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
         choice_load_profile = asset_dto.choice_load_profile
         oep_table_name = asset_dto.oep_table_name
         oep_column_name = asset_dto.oep_column_name
-        if asset.asset_type.asset_type == "myPredefinedSink":
+        if asset.asset_type.asset_type == "myPredefinedSink" or asset.asset_type.asset_type == "myPredefinedSinkOEP":
             if choice_load_profile is not None:
                 print(choice_load_profile)
                 asset_dto.input_timeseries = to_timeseries_data_for_predefined_profile(

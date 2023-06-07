@@ -290,6 +290,7 @@ SOURCE_CHOICE = (
     ("Wind", "Wind power plant"),
     ("Photovoltaic Free Field", "Photovoltaic Free Field"),
     ("Import Grid", "Import from the power grid"),
+    ("Other", "Other")
 )
 
 TRAFO_CHOICE = (
@@ -303,6 +304,7 @@ TRAFO_CHOICE = (
     ("Fuel cell", "Fuel cell"),
     ("Air source heat pump (large-scale)", "Air source heat pump (large-scale)"),
     ("Electrode heating boiler", "Electrode heating boiler"),
+    ("Other", "Other")
 )
 
 STORAGE_CHOICE = (
@@ -311,8 +313,10 @@ STORAGE_CHOICE = (
     ("Lithium Ion Battery Storage", "Lithium Ion Battery Storage"),
     ("Pumped storage power plant", "Pumped storage power plant"),
     ("Heat storage", "Heat storage (seasonal)"),
+    ("Heat storage (short term)", "Heat storage (short term)"),
     ("Gas storage", "Gas storage"),
-    ("Hydrogen storage", "Hydrogen storage")
+    ("Hydrogen storage", "Hydrogen storage"),
+    ("Other", "Other")
 )
 
 

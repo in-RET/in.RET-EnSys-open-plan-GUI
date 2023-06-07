@@ -301,7 +301,7 @@
         "asset_category": "energy_consumption",
         "energy_vector": "Electricity",
         "mvs_type": "sink",
-        "asset_fields": "[name,choice_load_profile,renewable_factor,oep_table_name,oep_column_name]",
+        "asset_fields": "[name,annual_energy_consumption,choice_load_profile,renewable_factor]",
         "unit": null
     }
 },
@@ -350,6 +350,18 @@
         "energy_vector": "Electricity",
         "mvs_type": "sink",
         "asset_fields": "[name,variable_costs,nominal_value]",
+        "unit": null
+    }
+},
+{
+    "model": "projects.assettype",
+    "pk": 11,
+    "fields": {
+        "asset_type": "myPredefinedSinkOEP",
+        "asset_category": "energy_consumption",
+        "energy_vector": "Electricity",
+        "mvs_type": "sink",
+        "asset_fields": "[name,renewable_factor,oep_table_name,oep_column_name]",
         "unit": null
     }
 },
@@ -1138,6 +1150,63 @@
 		"efficiency_el": null,
 		"efficiency_th": null,
 		"input_timeseries": null
+    }
+},
+{
+    "model": "projects.inputparametersuggestion",
+    "pk": 50,
+    "fields": {
+        "technology": "Heat storage (short term)",
+        "capex": 57971,
+        "opex": 0.5,
+        "lifetime": 30,
+        "year": 2030,
+        "crate": 1,
+		"efficiency": 1,
+		"efficiency_el": null,
+		"efficiency_th": null,
+		"input_timeseries": null,
+		"thermal_loss_rate": 1.33e-03,
+		"fixed_losses_relative_gamma": 1.33e-03,
+		"fixed_losses_absolute_delta": 2.03e-05
+    }
+},
+{
+    "model": "projects.inputparametersuggestion",
+    "pk": 51,
+    "fields": {
+        "technology": "Heat storage (short term)",
+        "capex": 57971,
+        "opex": 0.5,
+        "lifetime": 30,
+        "year": 2040,
+        "crate": 1,
+		"efficiency": 1,
+		"efficiency_el": null,
+		"efficiency_th": null,
+		"input_timeseries": null,
+		"thermal_loss_rate": 1.33e-03,
+		"fixed_losses_relative_gamma": 1.33e-03,
+		"fixed_losses_absolute_delta": 2.03e-05
+    }
+},
+{
+    "model": "projects.inputparametersuggestion",
+    "pk": 52,
+    "fields": {
+        "technology": "Heat storage (short term)",
+        "capex": 57971,
+        "opex": 0.5,
+        "lifetime": 30,
+        "year": 2045,
+        "crate": 1,
+		"efficiency": 1,
+		"efficiency_el": null,
+		"efficiency_th": null,
+		"input_timeseries": null,
+		"thermal_loss_rate": 1.33e-03,
+		"fixed_losses_relative_gamma": 1.33e-03,
+		"fixed_losses_absolute_delta": 2.03e-05
     }
 }
 ]

@@ -399,6 +399,12 @@ class InputparameterSuggestion(models.Model):
     thermal_loss_rate = models.FloatField(
         null=True, blank=True, validators=[MinValueValidator(0.0)]
     )
+    fixed_losses_relative_gamma = models.FloatField(
+        null=True, blank=True, validators=[MinValueValidator(0.0)]
+    )
+    fixed_losses_absolute_delta = models.FloatField(
+        null=True, blank=True, validators=[MinValueValidator(0.0)]
+    )
 
 
 class Asset(TopologyNode):
@@ -581,8 +587,8 @@ class Asset(TopologyNode):
     )
     emission_factor = models.FloatField(default=None, blank=True, null=True)
     renewable_factor = models.FloatField(default=None, blank=True, null=True)
-    oep_table_name = models.CharField(max_length=120, null=True, blank=True)
-    oep_column_name = models.CharField(max_length=120, null=True, blank=True)
+    oep_table_name = models.CharField(max_length=120, null=True, blank=False)
+    oep_column_name = models.CharField(max_length=120, null=True, blank=False)
     source_choice = models.CharField(
         null=True, blank=False, choices=SOURCE_CHOICE, max_length=40
     )
@@ -604,6 +610,9 @@ class Asset(TopologyNode):
     )
     year_choice_storage = models.IntegerField(
         null=True, blank=False, choices=YEAR_CHOICE
+    )
+    annual_energy_consumption = models.FloatField(
+        null=True, blank=False, validators=[MinValueValidator(0.0)]
     )
 
     @property

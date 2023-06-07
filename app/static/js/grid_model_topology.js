@@ -104,7 +104,7 @@ async function addNodeToDrawFlow(name, pos_x, pos_y, nodeInputs = 1, nodeOutputs
 
 function updateInputTimeseries(nodeType){
     //connected to the templates/asset/asset_create_form.html content
-	if(nodeType == "myPredefinedSink"){
+	if(nodeType == "myPredefinedSink" || nodeType == "myPredefinedSinkOEP"){
 		ts_data_div = document.getElementById("choice_load_profile_data");
 		if(ts_data_div){
 			var ts_data = JSON.parse(ts_data_div.querySelector("textarea").value);

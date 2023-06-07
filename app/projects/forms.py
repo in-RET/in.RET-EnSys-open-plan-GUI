@@ -1272,6 +1272,16 @@ class AssetCreateForm(OpenPlanModelForm):
                     "onchange": "plot_file_trace(obj=this.files, plot_id='timeseries_trace')",
                 }
             ),
+            "annual_energy_consumption": forms.NumberInput(
+                attrs={
+                    "placeholder": "e.g. 5000 "+unit+"h",
+                    "min": "0.0",
+                    "step": ".01",
+                    "data-bs-toggle": "tooltip",
+                    "title": _("Your yearly energy consumption."),
+                    "style": "font-weight:400; font-size:13px;",
+                }
+            ),
             "choice_load_profile": forms.Select(
                 attrs={
                     "required": False,
@@ -1558,7 +1568,8 @@ class AssetCreateForm(OpenPlanModelForm):
                 },
             ),
         }
-        labels = {"input_timeseries": _("Timeseries vector")}
+        labels = {"input_timeseries": _("Timeseries vector"),
+                  "oep_table_name": _("OEP table name in Model draft")}
         help_texts = {
             "input_timeseries": _(
                 "You can upload your timeseries as xls(x), csv or json format. Either there is one column with the values of the timeseries matching the scenario timesteps, or there are two columns, the first one being the timestamps and the second one the values of the timeseries. If you upload a spreadsheet with more than one tab only the first tab will be considered. The timeseries in csv format is expected to be in comma separated values with dot as decimal separator."

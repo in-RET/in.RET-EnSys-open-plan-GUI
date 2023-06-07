@@ -98,7 +98,7 @@
       {% endif %}
     </div>
 	<div class="row">
-      {% if form|has_field:"choice_load_profile" %}
+      {% if form|has_field:"choice_load_profile" or form|has_field:"oep_table_name"%}
 
         <div id="load_profile_trace"></div>
 		

@@ -705,6 +705,7 @@ def scenario_create_topology(request, proj_id, scen_id, step_id=2, max_step=3):
             "myExcess": _("Excess"),
             "myExport": _("Export"),
             "myPredefinedSink": _("Predefined Load Profile"),
+            "myPredefinedSinkOEP": _("Load profile from the Open Energy Platform"),
         },
         "bus": {"bus": _("Connecting Line")},
     }
@@ -1230,6 +1231,7 @@ def get_inputparameter_suggestion_source(request):
         technology == "Wind"
         or technology == "Photovoltaic Free Field"
         or technology == "Import Grid"
+        or technology == "Other" #empty queryset
     ):
         asset_type_name = "myPredefinedSource"
         form = AssetCreateForm(
@@ -1302,6 +1304,7 @@ def get_inputparameter_suggestion_trafo(request):
         or technology == "Fuel cell"
         or technology == "Air source heat pump (large-scale)"
         or technology == "Electrode heating boiler"
+        or technology == "Other"
     ):
         asset_type_name = "myPredefinedTransformer"
         form = AssetCreateForm(
@@ -1361,20 +1364,22 @@ def get_inputparameter_suggestion_storage(request):
     body_unicode = request.body.decode("utf-8")  # for POST
     body = json.loads(body_unicode)
     print(body)
-    capex, opex, lifetime, crate, efficiency, efficiency_el, efficiency_th, thermal_loss_rate = (None,) * 8
+    capex, opex, lifetime, crate, efficiency, efficiency_el, efficiency_th, thermal_loss_rate, fixed_losses_relative_gamma, fixed_losses_absolute_delta = (None,) * 10
     input_timeseries = ""
     technology = body[0]["kindOfComponentStorage"]
     year = body[1]["choosenTimestampStorage"]
 
     queryset = InputparameterSuggestion.objects.filter(technology=technology, year=year)
     for item in queryset:
-        print(item.unique_id, item.capex)
+        print(item.unique_id, item.capex, item.fixed_losses_relative_gamma)
         capex = item.capex
         opex = item.opex
         lifetime = item.lifetime
         crate = item.crate
         efficiency = item.efficiency
         thermal_loss_rate = item.thermal_loss_rate
+        fixed_losses_relative_gamma = item.fixed_losses_relative_gamma
+        fixed_losses_absolute_delta = item.fixed_losses_absolute_delta
         # efficiency_el = item.efficiency_el
         # efficiency_th = item.efficiency_th
         # input_timeseries = item.input_timeseries
@@ -1393,7 +1398,9 @@ def get_inputparameter_suggestion_storage(request):
             "invest_relation_output_capacity": crate,
             "inflow_conversion_factor": 1.0,
             "outflow_conversion_factor": efficiency,
-            "thermal_loss_rate": thermal_loss_rate
+            "thermal_loss_rate": thermal_loss_rate,
+            "fixed_thermal_losses_relative": fixed_losses_relative_gamma,
+            "fixed_thermal_losses_absolute": fixed_losses_absolute_delta
         },
     )
 
@@ -1501,7 +1508,8 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
         "myPredefinedSink",
         "myPredefinedSource",
         "myPredefinedTransformer",
-        "myExport"
+        "myExport",
+        "myPredefinedSinkOEP"
     ]:
         if asset_uuid:
             print(asset_uuid)
@@ -1512,7 +1520,7 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
                 if existing_asset.input_timeseries
                 else ""
             )
-            if asset_type_name == "myPredefinedSink":
+            if asset_type_name == "myPredefinedSink" or asset_type_name == "myPredefinedSinkOEP":
                 if existing_asset.choice_load_profile == "load_profile_1":
                     input_timeseries_data = [5] * 8760
                 elif existing_asset.choice_load_profile == "load_profile_2":
@@ -1580,7 +1588,7 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
             # print(form.data.get('name'))
             input_timeseries_data = ""
 
-        if asset_type_name == "myPredefinedSink":
+        if asset_type_name == "myPredefinedSink" or asset_type_name == "myPredefinedSinkOEP":
             # print(json.dumps(scenario.get_timestamps(json_format=True)))
 
             context = {
@@ -1989,6 +1997,29 @@ def request_mvs_simulation(request, scen_id=0):
                             )
                             # print("\nEnergy Consumption: \n")
                             # print("{} : {}".format(k, i))
+                            
+                        elif i["asset_type"] == "myPredefinedSink":
+                            power = (i["annual_energy_consumption"]["value"]/
+                                     sum(i["input_timeseries"]["value"]))
+                            list_sinks.append(
+                                InRetEnsysSink(
+                                    label=i["label"],
+                                    inputs={
+                                        i["inflow_direction"]: InRetEnsysFlow(
+                                            fix=i["input_timeseries"]["value"] if i["input_timeseries"] else None,
+                                            nominal_value=power,
+                                            variable_costs=i["variable_costs"]["value"] if i["variable_costs"] else None,
+                                            custom_attributes = {
+                                                "renewable_factor": i["renewable_factor"]["value"] if i["renewable_factor"] else None
+                                            }
+                                        )
+                                    },
+                                )
+                            )
+                            
+                            # print("\nEnergy Consumption: \n")
+                            # print("{} : {}".format(k, i))
+                            
                         else:
                             # print(k)
                             # print(i)
@@ -2064,6 +2095,9 @@ def request_mvs_simulation(request, scen_id=0):
                                 ) if bool(ep_costs) else None,
                             )
                         )
+                        
+                        # print("\nEnergy Storage: \n")
+                        # print("{} : {}".format(k, i))
 
                     except Exception as e:
                         error_msg = f"Storage Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {e}."

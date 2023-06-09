@@ -1,9 +1,16 @@
 FROM python:3.10
 
+ARG NONROOT_USER=developer
+
 ENV APP_ROOT /src
 ENV CONFIG_ROOT /config
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
+
+RUN groupadd -g 1000 $NONROOT_USER && useradd -s /bin/bash -m -r -u 1000 -g $NONROOT_USER $NONROOT_USER
+RUN echo "${NONROOT_USER}:${NONROOT_USER}" | chpasswd
+
+#USER ${NONROOT_USER}
 
 RUN mkdir ${CONFIG_ROOT}
 COPY requirements/postgres.txt ${CONFIG_ROOT}/requirements.txt
@@ -17,7 +24,7 @@ WORKDIR ${APP_ROOT}
 
 COPY . ${APP_ROOT}
 
-COPY ./djangoq_setup.sh /djangoq_setup.sh
-RUN chmod +x /djangoq_setup.sh
+#COPY ./djangoq_setup.sh ${APP_ROOT}/app/djangoq_setup.sh
+#RUN chmod +x ${APP_ROOT}/app/djangoq_setup.sh
 
 CMD ["python", "manage.py", "collectstatic", "--no-input"]

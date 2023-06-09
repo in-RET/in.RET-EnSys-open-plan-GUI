@@ -19,6 +19,7 @@ from django.shortcuts import *
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
+from dashboard.reportdash import createDashboard
 from epa.settings import (
     INRETENSYS_CHECK_URL,
     INRETENSYS_LP_FILE_URL,
@@ -634,7 +635,7 @@ def scenario_create_parameters(request, proj_id, scen_id=None, step_id=1, max_st
             # if a simulation object linked to this scenario exists, all steps have been already fullfilled
             qs_sim = Simulation.objects.filter(scenario=scenario)
             if qs_sim.exists():
-                max_step = 5
+                max_step = 6
             else:
                 # if a connexion object linked to this scenario exists, topology has already been saved once
                 qs_topo = ConnectionLink.objects.filter(scenario_id=scen_id)
@@ -763,7 +764,7 @@ def scenario_create_topology(request, proj_id, scen_id, step_id=2, max_step=3):
         # if a simulation object linked to this scenario exists, all steps have been already fullfilled
         qs_sim = Simulation.objects.filter(scenario=scenario)
         if qs_sim.exists():
-            max_step = 5
+            max_step = 6
 
         # this is a dict with keys "busses", "assets" and "links"
         topology_data_list = load_scenario_topology_from_db(scen_id)
@@ -824,7 +825,7 @@ def scenario_create_constraints(request, proj_id, scen_id, step_id=3, max_step=4
 
         # if a simulation object linked to this scenario exists, all steps have been already fullfilled
         if qs_sim.exists():
-            max_step = 5
+            max_step = 6
 
         # prepare the forms for each constraint
         unbound_forms = {}
@@ -927,11 +928,12 @@ def scenario_review(request, proj_id, scen_id, step_id=4, max_step=5):
 
             if simulation.status == ERROR:
                 context.update({"simulation_error_msg": simulation.errors})
-                html_template = "scenario/simulation/error.html"
+                html_template = f"scenario/simulation/error.html"
             elif simulation.status == PENDING:
-                html_template = "scenario/simulation/pending.html"
+                html_template = f"scenario/simulation/pending.html"
             elif simulation.status == DONE:
-                html_template = "scenario/simulation/success.html"
+                html_template = f"scenario/simulation/success.html"
+                context.update({"max_step": 6})
 
         else:
             print("no simulation existing")
@@ -940,8 +942,9 @@ def scenario_review(request, proj_id, scen_id, step_id=4, max_step=5):
 
 @login_required
 @require_http_methods(["GET", "POST"])
-def scenario_results(request, proj_id, scen_id, step_id=4, max_step=5):
-
+def scenario_results(request, proj_id, scen_id, step_id=5, max_step=6):
+    qs = Simulation.objects.filter(scenario_id=scen_id)
+    
     scenario = get_object_or_404(Scenario, pk=scen_id)
 
     if (scenario.project.user != request.user) and (
@@ -949,50 +952,27 @@ def scenario_results(request, proj_id, scen_id, step_id=4, max_step=5):
     ):
         raise PermissionDenied
 
-    if request.method == "GET":
-        html_template = f"scenario/simulation/no-status.html"
-        context = {
-            "scenario": scenario,
-            "scen_id": scen_id,
-            "proj_id": scenario.project.id,
-            "proj_name": scenario.project.name,
-            "step_id": step_id,
-            "step_list": STEP_LIST,
-            "max_step": max_step,
-            "MVS_GET_URL": INRETENSYS_CHECK_URL,
-            "MVS_LP_FILE_URL": INRETENSYS_LP_FILE_URL,
-        }
+    if qs.exists():
+        simulation = qs.first()
 
-        qs = Simulation.objects.filter(scenario_id=scen_id)
+    createDashboard(simulation)
 
-        if qs.exists():
-            simulation = qs.first()
-
-            if simulation.status == PENDING:
-                fetch_mvs_simulation_results(simulation)
-
-            context.update(
-                {
-                    "sim_id": simulation.id,
-                    "simulation_status": simulation.status,
-                    "secondsElapsed": simulation.elapsed_seconds,
-                    "rating": simulation.user_rating,
-                    "mvs_token": simulation.mvs_token,
-                }
-            )
-
-            if simulation.status == ERROR:
-                context.update({"simulation_error_msg": simulation.errors})
-                html_template = "scenario/simulation/error.html"
-            elif simulation.status == PENDING:
-                html_template = "scenario/simulation/pending.html"
-            elif simulation.status == DONE:
-                html_template = "scenario/simulation/success.html"
-
-        else:
-            print("no simulation existing")
-
-        return render(request, html_template, context)
+    html_template = f"scenario/scenario_step5.html"
+    
+    context = {
+        "scenario": scenario,
+        "scen_id": scen_id,
+        "proj_id": scenario.project.id,
+        "proj_name": scenario.project.name,
+        "step_id": step_id,
+        "step_list": STEP_LIST,
+        "max_step": max_step,
+        "MVS_GET_URL": INRETENSYS_CHECK_URL,
+        "MVS_LP_FILE_URL": INRETENSYS_LP_FILE_URL,
+        "workdir": simulation.mvs_token,
+    }
+    
+    return render(request, html_template, context)
 
 
 @login_required
@@ -1021,7 +1001,7 @@ SCENARIOS_STEPS = [
     scenario_create_topology,
     scenario_create_constraints,
     scenario_review,
-    scenario_results
+    scenario_results,
 ]
 
 

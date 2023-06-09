@@ -1505,6 +1505,8 @@ nav.navbar {
         content: "3"; }
       .wizard__steps li:nth-child(4)::before {
         content: "4"; }
+      .wizard__steps li:nth-child(5)::before {
+        content: "5"; }
       .wizard__steps li.active {
         color: #1F567D; }
         .wizard__steps li.active::before {
@@ -1555,7 +1557,9 @@ nav.navbar {
   flex-direction: row;
   justify-content: center;
   background-color: #F4F7F9;
-  min-height: calc(100vh - 13.75rem);}
+  min-height: calc(100vh - 18.5rem);
+  margin-top: 8.5rem;
+}
   .dashboard > div {
     width: 100%;
     max-width: 90rem;
@@ -2026,7 +2030,7 @@ nav.navbar {
     .system-design .drawflow .drawflow-node.myExcess,
     .system-design .drawflow .drawflow-node.myExport {
       border-bottom-color: #FFD6E0; }
-    .system-design .drawflow .drawflow-node.mySink .img,
+    .system-design .drawflow .drawflow-node.mySink .img::before,
     .system-design .drawflow .drawflow-node.myPredefinedSink .img::before,
     .system-design .drawflow .drawflow-node.myExcess .img::before,
     .system-design .drawflow .drawflow-node.myExport .img::before {
@@ -2551,9 +2555,19 @@ nav.navbar {
 }
 
 .help {
+  padding-top: 1rem;
   display: flex;
   flex-direction: column;
   align-items: center;
+}
 
-
+.extended_header {
+  margin-top: 6.5rem;
+  display: flex;
+  flex-direction: row;
+  align-content: center;
+  justify-content: space-between;
+  max-width: 90rem;
+  z-index: 1;
+  width: 100%;
 }

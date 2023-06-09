@@ -173,7 +173,7 @@
                                         </a>
                                         {% elif scenario.simulation.status == "DONE"%}
                                         <a class="btn btn--action results"
-                                            href="{% url 'scenario_visualize_results' scenario.id %}">
+                                            href="{% url 'scenario_steps_edit' project.id scenario.id 5 %}">
                                             <span class="icon icon-results" aria-hidden="true"></span>
                                             {% translate "Results" %}
                                         </a>

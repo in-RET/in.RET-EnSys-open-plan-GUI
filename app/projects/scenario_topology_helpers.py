@@ -158,10 +158,25 @@ def handle_storage_unit_form_post(
 def handle_asset_form_post(request, scen_id=0, asset_type_name="", asset_uuid=None):
 
     # collect the information about the connected nodes in the GUI
-    input_output_mapping = {
-        "inputs": json.loads(request.POST.get("inputs", "[]")),
-        "outputs": json.loads(request.POST.get("outputs", "[]")),
-    }
+    if asset_type_name == "myPredefinedSource" or asset_type_name == "mySource":
+        input_output_mapping = {
+            # "inputs": json.loads(request.POST.get("inputs", "[]")),
+            "outputs": json.loads(request.POST.get("outputs", "[]")),
+        }
+    elif (asset_type_name == "myPredefinedSink" 
+          or asset_type_name == "myPredefinedSinkOEP"
+          or asset_type_name == "mySink"
+          or asset_type_name == "myExport"
+          or asset_type_name == "myExcess"):
+        input_output_mapping = {
+            "inputs": json.loads(request.POST.get("inputs", "[]")),
+            # "outputs": json.loads(request.POST.get("outputs", "[]")),
+        }
+    else:
+        input_output_mapping = {
+            "inputs": json.loads(request.POST.get("inputs", "[]")),
+            "outputs": json.loads(request.POST.get("outputs", "[]")),
+        }
 
     if asset_uuid:
         existing_asset = get_object_or_404(Asset, unique_id=asset_uuid)
@@ -173,6 +188,7 @@ def handle_asset_form_post(request, scen_id=0, asset_type_name="", asset_uuid=No
             input_output_mapping=input_output_mapping,
         )
     else:
+        print('inside else of handle_asset_form_post()')
         form = AssetCreateForm(
             request.POST,
             request.FILES,

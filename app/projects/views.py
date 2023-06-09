@@ -1481,6 +1481,7 @@ def get_inputparameter_suggestion_storage(request):
 @require_http_methods(["GET"])
 def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=None):
     scenario = Scenario.objects.get(id=scen_id)
+    print('inside get_asset_create_form')
 
     # collect the information about the connected nodes in the GUI
     input_output_mapping = {
@@ -1978,6 +1979,9 @@ def request_mvs_simulation(request, scen_id=0):
                     except Exception as e:
                         error_msg = f"Source Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {e}."
                         logger.error(error_msg)
+                        
+                    print("\nEnergy Production: \n")
+                    print("{} : {}".format(k, i))
 
                 elif k == "energy_consumption":
                     try:
@@ -2075,9 +2079,9 @@ def request_mvs_simulation(request, scen_id=0):
                                         variable_costs=i["variable_costs"]["value"] if bool(i["variable_costs"]) else None,
                                     )
                                 },
-                                loss_rate=i["thermal_loss_rate"]["value"] if i["thermal_loss_rate"] else None,
-                                fixed_losses_relative=i["fixed_thermal_losses_relative"]["value"] if i["fixed_thermal_losses_relative"] else None,
-                                fixed_losses_absolute=i["fixed_thermal_losses_absolute"]["value"] if i["fixed_thermal_losses_absolute"] else None,
+                                loss_rate=i["thermal_loss_rate"]["value"] if i["thermal_loss_rate"] else 0,
+                                fixed_losses_relative=i["fixed_thermal_losses_relative"]["value"] if i["fixed_thermal_losses_relative"] else 0,
+                                fixed_losses_absolute=i["fixed_thermal_losses_absolute"]["value"] if i["fixed_thermal_losses_absolute"] else 0,
                                 initial_storage_level=i["initial_storage_level"]["value"] if bool(i["initial_storage_level"]) else None,
                                 balanced=i["balanced"]["value"],
                                 invest_relation_input_capacity=i["invest_relation_input_capacity"]["value"] if bool(i["invest_relation_input_capacity"]) else None,

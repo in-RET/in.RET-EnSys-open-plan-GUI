@@ -52,6 +52,7 @@ function drop(ev) {
     ev.preventDefault();
     // corresponds to data-node defined in templates/scenario/topology_drag_items.html
     const nodeName = ev.dataTransfer.getData("node");
+	//alert('Drop event');
     addNodeToDrawFlow(nodeName, ev.clientX, ev.clientY);
 }
 
@@ -99,7 +100,19 @@ async function addNodeToDrawFlow(name, pos_x, pos_y, nodeInputs = 1, nodeOutputs
         return false;
     pos_x = pos_x * (editor.precanvas.clientWidth / (editor.precanvas.clientWidth * editor.zoom)) - (editor.precanvas.getBoundingClientRect().x * (editor.precanvas.clientWidth / (editor.precanvas.clientWidth * editor.zoom)));
     pos_y = pos_y * (editor.precanvas.clientHeight / (editor.precanvas.clientHeight * editor.zoom)) - (editor.precanvas.getBoundingClientRect().y * (editor.precanvas.clientHeight / (editor.precanvas.clientHeight * editor.zoom)));
-    return createNodeObject(name, nodeInputs, nodeOutputs, nodeData, pos_x, pos_y);
+	//alert('inside addNodeToDrawFlow()');
+	if (name=="myPredefinedSource" || name=="mySource"){
+		nodeInputs=0;
+		return createNodeObject(name, nodeInputs, nodeOutputs, nodeData, pos_x, pos_y);
+	}
+	else if (name=="myPredefinedSink" || name=="myPredefinedSinkOEP" || name=="mySink" || name=="myExport" || name=="myExcess"){
+		nodeOutputs=0;
+		return createNodeObject(name, nodeInputs, nodeOutputs, nodeData, pos_x, pos_y);
+	}
+	else{
+		return createNodeObject(name, nodeInputs, nodeOutputs, nodeData, pos_x, pos_y);		
+	}
+    
 }
 
 function updateInputTimeseries(nodeType){
@@ -127,13 +140,28 @@ function updateInputTimeseries(nodeType){
 }
 
 // find out the name of the other nodes the given node is connected to
-function getInputOutputMapping(nodeId){
-    var input_output_mapping = {"inputs": {}, "outputs": {}};
-    editor.getNodeFromId(nodeId).inputs.input_1.connections.map(c => {const nodeIn = editor.getNodeFromId(parseInt(c.node)); input_output_mapping["inputs"][nodeIn.data.bustype] = nodeIn.data.name;});
-    editor.getNodeFromId(nodeId).outputs.output_1.connections.map(c => {const nodeOut = editor.getNodeFromId(parseInt(c.node)); input_output_mapping["outputs"][nodeOut.data.bustype] = nodeOut.data.name;});
-    input_output_mapping["inputs"] = JSON.stringify(input_output_mapping["inputs"]);
-    input_output_mapping["outputs"] = JSON.stringify(input_output_mapping["outputs"]);
-
+function getInputOutputMapping(nodeId, nodeType){
+	if (nodeType=="myPredefinedSource" || nodeType=="mySource"){
+		var input_output_mapping = {"outputs": {}};
+		//editor.getNodeFromId(nodeId).inputs.input_1.connections.map(c => {const nodeIn = editor.getNodeFromId(parseInt(c.node)); input_output_mapping["inputs"][nodeIn.data.bustype] = nodeIn.data.name;});
+		editor.getNodeFromId(nodeId).outputs.output_1.connections.map(c => {const nodeOut = editor.getNodeFromId(parseInt(c.node)); input_output_mapping["outputs"][nodeOut.data.bustype] = nodeOut.data.name;});
+		//input_output_mapping["inputs"] = JSON.stringify(input_output_mapping["inputs"]);
+		input_output_mapping["outputs"] = JSON.stringify(input_output_mapping["outputs"]);		
+	}
+	else if (nodeType=="myPredefinedSink" || nodeType=="myPredefinedSinkOEP" || nodeType=="mySink" || nodeType=="myExport" || nodeType=="myExcess"){
+		var input_output_mapping = {"inputs": {}};
+		editor.getNodeFromId(nodeId).inputs.input_1.connections.map(c => {const nodeIn = editor.getNodeFromId(parseInt(c.node)); input_output_mapping["inputs"][nodeIn.data.bustype] = nodeIn.data.name;});
+		//editor.getNodeFromId(nodeId).outputs.output_1.connections.map(c => {const nodeOut = editor.getNodeFromId(parseInt(c.node)); input_output_mapping["outputs"][nodeOut.data.bustype] = nodeOut.data.name;});
+		input_output_mapping["inputs"] = JSON.stringify(input_output_mapping["inputs"]);
+		//input_output_mapping["outputs"] = JSON.stringify(input_output_mapping["outputs"]);		
+	}
+	else{
+		var input_output_mapping = {"inputs": {}, "outputs": {}};
+		editor.getNodeFromId(nodeId).inputs.input_1.connections.map(c => {const nodeIn = editor.getNodeFromId(parseInt(c.node)); input_output_mapping["inputs"][nodeIn.data.bustype] = nodeIn.data.name;});
+		editor.getNodeFromId(nodeId).outputs.output_1.connections.map(c => {const nodeOut = editor.getNodeFromId(parseInt(c.node)); input_output_mapping["outputs"][nodeOut.data.bustype] = nodeOut.data.name;});
+		input_output_mapping["inputs"] = JSON.stringify(input_output_mapping["inputs"]);
+		input_output_mapping["outputs"] = JSON.stringify(input_output_mapping["outputs"]);		
+	}
     return input_output_mapping;
 }
 
@@ -210,6 +238,7 @@ function computeCOP(event){
 
 // one needs to add this function as event with eventListener (<some jquery div>.addEventListener("dblclick", dblClick))
 const dblClick = (e) => {
+	//alert('dblClick');
 
     const closestNode = e.target.closest('.drawflow-node');
     const nodeType = closestNode.querySelector('.box').getAttribute(ASSET_TYPE_NAME);
@@ -218,10 +247,12 @@ const dblClick = (e) => {
         const topologyNodeId = closestNode.id;
 
         const nodeId = parseInt(topologyNodeId.split("-").pop());
-        const input_output_mapping = getInputOutputMapping(nodeId);
+        const input_output_mapping = getInputOutputMapping(nodeId, nodeType);
+		
         // formGetUrl is defined in scenario_step2.html
         const getUrl = formGetUrl + nodeType +
             (nodesToDB.has(topologyNodeId) ? "/" + nodesToDB.get(topologyNodeId).uid : "");
+		//alert(getUrl);
 
         // get the form of the asset of the type "nodeType" (projects/views.py::get_asset_create_form)
          $.ajax({
@@ -248,6 +279,7 @@ const dblClick = (e) => {
                 $('[data-bs-toggle="tooltip"]').tooltip()
             },
          })
+		 //alert('Modal opens!');
     }
 };
 // endregion
@@ -284,7 +316,8 @@ const submitForm = (e) => {
     }
     else{
         const nodeId = parseInt(topologyNodeId.split("-").pop());
-        const input_output_mapping = getInputOutputMapping(nodeId);
+        const input_output_mapping = getInputOutputMapping(nodeId, assetTypeName);
+		//alert(input_output_mapping.inputs);
         formData.set("inputs", input_output_mapping.inputs);
         formData.set("outputs", input_output_mapping.outputs);
     }
@@ -360,8 +393,9 @@ $("#guiModal").on('hide.bs.modal', function (event) {
 
 
 /* Create node on the gui */
-async function createNodeObject(nodeName, connectionInputs = 1, connectionOutputs = 1, nodeData = {}, pos_x, pos_y) {
-
+async function createNodeObject(nodeName, connectionInputs, connectionOutputs, nodeData = {}, pos_x, pos_y) {
+//alert('inside createNodeObject()');
+//alert(nodeName);
     // automate the naming of assets to avoid name duplicates
     const editorData = editor.export().drawflow.Home.data;
     const node_list = Object.values(editorData);
@@ -392,11 +426,31 @@ async function createNodeObject(nodeName, connectionInputs = 1, connectionOutput
         </span>
     </div>
     <div class="img"></div>`;
-
-    return {
+	
+	if (nodeName=="myPredefinedSource" || nodeName=="mySource"){
+		connectionInputs=0;
+		connectionOutputs=1;
+		return {
+        "editorNodeId": editor.addNode(nodeName, connectionInputs, connectionOutputs, pos_x, pos_y, nodeName, nodeData, source_html),
+        "specificNodeType": nodeName
+    };		
+	}
+	else if (nodeName=="myPredefinedSink" || nodeName=="myPredefinedSinkOEP" || nodeName=="mySink" || nodeName=="myExport" || nodeName=="myExcess"){
+		connectionInputs=1;
+		connectionOutputs=0;
+		return {
+        "editorNodeId": editor.addNode(nodeName, connectionInputs, connectionOutputs, pos_x, pos_y, nodeName, nodeData, source_html),
+        "specificNodeType": nodeName
+    };		
+	}
+	else{
+		connectionInputs=1;
+		connectionOutputs=1;
+		return {
         "editorNodeId": editor.addNode(nodeName, connectionInputs, connectionOutputs, pos_x, pos_y, nodeName, nodeData, source_html),
         "specificNodeType": nodeName
     };
+	}
 }
 
 
@@ -410,6 +464,7 @@ const addBusses = async (data) =>
 
 const addAssets = async (data) =>
     await Promise.all(data.map(async nodeData => {
+		//alert('await createNodeObject()');
         const result = await createNodeObject(nodeData.name, 1, 1, nodeData.data, nodeData.pos_x, nodeData.pos_y);
         nodesToDB.set(`node-${result.editorNodeId}`, {uid:nodeData.data.unique_id, assetTypeName: nodeData.name });
     }));

@@ -39,7 +39,7 @@
                             <a class="nav-link" href="{% url 'project_search' %}">{% translate "My projects" %}</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ documentation_url }}" target="_blank" rel="noreferrer">{% translate "Documentation" %}</a>
+                            <a class="nav-link" href="{% url 'documentation' %}">{% translate "Documentation" %}</a>
                         </li>
                     {% endif %}
                 {% elif signup %}

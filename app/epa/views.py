@@ -24,3 +24,8 @@ def about(request):
 @require_http_methods(["GET"])
 def license(request):
     return render(request, "legal/license.html")
+
+
+@require_http_methods(["GET"])
+def documenation(request):
+    return render(request, "documentation/documentation.html")

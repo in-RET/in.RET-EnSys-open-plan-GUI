@@ -19,11 +19,12 @@ DEBUG = ast.literal_eval(os.getenv("DEBUG", "True"))
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+print(BASE_DIR)
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
-STATIC_URL = "/static/"
+STATIC_URL = "static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "cdn_static_root")
 
 STATICFILES_FINDERS = ["django.contrib.staticfiles.finders.FileSystemFinder"]
@@ -192,13 +193,6 @@ PROXY_CONFIG = (
     if USE_PROXY
     else ({})
 )
-
-MVS_API_HOST = os.getenv("MVS_API_HOST", "https://mvs-eland.rl-institut.de")
-# MVS_POST_URL = f"{MVS_API_HOST}/sendjson/openplan"
-# MVS_GET_URL = f"{MVS_API_HOST}/check/"
-# MVS_LP_FILE_URL = f"{MVS_API_HOST}/get_lp_file/"
-MVS_SA_POST_URL = f"{MVS_API_HOST}/sendjson/openplan/sensitivity-analysis"
-MVS_SA_GET_URL = f"{MVS_API_HOST}/check-sensitivity-analysis/"
 
 INRETENSYS_API_HOST = "http://fastapi:8001"
 INRETENSYS_POST_URL = f"{INRETENSYS_API_HOST}/uploadJson"

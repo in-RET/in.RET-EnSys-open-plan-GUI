@@ -4,7 +4,7 @@ import traceback
 from django_q.models import Schedule
 from django.contrib import messages
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.utils.safestring import mark_safe
 from projects.models import Simulation, SensitivityAnalysis
 from projects.requests import fetch_mvs_simulation_results

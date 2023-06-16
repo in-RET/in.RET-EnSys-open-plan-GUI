@@ -1,29 +1,29 @@
-.row.dashboard__create{
+.row.dashboard__create {
     margin-bottom: 1.5rem;
 }
 
-.result-selector{
-	display: flex;
-	flex-direction: row;
-	justify-content: center;
-	margin-top: 3rem;
+.result-selector {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-top: 3rem;
 }
 
-.result-selector h2{
- font-size: 1.563rem !important;
+.result-selector h2 {
+    font-size: 1.563rem !important;
 }
 
-#single-scenario-link.active{
-background-color: #F4F7F9 ;
+#single-scenario-link.active {
+    background-color: #F4F7F9;
 }
 
-#compare-scenario-link.active{
-background-color: #F4F7F9 ;
+#compare-scenario-link.active {
+    background-color: #F4F7F9;
 }
 
 
-#sensitivity-analysis-link.active{
-background-color: #F4F7F9 ;
+#sensitivity-analysis-link.active {
+    background-color: #F4F7F9;
 }
 
 .dashboard__scenarios {
@@ -32,19 +32,19 @@ background-color: #F4F7F9 ;
 }
 
 
-.greyed_out{
-pointer-events: none;
-opacity: 0.6;
+.greyed_out {
+    pointer-events: none;
+    opacity: 0.6;
 }
 
-.info__icon{
-height: 1.2rem;
-margin-left: .5rem;
+.info__icon {
+    height: 1.2rem;
+    margin-left: .5rem;
 
-#energy-system {
-    height: 650px !important;
-}
+    #energy-system {
+        height: 650px !important;
+    }
 
-form-control.view-only {
- background-color: red;
-}
+    form-control.view-only {
+        background-color: red;
+    }

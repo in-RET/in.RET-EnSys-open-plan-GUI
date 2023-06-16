@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% load i18n %}
+
+{% block head_block %}
+{% endblock head_block %}
+
+{% block start_body_scripts %}
+{% endblock %}
+
+{% block title %}{% translate "Documentation" %}{% endblock title %}
+
+{% block content %}
+<main>
+	<section class="header">
+		<div>
+			<div class="header__left">Left Header</div>
+			<h1 class="header__title">{% translate "Documentation" %}</h1>
+			<div class="header__back">Right Header</div>
+		</div>
+    </section>
+    <section class="standard-layout">
+        <p>Bla Bla Bla Bla Bla. ... Hier folgt text aus dem "So geht's".</p>
+    </section>
+
+</main>
+{% endblock content %}
+
+
+{% block end_body_scripts %}
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+{% endblock end_body_scripts %}

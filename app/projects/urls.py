@@ -113,15 +113,15 @@ urlpatterns = [
         name="scenario_review",
     ),
     path(
+        "project/<int:proj_id>/scenario/results/<int:scen_id>/",
+        scenario_results,
+        name="scenario_results",
+    ),
+    path(
         "project/<int:proj_id>/scenario/review/",
         back_to_scenario_review,
         name="back_to_scenario_review",
     ),
-    # path(
-    #     "project/check_time_period/",
-    #     check_choosen_time_period,
-    #     name="check_choosen_time_period",
-    # ),
     path("scenario/update/<int:scen_id>", scenario_update, name="scenario_update"),
     path("scenario/delete/<int:scen_id>", scenario_delete, name="scenario_delete"),
     path(
@@ -197,32 +197,6 @@ urlpatterns = [
         "simulation/fetch-results/<int:sim_id>",
         fetch_simulation_results,
         name="fetch_simulation_results",
-    ),
-    # Sensitivity analysis
-    path(
-        "scenario/<int:scen_id>/sensitivity-analysis/create",
-        sensitivity_analysis_create,
-        name="sensitivity_analysis_create",
-    ),
-    path(
-        "scenario/<int:scen_id>/sensitivity-analysis/<int:sa_id>",
-        sensitivity_analysis_create,
-        name="sensitivity_analysis_review",
-    ),
-    path(
-        "scenario/<int:scen_id>/sensitivity-analysis/run",
-        sensitivity_analysis_create,
-        name="sensitivity_analysis_run",
-    ),
-    path(
-        "scenario/<int:scen_id>/sensitivity-analysis/error",
-        sensitivity_analysis_create,
-        name="sensitivity_analysis_error",
-    ),
-    path(
-        "sensitivity-analysis/fetch-results/<int:sa_id>",
-        fetch_sensitivity_analysis_results,
-        name="fetch_sensitivity_analysis_results",
     ),
     # User Feedback
     path("user_feedback", user_feedback, name="user_feedback"),

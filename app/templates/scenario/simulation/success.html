@@ -1,5 +1,8 @@
 {% extends 'scenario/scenario_progression.html' %}
 {% load i18n %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load custom_filters %}
 
 {% block progression_content %}
 
@@ -27,12 +30,67 @@
 {% endblock progression_content %}
 
 {% block footer %}
-    <footer class="simulation-footer">
+  <footer class="simulation-footer">
+    <div>
+      <!--<a class="btn btn--medium" href="{% url 'scenario_visualize_results' scen_id %}">{% translate "Check results dashboard" %}</a>-->
+      <!-- href="{% url 'simulation_cancel' scen_id %}" -->
+      <button class="btn btn--medium btn--hollow" type="submit" onclick="confirmCancel()">{% translate "Rerun simulation" %}</button>
+      <a class="btn btn--medium btn--hollow" href="/static/working/{{ mvs_token }}/dumps/config.lp" download>{% translate "Download LP files" %}</a>
+      <a class="btn btn--medium" href="{% url 'scenario_results' proj_id scen_id %}" id="next_btn"  >{% translate "Next" %} </a>
+    </div>
+  </footer>
 
-      <div>
-        <a class="btn btn--medium" href="{% url 'scenario_visualize_results' scen_id %}">{% translate "Check results dashboard" %}</a>
-        <a class="btn btn--medium btn--hollow" href="/static/working/{{ mvs_token }}/dumps/config.lp" download>{% translate "Download LP files" %}</a>
-        <a class="btn btn--medium btn--hollow" href="{% url 'simulation_cancel' scen_id %}" onclick="return confirm('Are you sure?')">{% translate "Reset simulation" %}</a>
-      </div>
-    </footer>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+  <script>
+    function confirmCancel() {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "This will delete the Simulation data and re-run the Process",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes",
+        cancelButtonText: "Cancel",
+      }).then((result) => {
+          console.log(result.isConfirmed);
+          if (result.isConfirmed) {
+            $.ajax({
+              headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+              type: "GET",
+              url: "{% url 'simulation_cancel' scen_id %}",
+              success: 
+                function (resp) {
+                  console.log("sucessfully reseted.");
+                  $.ajax({
+                    headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+                    type: "POST",
+                    url: "{% url 'request_mvs_simulation' scen_id %}",
+                    success: function(resp) {
+                      window.location.reload()
+                    },                      
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                      Swal.fire({        
+                        title: "Failure",
+                        text: textStatus,
+                        icon: "warning",
+                        showCancelButton: false,
+                        confirmButtonText: "Yes",
+                      })
+                    }
+                  })
+                },
+          
+              error: function (XMLHttpRequest, textStatus, errorThrown) {
+                Swal.fire({        
+                  title: "Failure",
+                  text: textStatus,
+                  icon: "warning",
+                  showCancelButton: false,
+                  confirmButtonText: "Yes",
+                });
+              }
+            })
+          } else {
+            // do nothing
+          }})};
+  </script>
 {% endblock footer %}

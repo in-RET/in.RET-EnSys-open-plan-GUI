@@ -7,7 +7,7 @@ import numpy as np
 import plotly.graph_objects as go
 
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.shortcuts import get_object_or_404
 from django.db import models
 from dashboard.helpers import (

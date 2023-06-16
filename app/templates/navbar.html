@@ -13,7 +13,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light {{ navbar_class }}">
     <div class="container-fluid">
-        <a class="navbar-brand" href="{% url 'project_search' %}">
+        <a class="navbar-brand" href="/"> <!-- {% url 'project_search' %} -->
             <img src="{% static 'assets/logos/ensys_logo_full.png' %}" alt="ensys_logo_full">
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,7 +39,7 @@
                             <a class="nav-link" href="{% url 'project_search' %}">{% translate "My projects" %}</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ documentation_url }}" target="_blank" rel="noreferrer">{% translate "Documentation" %}</a>
+                            <a class="nav-link" href="{% url 'documentation' %}">{% translate "Documentation" %}</a>
                         </li>
                     {% endif %}
                 {% elif signup %}

@@ -19,10 +19,10 @@ from django.shortcuts import *
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
+from dashboard.reportdash import createDashboard
 from epa.settings import (
     INRETENSYS_CHECK_URL,
     INRETENSYS_LP_FILE_URL,
-    MVS_SA_GET_URL,
     OEP_URL,
 )
 from InRetEnsys import *
@@ -34,9 +34,7 @@ from projects.models import *
 from .constants import DONE, ERROR, MODIFIED, PENDING
 from .forms import *
 from .requests import (
-    fetch_mvs_sa_results,
     fetch_mvs_simulation_results,
-    mvs_sensitivity_analysis_request,
     mvs_simulation_request,
 )
 from .scenario_topology_helpers import (
@@ -567,6 +565,7 @@ STEP_LIST = [
     _("Energy system design"),
     _("Constraints"),
     _("Simulation"),
+    _("Results")
 ]
 
 
@@ -636,7 +635,7 @@ def scenario_create_parameters(request, proj_id, scen_id=None, step_id=1, max_st
             # if a simulation object linked to this scenario exists, all steps have been already fullfilled
             qs_sim = Simulation.objects.filter(scenario=scenario)
             if qs_sim.exists():
-                max_step = 5
+                max_step = 6
             else:
                 # if a connexion object linked to this scenario exists, topology has already been saved once
                 qs_topo = ConnectionLink.objects.filter(scenario_id=scen_id)
@@ -766,7 +765,7 @@ def scenario_create_topology(request, proj_id, scen_id, step_id=2, max_step=3):
         # if a simulation object linked to this scenario exists, all steps have been already fullfilled
         qs_sim = Simulation.objects.filter(scenario=scenario)
         if qs_sim.exists():
-            max_step = 5
+            max_step = 6
 
         # this is a dict with keys "busses", "assets" and "links"
         topology_data_list = load_scenario_topology_from_db(scen_id)
@@ -827,7 +826,7 @@ def scenario_create_constraints(request, proj_id, scen_id, step_id=3, max_step=4
 
         # if a simulation object linked to this scenario exists, all steps have been already fullfilled
         if qs_sim.exists():
-            max_step = 5
+            max_step = 6
 
         # prepare the forms for each constraint
         unbound_forms = {}
@@ -930,16 +929,51 @@ def scenario_review(request, proj_id, scen_id, step_id=4, max_step=5):
 
             if simulation.status == ERROR:
                 context.update({"simulation_error_msg": simulation.errors})
-                html_template = "scenario/simulation/error.html"
+                html_template = f"scenario/simulation/error.html"
             elif simulation.status == PENDING:
-                html_template = "scenario/simulation/pending.html"
+                html_template = f"scenario/simulation/pending.html"
             elif simulation.status == DONE:
-                html_template = "scenario/simulation/success.html"
+                html_template = f"scenario/simulation/success.html"
+                context.update({"max_step": 6})
 
         else:
             print("no simulation existing")
 
         return render(request, html_template, context)
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def scenario_results(request, proj_id, scen_id, step_id=5, max_step=6):
+    qs = Simulation.objects.filter(scenario_id=scen_id)
+    
+    scenario = get_object_or_404(Scenario, pk=scen_id)
+
+    if (scenario.project.user != request.user) and (
+        request.user not in scenario.project.viewers.all()
+    ):
+        raise PermissionDenied
+
+    if qs.exists():
+        simulation = qs.first()
+
+    createDashboard(simulation)
+
+    html_template = f"scenario/scenario_step5.html"
+    
+    context = {
+        "scenario": scenario,
+        "scen_id": scen_id,
+        "proj_id": scenario.project.id,
+        "proj_name": scenario.project.name,
+        "step_id": step_id,
+        "step_list": STEP_LIST,
+        "max_step": max_step,
+        "MVS_GET_URL": INRETENSYS_CHECK_URL,
+        "MVS_LP_FILE_URL": INRETENSYS_LP_FILE_URL,
+        "workdir": simulation.mvs_token,
+    }
+    
+    return render(request, html_template, context)
 
 
 @login_required
@@ -968,6 +1002,7 @@ SCENARIOS_STEPS = [
     scenario_create_topology,
     scenario_create_constraints,
     scenario_review,
+    scenario_results,
 ]
 
 
@@ -1090,121 +1125,7 @@ def scenario_delete(request, scen_id):
 
 # endregion Scenario
 
-
-@login_required
-@require_http_methods(["GET", "POST"])
-def sensitivity_analysis_create(request, scen_id, sa_id=None, step_id=5):
-    excuses_design_under_development(request)
-    scenario = get_object_or_404(Scenario, id=scen_id)
-    if scenario.project.user != request.user:
-        raise PermissionDenied
-
-    if request.method == "GET":
-        if sa_id is not None:
-            sa_item = get_object_or_404(SensitivityAnalysis, id=sa_id)
-            sa_form = SensitivityAnalysisForm(scen_id=scen_id, instance=sa_item)
-            sa_status = sa_item.status
-            mvs_token = sa_item.mvs_token
-        else:
-            number_existing_sa = scenario.sensitivityanalysis_set.all().count()
-            sa_item = None
-            sa_status = None
-            mvs_token = None
-            sa_form = SensitivityAnalysisForm(
-                scen_id=scen_id,
-                initial={"name": f"sensitivity_analysis_{number_existing_sa + 1}"},
-            )
-
-        answer = render(
-            request,
-            "scenario/sensitivity_analysis.html",
-            {
-                "proj_id": scenario.project.id,
-                "proj_name": scenario.project.name,
-                "scenario": scenario,
-                "scen_id": scen_id,
-                "step_id": step_id,
-                "step_list": STEP_LIST + [_("Sensitivity analysis")],
-                "max_step": 5,
-                "MVS_SA_GET_URL": MVS_SA_GET_URL,
-                "sa_form": sa_form,
-                "sa_status": sa_status,
-                "sa_id": sa_id,
-                "mvs_token": mvs_token,
-            },
-        )
-
-    if request.method == "POST":
-        qs = request.POST
-        sa_form = SensitivityAnalysisForm(qs)
-
-        if sa_form.is_valid():
-            sa_item = sa_form.save(commit=False)
-            # TODO if the reference value is not the same as in the current scenario, duplicate the scenario and bind the duplicate to sa_item
-            # TODO check if the scenario is already bound to a SA
-            sa_item.set_reference_scenario(scenario)
-            try:
-                data_clean = format_scenario_for_mvs(scenario)
-            except Exception as e:
-                error_msg = f"Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {e}."
-                logger.error(error_msg)
-                messages.error(request, error_msg)
-                answer = JsonResponse(
-                    {"error": f"Scenario Serialization ERROR! Thrown Exception: {e}."},
-                    status=500,
-                    content_type="application/json",
-                )
-
-            sa_item.save()
-
-            # Add the information about the sensitivity analysis to the json
-            data_clean.update(sa_item.payload)
-            # Make simulation request to MVS
-            response = mvs_sensitivity_analysis_request(data_clean)
-
-        if response is None:
-            error_msg = "Could not communicate with the simulation server."
-            logger.error(error_msg)
-            messages.error(request, error_msg)
-            # TODO redirect to prefilled feedback form / bug form
-            answer = JsonResponse(
-                {"status": "error", "error": error_msg},
-                status=407,
-                content_type="application/json",
-            )
-        else:
-            sa_item.mvs_token = response["id"] if response["id"] else None
-            # import pdb; pdb.set_trace()
-            # sa_item.parse_server_response(response)
-
-            if "status" in response.keys() and (
-                response["status"] == DONE or response["status"] == ERROR
-            ):
-                # TODO call method to fetch response here
-                sa_item.status = response["status"]
-                sa_item.response = response["results"]
-                # Simulation.objects.filter(scenario_id=scen_id).delete()
-                # TODO the reference scenario should have its simulation replaced by this one if successful, this can be done via the mvs_token of the simulation
-
-                sa_item.end_date = datetime.now()
-            else:  # PENDING
-                sa_item.status = response["status"]
-                # create a task which will update simulation status
-                # TODO check it does the right thing with sensitivity analysis
-                # create_or_delete_simulation_scheduler(mvs_token=sa_item.mvs_token)
-
-            sa_item.elapsed_seconds = (datetime.now() - sa_item.start_date).seconds
-            sa_item.save()
-            answer = HttpResponseRedirect(
-                reverse("sensitivity_analysis_review", args=[scen_id, sa_item.id])
-            )
-
-    return answer
-
-
 # region Asset
-
-
 @login_required
 @require_http_methods(["POST", "GET"])  # , "POST"
 def get_inputparameter_suggestion_source(request):
@@ -1565,8 +1486,7 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
                     or existing_asset.trafo_choice == "Methanisation"
                     or existing_asset.trafo_choice == "Electrolysis"
                     or existing_asset.trafo_choice == "Fuel cell"
-                    or existing_asset.trafo_choice
-                    == "Air source heat pump (large-scale)"
+                    or existing_asset.trafo_choice == "Air source heat pump (large-scale)"
                     or existing_asset.trafo_choice == "Electrode heating boiler"
                 ):
 
@@ -2321,6 +2241,8 @@ def request_mvs_simulation(request, scen_id=0):
         #jf.close()
 
         results = None
+
+        print("Model:", model)
     except Exception as e:
         error_msg = f"Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {e}."
         logger.error(error_msg)
@@ -2403,19 +2325,6 @@ def update_simulation_rating(request):
 def fetch_simulation_results(request, sim_id):
     simulation = get_object_or_404(Simulation, id=sim_id)
     are_result_ready = fetch_mvs_simulation_results(simulation)
-    return JsonResponse(
-        dict(areResultReady=are_result_ready),
-        status=200,
-        content_type="application/json",
-    )
-
-
-@json_view
-@login_required
-@require_http_methods(["GET"])
-def fetch_sensitivity_analysis_results(request, sa_id):
-    sa_item = get_object_or_404(SensitivityAnalysis, id=sa_id)
-    are_result_ready = fetch_mvs_sa_results(sa_item)
     return JsonResponse(
         dict(areResultReady=are_result_ready),
         status=200,

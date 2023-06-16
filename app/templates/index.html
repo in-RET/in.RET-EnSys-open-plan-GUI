@@ -3,26 +3,32 @@
 {% load i18n %}
 
 {% block index %}
-  {% if not user.is_authenticated %}
-  <main>
-    <section class="hero section" id="hero" data-aos="fade-up">
-      <div>
-        <div class="hero__text">
-          <h1>
-            {% translate "Model your local energy system" %}
-          </h1>
-          <span>
-                    {% translate "Use the GUI to include sector-coupling and optimize the energy system model subject to equality constraints" %}
-                  </span>
-          <a href="{% url 'signup' %}" class="btn btn--medium">
-            {% translate "Try out" %}
-          </a>
-        </div>
-        <div class="hero__image">
-          <img src="{% static 'assets/illustrations/energy_system_gui.svg' %}" alt="Energy system GUI">
-        </div>
+{% if not user.is_authenticated %}
+<main>
+  <section class="hero section" id="hero" data-aos="fade-up">
+    <div>
+      <div class="hero__text">
+        <h1>
+          {% translate "Model your local energy system" %}
+        </h1>
+        <span>
+          {% translate "Use the GUI to include sector-coupling and optimize the energy system model subject to equality constraints" %}
+        </span>
+        <a href="{% url 'signup' %}" class="btn btn--medium">
+          {% translate "Try out" %}
+        </a>
       </div>
-    </section>
-  </main>
-  {% endif %}
+      <div class="hero__image">
+        <img src="{% static 'assets/illustrations/energy_system_gui.png' %}" alt="Energy system GUI">
+      </div>
+    </div>
+  </section>
+  <section class="sponsors">
+    <img src="{% static 'assets/illustrations/logo-hsn.svg' %}" alt="Hochschule Nordhausen">
+    <img src="{% static 'assets/illustrations/tmuen-logo.svg' %}" alt="Thüringer Ministerium für Umwelt, Energie und Naturschutz">
+    <img src="{% static 'assets/illustrations/zo.rro_zweii-logo.svg' %}" alt="ZO.RRO ZWEI">
+    <img src="{% static 'assets/illustrations/theen-logo.svg' %}" alt="ThEEN">
+  </section>
+</main>
+{% endif %}
 {% endblock index %}

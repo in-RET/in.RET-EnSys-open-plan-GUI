@@ -4,14 +4,6 @@
 {% load custom_filters %}
 {% load i18n %}
 
-{% block head_block %}
-<style>
-.highlight {
-  background-color: blue;
-}
-</style>
-{% endblock head_block %}
-
 <!-- WRITE HTML CODE WITHIN THESE block content TAGS -->
 {% block progression_content %}
 
@@ -21,9 +13,17 @@
 
 
 {% block end_body_scripts %}
+<script>
+  function next_btn_clicked() {
+      form_id.click();
+  };
+
+</script>
+<script src="{% static 'js/form_utils.js' %}"></script>
 {% endblock end_body_scripts %}
 
 {% block footer %}
-    <footer class="simulation-footer">
-    </footer>
+<footer class="simulation-footer">
+
+</footer>
 {% endblock footer %}

@@ -7,7 +7,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 from django import forms
 from django.forms import ModelForm
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.conf import settings as django_settings
 from projects.models import *
 from projects.constants import RENEWABLE_ASSETS
@@ -647,19 +647,9 @@ class BusForm(OpenPlanModelForm):
                     "placeholder": "Bus Name",
                     "style": "font-weight:400; font-size:13px;",
                 }
-            ),
-            # "type": forms.Select(
-            #     choices=ENERGY_VECTOR,
-            #     attrs={
-            #         "data-bs-toggle": "tooltip",
-            #         "title": _("The energy Vector of the connected assets."),
-            #         "style": "font-weight:400; font-size:13px;",
-            #     },
-            # ),
+            )
         }
-        labels = {"name": _("Name"), 
-                  # "type": _("Energy carrier")
-                  }
+        labels = {"name": _("Name"), }
 
 
 # class SuggestionForm(OpenPlanModelForm):

@@ -470,7 +470,7 @@
             //position: 'bottom-end',
             showCancelButton: false,
             showConfirmButton: false,
-            footer: '<p>More information about the modeling process can be found in the <a href="{{ documentation_url }}">documentation</a>.</br> Stop the timer by hovering this window.</p>',
+            footer: '<p>More information about the modeling process can be found in the <a href="{% url "documentation" %}">documentation</a>.</br> Stop the timer by hovering this window.</p>',
             timer: 5000,
             timerProgressBar: true,
             didOpen: (window) => {

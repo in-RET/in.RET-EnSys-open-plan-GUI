@@ -598,7 +598,7 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
                 n for n in output_connection.values_list("bus__name", flat=True)
             ]
 
-        asset_efficiency = to_value_type(asset, "efficiency")
+        #asset_efficiency = to_value_type(asset, "efficiency")
 
         optional_parameters = {}
         # if asset.asset_type.asset_type in ("chp", "chp_fixed_ratio"):

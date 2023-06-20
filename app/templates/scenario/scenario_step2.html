@@ -53,7 +53,7 @@
             <div class="container">
                 <div class="row align-item-start">
                     <div class="col">
-                        <form id="assetForm">
+                        <form id="assetForm" onkeydown="return event.key != 'Enter';">
                             {% csrf_token %}
                             <div class="modal-body">
                             </div>

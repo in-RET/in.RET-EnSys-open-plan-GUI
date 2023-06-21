@@ -19,8 +19,6 @@ if(copCollapseDOM){
 })
 }
 
-
-
 // Initialize Drawflow
 const id = document.getElementById("drawflow");
 const editor = new Drawflow(id);

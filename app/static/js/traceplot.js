@@ -120,7 +120,7 @@ function fill_out_form_source(){
 		contentType: "application/json",
 		dataType: 'json',
 		success: function(response) {
-			alert("Got response from server ...");
+			Swal.fire('', "Got response from server ...", 'info');
 			//alert(response['form_html']);
 			$('#act_form_div').html(response['form_html']);
 			}
@@ -141,7 +141,7 @@ function fill_out_form_trafo(){
 		contentType: "application/json",
 		dataType: 'json',
 		success: function(response) {
-			alert("Got response from server ...");
+			Swal.fire('', "Got response from server ...", 'info');
 			//alert(response['form_html']);
 			$('#act_form_div').html(response['form_html']);
 			}
@@ -162,7 +162,7 @@ function fill_out_form_storage(){
 		contentType: "application/json",
 		dataType: 'json',
 		success: function(response) {
-			alert("Got response from server ...");
+			Swal.fire('', "Got response from server ...", 'info');
 			//alert(response['form_html']);
 			$('#act_form_div').html(response['form_html']);
 			}
@@ -186,7 +186,7 @@ function makePlotlyLoadProfile(value)
 		
 		var trace3 = {
 		  x: [...Array(8760).keys()],
-		  y: Array(8760).fill(7),
+		  y: Array(8760).fill(math.random() * 20 + 7),
 		  type: 'scatter'
 		};
 		
@@ -222,12 +222,27 @@ function makePlotly( x, y, plot_id="",userLayout=null){
             x = ts_timestamps
         }
 		else if(y.length == 0){
-            alert("Note: You have not uploaded a time series for this component! But you don't have to.");
+            Swal.fire({
+                title: "You have not uploaded a time series for this component! But you don't have to.",
+                icon: "info",
+                toast: true,
+                //position: 'bottom-end',
+                timer: 1200,
+                showCancelButton: false,
+                showConfirmButton: true,
+            })};
         }
         else{
-			alert("The number of values in your uploaded timeseries (" + y.length + ") does not match the scenario timestamps (" + ts_timestamps.length + ").\nPlease change the scenario settings or upload a new timeseries")
+			Swal.fire({
+                title: "The number of values in your uploaded timeseries (" + y.length + ") does not match the scenario timestamps (" + ts_timestamps.length + ").\nPlease change the scenario settings or upload a new timeseries",
+                icon: "info",
+                toast: true,
+                //position: 'bottom-end',
+                timer: 1200,
+                showCancelButton: false,
+                showConfirmButton: true,
+            })
         }
-    }
 
     var plotLayout = {...layout};
     // guess whether x is a number or a date and adjust the axis type accordingly

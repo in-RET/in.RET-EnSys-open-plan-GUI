@@ -282,6 +282,39 @@ const dblClick = (e) => {
 };
 // endregion
 
+// region mirroring elements
+const mirroring = (e) => {
+    if (e.which == 2) {
+        e.preventDefault();
+
+        const closestNode = e.target.closest('.drawflow-node');
+        
+        if (closestNode) {
+            console.log(closestNode)
+            if (closestNode.style.flexDirection == 'row-reverse') {
+                closestNode.style.flexDirection = 'row';
+
+                closestNode.children[0].children[0].classList.remove("mirrored");
+                closestNode.children[2].children[0].classList.remove("mirrored");
+            } else {
+                closestNode.style.flexDirection = 'row-reverse';
+             
+                closestNode.children[0].children[0].classList.add("mirrored");
+                closestNode.children[2].children[0].classList.add("mirrored");
+            }
+
+            /*
+            Swal.fire({
+                title: "Element wurde gespiegelt!",
+                toast: true,
+                icon: "info"
+            })
+            */   
+    
+    }
+    
+}
+}
 
 /* onclick method associated to the save button of the modal */
 const submitForm = (e) => {

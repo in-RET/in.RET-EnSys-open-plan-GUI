@@ -96,20 +96,24 @@
                 </div>
                 <div class="clear_design">
                     <a class="btn btn--medium btn--hollow" onclick="clearGridModel()">{% translate "Clear design" %}</a>
-                    <!--<div class="load-scenario">
+                    <div class="load-scenario">
                         <select class="form-select">
-                            <option selected>{% translate "Load system design from existing scenario" %}</option>
-                            <option value="1">PV Potsdam 2025</option>
-                            <option value="2">open_plan test</option>
+                            <option selected>{% translate "Year selection for this scenario" %}</option>
+                            <option value="1">2030</option>
+                            <option value="2">2035</option>
+                            <option value="1">2040</option>
+                            <option value="2">2045</option>
+                            <option value="1">2050</option>
                         </select>
-                    </div>-->
+                        <span class="icon icon-question" data-bs-toggle="tooltip" title="The selected year is used to get the exact predefined profile."></span>
+                    </div>
                 </div>
             </div>
             <div class="components">
                 <div class="components__title">
                     <div>
                         <h2>{% translate "Energy components" %}</h2>
-                        <span class="icon icon-question" data-bs-toggle="tooltip" title="Lorem ipsum"></span>
+                        <span class="icon icon-question" data-bs-toggle="tooltip" title="List of all possible components."></span>
                     </div>
                 </div>
                 <div class="components__content">
@@ -160,9 +164,9 @@
 <script>
     // activate the double click function provided in grid_model_topology
     document.querySelector('.drawflow').addEventListener("dblclick", dblClick);
-
+    document.querySelector('.drawflow').addEventListener("auxclick", mirroring);
+   
     /* First retrieve the busses and assets, then draw the links */
-
     $(window).on('load', async function () {
         const data = JSON.parse(`{{topology_data_list| escapejs }}`);
         Promise.all([addBusses(data['busses']), addAssets(data['assets'])])

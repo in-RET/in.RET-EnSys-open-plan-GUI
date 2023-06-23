@@ -2496,8 +2496,12 @@ nav.navbar .dropdown-menu li {
   background-color: #fff;
 }
 
-.system-design .gui__clear .load-scenario {
-  padding-right: 1rem;
+.load-scenario {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-content: center;
+  margin-top: 1rem;
 }
 
 .system-design .gui__clear .form-select {
@@ -2603,18 +2607,18 @@ nav.navbar .dropdown-menu li {
 }
 
 .system-design .drawflow .drawflow-node .inputs {
-  bottom: 2rem;
-  left: 0.9rem;
+  left: 0.5rem;
 }
 
 .system-design .drawflow .drawflow-node .outputs {
-  bottom: 2rem;
-  right: 0.9rem;
+  right: 0.5rem;
 }
 
 .system-design .drawflow .drawflow-node .inputs,
 .system-design .drawflow .drawflow-node .outputs {
-  position: absolute;
+  position: relative;
+  top: 0.4rem;
+
 }
 
 .system-design .drawflow .drawflow-node .inputs .input,
@@ -2635,10 +2639,22 @@ nav.navbar .dropdown-menu li {
   left: -22px;
 }
 
+.system-design .drawflow .drawflow-node .inputs .input.mirrored,
+.system-design .drawflow .drawflow-node .outputs .input.mirrored {
+  background-color: #4EC4C4;
+  left: -5px;
+}
+
 .system-design .drawflow .drawflow-node .inputs .output,
 .system-design .drawflow .drawflow-node .outputs .output {
   background-color: #C46A4E;
   right: -10px;
+}
+
+.system-design .drawflow .drawflow-node .inputs .output.mirrored,
+.system-design .drawflow .drawflow-node .outputs .output.mirrored {
+  background-color: #C46A4E;
+  right: 5px;
 }
 
 .system-design .drawflow .drawflow-node .img {

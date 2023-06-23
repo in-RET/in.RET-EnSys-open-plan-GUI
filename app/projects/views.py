@@ -1823,9 +1823,12 @@ def request_mvs_simulation(request, scen_id=0):
         )
     # Load scenario
     scenario = Scenario.objects.get(pk=scen_id)
+    results = None
+
     try:
         data_clean = format_scenario_for_mvs(scenario)
         interest_rate = data_clean["simulation_settings"]["interest_rate"]["value"]
+
 
         for k, v in data_clean.items():
             for i in v:
@@ -1833,6 +1836,7 @@ def request_mvs_simulation(request, scen_id=0):
                     list_busses.append(InRetEnsysBus(label=i["label"]))
 
                 elif k == "energy_production":
+                    print(i)
                     if bool(i["capex"]):
                         ep_costs = epc_calc(
                             i["capex"]["value"],
@@ -1899,6 +1903,9 @@ def request_mvs_simulation(request, scen_id=0):
                     except Exception as e:
                         error_msg = f"Source Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {e}."
                         logger.error(error_msg)
+
+                        messages.error(request, error_msg)
+                        raise Exception(error_msg + " - 407")
                         
                     print("\nEnergy Production: \n")
                     print("{} : {}".format(k, i))
@@ -1970,6 +1977,9 @@ def request_mvs_simulation(request, scen_id=0):
                         error_msg = f"Sink Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {e}."
                         logger.error(error_msg)
 
+                        messages.error(request, error_msg)
+                        raise Exception(error_msg + " - 407")
+
                 elif k == "energy_storage":
                     if bool(i["capex"]):
                         ep_costs = epc_calc(
@@ -2027,6 +2037,9 @@ def request_mvs_simulation(request, scen_id=0):
                         error_msg = f"Storage Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {e}."
                         logger.error(error_msg)
 
+                        messages.error(request, error_msg)
+                        raise Exception(error_msg + " - 407")
+                    
                 elif k == "energy_conversion":
 
                     if bool(i["capex"]):
@@ -2169,6 +2182,8 @@ def request_mvs_simulation(request, scen_id=0):
                         error_msg = f"Trafo Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {e}."
                         logger.error(error_msg)
 
+                        raise Exception(error_msg + " - 407")
+
         print(data_clean["constraints"])
         print(data_clean["economic_data"])
         print(data_clean["simulation_settings"])
@@ -2201,27 +2216,24 @@ def request_mvs_simulation(request, scen_id=0):
 
         #print(data_clean["constraints"])
 
-        (
-            list_constraints.append(
-                InRetEnsysConstraints(
-                    typ=Constraints.emission_limit,
-                    keyword="emission_factor",
-                    limit=data_clean["constraints"]["maximum_emissions"]["value"],
-                )
-            ) if "maximum_emissions" in data_clean["constraints"] else None
-        )
-
-        (
-            list_constraints.append(
-                InRetEnsysConstraints(
-                    typ=Constraints.generic_integral_limit,
-                    keyword="renewable_factor",
-                    limit=data_clean["constraints"]["minimal_renewable_factor"][
-                        "value"
-                    ],
-                )
-            ) if "minimal_renewable_factor" in data_clean["constraints"] else None
-        )
+        list_constraints.append(
+            InRetEnsysConstraints(
+                typ=Constraints.emission_limit,
+                keyword="emission_factor",
+                limit=data_clean["constraints"]["maximum_emissions"]["value"],
+            )
+        ) if "maximum_emissions" in data_clean["constraints"] else None
+        
+        list_constraints.append(
+            InRetEnsysConstraints(
+                typ=Constraints.generic_integral_limit,
+                keyword="renewable_factor",
+                limit=data_clean["constraints"]["minimal_renewable_factor"][
+                    "value"
+                ],
+            )
+        ) if "minimal_renewable_factor" in data_clean["constraints"] else None
+        
 
         if len(list_constraints) > 0:
             for item in list_constraints:
@@ -2240,37 +2252,20 @@ def request_mvs_simulation(request, scen_id=0):
         #jf.write(model.json())
         #jf.close()
 
-        results = None
+        if request.method == "POST":
+            output_lp_file = request.POST.get("output_lp_file", None)
+        if output_lp_file == "on":
+            data_clean["simulation_settings"]["output_lp_file"] = "true"
 
-        print("Model:", model)
+        results = mvs_simulation_request(model.json())
     except Exception as e:
         error_msg = f"Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {e}."
         logger.error(error_msg)
         messages.error(request, error_msg)
-        answer = JsonResponse(
-            {"error": f"Scenario Serialization ERROR! Thrown Exception: {e}."},
-            status=500,
-            content_type="application/json",
-        )
-
-    if request.method == "POST":
-        output_lp_file = request.POST.get("output_lp_file", None)
-        if output_lp_file == "on":
-            data_clean["simulation_settings"]["output_lp_file"] = "true"
-
-    results = mvs_simulation_request(model.json())
-
-    if results is None:
-        error_msg = "Could not communicate with the simulation server."
-        logger.error(error_msg)
-        messages.error(request, error_msg)
-        # TODO redirect to prefilled feedback form / bug form
-        answer = JsonResponse(
-            {"status": "error", "error": error_msg},
-            status=407,
-            content_type="application/json",
-        )
-    else:
+        
+        raise Exception(error_msg + " - 407")
+    
+    try:
         # delete existing simulation
         Simulation.objects.filter(scenario_id=scen_id).delete()
         # Create empty Simulation model object
@@ -2294,6 +2289,13 @@ def request_mvs_simulation(request, scen_id=0):
         answer = HttpResponseRedirect(
             reverse("scenario_review", args=[scenario.project.id, scen_id])
         )
+    except Exception as e:
+        error_msg = "Could not communicate with the simulation server."
+        logger.error(error_msg)
+        messages.error(request, error_msg)
+        # TODO redirect to prefilled feedback form / bug form
+
+        raise Exception(error_msg + " - 407")
 
     return answer
 

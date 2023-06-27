@@ -1490,24 +1490,24 @@ class AssetCreateForm(OpenPlanModelForm):
                     "onchange": "loadPredefindedDataKindofSource(this.value)",
                 },
             ),
-            "year_choice_source": forms.Select(
-                choices=YEAR_CHOICE,
-                attrs={
-                    "data-bs-toggle": "tooltip",
-                    "title": _(""),
-                    "style": "font-weight:400; font-size:13px;",
-                    "onchange": "PredefindedSourceYear(this.value)",
-                },
-            ),
-            "year_choice_trafo": forms.Select(
-                choices=YEAR_CHOICE,
-                attrs={
-                    "data-bs-toggle": "tooltip",
-                    "title": _(""),
-                    "style": "font-weight:400; font-size:13px;",
-                    "onchange": "PredefindedTrafoYear(this.value)",
-                },
-            ),
+            # "year_choice_source": forms.Select(
+            #     choices=YEAR_CHOICE,
+            #     attrs={
+            #         "data-bs-toggle": "tooltip",
+            #         "title": _(""),
+            #         "style": "font-weight:400; font-size:13px;",
+            #         "onchange": "PredefindedSourceYear(this.value)",
+            #     },
+            # ),
+            # "year_choice_trafo": forms.Select(
+            #     choices=YEAR_CHOICE,
+            #     attrs={
+            #         "data-bs-toggle": "tooltip",
+            #         "title": _(""),
+            #         "style": "font-weight:400; font-size:13px;",
+            #         "onchange": "PredefindedTrafoYear(this.value)",
+            #     },
+            # ),
             "trafo_choice": forms.Select(
                 choices=TRAFO_CHOICE,
                 attrs={
@@ -1539,15 +1539,15 @@ class AssetCreateForm(OpenPlanModelForm):
                     "step": ".01",
                 }
             ),
-            "year_choice_storage": forms.Select(
-                choices=YEAR_CHOICE,
-                attrs={
-                    "data-bs-toggle": "tooltip",
-                    "title": _(""),
-                    "style": "font-weight:400; font-size:13px;",
-                    "onchange": "PredefindedStorageYear(this.value)",
-                },
-            ),
+            # "year_choice_storage": forms.Select(
+            #     choices=YEAR_CHOICE,
+            #     attrs={
+            #         "data-bs-toggle": "tooltip",
+            #         "title": _(""),
+            #         "style": "font-weight:400; font-size:13px;",
+            #         "onchange": "PredefindedStorageYear(this.value)",
+            #     },
+            # ),
             "storage_choice": forms.Select(
                 choices=STORAGE_CHOICE,
                 attrs={

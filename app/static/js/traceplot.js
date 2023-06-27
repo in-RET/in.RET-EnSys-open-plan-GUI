@@ -26,25 +26,14 @@ const layout = {
 };
 
 var kindOfComponentSource = '';
-var choosenTimestampSource = '';
 var kindOfComponentTrafo = '';
-var choosenTimestampTrafo = '';
 var kindOfComponentStorage = '';
-var choosenTimestampStorage = '';
+
 
 // handling predefined sources
 function loadPredefindedDataKindofSource(value){
 	kindOfComponentSource = value;
-	if (kindOfComponentSource != '' && choosenTimestampSource != ''){
-		fill_out_form_source();
-	}
-}
-
-function PredefindedSourceYear(value){
-	choosenTimestampSource = value;
-	alert(choosenTimestampSource+ ' ' + kindOfComponentSource);
-	//fill_out_form();
-	if (kindOfComponentSource != '' && choosenTimestampSource != ''){
+	if (kindOfComponentSource != '' && choosenTimestamp != ''){
 		fill_out_form_source();
 	}
 }
@@ -52,15 +41,7 @@ function PredefindedSourceYear(value){
 // handling predefined transformers
 function loadPredefindedDataKindofTrafo(value){
 	kindOfComponentTrafo = value;
-	if (kindOfComponentTrafo != '' && choosenTimestampTrafo != ''){
-		fill_out_form_trafo();
-	}
-}
-
-function PredefindedTrafoYear(value){
-	choosenTimestampTrafo = value;
-	alert(choosenTimestampTrafo + ' ' + kindOfComponentTrafo);
-	if (kindOfComponentTrafo != '' && choosenTimestampTrafo != ''){
+	if (kindOfComponentTrafo != '' && choosenTimestamp != ''){
 		fill_out_form_trafo();
 	}
 }
@@ -68,15 +49,7 @@ function PredefindedTrafoYear(value){
 // handling predefined storages
 function loadPredefindedDataKindofStorage(value){
 	kindOfComponentStorage = value;
-	if (kindOfComponentStorage != '' && choosenTimestampStorage != ''){
-		fill_out_form_storage();
-	}
-}
-
-function PredefindedStorageYear(value){
-	choosenTimestampStorage = value;
-	alert(choosenTimestampStorage + ' ' + kindOfComponentStorage);
-	if (kindOfComponentStorage != '' && choosenTimestampStorage != ''){
+	if (kindOfComponentStorage != '' && choosenTimestamp != ''){
 		fill_out_form_storage();
 	}
 }
@@ -110,7 +83,7 @@ function fill_out_form_source(){
 	//alert('Called');
 	var server_data = [
 		{"kindOfComponentSource": kindOfComponentSource},
-		{"choosenTimestampSource": choosenTimestampSource},
+		{"choosenTimestampSource": choosenTimestamp},
 	];
 			
 	$.ajax({
@@ -131,7 +104,7 @@ function fill_out_form_trafo(){
 	//alert('Called');
 	var server_data = [
 		{"kindOfComponentTrafo": kindOfComponentTrafo},
-		{"choosenTimestampTrafo": choosenTimestampTrafo},
+		{"choosenTimestampTrafo": choosenTimestamp},
 	];
 			
 	$.ajax({
@@ -152,7 +125,7 @@ function fill_out_form_storage(){
 	//alert('Called');
 	var server_data = [
 		{"kindOfComponentStorage": kindOfComponentStorage},
-		{"choosenTimestampStorage": choosenTimestampStorage},
+		{"choosenTimestampStorage": choosenTimestamp},
 	];
 			
 	$.ajax({

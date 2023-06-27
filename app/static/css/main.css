@@ -2721,6 +2721,7 @@ nav.navbar .dropdown-menu li {
 
 .system-design .drawflow .drawflow-node.mySink,
 .system-design .drawflow .drawflow-node.myPredefinedSink,
+.system-design .drawflow .drawflow-node.myPredefinedSinkOEP,
 .system-design .drawflow .drawflow-node.myExcess,
 .system-design .drawflow .drawflow-node.myExport {
   border-bottom-color: #FFD6E0;
@@ -2728,6 +2729,7 @@ nav.navbar .dropdown-menu li {
 
 .system-design .drawflow .drawflow-node.mySink .img::before,
 .system-design .drawflow .drawflow-node.myPredefinedSink .img::before,
+.system-design .drawflow .drawflow-node.myPredefinedSinkOEP .img::before,
 .system-design .drawflow .drawflow-node.myExcess .img::before,
 .system-design .drawflow .drawflow-node.myExport .img::before {
   content: '';

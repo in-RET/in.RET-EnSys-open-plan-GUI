@@ -188,14 +188,14 @@
             showCancelButton: true,
             confirmButtonText: "Yes, clear everything!",
             cancelButtonText: "Cancel",
-        }).then((result) => result.value && editor.clearModuleSelected());
+        }).then((result) => result.value && editor.clearModuleSelected()).then((result) => save_topology(reset = true));
     }
 
     /*
      * Export Topology to JSON and send to back-end.
      * Used by the Save and Next buttons at page footer
     */
-    function save_topology(move_step = false) {
+    function save_topology(move_step = false, reset = false) {
         // Data Pre-check
         /*
         /* Check if there are duplicate node names in the model

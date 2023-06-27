@@ -31,27 +31,30 @@ var kindOfComponentStorage = '';
 
 
 // handling predefined sources
-function loadPredefindedDataKindofSource(value){
-	kindOfComponentSource = value;
-	if (kindOfComponentSource != '' && choosenTimestamp != ''){
-		fill_out_form_source();
-	}
+function loadPredefindedDataKindofSource(value) {
+    kindOfComponentSource = value;
+    if (kindOfComponentSource != '' && choosenTimestamp != '') {
+        fill_out_form_source();
+    }
 }
+
 
 // handling predefined transformers
-function loadPredefindedDataKindofTrafo(value){
-	kindOfComponentTrafo = value;
-	if (kindOfComponentTrafo != '' && choosenTimestamp != ''){
-		fill_out_form_trafo();
-	}
+function loadPredefindedDataKindofTrafo(value) {
+    kindOfComponentTrafo = value;
+    if (kindOfComponentTrafo != '' && choosenTimestamp != '') {
+        fill_out_form_trafo();
+    }
 }
 
+
 // handling predefined storages
-function loadPredefindedDataKindofStorage(value){
-	kindOfComponentStorage = value;
-	if (kindOfComponentStorage != '' && choosenTimestamp != ''){
-		fill_out_form_storage();
-	}
+function loadPredefindedDataKindofStorage(value) {
+    kindOfComponentStorage = value;
+    if (kindOfComponentStorage != '' && choosenTimestamp != '') {
+        fill_out_form_storage();
+    }
+}
 
 
 $.ajaxSetup({
@@ -79,74 +82,11 @@ $.ajaxSetup({
 });
 
 
-<<<<<<< HEAD
-function fill_out_form_source(){
-	//alert('Called');
-	var server_data = [
-		{"kindOfComponentSource": kindOfComponentSource},
-		{"choosenTimestampSource": choosenTimestamp},
-	];
-			
-	$.ajax({
-		type: "POST",
-		url: "/en/asset/get_param_suggestion_source/",
-		data: JSON.stringify(server_data),
-		contentType: "application/json",
-		dataType: 'json',
-		success: function(response) {
-			Swal.fire('', "Got response from server ...", 'info');
-			//alert(response['form_html']);
-			$('#act_form_div').html(response['form_html']);
-			}
-	});
-}
-
-function fill_out_form_trafo(){
-	//alert('Called');
-	var server_data = [
-		{"kindOfComponentTrafo": kindOfComponentTrafo},
-		{"choosenTimestampTrafo": choosenTimestamp},
-	];
-			
-	$.ajax({
-		type: "POST",
-		url: "/en/asset/get_param_suggestion_trafo/",
-		data: JSON.stringify(server_data),
-		contentType: "application/json",
-		dataType: 'json',
-		success: function(response) {
-			Swal.fire('', "Got response from server ...", 'info');
-			//alert(response['form_html']);
-			$('#act_form_div').html(response['form_html']);
-			}
-	});
-}
-
-function fill_out_form_storage(){
-	//alert('Called');
-	var server_data = [
-		{"kindOfComponentStorage": kindOfComponentStorage},
-		{"choosenTimestampStorage": choosenTimestamp},
-	];
-			
-	$.ajax({
-		type: "POST",
-		url: "/en/asset/get_param_suggestion_storage/",
-		data: JSON.stringify(server_data),
-		contentType: "application/json",
-		dataType: 'json',
-		success: function(response) {
-			Swal.fire('', "Got response from server ...", 'info');
-			//alert(response['form_html']);
-			$('#act_form_div').html(response['form_html']);
-			}
-	});
-=======
 function fill_out_form_source() {
     //alert('Called');
     var server_data = [
         { "kindOfComponentSource": kindOfComponentSource },
-        { "choosenTimestampSource": choosenTimestampSource },
+        { "choosenTimestampSource": choosenTimestamp },
     ];
 
     $.ajax({
@@ -167,7 +107,7 @@ function fill_out_form_trafo() {
     //alert('Called');
     var server_data = [
         { "kindOfComponentTrafo": kindOfComponentTrafo },
-        { "choosenTimestampTrafo": choosenTimestampTrafo },
+        { "choosenTimestampTrafo": choosenTimestamp },
     ];
 
     $.ajax({
@@ -188,7 +128,7 @@ function fill_out_form_storage() {
     //alert('Called');
     var server_data = [
         { "kindOfComponentStorage": kindOfComponentStorage },
-        { "choosenTimestampStorage": choosenTimestampStorage },
+        { "choosenTimestampStorage": choosenTimestamp },
     ];
 
     $.ajax({
@@ -203,7 +143,6 @@ function fill_out_form_storage() {
             $('#act_form_div').html(response['form_html']);
         }
     });
->>>>>>> 0e2d5aa5b027b7bb34907caea081aad386a3b5a2
 }
 
 function makePlotlyLoadProfile(value) {

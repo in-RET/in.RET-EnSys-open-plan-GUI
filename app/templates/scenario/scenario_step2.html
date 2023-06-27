@@ -132,7 +132,9 @@
         </div>
         <div id="drawflow" class="gui" ondrop="drop(event)" ondragover="allowDrop(event)">
             <div class="gui__empty-text">
-                <span>{% translate "Drag and drop components to build your energy system" %}</span>
+                <span>{% translate "Drag and drop components to build your energy system" %}</span><br />
+                <span>DoubleClick: Opens form to enter parameters</span><br />
+                <span>Middle Mousebutton: Mirrors the selected block</span>
             </div>
         </div>
 
@@ -188,14 +190,14 @@
             showCancelButton: true,
             confirmButtonText: "Yes, clear everything!",
             cancelButtonText: "Cancel",
-        }).then((result) => result.value && editor.clearModuleSelected()).then((result) => save_topology(reset = true));
+        }).then((result) => result.value && editor.clearModuleSelected()).then((result) => save_topology());
     }
 
     /*
      * Export Topology to JSON and send to back-end.
      * Used by the Save and Next buttons at page footer
     */
-    function save_topology(move_step = false, reset = false) {
+    function save_topology(move_step = false) {
         // Data Pre-check
         /*
         /* Check if there are duplicate node names in the model

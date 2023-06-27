@@ -592,10 +592,10 @@ class Asset(TopologyNode):
     source_choice = models.CharField(
         null=True, blank=False, choices=SOURCE_CHOICE, max_length=40
     )
-    year_choice_source = models.IntegerField(
-        null=True, blank=False, choices=YEAR_CHOICE
-    )
-    year_choice_trafo = models.IntegerField(null=True, blank=False, choices=YEAR_CHOICE)
+    # year_choice_source = models.IntegerField(
+    #     null=True, blank=False, choices=YEAR_CHOICE
+    # )
+    # year_choice_trafo = models.IntegerField(null=True, blank=False, choices=YEAR_CHOICE)
     trafo_choice = models.CharField(
         null=True, blank=False, choices=TRAFO_CHOICE, max_length=40
     )
@@ -608,9 +608,9 @@ class Asset(TopologyNode):
     storage_choice = models.CharField(
         null=True, blank=False, choices=STORAGE_CHOICE, max_length=40
     )
-    year_choice_storage = models.IntegerField(
-        null=True, blank=False, choices=YEAR_CHOICE
-    )
+    # year_choice_storage = models.IntegerField(
+    #     null=True, blank=False, choices=YEAR_CHOICE
+    # )
     annual_energy_consumption = models.FloatField(
         null=True, blank=False, validators=[MinValueValidator(0.0)]
     )

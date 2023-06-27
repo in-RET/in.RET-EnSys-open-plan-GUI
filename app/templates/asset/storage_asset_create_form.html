@@ -7,7 +7,6 @@
   {{ form.name|as_crispy_field }}
   {% if form.asset_type_name == "myPredefinedStorage" %}
 		{{ form.storage_choice|as_crispy_field }}
-		{{ form.year_choice_storage|as_crispy_field }}
 	{% endif %}
 </div>
 

@@ -16,14 +16,86 @@
 <main>
 	<section class="header">
 		<div>
-			<div class="header__left">Left Header</div>
+			<div class="header__left"></div>
 			<h1 class="header__title">{% translate "Documentation" %}</h1>
-			<div class="header__back">Right Header</div>
+			<div class="header__back"></div>
 		</div>
-    </section>
-    <section class="standard-layout">
-        <p>Bla Bla Bla Bla Bla. ... Hier folgt text aus dem "So geht's".</p>
-    </section>
+	</section>
+	<section class="standard-layout">
+		<div>
+			<h3>Hintergründe </h3>
+			<p>Bla Bla Bla Bla Bla. ... Hier folgt text aus dem "So geht's". ... Not Safe for Work!</p>
+			<p>Das Akronym oemof steht für open energy modelling framework und ist eine in Python implementierte
+				open-source
+				Simulationsumgebung für Energiesysteme.
+				Sie wird von einem Entwicklerteam des Reiner Lemoine Instituts Berlin, der Hochschule Flensburg und der
+				Universität Bremen weiterentwickelt.</p>
+			<p>Oemof ist objektorientiert und setzt auf das Framework pyomo auf. Pyomo erzeugt eine Datei für die
+				lineare
+				Programmierung, die die vom Solver zu lösende Zielfunktion und die Nebenbedingungen enthält.</p>
+			<p>Das oemof-Package ''solph'' stellt Klassen zur Simulation der Bestandteile eines Energiesystems zur
+				Verfügung, welches blockweise aufgebaut ist. So ist z.B. die Solarthermie ein Block und die
+				Fernwärmelast
+				ein anderer. Nachfolgend werden alle Klassen kurz erläutert. </p>
+			<p> Das Energiesystem setzt sich aus Quellen, Senken, Speichertechnologien, Umwandlungsstellen und
+				Verbindungsleitungen zwischen diesen zusammen.
+				Die vorrangig verwendeten Komponenten sind:
+			<ul>
+				<li>Source</li>
+				<li>Sink</li>
+				<li>GenericStorage</li>
+				<li>Transformer</li>
+				<li>Bus</li>
+			</ul>
+			</p>
+			<p> Jede Komponente ist mit mindestens einem Bus verbunden. Jeder Knoten im
+				Programm wird mit einem Namen (label) eindeutig bezeichnet. Zu Beginn
+				wird eine Instanz der Klasse EnergySystem() erzeugt, der als Parameter das
+				zu simulierende Zeitintervall übergeben wird und der alle Objekte des Ener-
+				giesystemmodells hinzugefügt werden.
+				Für Energiequellen, denen Einspeiseprofil, Nennleistung, Kosten und Haltezei-
+				ten (bei Kraftwerken) mit übergeben werden können, sieht solph die Klasse
+				Source() vor. Eine Instanz der Klasse Source() hat einen Ausgang (outputs)
+				und keinen Eingang. Kraft-Wärme-Kopplungsanlagen als Energielieferanten
+				sind insbesondere mit der Klasse GenericCHP() abbildbar. Dazu zählen
+				Blockheizkraftwerke und Heizkraftwerke mit Gegendruckturbinen.
+				Die Klasse Sink() repräsentiert das Verhalten von Verbrauchern. Einem Ver-
+				braucher können Lastprofil und Nennleistung zugeordnet werden; Kosten sind
+				an der Stelle nicht notwendig, da Ziel der Optimierung die kostenoptimale De-
+				ckung der Last in jedem Zeitschritt ist. Sink() hat einen Input – das Dictionary
+				inputs und keinen Ausgang. Der Schlüssel des Dictionarys ist der Quellbus,
+				von dem die Senke ihre Energie bezieht. Der Wert ist der Aufruf der Klasse
+				Flow(), der die gewünschten Eigenschaften des Energieflusses übergeben
+				werden.
+				Die Klasse GenericStorage() bildet die charakteristischen Eigenschaften ei-
+				nes Energiespeichers ab. Eine Instanz der Klasse hat zunächst einmal zwei
+				Attribute, die den Energiefluss in den Speicher (inputs) und aus dem Spei-
+				cher (outputs) definieren. Die Nennkapazität (nominal_storage_capacity)
+				kann fest vorgegeben oder vom Optimierer bestimmt werden. Die boolesche
+				Variable balanced ist standardmäßig auf true gesetzt, was bedeutet, dass der
+				Speicher am Ende wieder genauso voll ist, wie zu Beginn des Simulationszeit-
+				raums. Das initial_storage_level bestimmt den Füllstand des Speichers
+				im ersten Zeitschritt. Im Thüringer Modell ist jeder Speicher zu Beginn zur
+				Hälfte gefüllt. Die C-Rate, mit der der maximal in einem Zeitschritt entnehm-
+				bare Anteil der Kapazität festgelegt wird, fließt in die invest_relation_out-
+				put_capacity ein. Die Eigenschaft wird in der Klasse mit der installierten,
+				optimierten Nennkapazität multipliziert. Gleiches gilt für die invest_rela-
+				tion_input_capacity. Zudem können dem Objekt der Ein- und Ausspei-
+				cherwirkungsgrad der Speichertechnologie (inflow_conversion_factor/
+				outflow_conversion_factor) mit übergeben werden und bei saisonalen
+				Speichern auch eine Verlustrate (loss_rate), die den prozentualen Ladungs-
+				verlust zwischen zwei Zeitschritten beschreibt.
+				Zum Erstellen von Energiewandlern stellt die Klasse Transformer() sicher,
+				dass die zu- und abfließenden Energiemengen unter Berücksichtigung des gewünschten Wirkungsgrades in
+				einem Zeitschritt identisch sind. Eine Instanz
+				dieser Klasse kann beliebig viele Ein- und Ausgänge haben.
+				Alle genannten Komponenten können mit Instanzen der Klasse Bus() zu ei-
+				nem Energiesystemmodell miteinander verknüpft werden. Ein Bus ist in oemof
+				eine Sammelschiene, deren zu- und abfließende Energiemengen sich in jedem
+				Zeitschritt ausgleichen.
+			</p>
+		</div>
+	</section>
 
 </main>
 {% endblock content %}

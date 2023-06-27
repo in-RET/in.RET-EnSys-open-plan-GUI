@@ -228,9 +228,9 @@ body {
 
 main {
   display: block;
-  margin-top: 7rem;
+  margin-top: 1rem;
   height: 100%;
-  position: fixed;
+  position: relative;
   width: 100%;
 }
 
@@ -2033,7 +2033,6 @@ nav.navbar .dropdown-menu li {
   justify-content: center;
   background-color: #FFF;
   min-height: calc(100vh - 18.5rem);
-  margin-top: 8.5rem;
 }
 
 .dashboard>div {
@@ -2545,6 +2544,7 @@ nav.navbar .dropdown-menu li {
   transform: translateY(-50%);
   left: 50%;
   transform: translateX(-50%);
+  text-align: center;
 }
 
 .system-design .gui__empty-text span {
@@ -2721,6 +2721,7 @@ nav.navbar .dropdown-menu li {
 
 .system-design .drawflow .drawflow-node.mySink,
 .system-design .drawflow .drawflow-node.myPredefinedSink,
+.system-design .drawflow .drawflow-node.myPredefinedSinkOEP,
 .system-design .drawflow .drawflow-node.myExcess,
 .system-design .drawflow .drawflow-node.myExport {
   border-bottom-color: #FFD6E0;
@@ -2728,6 +2729,7 @@ nav.navbar .dropdown-menu li {
 
 .system-design .drawflow .drawflow-node.mySink .img::before,
 .system-design .drawflow .drawflow-node.myPredefinedSink .img::before,
+.system-design .drawflow .drawflow-node.myPredefinedSinkOEP .img::before,
 .system-design .drawflow .drawflow-node.myExcess .img::before,
 .system-design .drawflow .drawflow-node.myExport .img::before {
   content: '';

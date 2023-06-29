@@ -92,20 +92,24 @@
                 </div>
                 <div class="clear_design">
                     <a class="btn btn--medium btn--hollow" onclick="clearGridModel()">{% translate "Clear design" %}</a>
-                    <!--<div class="load-scenario">
-                        <select class="form-select">
-                            <option selected>{% translate "Load system design from existing scenario" %}</option>
-                            <option value="1">PV Potsdam 2025</option>
-                            <option value="2">open_plan test</option>
+                    <div class="load-scenario">
+                        <select class="form-select" onchange="getSelectedYear()" id="select_id_year">
+                            <option selected>{% translate "Year selection for this scenario" %}</option>
+							<option value="2025">2025</option>
+                            <option value="2030">2030</option>
+                            <option value="2035">2035</option>
+                            <option value="2040">2040</option>
+                            <option value="2045">2045</option>
                         </select>
-                    </div>-->
+                        <span class="icon icon-question" data-bs-toggle="tooltip" title="The selected year is used to read out the parameters of all technologies for exactly this year from the database."></span>
+                    </div>
                 </div>
             </div>
             <div class="components">
                 <div class="components__title">
                     <div>
                         <h2>{% translate "Energy components" %}</h2>
-                        <span class="icon icon-question" data-bs-toggle="tooltip" title="Lorem ipsum"></span>
+                        <span class="icon icon-question" data-bs-toggle="tooltip" title="List of all possible components."></span>
                     </div>
                 </div>
                 <div class="components__content">
@@ -124,7 +128,9 @@
         </div>
         <div id="drawflow" class="gui" ondrop="drop(event)" ondragover="allowDrop(event)">
             <div class="gui__empty-text">
-                <span>{% translate "Drag and drop components to build your energy system" %}</span>
+                <span>{% translate "Drag and drop components to build your energy system" %}</span><br />
+                <span>DoubleClick: Opens form to enter parameters</span><br />
+                <span>Middle Mousebutton: Mirrors the selected block</span>
             </div>
         </div>
 
@@ -142,6 +148,16 @@
 <script src=" https://cdn.jsdelivr.net/npm/jquery-ui@1.13.2/dist/jquery-ui.min.js "></script>
 
 <script>
+var choosenTimestamp = '';
+
+function getSelectedYear() {
+    choosenTimestamp = document.getElementById("select_id_year").value;
+    alert(choosenTimestamp);
+}
+</script>
+
+
+<script>
     const csrfToken = '{{ csrf_token }}';
     const formGetUrl = `{% url 'get_asset_create_form' scenario.id %}`;
     const formPostUrl = `{% url 'asset_create_or_update' scenario.id %}`;
@@ -154,9 +170,9 @@
 <script>
     // activate the double click function provided in grid_model_topology
     document.querySelector('.drawflow').addEventListener("dblclick", dblClick);
-
+    document.querySelector('.drawflow').addEventListener("auxclick", mirroring);
+   
     /* First retrieve the busses and assets, then draw the links */
-
     $(window).on('load', async function () {
         const data = JSON.parse(`{{topology_data_list| escapejs }}`);
         Promise.all([addBusses(data['busses']), addAssets(data['assets'])])
@@ -178,7 +194,7 @@
             showCancelButton: true,
             confirmButtonText: "Yes, clear everything!",
             cancelButtonText: "Cancel",
-        }).then((result) => result.value && editor.clearModuleSelected());
+        }).then((result) => result.value && editor.clearModuleSelected()).then((result) => save_topology());
     }
 
     /*

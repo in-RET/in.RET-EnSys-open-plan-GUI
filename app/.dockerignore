@@ -14,7 +14,7 @@ Pipfile.lock
 webpack.config.js
 .babelrc.json
 .dockerignore
-
+**/node_modules
 # **
 # !cdn_static_root/
 # !dashboard/**

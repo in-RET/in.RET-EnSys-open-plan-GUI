@@ -7,11 +7,9 @@
     {{ form.name|as_crispy_field }}
 	{% if form.asset_type_name == "myPredefinedSource" %}
 		{{ form.source_choice|as_crispy_field }}
-		{{ form.year_choice_source|as_crispy_field }}
 	{% endif %}
 	{% if form.asset_type_name == "myPredefinedTransformer" %}
 		{{ form.trafo_choice|as_crispy_field }}
-		{{ form.year_choice_trafo|as_crispy_field }}
 	{% endif %}
   </div>
 

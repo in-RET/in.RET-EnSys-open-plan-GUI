@@ -361,7 +361,7 @@
         "asset_category": "energy_consumption",
         "energy_vector": "Electricity",
         "mvs_type": "sink",
-        "asset_fields": "[name,renewable_factor,oep_table_name,oep_column_name]",
+        "asset_fields": "[name,renewable_factor,oep_table_name,oep_column_name,nominal_value]",
         "unit": null
     }
 },

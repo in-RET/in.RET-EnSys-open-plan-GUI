@@ -614,7 +614,9 @@ def scenario_create_parameters(request, proj_id, scen_id=None, step_id=1, max_st
     user_projects = request.user.project_set.all()
 
     form = ScenarioCreateForm(
-        initial={"project": project}, project_queryset=user_projects
+        initial={"project": project,
+                 "evaluated_period": 365}, 
+        project_queryset=user_projects
     )
     if scen_id == "None":
         scen_id = None
@@ -1166,6 +1168,13 @@ def get_inputparameter_suggestion_source(request):
                 "lifetime": lifetime,
             },
         )
+        
+    if technology == "Wind" or technology == "Photovoltaic Free Field":
+        field = form.fields["summed_max"]
+        field.widget = field.hidden_widget()
+        
+        field = form.fields["summed_min"]
+        field.widget = field.hidden_widget()
 
     # form_suggestion = SuggestionForm(initial={"capex": 600000, "opex": 2,
     #                                           "lifetime": 20})

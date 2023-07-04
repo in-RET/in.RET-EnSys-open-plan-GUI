@@ -389,11 +389,11 @@ class CommentForm(ModelForm):
 scenario_widgets = {
     "name": forms.TextInput(attrs={"placeholder": "Scenario name"}),
     "start_date": forms.DateInput(
-        format="%Y-%m-%d",
+        format='%d%m%Y',
         attrs={
             "class": "TestDateClass",
             "placeholder": "Select a start date",
-            "type": "date",
+            "type": "date", #The standard HTML5 input tag type="date" doesn’t allow for customization.
         },
     ),
     "time_step": forms.Select(
@@ -409,8 +409,8 @@ scenario_widgets = {
     ),
     "evaluated_period": forms.NumberInput(
         attrs={
-            "placeholder": "value between 1 and 365",
-            "min": "1",
+            "placeholder": "so far only one year is possible",
+            "min": "365",
             "max": "365",
             "step": "1",
             "data-bs-toggle": "tooltip",
@@ -450,7 +450,7 @@ scenario_widgets = {
 scenario_labels = {
     "project": _("Project"),
     "name": _("Scenario name"),
-    "evaluated_period": _("Simulation Period - Number of Days (Note that a very short simulation period can lead to unrealistic results.)"),
+    "evaluated_period": _("Simulation period of one year"), #(Note that a very short simulation period can lead to unrealistic results.)
     "time_step": _("Time Step"),
     "start_date": _("Start Date"),
     # "capex_fix": _("Development costs"),

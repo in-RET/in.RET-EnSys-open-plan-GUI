@@ -389,7 +389,7 @@ class CommentForm(ModelForm):
 scenario_widgets = {
     "name": forms.TextInput(attrs={"placeholder": "Scenario name"}),
     "start_date": forms.DateInput(
-        format='%d%m%Y',
+        format="%Y-%m-%d",
         attrs={
             "class": "TestDateClass",
             "placeholder": "Select a start date",
@@ -640,16 +640,25 @@ class BusForm(OpenPlanModelForm):
 
     class Meta:
         model = Bus
-        fields = ["name"]
+        fields = ["name", "type"]
         widgets = {
             "name": forms.TextInput(
                 attrs={
                     "placeholder": "Bus Name",
                     "style": "font-weight:400; font-size:13px;",
                 }
+            ),
+            "type": forms.Select(
+                choices=ENERGY_VECTOR,
+                attrs={
+                    "data-bs-toggle": "tooltip",
+                    "title": _("The energy Vector of the connected assets."),
+                    "style": "font-weight:400; font-size:13px;",
+                },
             )
         }
-        labels = {"name": _("Name"), }
+        labels = {"name": _("Name"), 
+                  "type": _("Energy carrier")}
 
 
 # class SuggestionForm(OpenPlanModelForm):

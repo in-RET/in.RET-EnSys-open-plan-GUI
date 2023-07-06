@@ -268,6 +268,8 @@ ENERGY_VECTOR = (
     ("Heat", "Heat"),
     ("Gas", "Gas"),
     ("H2", "H2"),
+    ("Biomass", "Biomass"),
+    ("Other", "Other"),
     # ('Diesel', 'Diesel'),
 )
 

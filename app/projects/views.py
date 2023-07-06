@@ -28,7 +28,7 @@ from epa.settings import (
 from InRetEnsys import *
 from InRetEnsys.types import Solver, Constraints
 from jsonview.decorators import json_view
-from projects.helpers import epc_calc, format_scenario_for_mvs
+from projects.helpers import epc_calc, format_scenario_for_mvs, polate_unknown_capex
 from projects.models import *
 
 from .constants import DONE, ERROR, MODIFIED, PENDING
@@ -1138,22 +1138,26 @@ def get_inputparameter_suggestion_source(request):
     input_timeseries = ""
     technology = body[0]["kindOfComponentSource"]
     year = body[1]["choosenTimestampSource"]
-
+    
     if (
         technology == "Wind"
         or technology == "Photovoltaic Free Field"
-        or technology == "Other" #empty queryset
+        # or technology == "Other" #empty queryset
     ):
-        queryset = InputparameterSuggestion.objects.filter(technology=technology, year=year)
-        for item in queryset:
-            print(item.unique_id, item.capex)
-            capex = item.capex
-            opex = item.opex
-            lifetime = item.lifetime
-            # efficiency = item.efficiency
-            # efficiency_el = item.efficiency_el
-            # efficiency_th = item.efficiency_th
-            input_timeseries = item.input_timeseries
+        if year == "2025" or year == "2035":
+            capex, opex, lifetime, input_timeseries = polate_unknown_capex(technology, year)
+        
+        else: #2030, 2040, 2045           
+            queryset = InputparameterSuggestion.objects.filter(technology=technology, year=year)
+            for item in queryset:
+                print(item.unique_id, item.capex)
+                capex = item.capex
+                opex = item.opex
+                lifetime = item.lifetime
+                # efficiency = item.efficiency
+                # efficiency_el = item.efficiency_el
+                # efficiency_th = item.efficiency_th
+                input_timeseries = item.input_timeseries
             
         asset_type_name = "myPredefinedSource"
         form = AssetCreateForm(
@@ -1167,6 +1171,21 @@ def get_inputparameter_suggestion_source(request):
                 "lifetime": lifetime,
             },
         )
+        
+    elif technology == "Other":
+        asset_type_name = "myPredefinedSource"
+        form = AssetCreateForm(
+            asset_type=asset_type_name,
+            initial={
+                "name": "What ever you like",
+                "source_choice": technology,
+                "year_choice_source": year,
+                "capex": "",
+                "opex": "",
+                "lifetime": "",
+            },
+        )
+        
         
     elif technology == "Import Grid":
                 
@@ -2230,22 +2249,24 @@ def request_mvs_simulation(request, scen_id=0):
                         
                     if i['trafo_choice'] == "Biogas CHP":
                         print("\nEnergy Conversion (Biogas CHP): \n")
-                        print("{} : {}".format(k, i))
+                        print("{} : {}".format(k, i))                        
                         
-                        queryset = Bus.objects.filter(name=i['outflow_direction'][0])
-                        for item in queryset:
-                            print(item.id, item.name, item.type)
-                            
-                        if item.type == "Electricity":
-                            output_first = i['outflow_direction'][0] #first one is considered to be el
-                            output_second = i['outflow_direction'][1] #second one is consideres to be th
-                        elif item.type == "Heat":
-                            output_first = i['outflow_direction'][1]
-                            output_second = i['outflow_direction'][0]
-                            
-                        print(output_first, output_second)
-
                         try:
+                            queryset = Bus.objects.filter(name=i['outflow_direction'][0])
+                            for item in queryset:
+                                print(item.id, item.name, item.type)
+                                
+                            if item.type == "Electricity":
+                                output_first = i['outflow_direction'][0] #first one is considered to be el
+                                output_second = i['outflow_direction'][1] #second one is consideres to be th
+                            elif item.type == "Heat":
+                                output_first = i['outflow_direction'][1]
+                                output_second = i['outflow_direction'][0]
+                            else:
+                                print('The CHP biogas is not connected correctly!')
+                                
+                            print(output_first, output_second)
+                            
                             list_transformers.append(
                                 InRetEnsysTransformer(
                                     label=i["label"],

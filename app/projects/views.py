@@ -4,6 +4,7 @@ import json
 import logging
 import traceback
 import shutil
+import numpy as np
 from datetime import datetime
 
 import requests
@@ -1142,6 +1143,7 @@ def get_inputparameter_suggestion_source(request):
     if (
         technology == "Wind"
         or technology == "Photovoltaic Free Field"
+        or technology == "Roof Mounted Photovoltaic"
         # or technology == "Other" #empty queryset
     ):
         if year == "2025" or year == "2035":
@@ -1163,7 +1165,7 @@ def get_inputparameter_suggestion_source(request):
         form = AssetCreateForm(
             asset_type=asset_type_name,
             initial={
-                "name": "What ever you like",
+                "name": technology,
                 "source_choice": technology,
                 "year_choice_source": year,
                 "capex": capex,
@@ -1185,6 +1187,39 @@ def get_inputparameter_suggestion_source(request):
                 "lifetime": "",
             },
         )
+        
+    elif technology == "Solar thermal system": #from "So gehts", the same for all years
+        # cwd = os.getcwd()
+        asset_type_name = "myPredefinedSource"
+        form = AssetCreateForm(
+            asset_type=asset_type_name,
+            initial={
+                "name": technology,
+                "source_choice": technology,
+                "year_choice_source": year,
+                "capex": 270, #€/m2
+                "opex": 1.5,
+                "lifetime": 20,
+            },
+        )
+        array_data = np.load('static/Solar thermal energy profile.npy')
+        input_timeseries = str(array_data)
+        
+    elif technology == "Run-of-river power plant": #from "So gehts", the same for all years
+        asset_type_name = "myPredefinedSource"
+        form = AssetCreateForm(
+            asset_type=asset_type_name,
+            initial={
+                "name": technology,
+                "source_choice": technology,
+                "year_choice_source": year,
+                "capex": 5000000,
+                "opex": 5,
+                "lifetime": 60
+            },
+        )
+        array_data = np.load('static/Run-of-river power plant profile.npy')
+        input_timeseries = str(array_data)
         
         
     elif technology == "Import Grid":

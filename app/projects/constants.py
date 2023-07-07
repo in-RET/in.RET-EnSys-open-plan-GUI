@@ -291,8 +291,11 @@ SOURCE_CHOICE = (
     ("", "Choose..."),
     ("Wind", "Wind power plant"),
     ("Photovoltaic Free Field", "Ground Mounted Photovoltaic"),
+    ("Roof Mounted Photovoltaic", "Roof Mounted Photovoltaic"),
     ("Import Grid", "Import from the power grid"),
     ("Biomass supply", "Biomass supply"),
+    ("Solar thermal system", "Solar thermal system"),
+    ("Run-of-river power plant", "Run-of-river power plant"),
     ("Other", "Other")
 )
 

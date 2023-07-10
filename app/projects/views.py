@@ -1139,6 +1139,7 @@ def get_inputparameter_suggestion_source(request):
     input_timeseries = ""
     technology = body[0]["kindOfComponentSource"]
     year = body[1]["choosenTimestampSource"]
+    asset_type_name = "myPredefinedSource"
     
     if (
         technology == "Wind"
@@ -1147,7 +1148,7 @@ def get_inputparameter_suggestion_source(request):
         # or technology == "Other" #empty queryset
     ):
         if year == "2025" or year == "2035":
-            capex, opex, lifetime, input_timeseries = polate_unknown_capex(technology, year)
+            capex, opex, lifetime, input_timeseries = polate_unknown_capex(technology, year, asset_type_name)
         
         else: #2030, 2040, 2045           
             queryset = InputparameterSuggestion.objects.filter(technology=technology, year=year)
@@ -1161,7 +1162,6 @@ def get_inputparameter_suggestion_source(request):
                 # efficiency_th = item.efficiency_th
                 input_timeseries = item.input_timeseries
             
-        asset_type_name = "myPredefinedSource"
         form = AssetCreateForm(
             asset_type=asset_type_name,
             initial={
@@ -1175,7 +1175,6 @@ def get_inputparameter_suggestion_source(request):
         )
         
     elif technology == "Other":
-        asset_type_name = "myPredefinedSource"
         form = AssetCreateForm(
             asset_type=asset_type_name,
             initial={
@@ -1190,7 +1189,6 @@ def get_inputparameter_suggestion_source(request):
         
     elif technology == "Solar thermal system": #from "So gehts", the same for all years
         # cwd = os.getcwd()
-        asset_type_name = "myPredefinedSource"
         form = AssetCreateForm(
             asset_type=asset_type_name,
             initial={
@@ -1206,7 +1204,6 @@ def get_inputparameter_suggestion_source(request):
         input_timeseries = str(array_data)
         
     elif technology == "Run-of-river power plant": #from "So gehts", the same for all years
-        asset_type_name = "myPredefinedSource"
         form = AssetCreateForm(
             asset_type=asset_type_name,
             initial={
@@ -1223,8 +1220,6 @@ def get_inputparameter_suggestion_source(request):
         
         
     elif technology == "Import Grid":
-                
-        asset_type_name = "myPredefinedSource"
         form = AssetCreateForm(
             asset_type=asset_type_name,
             initial={
@@ -1246,8 +1241,6 @@ def get_inputparameter_suggestion_source(request):
         field.widget = field.hidden_widget()
         
     elif technology == "Biomass supply":
-                
-        asset_type_name = "myPredefinedSource"
         form = AssetCreateForm(
             asset_type=asset_type_name,
             initial={
@@ -1323,17 +1316,24 @@ def get_inputparameter_suggestion_trafo(request):
     input_timeseries = ""
     technology = body[0]["kindOfComponentTrafo"]
     year = body[1]["choosenTimestampTrafo"]
-
-    queryset = InputparameterSuggestion.objects.filter(technology=technology, year=year)
-    for item in queryset:
-        print(item.unique_id, item.capex)
-        capex = item.capex
-        opex = item.opex
-        lifetime = item.lifetime
-        efficiency = item.efficiency
-        efficiency_el = item.efficiency_el
-        efficiency_th = item.efficiency_th
-        input_timeseries = item.input_timeseries
+    asset_type_name = "myPredefinedTransformer"
+    
+    if year == "2025" or year == "2035" and technology != "Other":
+        (capex, opex, lifetime, efficiency, efficiency_el, 
+         efficiency_th, input_timeseries) = polate_unknown_capex(technology, year, asset_type_name)
+    
+    else: 
+        #2030, 2040, 2045
+        queryset = InputparameterSuggestion.objects.filter(technology=technology, year=year)
+        for item in queryset:
+            print(item.unique_id, item.capex)
+            capex = item.capex
+            opex = item.opex
+            lifetime = item.lifetime
+            efficiency = item.efficiency
+            efficiency_el = item.efficiency_el
+            efficiency_th = item.efficiency_th
+            input_timeseries = item.input_timeseries
 
     if (
         technology == "Biogas CHP"
@@ -1347,7 +1347,7 @@ def get_inputparameter_suggestion_trafo(request):
         or technology == "Electrode heating boiler"
         or technology == "Other"
     ):
-        asset_type_name = "myPredefinedTransformer"
+        
         form = AssetCreateForm(
             asset_type=asset_type_name,
             initial={
@@ -1406,26 +1406,33 @@ def get_inputparameter_suggestion_storage(request):
     body = json.loads(body_unicode)
     print(body)
     capex, opex, lifetime, crate, efficiency, efficiency_el, efficiency_th, thermal_loss_rate, fixed_losses_relative_gamma, fixed_losses_absolute_delta = (None,) * 10
-    input_timeseries = ""
+    # input_timeseries = ""
     technology = body[0]["kindOfComponentStorage"]
     year = body[1]["choosenTimestampStorage"]
-
-    queryset = InputparameterSuggestion.objects.filter(technology=technology, year=year)
-    for item in queryset:
-        print(item.unique_id, item.capex, item.fixed_losses_relative_gamma)
-        capex = item.capex
-        opex = item.opex
-        lifetime = item.lifetime
-        crate = item.crate
-        efficiency = item.efficiency
-        thermal_loss_rate = item.thermal_loss_rate
-        fixed_losses_relative_gamma = item.fixed_losses_relative_gamma
-        fixed_losses_absolute_delta = item.fixed_losses_absolute_delta
-        # efficiency_el = item.efficiency_el
-        # efficiency_th = item.efficiency_th
-        # input_timeseries = item.input_timeseries
-
     asset_type_name = "myPredefinedStorage"
+    
+    if year == "2025" or year == "2035" and technology != "Other":
+        (capex_new, opex, lifetime, crate, efficiency, thermal_loss_rate, 
+         fixed_losses_relative_gamma, fixed_losses_absolute_delta) = polate_unknown_capex(technology, year, asset_type_name)
+    
+    else: 
+        #2030, 2040, 2045
+        queryset = InputparameterSuggestion.objects.filter(technology=technology, year=year)
+        for item in queryset:
+            print(item.unique_id, item.capex, item.fixed_losses_relative_gamma)
+            capex = item.capex
+            opex = item.opex
+            lifetime = item.lifetime
+            crate = item.crate
+            efficiency = item.efficiency
+            thermal_loss_rate = item.thermal_loss_rate
+            fixed_losses_relative_gamma = item.fixed_losses_relative_gamma
+            fixed_losses_absolute_delta = item.fixed_losses_absolute_delta
+            # efficiency_el = item.efficiency_el
+            # efficiency_th = item.efficiency_th
+            # input_timeseries = item.input_timeseries
+
+    
     form = StorageForm_II(
         asset_type=asset_type_name,
         initial={

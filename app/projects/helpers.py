@@ -83,7 +83,7 @@ def epc_calc(capex, Amortisierungszeit, opex, interest_rate):
     return epc
 
 
-def polate_unknown_capex(technology, year):
+def polate_unknown_capex(technology, year, asset_type_name):
     queryset_2030 = InputparameterSuggestion.objects.filter(technology=technology, year=2030)
     queryset_2040 = InputparameterSuggestion.objects.filter(technology=technology, year=2040)
     
@@ -92,7 +92,15 @@ def polate_unknown_capex(technology, year):
         capex_2030 = item.capex
         opex = item.opex
         lifetime = item.lifetime
+        efficiency = item.efficiency
+        efficiency_el = item.efficiency_el
+        efficiency_th = item.efficiency_th
         input_timeseries = item.input_timeseries
+        thermal_loss_rate = item.thermal_loss_rate
+        fixed_losses_relative_gamma = item.fixed_losses_relative_gamma
+        fixed_losses_absolute_delta = item.fixed_losses_absolute_delta
+        crate = item.crate
+        # print(crate)
         
     for item in queryset_2040:
         # print(item.unique_id, item.capex)
@@ -111,9 +119,16 @@ def polate_unknown_capex(technology, year):
         capex_new = f_linear(2035)
         # print(capex_2030, capex_new, capex_2040)
         
-    return capex_new, opex, lifetime, input_timeseries
-
+    if asset_type_name == "myPredefinedStorage":
+        return capex_new, opex, lifetime, crate, efficiency, thermal_loss_rate, fixed_losses_relative_gamma, fixed_losses_absolute_delta
     
+    elif asset_type_name == "myPredefinedTransformer":
+        return capex_new, opex, lifetime, efficiency, efficiency_el, efficiency_th, input_timeseries
+    
+    elif asset_type_name == "myPredefinedSource":
+        return capex_new, opex, lifetime, input_timeseries
+    
+
 
 def sensitivity_analysis_payload(
     variable_parameter_name="",

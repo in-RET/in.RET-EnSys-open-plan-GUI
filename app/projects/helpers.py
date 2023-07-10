@@ -10,8 +10,10 @@ from django.utils.translation import gettext_lazy as _
 from projects.dtos import convert_to_dto
 from projects.constants import MAP_MVS_EPA
 from dashboard.helpers import KPIFinder
+from projects.models import InputparameterSuggestion
 
 from oemof.tools import economics
+import scipy
 
 PARAMETERS = {}
 if os.path.exists(staticfiles_storage.path("MVS_parameters_list.csv")) is True:
@@ -80,6 +82,38 @@ def epc_calc(capex, Amortisierungszeit, opex, interest_rate):
     epc = investk + betriebsk
     return epc
 
+
+def polate_unknown_capex(technology, year):
+    queryset_2030 = InputparameterSuggestion.objects.filter(technology=technology, year=2030)
+    queryset_2040 = InputparameterSuggestion.objects.filter(technology=technology, year=2040)
+    
+    for item in queryset_2030:
+        # print(item.unique_id, item.capex)
+        capex_2030 = item.capex
+        opex = item.opex
+        lifetime = item.lifetime
+        input_timeseries = item.input_timeseries
+        
+    for item in queryset_2040:
+        # print(item.unique_id, item.capex)
+        capex_2040 = item.capex
+        
+    x = [2030, 2040]
+    y = [capex_2030, capex_2040]
+    
+    if year == "2025":
+        f_ex = scipy.interpolate.interp1d(x, y, fill_value = "extrapolate")
+        capex_new = f_ex(2025)
+        # print(capex_new, capex_2030, capex_2040)
+        
+    elif year == "2035":
+        f_linear = scipy.interpolate.interp1d(x, y) 
+        capex_new = f_linear(2035)
+        # print(capex_2030, capex_new, capex_2040)
+        
+    return capex_new, opex, lifetime, input_timeseries
+
+    
 
 def sensitivity_analysis_payload(
     variable_parameter_name="",

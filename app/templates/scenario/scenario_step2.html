@@ -7,7 +7,7 @@
 
 {% block head_block %}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jerosoler/Drawflow/dist/drawflow.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.24.2/plotly.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/plotly.js@2.24.2/dist/plotly.min.js"></script>
 <!--<script src="{% static 'js/plotly.min.js' %}"></script>-->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
@@ -16,13 +16,9 @@
 
 
 {% block start_body_scripts %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/1.0.21/jquery.csv.min.js"
-    integrity="sha512-Y8iWYJDo6HiTo5xtml1g4QqHtl/PO1w+dmUpQfQSOTqKNsMhExfyPN2ncNAe9JuJUSKzwK/b6oaNPop4MXzkwg=="
-    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.1.1/d3.min.js"
-    integrity="sha512-COTaPOlz12cG4fSfcBsxZsjauBAyldqp+8FQUM/dZHm+ts/jR4AFoJhCqxy8K10Jrf3pojfsbq7fAPTb1XaVkg=="
-    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script type="text/javascript" src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+<script src=" https://cdn.jsdelivr.net/npm/jquery-csv@1.0.21/src/jquery.csv.min.js "></script>
+<script src=" https://cdn.jsdelivr.net/npm/d3@7.8.5/dist/d3.min.js "></script>
+<script src=" https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js "></script>
 <script src="{% static 'js/traceplot.js' %}"></script>
 
 <!--
@@ -148,10 +144,8 @@
 
 <script src="https://cdn.jsdelivr.net/gh/jerosoler/Drawflow/dist/drawflow.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.serializeJSON/3.1.0/jquery.serializejson.min.js"
-    integrity="sha512-4y8bsEzrXJqRyl2dqjdKk/DetH59JcFTtYNMsy5DUpvVV8CXiSrQ1gSCL3+dFgj1Xco0ONPizsYd6wX2eAXL2g=="
-    crossorigin="anonymous"></script>
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src=" https://cdn.jsdelivr.net/npm/jquery-serializejson@3.2.1/jquery.serializejson.min.js "></script>
+<script src=" https://cdn.jsdelivr.net/npm/jquery-ui@1.13.2/dist/jquery-ui.min.js "></script>
 
 <script>
 var choosenTimestamp = '';
@@ -214,9 +208,12 @@ function getSelectedYear() {
         /* and prevent user from saving the model if there are.
         */
         let editorData = editor.export().drawflow.Home.data;
-        const node_list = Object.values(editorData)
-        const node_names = node_list.map(obj => obj.data.name);
-        const duplicate_names = node_names.filter((name, i, a) => a.indexOf(name) !== i);
+        let node_list = Object.values(editorData);
+        let node_names = node_list.map(obj => obj.data.name);
+        let duplicate_names = node_names.filter((name, i, a) => a.indexOf(name) !== i);
+
+        console.log(node_names);
+        console.log(duplicate_names);
 
         if (duplicate_names.length != 0)
             return Swal.fire('Grid Model Error',

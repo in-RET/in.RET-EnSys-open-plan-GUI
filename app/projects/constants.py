@@ -250,10 +250,10 @@ COUNTRY = (
 CURRENCY = (
     ("", "Choose..."),
     ("EUR", "EUR"),
-    ("INR", "INR"),
-    ("NOK", "NOK"),
-    ("USD", "USD"),
-    ("GBP", "GBP"),
+    # ("INR", "INR"),
+    # ("NOK", "NOK"),
+    # ("USD", "USD"),
+    # ("GBP", "GBP"),
 )
 
 TRUE_FALSE_CHOICES = ((None, "Choose"), (True, "Yes"), (False, "No"))
@@ -268,6 +268,8 @@ ENERGY_VECTOR = (
     ("Heat", "Heat"),
     ("Gas", "Gas"),
     ("H2", "H2"),
+    ("Biomass", "Biomass"),
+    ("Other", "Other"),
     # ('Diesel', 'Diesel'),
 )
 
@@ -288,8 +290,12 @@ FLOW_CHOICE = (
 SOURCE_CHOICE = (
     ("", "Choose..."),
     ("Wind", "Wind power plant"),
-    ("Photovoltaic Free Field", "Photovoltaic Free Field"),
+    ("Photovoltaic Free Field", "Ground Mounted Photovoltaic"),
+    ("Roof Mounted Photovoltaic", "Roof Mounted Photovoltaic"),
     ("Import Grid", "Import from the power grid"),
+    ("Biomass supply", "Biomass supply"),
+    ("Solar thermal system", "Solar thermal system"),
+    ("Run-of-river power plant", "Run-of-river power plant"),
     ("Other", "Other")
 )
 
@@ -347,13 +353,13 @@ USER_MODE = (
 
 MW_KW_CHOICE = (
     ("", "Choose..."),
-    ("kW/kWh", "kW/kWh"),
+    # ("kW/kWh", "kW/kWh"),
     ("MW/MWh", "MW/MWh")
 )
 
 CO2_UNIT_CHOICE = (
     ("", "Choose..."),
-    ("kg CO2", "kg CO2"),
+    # ("kg CO2", "kg CO2"),
     ("t CO2", "t CO2")
 )
 

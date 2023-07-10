@@ -124,11 +124,15 @@ class AssetDto:
         summed_max: ValueTypeDto,
         summed_min: ValueTypeDto,
         efficiency: ValueTypeDto,
+        efficiency_el: ValueTypeDto,
+        efficiency_th: ValueTypeDto,
         emission_factor: ValueTypeDto,
         renewable_factor: ValueTypeDto,
         input_timeseries: TimeseriesDataDto,
         unit: str,
         annual_energy_consumption: ValueTypeDto,
+        source_choice: str,
+        trafo_choice: str
         # beta: ValueTypeDto = None,
     ):
         self.asset_type = asset_type
@@ -174,11 +178,15 @@ class AssetDto:
         self.summed_max = summed_max
         self.summed_min = summed_min
         self.efficiency = efficiency
+        self.efficiency_el = efficiency_el
+        self.efficiency_th = efficiency_th
         self.emission_factor = emission_factor
         self.renewable_factor = renewable_factor
         self.input_timeseries = input_timeseries
         self.unit = unit
         self.annual_energy_consumption = annual_energy_consumption
+        self.source_choice = source_choice
+        self.trafo_choice = trafo_choice
 
         # self.beta = beta
 
@@ -250,10 +258,10 @@ class EssDto:
 
 class BusDto:
     def __init__(self, label: str, 
-                 # energy_vector: str, 
+                 energy_vector: str, 
                  assets: List[AssetDto]):
         self.label = label
-        # self.energy_vector = energy_vector
+        self.energy_vector = energy_vector
         self.assets = assets
 
 
@@ -734,11 +742,15 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
             to_value_type(asset, "summed_max"),
             to_value_type(asset, "summed_min"),
             to_value_type(asset, "efficiency"),
+            to_value_type(asset, "efficiency_el"),
+            to_value_type(asset, "efficiency_th"),
             to_value_type(asset, "emission_factor"),
             to_value_type(asset, "renewable_factor"),
             to_timeseries_data(asset, "input_timeseries"),
             asset.asset_type.unit,
             to_value_type(asset, "annual_energy_consumption"),
+            asset.source_choice,
+            asset.trafo_choice,
             **optional_parameters,
         )
 
@@ -799,7 +811,7 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
         )
 
         bus_dto = BusDto(bus.name, 
-                         # bus.type, 
+                         bus.type, 
                          bus_asset_list)
 
         bus_dto_list.append(bus_dto)
@@ -837,6 +849,10 @@ def to_value_type(model_obj, field_name):
     value_type = ValueType.objects.filter(type=field_name).first()
     unit = value_type.unit if value_type is not None else None
     value = getattr(model_obj, field_name)
+    if field_name == "efficiency":
+        if model_obj.trafo_choice == "Biogas CHP" or model_obj.trafo_choice == "GuD":
+            value=None
+            # print(model_obj.trafo_choice, value)
 
     if value is not None:
         # make sure the value is not a str if the unit is "factor"

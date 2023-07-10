@@ -4,6 +4,7 @@ import json
 import logging
 import traceback
 import shutil
+import numpy as np
 from datetime import datetime
 
 import requests
@@ -28,7 +29,7 @@ from epa.settings import (
 from InRetEnsys import *
 from InRetEnsys.types import Solver, Constraints
 from jsonview.decorators import json_view
-from projects.helpers import epc_calc, format_scenario_for_mvs
+from projects.helpers import epc_calc, format_scenario_for_mvs, polate_unknown_capex
 from projects.models import *
 
 from .constants import DONE, ERROR, MODIFIED, PENDING
@@ -614,7 +615,9 @@ def scenario_create_parameters(request, proj_id, scen_id=None, step_id=1, max_st
     user_projects = request.user.project_set.all()
 
     form = ScenarioCreateForm(
-        initial={"project": project}, project_queryset=user_projects
+        initial={"project": project,
+                 "evaluated_period": 365}, 
+        project_queryset=user_projects
     )
     if scen_id == "None":
         scen_id = None
@@ -1136,29 +1139,33 @@ def get_inputparameter_suggestion_source(request):
     input_timeseries = ""
     technology = body[0]["kindOfComponentSource"]
     year = body[1]["choosenTimestampSource"]
-
-    queryset = InputparameterSuggestion.objects.filter(technology=technology, year=year)
-    for item in queryset:
-        print(item.unique_id, item.capex)
-        capex = item.capex
-        opex = item.opex
-        lifetime = item.lifetime
-        efficiency = item.efficiency
-        efficiency_el = item.efficiency_el
-        efficiency_th = item.efficiency_th
-        input_timeseries = item.input_timeseries
-
+    
     if (
         technology == "Wind"
         or technology == "Photovoltaic Free Field"
-        or technology == "Import Grid"
-        or technology == "Other" #empty queryset
+        or technology == "Roof Mounted Photovoltaic"
+        # or technology == "Other" #empty queryset
     ):
+        if year == "2025" or year == "2035":
+            capex, opex, lifetime, input_timeseries = polate_unknown_capex(technology, year)
+        
+        else: #2030, 2040, 2045           
+            queryset = InputparameterSuggestion.objects.filter(technology=technology, year=year)
+            for item in queryset:
+                print(item.unique_id, item.capex)
+                capex = item.capex
+                opex = item.opex
+                lifetime = item.lifetime
+                # efficiency = item.efficiency
+                # efficiency_el = item.efficiency_el
+                # efficiency_th = item.efficiency_th
+                input_timeseries = item.input_timeseries
+            
         asset_type_name = "myPredefinedSource"
         form = AssetCreateForm(
             asset_type=asset_type_name,
             initial={
-                "name": "What ever you like",
+                "name": technology,
                 "source_choice": technology,
                 "year_choice_source": year,
                 "capex": capex,
@@ -1166,7 +1173,120 @@ def get_inputparameter_suggestion_source(request):
                 "lifetime": lifetime,
             },
         )
-
+        
+    elif technology == "Other":
+        asset_type_name = "myPredefinedSource"
+        form = AssetCreateForm(
+            asset_type=asset_type_name,
+            initial={
+                "name": "What ever you like",
+                "source_choice": technology,
+                "year_choice_source": year,
+                "capex": "",
+                "opex": "",
+                "lifetime": "",
+            },
+        )
+        
+    elif technology == "Solar thermal system": #from "So gehts", the same for all years
+        # cwd = os.getcwd()
+        asset_type_name = "myPredefinedSource"
+        form = AssetCreateForm(
+            asset_type=asset_type_name,
+            initial={
+                "name": technology,
+                "source_choice": technology,
+                "year_choice_source": year,
+                "capex": 270, #€/m2
+                "opex": 1.5,
+                "lifetime": 20,
+            },
+        )
+        array_data = np.load('static/Solar thermal energy profile.npy')
+        input_timeseries = str(array_data)
+        
+    elif technology == "Run-of-river power plant": #from "So gehts", the same for all years
+        asset_type_name = "myPredefinedSource"
+        form = AssetCreateForm(
+            asset_type=asset_type_name,
+            initial={
+                "name": technology,
+                "source_choice": technology,
+                "year_choice_source": year,
+                "capex": 5000000,
+                "opex": 5,
+                "lifetime": 60
+            },
+        )
+        array_data = np.load('static/Run-of-river power plant profile.npy')
+        input_timeseries = str(array_data)
+        
+        
+    elif technology == "Import Grid":
+                
+        asset_type_name = "myPredefinedSource"
+        form = AssetCreateForm(
+            asset_type=asset_type_name,
+            initial={
+                "name": "Electricity supply grid",
+                "source_choice": technology,
+                "capex": 153030,
+                "maximum": 300,
+                "variable_costs": 70
+            },
+        )
+        
+        field = form.fields["capex"]
+        field.label = "Performance price"
+        field = form.fields["opex"]
+        field.widget = field.hidden_widget()
+        field = form.fields["lifetime"]
+        field.widget = field.hidden_widget()
+        field = form.fields["existing"]
+        field.widget = field.hidden_widget()
+        
+    elif technology == "Biomass supply":
+                
+        asset_type_name = "myPredefinedSource"
+        form = AssetCreateForm(
+            asset_type=asset_type_name,
+            initial={
+                "name": "Biomass supply",
+                "source_choice": technology,
+                "year_choice_source": year,
+                "summed_max": 83479,
+                "variable_costs": 25
+            },
+        )
+        field = form.fields["capex"]
+        field.widget = field.hidden_widget()
+        field = form.fields["opex"]
+        field.widget = field.hidden_widget()
+        field = form.fields["lifetime"]
+        field.widget = field.hidden_widget()
+        field = form.fields["existing"]
+        field.widget = field.hidden_widget()
+        field = form.fields["maximum"]
+        field.widget = field.hidden_widget()
+        field = form.fields["minimum"]
+        field.widget = field.hidden_widget()
+        field = form.fields["offset"]
+        field.widget = field.hidden_widget()
+        field = form.fields["_max"]
+        field.widget = field.hidden_widget()
+        field = form.fields["_min"]
+        field.widget = field.hidden_widget()
+        
+    if technology == "Wind" or technology == "Photovoltaic Free Field":
+        field = form.fields["summed_max"]
+        field.widget = field.hidden_widget()
+        
+        field = form.fields["summed_min"]
+        field.widget = field.hidden_widget()
+        
+    field = form.fields["nominal_value"]
+    field.widget = field.hidden_widget()
+        
     # form_suggestion = SuggestionForm(initial={"capex": 600000, "opex": 2,
     #                                           "lifetime": 20})
 
@@ -1828,26 +1948,67 @@ def request_mvs_simulation(request, scen_id=0):
     try:
         data_clean = format_scenario_for_mvs(scenario)
         interest_rate = data_clean["simulation_settings"]["interest_rate"]["value"]
+        
+        if data_clean["simulation_settings"]["time_step"] == 60:
+            timesteps = int(
+                data_clean["simulation_settings"]["evaluated_period"]["value"] * 24
+            )
+            freq='hourly'
+        elif data_clean["simulation_settings"]["time_step"] == 15:
+            timesteps = int(
+                data_clean["simulation_settings"]["evaluated_period"]["value"] * 24 * 4
+            )
+            freq='quarter_hourly'
+            
+        print(timesteps)
 
 
         for k, v in data_clean.items():
             for i in v:
                 if k == "energy_busses":
                     list_busses.append(InRetEnsysBus(label=i["label"]))
+                    # print(list_busses)
+                    # print(i['energy_vector'])
 
                 elif k == "energy_production":
-                    print(i)
-                    if bool(i["capex"]):
-                        ep_costs = epc_calc(
-                            i["capex"]["value"],
-                            i["lifetime"]["value"],
-                            i["opex"]["value"],
-                            interest_rate
+                    # print(i)
+                    
+                    if i['source_choice'] == "Biomass supply":
+                        summed_max = i["summed_max"]["value"] if i["summed_max"] else None,
+                        # print(summed_max[0])
+                        nominal_value = summed_max[0]/timesteps,
+                        # print(nominal_value[0])
+                        list_sources.append(
+                            InRetEnsysSource(
+                                label=i["label"],
+                                outputs={
+                                    i["outflow_direction"]: InRetEnsysFlow(
+                                        variable_costs=i["variable_costs"]["value"]
+                                        if i["variable_costs"]
+                                        else None,
+                                        nominal_value=nominal_value[0],
+                                        summed_max=summed_max[0]/nominal_value[0],
+                                        summed_min=i["summed_min"]["value"]
+                                        if i["summed_min"]
+                                        else None,
+                                        nonconvex=InRetEnsysNonConvex()
+                                        if i["nonconvex"]["value"] == True
+                                        else None,
+                                        _min=i["_min"]["value"] if i["_min"] else None,
+                                        _max=i["_max"]["value"] if i["_max"] else None,
+                                        custom_attributes = {
+                                            "emission_factor": i["emission_factor"]["value"] if i["emission_factor"] else None,
+                                            "renewable_factor": i["renewable_factor"]["value"] if i["renewable_factor"] else None
+                                            },
+                                    )
+                                },
+                            )
                         )
-                    else:
-                        ep_costs = None
-
-                    try:
+                        
+                        print("\nEnergy Production (Biomass Import): \n")
+                        print("{} : {}".format(k, i))
+                        
+                    elif i['source_choice'] == "Import Grid":
                         list_sources.append(
                             InRetEnsysSource(
                                 label=i["label"],
@@ -1878,7 +2039,9 @@ def request_mvs_simulation(request, scen_id=0):
                                             "renewable_factor": i["renewable_factor"]["value"] if i["renewable_factor"] else None
                                             },
                                         investment=InRetEnsysInvestment(
-                                            ep_costs=ep_costs,
+                                            ep_costs=i["capex"]["value"]
+                                            if bool(i["capex"])
+                                            else None,
                                             maximum=i["maximum"]["value"]
                                             if bool(i["maximum"])
                                             else 1000000,
@@ -1893,22 +2056,89 @@ def request_mvs_simulation(request, scen_id=0):
                                             else 0,
                                             nonconvex=True if i["offset"] else False,
                                         )
-                                        if bool(ep_costs)
+                                        if bool(i["capex"])
                                         else None,
                                     )
                                 },
                             )
                         )
-
-                    except Exception as e:
-                        error_msg = f"Source Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {e}."
-                        logger.error(error_msg)
-
-                        messages.error(request, error_msg)
-                        raise Exception(error_msg + " - 407")
+                        print("\nEnergy Production (Grid): \n")
+                        print("{} : {}".format(k, i))
                         
-                    print("\nEnergy Production: \n")
-                    print("{} : {}".format(k, i))
+                    else:
+                        
+                        if bool(i["capex"]):
+                            ep_costs = epc_calc(
+                                i["capex"]["value"],
+                                i["lifetime"]["value"],
+                                i["opex"]["value"],
+                                interest_rate
+                            )
+                        else:
+                            ep_costs = None
+
+                        try:
+                            list_sources.append(
+                                InRetEnsysSource(
+                                    label=i["label"],
+                                    outputs={
+                                        i["outflow_direction"]: InRetEnsysFlow(
+                                            fix=i["input_timeseries"]["value"]
+                                            if i["input_timeseries"]["value"]
+                                            else None,
+                                            variable_costs=i["variable_costs"]["value"]
+                                            if i["variable_costs"]
+                                            else None,
+                                            nominal_value=i["nominal_value"]["value"]
+                                            if i["nominal_value"]
+                                            else None,
+                                            summed_max=i["summed_max"]["value"]
+                                            if i["summed_max"]
+                                            else None,
+                                            summed_min=i["summed_min"]["value"]
+                                            if i["summed_min"]
+                                            else None,
+                                            nonconvex=InRetEnsysNonConvex()
+                                            if i["nonconvex"]["value"] == True
+                                            else None,
+                                            _min=i["_min"]["value"] if i["_min"] else None,
+                                            _max=i["_max"]["value"] if i["_max"] else None,
+                                            custom_attributes = {
+                                                "emission_factor": i["emission_factor"]["value"] if i["emission_factor"] else None,
+                                                "renewable_factor": i["renewable_factor"]["value"] if i["renewable_factor"] else None
+                                                },
+                                            investment=InRetEnsysInvestment(
+                                                ep_costs=ep_costs,
+                                                maximum=i["maximum"]["value"]
+                                                if bool(i["maximum"])
+                                                else 1000000,
+                                                minimum=i["minimum"]["value"]
+                                                if bool(i["minimum"])
+                                                else 0,
+                                                existing=i["existing"]["value"]
+                                                if bool(i["existing"])
+                                                else 0,
+                                                offset=i["offset"]["value"]
+                                                if bool(i["offset"])
+                                                else 0,
+                                                nonconvex=True if i["offset"] else False,
+                                            )
+                                            if bool(ep_costs)
+                                            else None,
+                                        )
+                                    },
+                                )
+                            )
+    
+                        except Exception as e:
+                            error_msg = f"Source Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {e}."
+                            logger.error(error_msg)
+    
+                            messages.error(request, error_msg)
+                            raise Exception(error_msg + " - 407")
+                        
+                        print("\nEnergy Production (all other): \n")
+                        print("{} : {}".format(k, i))
 
                 elif k == "energy_consumption":
                     try:
@@ -2051,138 +2281,266 @@ def request_mvs_simulation(request, scen_id=0):
                         )
                     else:
                         ep_costs = None
-
-                    try:
-                        list_transformers.append(
-                            InRetEnsysTransformer(
-                                label=i["label"],
-                                inputs={
-                                    i["inflow_direction"]: InRetEnsysFlow(
-                                        # We first assume that it is a base load.
-                                        fix=i["input_timeseries"]["value"]
-                                        if i["input_timeseries"]["value"]
-                                        else None,
-                                        variable_costs=i["variable_costs"]["value"]
-                                        if i["variable_costs"]
-                                        and i["eco_params_flow_choice"] == "inputs"
-                                        else None,
-                                        nominal_value=i["nominal_value"]["value"]
-                                        if i["nominal_value"]
-                                        and i["tec_params_flow_choice"] == "inputs"
-                                        else None,
-                                        summed_max=i["summed_max"]["value"]
-                                        if i["summed_max"]
-                                        and i["tec_params_flow_choice"] == "inputs"
-                                        else None,
-                                        summed_min=i["summed_min"]["value"]
-                                        if i["summed_min"]
-                                        and i["tec_params_flow_choice"] == "inputs"
-                                        else None,
-                                        nonconvex=InRetEnsysNonConvex()
-                                        if i["nonconvex"]["value"] == True
-                                        and i["tec_params_flow_choice"] == "inputs"
-                                        else None,
-                                        _min=i["_min"]["value"]
-                                        if i["_min"]
-                                        and i["tec_params_flow_choice"] == "inputs"
-                                        else None,
-                                        _max=i["_max"]["value"]
-                                        if i["_max"]
-                                        and i["tec_params_flow_choice"] == "inputs"
-                                        else None,
-                                        investment=InRetEnsysInvestment(
-                                            ep_costs=ep_costs,
-                                            maximum=i["maximum"]["value"]
-                                            if bool(i["maximum"])
-                                            else 1000000,
-                                            minimum=i["minimum"]["value"]
-                                            if bool(i["minimum"])
-                                            else 0,
-                                            existing=i["existing"]["value"]
-                                            if bool(i["existing"])
-                                            else 0,
-                                            offset=i["offset"]["value"]
-                                            if bool(i["offset"])
-                                            else 0,
-                                            nonconvex=True
-                                            if bool(i["offset"])
-                                            else False,
+                        
+                    if i['trafo_choice'] == "Biogas CHP":
+                        print("\nEnergy Conversion (Biogas CHP): \n")
+                        print("{} : {}".format(k, i))                        
+                        
+                        try:
+                            queryset = Bus.objects.filter(name=i['outflow_direction'][0])
+                            for item in queryset:
+                                print(item.id, item.name, item.type)
+                                
+                            if item.type == "Electricity":
+                                output_first = i['outflow_direction'][0] #first one is considered to be el
+                                output_second = i['outflow_direction'][1] #second one is consideres to be th
+                            elif item.type == "Heat":
+                                output_first = i['outflow_direction'][1]
+                                output_second = i['outflow_direction'][0]
+                            else:
+                                print('The CHP biogas is not connected correctly!')
+                                
+                            print(output_first, output_second)
+                            
+                            list_transformers.append(
+                                InRetEnsysTransformer(
+                                    label=i["label"],
+                                    inputs={
+                                        i["inflow_direction"]: InRetEnsysFlow(
+                                            
+                                            fix=[1]*timesteps,
+                                            variable_costs=i["variable_costs"]["value"]
+                                            if i["variable_costs"]
+                                            and i["eco_params_flow_choice"] == "inputs"
+                                            else None,
+                                            nonconvex=InRetEnsysNonConvex()
+                                            if i["nonconvex"]["value"] == True
+                                            and i["tec_params_flow_choice"] == "inputs"
+                                            else None,
+                                            _min=i["_min"]["value"]
+                                            if i["_min"]
+                                            and i["tec_params_flow_choice"] == "inputs"
+                                            else None,
+                                            _max=i["_max"]["value"]
+                                            if i["_max"]
+                                            and i["tec_params_flow_choice"] == "inputs"
+                                            else None,
                                         )
-                                        if bool(ep_costs)
-                                        and i["eco_params_flow_choice"] == "inputs"
-                                        else None,
-                                    )
-                                },
-                                outputs={
-                                    i["outflow_direction"]: InRetEnsysFlow(
-                                        # We first assume that it is a base load.
-                                        fix=i["input_timeseries"]["value"]
-                                        if i["input_timeseries"]["value"]
-                                        else None,
-                                        variable_costs=i["variable_costs"]["value"]
-                                        if i["variable_costs"]
-                                        and i["eco_params_flow_choice"] == "outputs"
-                                        else None,
-                                        nominal_value=i["nominal_value"]["value"]
-                                        if i["nominal_value"]
-                                        and i["tec_params_flow_choice"] == "outputs"
-                                        else None,
-                                        summed_max=i["summed_max"]["value"]
-                                        if i["summed_max"]
-                                        and i["tec_params_flow_choice"] == "outputs"
-                                        else None,
-                                        summed_min=i["summed_min"]["value"]
-                                        if i["summed_min"]
-                                        and i["tec_params_flow_choice"] == "outputs"
-                                        else None,
-                                        nonconvex=InRetEnsysNonConvex()
-                                        if i["nonconvex"]["value"] == True
-                                        and i["tec_params_flow_choice"] == "outputs"
-                                        else None,
-                                        _min=i["_min"]["value"]
-                                        if i["_min"]
-                                        and i["tec_params_flow_choice"] == "outputs"
-                                        else None,
-                                        _max=i["_max"]["value"]
-                                        if i["_max"]
-                                        and i["tec_params_flow_choice"] == "outputs"
-                                        else None,
-                                        custom_attributes= {
-                                            "renewable_factor": i["renewable_factor"]["value"] if i["renewable_factor"] else None
-                                        },
-                                        investment=InRetEnsysInvestment(
-                                            ep_costs=ep_costs,
-                                            maximum=i["maximum"]["value"]
-                                            if bool(i["maximum"])
-                                            else 1000000,
-                                            minimum=i["minimum"]["value"]
-                                            if bool(i["minimum"])
-                                            else 0,
-                                            existing=i["existing"]["value"]
-                                            if bool(i["existing"])
-                                            else 0,
-                                            offset=i["offset"]["value"]
-                                            if bool(i["offset"])
-                                            else 0,
-                                            nonconvex=True
-                                            if bool(i["offset"])
-                                            else False,
+                                    },
+                                    outputs={
+                                        output_first: InRetEnsysFlow(
+                                            
+                                            fix=[1]*timesteps,
+                                            variable_costs=i["variable_costs"]["value"]
+                                            if i["variable_costs"]
+                                            and i["eco_params_flow_choice"] == "outputs"
+                                            else None,
+                                            nonconvex=InRetEnsysNonConvex()
+                                            if i["nonconvex"]["value"] == True
+                                            and i["tec_params_flow_choice"] == "outputs"
+                                            else None,
+                                            _min=i["_min"]["value"]
+                                            if i["_min"]
+                                            and i["tec_params_flow_choice"] == "outputs"
+                                            else None,
+                                            _max=i["_max"]["value"]
+                                            if i["_max"]
+                                            and i["tec_params_flow_choice"] == "outputs"
+                                            else None,
+                                            custom_attributes= {
+                                                "renewable_factor": i["renewable_factor"]["value"] if i["renewable_factor"] else None
+                                            },
+                                            investment=InRetEnsysInvestment(#investment for electricity
+                                                ep_costs=ep_costs,
+                                                maximum=i["maximum"]["value"]
+                                                if bool(i["maximum"])
+                                                else 1000000,
+                                                minimum=i["minimum"]["value"]
+                                                if bool(i["minimum"])
+                                                else 0,
+                                                existing=i["existing"]["value"]
+                                                if bool(i["existing"])
+                                                else 0,
+                                                offset=i["offset"]["value"]
+                                                if bool(i["offset"])
+                                                else 0,
+                                                nonconvex=True
+                                                if bool(i["offset"])
+                                                else False,
+                                            )
+                                            if bool(ep_costs)
+                                            and i["eco_params_flow_choice"] == "outputs"
+                                            else None,
+                                        ),
+                                        output_second: InRetEnsysFlow(
+                                            # We first assume that it is a base load.
+                                            fix=[1]*timesteps,
+                                            variable_costs=i["variable_costs"]["value"]
+                                            if i["variable_costs"]
+                                            and i["eco_params_flow_choice"] == "outputs"
+                                            else None,
+                                            nonconvex=InRetEnsysNonConvex()
+                                            if i["nonconvex"]["value"] == True
+                                            and i["tec_params_flow_choice"] == "outputs"
+                                            else None,
+                                            _min=i["_min"]["value"]
+                                            if i["_min"]
+                                            and i["tec_params_flow_choice"] == "outputs"
+                                            else None,
+                                            _max=i["_max"]["value"]
+                                            if i["_max"]
+                                            and i["tec_params_flow_choice"] == "outputs"
+                                            else None,
+                                            custom_attributes= {
+                                                "renewable_factor": i["renewable_factor"]["value"] if i["renewable_factor"] else None
+                                            },
                                         )
-                                        if bool(ep_costs)
-                                        and i["eco_params_flow_choice"] == "outputs"
-                                        else None,
-                                    )
-                                },
-                                conversion_factors={
-                                    i["outflow_direction"]: i["efficiency"]["value"]
-                                },
+                                    },
+                                    conversion_factors={
+                                        output_first: i["efficiency_el"]["value"],
+                                        output_second: i["efficiency_th"]["value"]
+                                    },
+                                )
                             )
-                        )
-                    except Exception as e:
-                        error_msg = f"Trafo Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {e}."
-                        logger.error(error_msg)
-
-                        raise Exception(error_msg + " - 407")
+                        except Exception as e:
+                            error_msg = f"Trafo Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {e}."
+                            logger.error(error_msg)
+    
+                            raise Exception(error_msg + " - 407")
+                            
+                    
+                    else:
+                        try:
+                            list_transformers.append(
+                                InRetEnsysTransformer(
+                                    label=i["label"],
+                                    inputs={
+                                        i["inflow_direction"]: InRetEnsysFlow(
+                                            # We first assume that it is a base load.
+                                            # fix=i["input_timeseries"]["value"]
+                                            # if i["input_timeseries"]["value"]
+                                            # else None,
+                                            variable_costs=i["variable_costs"]["value"]
+                                            if i["variable_costs"]
+                                            and i["eco_params_flow_choice"] == "inputs"
+                                            else None,
+                                            nominal_value=i["nominal_value"]["value"]
+                                            if i["nominal_value"]
+                                            and i["tec_params_flow_choice"] == "inputs"
+                                            else None,
+                                            summed_max=i["summed_max"]["value"]
+                                            if i["summed_max"]
+                                            and i["tec_params_flow_choice"] == "inputs"
+                                            else None,
+                                            summed_min=i["summed_min"]["value"]
+                                            if i["summed_min"]
+                                            and i["tec_params_flow_choice"] == "inputs"
+                                            else None,
+                                            nonconvex=InRetEnsysNonConvex()
+                                            if i["nonconvex"]["value"] == True
+                                            and i["tec_params_flow_choice"] == "inputs"
+                                            else None,
+                                            _min=i["_min"]["value"]
+                                            if i["_min"]
+                                            and i["tec_params_flow_choice"] == "inputs"
+                                            else None,
+                                            _max=i["_max"]["value"]
+                                            if i["_max"]
+                                            and i["tec_params_flow_choice"] == "inputs"
+                                            else None,
+                                            investment=InRetEnsysInvestment(
+                                                ep_costs=ep_costs,
+                                                maximum=i["maximum"]["value"]
+                                                if bool(i["maximum"])
+                                                else 1000000,
+                                                minimum=i["minimum"]["value"]
+                                                if bool(i["minimum"])
+                                                else 0,
+                                                existing=i["existing"]["value"]
+                                                if bool(i["existing"])
+                                                else 0,
+                                                offset=i["offset"]["value"]
+                                                if bool(i["offset"])
+                                                else 0,
+                                                nonconvex=True
+                                                if bool(i["offset"])
+                                                else False,
+                                            )
+                                            if bool(ep_costs)
+                                            and i["eco_params_flow_choice"] == "inputs"
+                                            else None,
+                                        )
+                                    },
+                                    outputs={
+                                        i["outflow_direction"]: InRetEnsysFlow(
+                                            # We first assume that it is a base load.
+                                            # fix=i["input_timeseries"]["value"]
+                                            # if i["input_timeseries"]["value"]
+                                            # else None,
+                                            variable_costs=i["variable_costs"]["value"]
+                                            if i["variable_costs"]
+                                            and i["eco_params_flow_choice"] == "outputs"
+                                            else None,
+                                            nominal_value=i["nominal_value"]["value"]
+                                            if i["nominal_value"]
+                                            and i["tec_params_flow_choice"] == "outputs"
+                                            else None,
+                                            summed_max=i["summed_max"]["value"]
+                                            if i["summed_max"]
+                                            and i["tec_params_flow_choice"] == "outputs"
+                                            else None,
+                                            summed_min=i["summed_min"]["value"]
+                                            if i["summed_min"]
+                                            and i["tec_params_flow_choice"] == "outputs"
+                                            else None,
+                                            nonconvex=InRetEnsysNonConvex()
+                                            if i["nonconvex"]["value"] == True
+                                            and i["tec_params_flow_choice"] == "outputs"
+                                            else None,
+                                            _min=i["_min"]["value"]
+                                            if i["_min"]
+                                            and i["tec_params_flow_choice"] == "outputs"
+                                            else None,
+                                            _max=i["_max"]["value"]
+                                            if i["_max"]
+                                            and i["tec_params_flow_choice"] == "outputs"
+                                            else None,
+                                            custom_attributes= {
+                                                "renewable_factor": i["renewable_factor"]["value"] if i["renewable_factor"] else None
+                                            },
+                                            investment=InRetEnsysInvestment(
+                                                ep_costs=ep_costs,
+                                                maximum=i["maximum"]["value"]
+                                                if bool(i["maximum"])
+                                                else 1000000,
+                                                minimum=i["minimum"]["value"]
+                                                if bool(i["minimum"])
+                                                else 0,
+                                                existing=i["existing"]["value"]
+                                                if bool(i["existing"])
+                                                else 0,
+                                                offset=i["offset"]["value"]
+                                                if bool(i["offset"])
+                                                else 0,
+                                                nonconvex=True
+                                                if bool(i["offset"])
+                                                else False,
+                                            )
+                                            if bool(ep_costs)
+                                            and i["eco_params_flow_choice"] == "outputs"
+                                            else None,
+                                        )
+                                    },
+                                    conversion_factors={
+                                        i["outflow_direction"]: i["efficiency"]["value"]
+                                    },
+                                )
+                            )
+                        except Exception as e:
+                            error_msg = f"Trafo Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {e}."
+                            logger.error(error_msg)
+    
+                            raise Exception(error_msg + " - 407")
 
         print(data_clean["constraints"])
         print(data_clean["economic_data"])
@@ -2190,19 +2548,7 @@ def request_mvs_simulation(request, scen_id=0):
         print(data_clean["simulation_settings"]["evaluated_period"])
         print(data_clean["simulation_settings"]["evaluated_period"]["value"])
         
-        if data_clean["simulation_settings"]["time_step"] == 60:
-            timesteps = int(
-                data_clean["simulation_settings"]["evaluated_period"]["value"] * 24
-            )
-            freq='hourly'
-        elif data_clean["simulation_settings"]["time_step"] == 15:
-            timesteps = int(
-                data_clean["simulation_settings"]["evaluated_period"]["value"] * 24 * 4
-            )
-            freq='quarter_hourly'
-            
-        print(timesteps)
-
+        
         energysystem = InRetEnsysEnergysystem(
             busses=list_busses,
             sinks=list_sinks,

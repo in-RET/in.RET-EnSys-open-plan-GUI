@@ -34,7 +34,7 @@
 			<p>All diese obig genannten Funktionen sind im hier vorliegenden Benutzerinterface nutzbar. Von der
 				Erstellung von Energiesystemen, welche im Hintergrund in „oemof“ überführt werden bis hin zur Lösung
 				dieser Systeme mit dem Bereitgestellten Solver auf dem Server der Hochschule Nordhausen, sofern das
-				Online-Angebot der Hochschule genutzt wird.!</p>
+				Online-Angebot der Hochschule genutzt wird.</p>
 
 			<h3>Energiesystemkomponenten</h3>
 			<p>Das Package „oemof.solph“ stellt Klassen zur Simulation der Bestandteile eines Energiesystems zur
@@ -43,6 +43,7 @@
 			<p>Das Energiesystem setzt sich aus Quellen, Senken, Speichern und Umwandlungsstellen zusammen. Jede
 				Komponente ist mit mindestens einem Bus verbunden. Jeder Knoten im Programm wird mit einem Namen
 				eindeutig bezeichnet. </p>
+			<h4>Quellen</h4>
 			<p>Für Energiequellen, denen Einspeiseprofil, Nennleistung, Kosten mit übergeben werden können, stehen dem
 				Benutzer, je nach Erfahrung, verschiedene Blöcke zur Verfügung.</p>
 			<p>Diese sind:</p>
@@ -50,10 +51,11 @@
 				<li>Predefined Source (Default)</li>
 				<li>Source(Expert)</li>
 			</ul>
-
 			<p>Energiequellen besitzen einen Ausgang und speise ihre Energie immer in einen Bus ein. Ebenfalls ist der
 				entscheidende Unterschied beider Blöcke, das dem Default-User vorgefertigte Einspeiseprofile für
 				verschiedene Technologie (Photovoltaik, Wind etc.) an die Hand gegeben werden.</p>
+
+			<h4>Senken</h4>
 			<p>Der Block „Sink“ repräsentiert das Verhalten von Verbrauchern. Einem Verbraucher können Lastprofil und
 				Nennleistung zugeordnet werden; Kosten sind an der Stelle nicht notwendig, da Ziel der Optimierung die
 				kostenoptimale Deckung der Last in jedem Zeitschritt ist.</p>
@@ -65,6 +67,8 @@
 				<li>Predefined Load Profile(Default)</li>
 				<li>Load Profile from Open Energy Platform (Default)</li>
 			</ul>
+
+			<h4>Speicher</h4>
 			<p>Die zur Verfügung stehende Blöcke für Energiespeicher bilden die charakteristischen Eigenschaften
 				verschiedener Speicherarten ab. Ein Block der Klasse hat einen Eingang und ebenfalls einen Ausgang. Die
 				Nennkapazität („nominal_storage_capacity“) kann fest vorgegeben oder vom Optimierer (Solver) bestimmt
@@ -78,11 +82,15 @@
 				(„inflow_conversion_factor“/ „outflow_conversion_factor“) mit übergeben werden und bei saisonalen
 				Speichern auch eine Verlustrate („loss_rate“), die den prozentualen Ladungsverlust zwischen zwei
 				Zeitschritten beschreibt.</p>
+
+			<h4>Transformer</h4>
 			<p>Zum Erstellen von Energiewandlern stellt die Blöcke der Klasse Transformer() sicher, dass die zu- und
 				abfließenden Energiemengen unter Berücksichtigung des gewünschten Wirkungsgrades in einem Zeitschritt
 				identisch sind. Eine Instanz dieser Klasse kann beliebig viele Ein- und Ausgänge haben. Alle genannten
 				Komponenten können mit Instanzen der Klasse „Bus“ zu einem Energiesystemmodell miteinander verknüpft
 				werden. </p>
+
+			<h4>Bus</h4>
 			<p>Ein Bus ist in „oemof“ eine Sammelschiene, deren zu- und abfließende Energiemengen sich in jedem
 				Zeitschritt ausgleichen.</p>
 		</div>

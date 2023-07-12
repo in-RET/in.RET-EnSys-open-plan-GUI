@@ -2327,6 +2327,11 @@ nav.navbar .dropdown-menu li {
   font-size: 1.25rem;
 }
 
+.standard-layout h4 {
+  font-weight: bold;
+  font-size: 1rem;
+}
+
 .standard-layout__paragraph {
   padding-bottom: 1rem;
 }

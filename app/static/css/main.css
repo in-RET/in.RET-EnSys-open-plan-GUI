@@ -228,7 +228,7 @@ body {
 
 main {
   display: block;
-  margin-top: 1rem;
+  margin-top: 2.7rem;
   height: 100%;
   position: relative;
   width: 100%;
@@ -1808,7 +1808,7 @@ nav.navbar .dropdown-menu li {
   }
 
   .navbar.navbar--scenario {
-    position: relative;
+    position: fixed;
   }
 
   .navbar.navbar--scenario .nav-item.locale::before {
@@ -2032,7 +2032,7 @@ nav.navbar .dropdown-menu li {
   flex-direction: row;
   justify-content: center;
   background-color: #FFF;
-  min-height: calc(100vh - 18.5rem);
+  min-height: calc(100vh - 14.7rem);
 }
 
 .dashboard>div {
@@ -2371,6 +2371,13 @@ nav.navbar .dropdown-menu li {
   justify-content: center;
 }
 
+.math_wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
 @use 'variables' as *;
 
 .clear_design {
@@ -2383,8 +2390,7 @@ nav.navbar .dropdown-menu li {
   display: flex;
   flex-direction: row;
   height: calc(100vh - 14rem);
-  border-top: 2px solid #F4F7F9;
-  margin-top: 4rem
+  margin-top: 8.8rem
 }
 
 .system-design .components {
@@ -2785,13 +2791,32 @@ nav.navbar .dropdown-menu li {
   align-items: center;
   bottom: 5rem;
   width: 100%;
-  position: fixed;
+  min-width: 1024px;
+  position: absolute;
+
 }
 
 .sponsors img {
   padding: 20px;
   max-height: 100px;
 }
+
+.sponsors > .wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 90rem;
+}
+
+.sponsors > .wrapper div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
 
 .hero {
   padding-top: 4.5rem;
@@ -3159,8 +3184,7 @@ nav.navbar .dropdown-menu li {
   display: flex;
   flex-direction: row;
   justify-content: center;
-  margin-top: 4.5rem;
-  border-top: 2px solid #F4F7F9;
+  margin-top: 8.8rem;
 }
 
 .scenario-create form {

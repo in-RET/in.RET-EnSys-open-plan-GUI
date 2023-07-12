@@ -17,11 +17,18 @@
             {% csrf_token %}
             <div id="FormGroup" class="form-group">
                 {% for constraint_id, form in forms.items %}
-
                     <div class="input-item">
                         <div class="scenario-create__form">
                             <div>
                                 <label class="form-label">{{ forms_labels|get_item:constraint_id }} ({{ form.instance.unit }})</label>
+                                {% if constraint_id == 'minimal_renewable_factor' %}
+                                    <div class="math_wrapper">
+                                        <img src="{% static 'assets/illustrations/billanziellErneuerbar_1.svg' %}"><br>
+                                        <span>or</span><br>
+                                        <img src="{% static 'assets/illustrations/billanziellErneuerbar_2.svg' %}"><br>
+                                    </div>
+                                {% endif %}
+
                                 {% for field in form.visible_fields %}
                                     <!-- TODO: add class form-control and aria-describedby with constraint_id + "Help" -->
                                     {{ field|as_crispy_field }}

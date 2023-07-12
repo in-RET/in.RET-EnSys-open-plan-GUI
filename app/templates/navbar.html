@@ -46,10 +46,10 @@
                     <!--For user signup the nav bar does not display all options-->
                 {% else %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'about' %}">{% translate "Contact" %}</a>
+                        <a class="nav-link" href="{% url 'about' %}">{% translate "About" %}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ documentation_url }}" target="_blank" rel="noreferrer">{% translate "Documentation" %}</a>
+                        <a class="nav-link" href="{% url 'documentation' %}" target="_blank" rel="noreferrer">{% translate "Documentation" %}</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'usecase_search' %}">{% translate "Use cases" %}</a>

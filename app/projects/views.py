@@ -753,6 +753,7 @@ def scenario_create_topology(request, proj_id, scen_id, step_id=2, max_step=3):
 
         scenario = get_object_or_404(Scenario, pk=scen_id)
         print(scenario.user_mode_choice)
+        print(scenario.simulation_year)
         
         if scenario.user_mode_choice == "Default User":
             components = components_default_user
@@ -783,6 +784,7 @@ def scenario_create_topology(request, proj_id, scen_id, step_id=2, max_step=3):
                 "max_step": max_step,
                 "components": components,
                 "group_names": group_names,
+                "choosenTimestamp": scenario.simulation_year,
             },
         )
 
@@ -1583,7 +1585,7 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
                     "fixed_thermal_losses_relative": existing_ess_asset.fixed_thermal_losses_relative,
                     "fixed_thermal_losses_absolute": existing_ess_asset.fixed_thermal_losses_absolute,
                     "storage_choice": existing_ess_asset.storage_choice,
-                    "year_choice_storage": existing_ess_asset.year_choice_storage
+                    #"year_choice_storage": existing_ess_asset.year_choice_storage
                 },
                 input_output_mapping=input_output_mapping,
             )

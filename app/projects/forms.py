@@ -426,6 +426,15 @@ scenario_widgets = {
             "title": _("interest rate in % - is used for the interest calculation of the annuities of the technologies")
         }
     ),
+    "simulation_year": forms.Select(
+        attrs={
+            "placeholder": "eg. 2035",
+            "step": "5",
+            "data-bs-toggle": "tooltip",
+            "title": _("Simulationyear"),
+        },
+        choices=((2025, "2025"), (2030, "2030"), (2035, "2035"), (2040, "2040"), (2045, "2045"), (2050, "2050")),
+    ),
     # "timeframe_choice": forms.Select(
     #     choices=TIME_CHOICE,
     #     attrs={
@@ -456,6 +465,7 @@ scenario_labels = {
     # "capex_fix": _("Development costs"),
     # "timeframe_choice": _(""),
     "interest_rate": _("Interest Rate"),
+    #"simulation_year": _("Year of Simulation"),
 }
 
 scenario_field_order = [
@@ -466,7 +476,8 @@ scenario_field_order = [
     "time_step",
     "start_date",
     # "capex_fix",
-    "interest_rate"
+    "interest_rate",
+    #"simulation_year"
 ]
 
 

@@ -799,7 +799,7 @@ def scenario_create_constraints(request, proj_id, scen_id, step_id=3, max_step=4
     constraints_labels = {
         # "minimal_degree_of_autonomy": _("Minimal degree of autonomy"),
         "minimal_renewable_factor": _(
-            "'Bilanziell erneuerbar'/Bilanzielle Autarkie [MWh] the (in)equation looks like this: -(Erzeugung) <= -(Last) OR -(Erzeugung) + Last <= 0"
+            "'Bilanziell erneuerbar'/Bilanzielle Autarkie [MWh]"
         ),
         "maximum_emissions": _("Maximal CO2 emissions"),
         # "net_zero_energy": _("Net zero energy system"),

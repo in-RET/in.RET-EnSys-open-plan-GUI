@@ -33,7 +33,7 @@ var kindOfComponentStorage = '';
 // handling predefined sources
 function loadPredefindedDataKindofSource(value) {
     kindOfComponentSource = value;
-    if (kindOfComponentSource != '' && choosenTimestamp != '') {
+    if (kindOfComponentSource != '' && choosenYear != '') {
         fill_out_form_source();
     }
 }
@@ -42,7 +42,7 @@ function loadPredefindedDataKindofSource(value) {
 // handling predefined transformers
 function loadPredefindedDataKindofTrafo(value) {
     kindOfComponentTrafo = value;
-    if (kindOfComponentTrafo != '' && choosenTimestamp != '') {
+    if (kindOfComponentTrafo != '' && choosenYear != '') {
         fill_out_form_trafo();
     }
 }
@@ -51,7 +51,7 @@ function loadPredefindedDataKindofTrafo(value) {
 // handling predefined storages
 function loadPredefindedDataKindofStorage(value) {
     kindOfComponentStorage = value;
-    if (kindOfComponentStorage != '' && choosenTimestamp != '') {
+    if (kindOfComponentStorage != '' && choosenYear != '') {
         fill_out_form_storage();
     }
 }
@@ -86,7 +86,7 @@ function fill_out_form_source() {
     //alert('Called');
     var server_data = [
         { "kindOfComponentSource": kindOfComponentSource },
-        { "choosenTimestampSource": choosenTimestamp },
+        { "choosenTimestampSource": choosenYear },
     ];
 
     $.ajax({
@@ -107,7 +107,7 @@ function fill_out_form_trafo() {
     //alert('Called');
     var server_data = [
         { "kindOfComponentTrafo": kindOfComponentTrafo },
-        { "choosenTimestampTrafo": choosenTimestamp },
+        { "choosenTimestampTrafo": choosenYear },
     ];
 
     $.ajax({
@@ -128,7 +128,7 @@ function fill_out_form_storage() {
     //alert('Called');
     var server_data = [
         { "kindOfComponentStorage": kindOfComponentStorage },
-        { "choosenTimestampStorage": choosenTimestamp },
+        { "choosenTimestampStorage": choosenYear },
     ];
 
     $.ajax({

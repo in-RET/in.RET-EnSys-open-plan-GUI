@@ -393,7 +393,7 @@ scenario_widgets = {
         attrs={
             "class": "TestDateClass",
             "placeholder": "Select a start date",
-            "type": "date",
+            "type": "date", #The standard HTML5 input tag type="date" doesn’t allow for customization.
         },
     ),
     "time_step": forms.Select(
@@ -409,8 +409,8 @@ scenario_widgets = {
     ),
     "evaluated_period": forms.NumberInput(
         attrs={
-            "placeholder": "value between 1 and 365",
-            "min": "1",
+            "placeholder": "so far only one year is possible",
+            "min": "365",
             "max": "365",
             "step": "1",
             "data-bs-toggle": "tooltip",
@@ -459,7 +459,7 @@ scenario_widgets = {
 scenario_labels = {
     "project": _("Project"),
     "name": _("Scenario name"),
-    "evaluated_period": _("Simulation Period - Number of Days (Note that a very short simulation period can lead to unrealistic results.)"),
+    "evaluated_period": _("Simulation period of one year"), #(Note that a very short simulation period can lead to unrealistic results.)
     "time_step": _("Time Step"),
     "start_date": _("Start Date"),
     # "capex_fix": _("Development costs"),
@@ -651,16 +651,25 @@ class BusForm(OpenPlanModelForm):
 
     class Meta:
         model = Bus
-        fields = ["name"]
+        fields = ["name", "type"]
         widgets = {
             "name": forms.TextInput(
                 attrs={
                     "placeholder": "Bus Name",
                     "style": "font-weight:400; font-size:13px;",
                 }
+            ),
+            "type": forms.Select(
+                choices=ENERGY_VECTOR,
+                attrs={
+                    "data-bs-toggle": "tooltip",
+                    "title": _("The energy Vector of the connected assets."),
+                    "style": "font-weight:400; font-size:13px;",
+                },
             )
         }
-        labels = {"name": _("Name"), }
+        labels = {"name": _("Name"), 
+                  "type": _("Energy carrier")}
 
 
 # class SuggestionForm(OpenPlanModelForm):

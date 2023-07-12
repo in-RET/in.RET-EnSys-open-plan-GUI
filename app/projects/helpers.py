@@ -10,8 +10,10 @@ from django.utils.translation import gettext_lazy as _
 from projects.dtos import convert_to_dto
 from projects.constants import MAP_MVS_EPA
 from dashboard.helpers import KPIFinder
+from projects.models import InputparameterSuggestion
 
 from oemof.tools import economics
+import scipy
 
 PARAMETERS = {}
 if os.path.exists(staticfiles_storage.path("MVS_parameters_list.csv")) is True:
@@ -79,6 +81,53 @@ def epc_calc(capex, Amortisierungszeit, opex, interest_rate):
     betriebsk = capex * (opex / 100)
     epc = investk + betriebsk
     return epc
+
+
+def polate_unknown_capex(technology, year, asset_type_name):
+    queryset_2030 = InputparameterSuggestion.objects.filter(technology=technology, year=2030)
+    queryset_2040 = InputparameterSuggestion.objects.filter(technology=technology, year=2040)
+    
+    for item in queryset_2030:
+        # print(item.unique_id, item.capex)
+        capex_2030 = item.capex
+        opex = item.opex
+        lifetime = item.lifetime
+        efficiency = item.efficiency
+        efficiency_el = item.efficiency_el
+        efficiency_th = item.efficiency_th
+        input_timeseries = item.input_timeseries
+        thermal_loss_rate = item.thermal_loss_rate
+        fixed_losses_relative_gamma = item.fixed_losses_relative_gamma
+        fixed_losses_absolute_delta = item.fixed_losses_absolute_delta
+        crate = item.crate
+        # print(crate)
+        
+    for item in queryset_2040:
+        # print(item.unique_id, item.capex)
+        capex_2040 = item.capex
+        
+    x = [2030, 2040]
+    y = [capex_2030, capex_2040]
+    
+    if year == "2025":
+        f_ex = scipy.interpolate.interp1d(x, y, fill_value = "extrapolate")
+        capex_new = f_ex(2025)
+        # print(capex_new, capex_2030, capex_2040)
+        
+    elif year == "2035":
+        f_linear = scipy.interpolate.interp1d(x, y) 
+        capex_new = f_linear(2035)
+        # print(capex_2030, capex_new, capex_2040)
+        
+    if asset_type_name == "myPredefinedStorage":
+        return capex_new, opex, lifetime, crate, efficiency, thermal_loss_rate, fixed_losses_relative_gamma, fixed_losses_absolute_delta
+    
+    elif asset_type_name == "myPredefinedTransformer":
+        return capex_new, opex, lifetime, efficiency, efficiency_el, efficiency_th, input_timeseries
+    
+    elif asset_type_name == "myPredefinedSource":
+        return capex_new, opex, lifetime, input_timeseries
+    
 
 
 def sensitivity_analysis_payload(

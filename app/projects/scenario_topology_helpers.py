@@ -10,6 +10,7 @@ from projects.models import (
     Project,
     EconomicData,
     COPCalculator,
+    InputparameterSuggestion
 )
 import json
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
@@ -188,13 +189,15 @@ def handle_asset_form_post(request, scen_id=0, asset_type_name="", asset_uuid=No
             input_output_mapping=input_output_mapping,
         )
     else:
-        print('inside else of handle_asset_form_post()')
+        input_timeseries = request.FILES.get("input_timeseries", None)
+        
         form = AssetCreateForm(
             request.POST,
             request.FILES,
             asset_type=asset_type_name,
             scenario_id=scen_id,
             input_output_mapping=input_output_mapping,
+            # source_choice=source_choice
         )
 
     asset_type = get_object_or_404(AssetType, asset_type=asset_type_name)
@@ -203,6 +206,15 @@ def handle_asset_form_post(request, scen_id=0, asset_type_name="", asset_uuid=No
         asset = form.save(commit=False)
         asset.scenario = scenario
         asset.asset_type = asset_type
+        # print(asset.input_timeseries)
+        if (asset.source_choice == "Wind"
+            or asset.source_choice == "Photovoltaic Free Field" 
+            or asset.source_choice == "Roof Mounted Photovoltaic"
+            or asset.source_choice == "Solar thermal system"
+            or asset.source_choice == "Run-of-river power plant"): # for wind pv (twice) solar water
+            queryset = InputparameterSuggestion.objects.filter(technology=asset.source_choice)
+            for item in queryset:
+                asset.input_timeseries = item.input_timeseries
         try:
             asset.pos_x = float(form.data["pos_x"])
             asset.pos_y = float(form.data["pos_y"])

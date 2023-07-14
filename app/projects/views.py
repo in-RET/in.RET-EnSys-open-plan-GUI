@@ -1173,6 +1173,8 @@ def get_inputparameter_suggestion_source(request):
                 "lifetime": lifetime,
             },
         )
+        field = form.fields["input_timeseries"]
+        field.widget = field.hidden_widget()
         
     elif technology == "Other":
         form = AssetCreateForm(
@@ -1184,40 +1186,56 @@ def get_inputparameter_suggestion_source(request):
                 "capex": "",
                 "opex": "",
                 "lifetime": "",
+                "input_timeseries" : "" #would be the file
             },
         )
+        input_timeseries = "" #for visualisation
         
     elif technology == "Solar thermal system": #from "So gehts", the same for all years
         # cwd = os.getcwd()
+        queryset = InputparameterSuggestion.objects.filter(technology=technology)
+        for item in queryset:
+            input_timeseries = item.input_timeseries
+            capex = item.capex
+            opex = item.opex
+            lifetime = item.lifetime
+        
         form = AssetCreateForm(
             asset_type=asset_type_name,
             initial={
                 "name": technology,
                 "source_choice": technology,
                 "year_choice_source": year,
-                "capex": 270, #€/m2
-                "opex": 1.5,
-                "lifetime": 20,
+                "capex": capex, #€/m2
+                "opex": opex,
+                "lifetime": lifetime
             },
         )
-        array_data = np.load('static/Solar thermal energy profile.npy')
-        input_timeseries = str(array_data)
+            
+        # array_data = np.load('static/Solar thermal energy profile.npy')
+        # input_timeseries = str(array_data)
         
     elif technology == "Run-of-river power plant": #from "So gehts", the same for all years
+        queryset = InputparameterSuggestion.objects.filter(technology=technology)
+        for item in queryset:
+            input_timeseries = item.input_timeseries
+            capex = item.capex
+            opex = item.opex
+            lifetime = item.lifetime
+            
         form = AssetCreateForm(
             asset_type=asset_type_name,
             initial={
                 "name": technology,
                 "source_choice": technology,
                 "year_choice_source": year,
-                "capex": 5000000,
-                "opex": 5,
-                "lifetime": 60
+                "capex": capex,
+                "opex": opex,
+                "lifetime": lifetime
             },
         )
-        array_data = np.load('static/Run-of-river power plant profile.npy')
-        input_timeseries = str(array_data)
-        
+        # array_data = np.load('static/Run-of-river power plant profile.npy')
+        # input_timeseries = str(array_data)        
         
     elif technology == "Import Grid":
         form = AssetCreateForm(
@@ -1230,6 +1248,7 @@ def get_inputparameter_suggestion_source(request):
                 "variable_costs": 70
             },
         )
+        input_timeseries = ""
         
         field = form.fields["capex"]
         field.label = "Performance price"
@@ -1251,6 +1270,8 @@ def get_inputparameter_suggestion_source(request):
                 "variable_costs": 25
             },
         )
+        input_timeseries = ""
+        
         field = form.fields["capex"]
         field.widget = field.hidden_widget()
         field = form.fields["opex"]
@@ -1412,7 +1433,7 @@ def get_inputparameter_suggestion_storage(request):
     asset_type_name = "myPredefinedStorage"
     
     if year == "2025" or year == "2035" and technology != "Other":
-        (capex_new, opex, lifetime, crate, efficiency, thermal_loss_rate, 
+        (capex, opex, lifetime, crate, efficiency, thermal_loss_rate, 
          fixed_losses_relative_gamma, fixed_losses_absolute_delta) = polate_unknown_capex(technology, year, asset_type_name)
     
     else: 
@@ -1710,7 +1731,7 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
                     "fixed_thermal_losses_relative": existing_ess_asset.fixed_thermal_losses_relative,
                     "fixed_thermal_losses_absolute": existing_ess_asset.fixed_thermal_losses_absolute,
                     "storage_choice": existing_ess_asset.storage_choice,
-                    "year_choice_storage": existing_ess_asset.year_choice_storage
+                    # "year_choice_storage": existing_ess_asset.year_choice_storage
                 },
                 input_output_mapping=input_output_mapping,
             )

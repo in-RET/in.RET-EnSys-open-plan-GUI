@@ -17,31 +17,62 @@
 	<section class="standard-layout">
 		<div>
 			<div class="standard-layout__paragraph">
-				<h2>{% translate "open_plan project consortium" %}</h2>
-				<p>The open_plan project consortium is composed of the <a href="https://reiner-lemoine-institut.de/" target="_blank" rel="noreferrer">Reiner Lemoine Institut</a> (RLI), <a href="https://www.dgs-berlin.de" target="_blank" rel="noreferrer">Deutsche Gesellschaft für Sonnenenergie</a> (DGS) and the <a href="https://www.pik-potsdam.de/de" target="_blank" rel="noreferrer">Potsdam Institut für Klimafolgenforschung</a> (PIK). It is funded within the framework of the "Technology-oriented systems analysis" funding area of the BMWi's 7th Energy Research Programme "Innovation for the energy transition".</p>
+				<h2>{% translate "Special Thanks" %}</h2>
+				<p>First of all we want to thank the open_plan project consortium, which is composed of the <a href="https://reiner-lemoine-institut.de/" target="_blank" rel="noreferrer">Reiner Lemoine Institut</a> (RLI), <a href="https://www.dgs-berlin.de" target="_blank" rel="noreferrer">Deutsche Gesellschaft für Sonnenenergie</a> (DGS) and the <a href="https://www.pik-potsdam.de/de" target="_blank" rel="noreferrer">Potsdam Institut für Klimafolgenforschung</a> (PIK), for developing the open-plan-tool, which is the basis for our extension.</p>
 			</div>
 			<div class="standard-layout__paragraph">
-				<h2>{% translate "open_plan project website" %}</h2>
-				<p>You can visit the open_plan <a href="https://open-plan-tool.org/" target="_blank" rel="noreferrer">website</a> to know more about the cellular approach and the open_plan project </p>
+				<h2>{% translate "Contact the Developer and Maintainer" %}</h2>
+				<p>You can contact the EnSys project team via</p>
+				<div style="display: flex; flex-direction: row; justify-content: space-between; align-items: start;">
+					<div>
+						<h3>Mail</h3>
+						<a href="mailto:ensys@hs-nordhausen.de">ensys@hs-nordhausen.de</a>		
+					</div>
+					<div>
+						<h3>Placeholder</h3>
+					</div>
+					<div>
+						<h3>Post</h3>
+						<span>Hochschule Nordhausen</span><br>
+						<span>Weinberghof 4</span><br>
+						<span>99974 Nordhausen</span><br>
+					</div>
+				</div>
 			</div>
 			<div class="standard-layout__paragraph standard-layout__paragraph--foreground">
 				<h2>{% translate "Feedback or question?" %}</h2>
-				<p>You can always <a href="{% url 'user_feedback' %}">leave us a comment or feedback</a> on things you would improve. You can also visit <a href="https://github.com/orgs/open-plan-tool/projects/5" target="_blank" rel="noreferrer">our github project page</a> to see which bugs are being fixed and which new features are being developped.</p>
+				<p>You can always <a href="{% url 'user_feedback' %}">leave us a comment or feedback</a> on things you would improve. You can also visit <a href="https://github.com/in-RET/in.RET-EnSys-open-plan-GUI/issues" target="_blank" rel="noreferrer">our github project page</a> to see which bugs are being fixed and which new features are being developped.</p>
+				<div class="standard-layout__paragraph">
+					<h2>open energy modelling initiative</h2>
+					<p>If they have a question about general modeling or further problems they are welcome to look in the <a href="https://forum.openmod.org/">forum</a>.</p>
+				</div>
 			</div>
-			<div class="standard-layout__paragraph standard-layout__paragraph--small">
+			<div class="standard-layout__paragraph">
+				<h2>Technical Background</h2>
+				<h3>Frontend</h3>
+				<p>The Frontend is the here useable Graphical user interface, which is based on the software 'open-plan' from the Reiner Lemoine Institut.</p>
+				<h3>Backend</h3>
+				<p>The backend is the processing component of this software package.</p>
+				<p>It is composed of an API, which is the handover point between the frontend and the server. The API is based on the Python software library "FastAPI". This generates the oemof energy system from the transferred data and starts the optimization in an encapsulated Docker container.</p>
+			</div>
+			<div class="standard-layout__paragraph">
+				<h2>open energy modelling initiative</h2>
+				<p>If they have a question about general modeling or further problems they are welcome to look in the <a href="https://forum.openmod.org/">forum</a>.</p>
+			</div>
+			<div class="standard-layout__paragraph">
 				<h2>Github</h2>
-				<p>You can follow the development of this <a href="https://github.com/open-plan-tool/gui" target="_blank" rel="noreferrer">user interface</a>, or deploy your own open-plan tool (including <a href="https://github.com/open-plan-tool/simulation-server" target="_blank" rel="noreferrer">simulation server</a> and user interface) by visiting our <a href="https://github.com/open-plan-tool/gui" target="_blank" rel="noreferrer">github page</a></p>
+				<p>You can follow the development of this <a href="https://github.com/in-RET/in.RET-EnSys-open-plan-GUI" target="_blank" rel="noreferrer">user interface</a>, or deploy your own ensys tool (including a simulation server and user interface) by visiting our <a href="https://github.com/in-RET/inretensys-common" target="_blank" rel="noreferrer">github page</a></p>
 			</div>
-			<div class="standard-layout__paragraph standard-layout__paragraph--small">
+			<div class="standard-layout__paragraph">
 				<h2>{% translate "Simulation server" %}</h2>
 				<p>
-					{% translate "Our simulations run on a server hosted at RLI, the code to setup the simulation server is licenced under MIT License and publicly available on" %} <a href="https://github.com/open-plan-tool/simulation-server" target="_blank" rel="noreferrer">our github page</a>.
-					The simulation are perfomed with <a href="https://github.com/rl-institut/multi-vector-simulator" target="_blank" rel="noreferrer">multi-vector-simulator</a>, a code using <a href="https://github.com/oemof/oemof-solph" target="_blank" rel="noreferrer">oemof-soplh</a> to simulate energy system model from techno-economic parameters.
+					{% translate "Our simulations run on a server hosted at Hochschule Nordhausen, the code to setup the simulation server is licenced under aGPL License and publicly available on" %} <a href="https://github.com/in-RET/inretensys-common" target="_blank" rel="noreferrer">our github page</a>.
+					The simulation are perfomed with a self coded backend, available on <a href="https://github.com/in-RET/inretensys-fastapi">github</a>. A code using <a href="https://github.com/oemof/oemof-solph" target="_blank" rel="noreferrer">oemof-soplh</a> to simulate energy system model from techno-economic parameters.
 				</p>
 			</div>
 			<div class="standard-layout__paragraph standard-layout__paragraph--small">
 				<h2>{% translate "This webapp design" %}</h2>
-				<p>{% translate "Bryan Lancien from Reiner Lemoine Institut" %}</p>
+				<p>{% translate "Basis: Bryan Lancien from Reiner Lemoine Institut" %}</p>
 			</div>
 		</div>
 	</section>

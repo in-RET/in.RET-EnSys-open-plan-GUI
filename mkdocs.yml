@@ -26,7 +26,9 @@ markdown_extensions:
     - pymdownx.arithmatex:
         generic: true
     - pymdownx.tabbed:
-        alternate_style: true 
+        alternate_style: true
+    - pymdownx.tasklist:
+        custom_checkbox: true
 extra_javascript:
     - js/mathjax.js
     - https://polyfill.io/v3/polyfill.min.js?features=es6

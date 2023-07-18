@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+
+{% block title %} {% translate "FAQ" %} {% endblock title%}
+
+<!-- WRITE HTML CODE WITHIN THESE block content TAGS -->
+{% block content %}
+<main class="legal" style="width: 100%;">
+	<section class="header">
+		<div>
+			<div class="header__left"></div>
+			<h1 class="header__title">Frequently Asked Questions</h1>
+			<div class="header__back"></div>
+		</div>
+	</section>
+	<section class="standard-layout">
+		<div>
+			<div class="standard-layout__paragraph">
+				<h2>Placeholder</h2>
+                <p>Lorem Ipsum</p>
+			</div>
+			<div class="standard-layout__paragraph standard-layout__paragraph--foreground">
+				<h2>Hilfe! Nichts geht!</h2>
+				<ul>
+                    <li>Ruhe bewahren</li>
+                    <li>bis 10e10 zählen</li>
+                    <li>in Panik verfallen</li>
+                    <li>Bildschirme ruckartig vom Tisch schieben</li>
+                    <li>schreiend im Kreis rennen</li>
+                </ul>
+			</div>
+			<div class="standard-layout__paragraph standard-layout__paragraph--small">
+				<h2>Small Placeholder</h2>
+				<p>Lorem Ipsum</p>
+			</div>
+		</div>
+	</section>
+</main>
+{% endblock content %}
+

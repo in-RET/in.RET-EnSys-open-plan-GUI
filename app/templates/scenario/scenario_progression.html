@@ -21,7 +21,8 @@
                     {% for step in step_list %}
 
                     <li {% if step_id == forloop.counter %} class="active" {% endif %}>
-                        {% if scen_id %}
+                        {% translate step %}
+                        <!--{% if scen_id %}
                             {% if forloop.counter < max_step %}
                                 <a href="{% url 'scenario_steps_edit' proj_id scen_id forloop.counter %}" >{% translate step %}</a>
                             {% else %}
@@ -29,7 +30,7 @@
                             {% endif %}
                         {% else %}
                             {% translate step %}
-                        {% endif %}
+                        {% endif %}-->
                     </li>
 
                     {% endfor %}

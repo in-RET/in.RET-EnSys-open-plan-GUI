@@ -13,4 +13,5 @@
 package-lock.json
 package.json
 
-app/InRetEnsys-*.whl
+app/InRetEnsys-*.whlsite/
+site/

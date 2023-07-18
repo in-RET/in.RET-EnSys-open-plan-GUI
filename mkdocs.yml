@@ -23,8 +23,20 @@ markdown_extensions:
         - name: mermaid
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
+    - pymdownx.arithmatex:
+        generic: true
+    - pymdownx.tabbed:
+        alternate_style: true 
+extra_javascript:
+    - js/mathjax.js
+    - https://polyfill.io/v3/polyfill.min.js?features=es6
+    - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
 nav:
     - 'Home': index.md
+    - 'Introduction':
+        - 'Installation': getting_started/installation.md
+        - 'First Steps': getting_started/first_steps.md
+        - 'FAQ': getting_started/faq.md
     - 'About': about.md
     - 'Release Notes': release-notes.md
 theme:
@@ -56,6 +68,8 @@ theme:
             name: Switch to light mode
 
     language: en
+    features:
+        - content.tabs.link
 
 extra:
     social:

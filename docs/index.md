@@ -1,8 +1,8 @@
-!!! note
+!!! warning
     This is a prototype. Under Construction!
 
 <figure markdown>
-  ![Image title](assets/Ensys_Logo.svg){ width="300" }
+  ![Image title](assets/Ensys_Logo.svg){ width="650" }
 </figure>
 
 The graphical user interface for oemof.solph.

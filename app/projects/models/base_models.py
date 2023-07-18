@@ -239,7 +239,7 @@ class Scenario(models.Model):
         null=True, blank=False, validators=[MinValueValidator(0.0)]
     )
 
-    simulation_year = models.IntegerField(validators=[MinValueValidator(2029)])
+    simulation_year = models.IntegerField(validators=[MinValueValidator(2024)])
 
     def __str__(self):
         return self.name

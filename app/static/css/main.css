@@ -2302,6 +2302,11 @@ nav.navbar .dropdown-menu li {
   padding-top: 10rem;
 }
 
+.standard-layout>div img {
+  max-width: 50rem;
+  margin: auto;
+}
+
 .standard-layout>div:before {
   content: '';
   position: absolute;

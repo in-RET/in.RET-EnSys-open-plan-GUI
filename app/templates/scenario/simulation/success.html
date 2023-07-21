@@ -34,6 +34,7 @@
     <div>
       <!--<a class="btn btn--medium" href="{% url 'scenario_visualize_results' scen_id %}">{% translate "Check results dashboard" %}</a>-->
       <!-- href="{% url 'simulation_cancel' scen_id %}" -->
+      <a class="btn btn--medium btn--hollow btn--previous" href="{% url 'scenario_steps_edit' proj_id scen_id step_id|add:'-1' %}" aria-disabled="true">{% translate "Previous" %}</a>
       <button class="btn btn--medium btn--hollow" type="submit" onclick="confirmCancel()">{% translate "Rerun simulation" %}</button>
       <a class="btn btn--medium btn--hollow" href="/static/working/{{ mvs_token }}/dumps/config.lp" download>{% translate "Download LP files" %}</a>
       <a class="btn btn--medium" href="{% url 'scenario_results' proj_id scen_id %}" id="next_btn"  >{% translate "Next" %} </a>

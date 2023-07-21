@@ -1,3 +1,0 @@
-# About
-
-To be completed!

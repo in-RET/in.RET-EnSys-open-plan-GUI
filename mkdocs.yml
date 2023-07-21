@@ -35,11 +35,16 @@ extra_javascript:
     - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
 nav:
     - 'Home': index.md
+    - 'Possibilities': 'possibilities.md'
     - 'Introduction':
         - 'Installation': getting_started/installation.md
         - 'First Steps': getting_started/first_steps.md
         - 'FAQ': getting_started/faq.md
-    - 'About': about.md
+    - 'About': 
+        - 'in.RET': about/inret.md
+        - 'EnSys': about/ensys.md
+        - 'Frontend': about/frontend.md
+        - 'Backend': about/backend.md
     - 'Release Notes': release-notes.md
 theme:
     name: material

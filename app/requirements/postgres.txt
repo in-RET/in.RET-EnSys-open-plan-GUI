@@ -65,7 +65,7 @@ ply==3.11
 psycopg2
 pvlib==0.9.3
 pycparser==2.21
-pydantic==1.10.2
+pydantic
 Pygments==2.13.0
 Pyomo==6.5.0
 pyparsing==3.0.9

@@ -938,8 +938,9 @@ def scenario_review(request, proj_id, scen_id, step_id=4, max_step=5):
             elif simulation.status == PENDING:
                 html_template = f"scenario/simulation/pending.html"
             elif simulation.status == DONE:
-                html_template = f"scenario/simulation/success.html"
                 context.update({"max_step": 6})
+                html_template = f"scenario/simulation/success.html"
+                
 
         else:
             print("no simulation existing")

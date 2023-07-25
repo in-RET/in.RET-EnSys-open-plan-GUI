@@ -63,16 +63,8 @@ def fetch_mvs_simulation_results(simulation):
         response = mvs_simulation_check_status(token=simulation.mvs_token)
         try:
             simulation.status = response["status"]
-            # imulation.errors = (
-            #    json.dumps(response["results"][ERROR])
-            #    if simulation.status == ERROR
-            #    else None
-            # )
-            # simulation.results = (
-            #    parse_mvs_results(simulation, response["results"])
-            #    if simulation.status == DONE
-            #    else None
-            # )
+            simulation.errors = response["addpayload"]
+            print(simulation.errors)
             logger.info(f"The simulation {simulation.id} is {simulation.status}.")
         except:
             simulation.status = ERROR
@@ -92,11 +84,8 @@ def get_mvs_simulation_results(simulation):
     if simulation.status == DONE:
         response = mvs_simulation_check_status(token=simulation.mvs_token)
         simulation.status = response["status"]
-        simulation.errors = (
-            json.dumps(response["results"][ERROR])
-            if simulation.status == ERROR
-            else None
-        )
+        simulation.errors = response["addpayload"]
+        print(simulation.errors)
         simulation.results = (
             parse_mvs_results(simulation, response["results"])
             if simulation.status == DONE

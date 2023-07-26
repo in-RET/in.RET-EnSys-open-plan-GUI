@@ -13,7 +13,7 @@ RUN echo "${NONROOT_USER}:${NONROOT_USER}" | chpasswd
 #USER ${NONROOT_USER}
 
 RUN mkdir ${CONFIG_ROOT}
-COPY requirements/postgres.txt ${CONFIG_ROOT}/requirements.txt
+COPY requirements/requirements.txt ${CONFIG_ROOT}/requirements.txt
 COPY requirements/InRetEnsys-0.2a6-py3-none-any.whl ${CONFIG_ROOT}/InRetEnsys-0.2a6-py3-none-any.whl
 
 RUN pip install --upgrade pip

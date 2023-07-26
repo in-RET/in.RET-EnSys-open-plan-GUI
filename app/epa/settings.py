@@ -44,6 +44,11 @@ SECRET_KEY = os.getenv(
 
 ALLOWED_HOSTS = ["*"]
 
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:20001/",
+    "http://iae.hs-nordhausen.de:20001/"
+]
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -59,6 +64,7 @@ INSTALLED_APPS = [
     "dashboard.apps.DashboardConfig",
     # 3rd Party
     "crispy_forms",
+    "crispy_bootstrap4"
     "django_q",
     "django_plotly_dash.apps.DjangoPlotlyDashConfig",
 ]

@@ -42,7 +42,6 @@ httpcore==0.16.2
 httpx==0.23.1
 idna==3.4
 importlib-resources==5.10.1
-InRetEnsys @ file:///home/pyrokar/Github/inretensys-common/inretensys-gui/app/requirements/InRetEnsys-0.2a5-py3-none-any.whl
 isodate==0.6.1
 itsdangerous==2.1.2
 Jinja2==3.1.2

@@ -3091,6 +3091,7 @@ nav.navbar .dropdown-menu li {
 
 .project__scenarios .actions .btn--action {
   margin-top: 0;
+  padding: 0.25rem 0.5rem;
 }
 
 .project__scenarios .actions .btn--action.results {

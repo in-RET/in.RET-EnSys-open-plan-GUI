@@ -156,6 +156,11 @@
                                                 </div>-->
                                     </div>
                                     <div class="actions">
+                                        <a class="btn btn--action results"
+                                            href="{% url 'scenario_steps_edit' proj_id=project.id scen_id=scenario.id step_id=2 %}">
+                                            {% translate "Model" %}
+                                        </a>
+
                                         {% if scenario.simulation %}
                                         {% if scenario.simulation.status == "PENDING"%}
                                         <a class="btn btn--action btn--pending"

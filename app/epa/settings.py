@@ -45,8 +45,8 @@ SECRET_KEY = os.getenv(
 ALLOWED_HOSTS = ["*"]
 
 CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:20001/",
-    "http://iae.hs-nordhausen.de:20001/"
+    "http://localhost:20001",
+    "http://iae.hs-nordhausen.de:20001"
 ]
 
 # Application definition

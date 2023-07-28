@@ -33,7 +33,7 @@
     {% block start_body_scripts %}{% endblock %}
 
     {% setvar "https://github.com/in-RET/in.RET-EnSys-open-plan-GUI" as github_url %}
-    <!--{% setvar "documentation/documentation.html" as documentation_url %}-->
+    {% setvar "https://in-ret.github.io/in.RET-EnSys-open-plan-GUI/" as documentation_url %}
 
     {% block navbar %}
     {% include "navbar.html" with user=user %}
@@ -70,7 +70,7 @@
             <div class="footer__links">
                 <ul>
                     <li><a href="{% url 'about' %}">{% translate "About" %}</a></li>
-                    <li><a href="{% url 'documentation' %}">{% translate "Documentation" %}</a></li>
+                    <li><a href="{{ documentation_url }}" target="_blank" rel="noreferrer">{% translate "Documentation" %}</a></li>
                     <li><a href="{{ github_url }}" target="_blank" rel="noreferrer">{% translate "Github" %}</a></li>
                     <li><a href="{% url 'usecase_search' %}">{% translate "Use cases" %}</a></li>
                     <li><a href="{% url 'faq' %}">{% translate "FAQ" %}</a></li>

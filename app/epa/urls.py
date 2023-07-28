@@ -20,7 +20,7 @@ from django.conf.urls.i18n import i18n_patterns
 from django.conf.urls.static import static
 from django.urls import include, path, re_path
 
-from .views import about, imprint, license, privacy, documenation, faq
+from .views import about, imprint, license, privacy, faq
 from .settings import STATIC_ROOT, STATIC_URL
 
 urlpatterns = (
@@ -35,7 +35,6 @@ urlpatterns = (
         path("about/", about, name="about"),
         path("license/", license, name="license"),
         path("faq", faq, name="faq"),
-        path("documentation/", documenation, name="documentation"),
         # path('plotly_dash/', include('dashplots.urls')),
         path("django_plotly_dash/", include("django_plotly_dash.urls")),
     )

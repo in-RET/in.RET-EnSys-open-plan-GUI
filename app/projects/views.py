@@ -2634,7 +2634,7 @@ def request_mvs_simulation(request, scen_id=0):
         if output_lp_file == "on":
             data_clean["simulation_settings"]["output_lp_file"] = "true"
 
-        results = mvs_simulation_request(model.json())
+        results = mvs_simulation_request(model.model_dump_json(exclude_none=True))
     except Exception as e:
         error_msg = f"Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {e}."
         logger.error(error_msg)

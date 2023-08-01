@@ -2593,7 +2593,7 @@ def request_mvs_simulation(request, scen_id=0):
         list_constraints.append(
             InRetEnsysConstraints(
                 typ=Constraints.emission_limit,
-                keyword="emission_factor",
+                #keyword="emission_factor",
                 limit=data_clean["constraints"]["maximum_emissions"]["value"],
             )
         ) if "maximum_emissions" in data_clean["constraints"] else None
@@ -2616,8 +2616,8 @@ def request_mvs_simulation(request, scen_id=0):
         model = InRetEnsysModel(
             energysystem=energysystem,
             solver=Solver.cbc,
-            # solver_verbose=False
-            # constraints=list_constraints,
+            #solver_verbose=True,
+            #constraints=list_constraints,
         )
 
         # File output for debugging

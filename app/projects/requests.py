@@ -52,21 +52,20 @@ def mvs_simulation_check_status(token):
         logger.error(f"Other error occurred: {err}")
         return None
     else:
-        logger.info("Success!")
-
+        logger.info("Check_Satus successfully!")
         return json.loads(response.content)
 
 
 def fetch_mvs_simulation_results(simulation):
     if simulation.status == PENDING:
         response = mvs_simulation_check_status(token=simulation.mvs_token)
-        print("response:", response)
+        print("Response:", response)
+        
         try:
             simulation.status = response["status"]
             simulation.errors = response["error"]
             exitcode = response["exitcode"]
             
-            print(exitcode, ":", simulation.errors)
             logger.info(f"The simulation {simulation.id} is {simulation.status}.")
         except:
             simulation.status = ERROR
@@ -77,8 +76,15 @@ def fetch_mvs_simulation_results(simulation):
             datetime.now() if response["status"] in [ERROR, DONE] else None
         )
         simulation.save()
-
-    return simulation.status != PENDING
+    
+    if simulation.status == ERROR:
+        return "Error"
+    elif simulation.status == PENDING:
+        return "Pending"
+    elif simulation.status == DONE:
+        return "Done"
+    else:
+        return "Failure"
 
 
 def get_mvs_simulation_results(simulation):
@@ -87,11 +93,9 @@ def get_mvs_simulation_results(simulation):
         response = mvs_simulation_check_status(token=simulation.mvs_token)
         simulation.status = response["status"]
         simulation.errors = response["error"]
-        print(simulation.errors)
+        
         simulation.results = (
-            parse_mvs_results(simulation, response["results"])
-            if simulation.status == DONE
-            else None
+            parse_mvs_results(simulation, response["results"]) if simulation.status == DONE else None
         )
         logger.info(f"The simulation {simulation.id} is finished")
 

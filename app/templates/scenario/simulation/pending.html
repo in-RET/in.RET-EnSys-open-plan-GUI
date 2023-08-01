@@ -41,8 +41,30 @@
 {% if simulation_status == "PENDING" %}
 <script>
     const checkSimulationUrl = `{% url 'fetch_simulation_results' sim_id %}`;
+    const myInterval = setInterval(check_if_simulation_is_done, 3000);
+
+    function check_if_simulation_is_done(url=checkSimulationUrl){
+        $.ajax({
+            type: "GET",
+            url: url,
+            success: function (resp) {
+                console.log(resp);
+                if(resp.status == "Done"){
+                    clearInterval(myInterval);
+                    //location.reload();
+                    location.href = "{% url 'scenario_results' proj_id scen_id %}";
+                } else if(resp.status == "Error") {
+                    clearInterval(myInterval);
+                    location.reload();
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                clearInterval(myInterval);
+            }
+        });
+    };
 </script>
-<script src="{% static 'js/simulation_requests.js' %}"></script>
+
 {% endif %}
 
 {% endblock end_body_scripts %}

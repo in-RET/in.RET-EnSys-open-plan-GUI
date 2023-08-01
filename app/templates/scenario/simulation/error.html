@@ -16,9 +16,12 @@
           </div>
           <div class="simulation__feedback">
             <div class="item item--error">
-               <p>{% translate "The following input parameters contain errors" %}:</p>
-               <div>{{ simulation_error_msg }}</div>
-
+              <p>{% translate "The following input parameters contain errors" %}:</p>
+              <div>
+                {% for line in simulation_error_msg %}
+                  {{ line }}<br>
+                {% endfor %}
+              </div>
             </div>
           </div>
         </div>

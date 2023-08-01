@@ -895,9 +895,7 @@ def scenario_review(request, proj_id, scen_id, step_id=4, max_step=5):
 
     scenario = get_object_or_404(Scenario, pk=scen_id)
 
-    if (scenario.project.user != request.user) and (
-        request.user not in scenario.project.viewers.all()
-    ):
+    if (scenario.project.user != request.user) and (request.user not in scenario.project.viewers.all()):
         raise PermissionDenied
 
     if request.method == "GET":
@@ -933,15 +931,14 @@ def scenario_review(request, proj_id, scen_id, step_id=4, max_step=5):
             )
 
             if simulation.status == ERROR:
-                context.update({"simulation_error_msg": simulation.errors})
+                debugging = {"simulation_error_msg": simulation.errors.splitlines()}
+                context.update(debugging)
                 html_template = f"scenario/simulation/error.html"
             elif simulation.status == PENDING:
                 html_template = f"scenario/simulation/pending.html"
             elif simulation.status == DONE:
                 context.update({"max_step": 6})
                 html_template = f"scenario/simulation/success.html"
-                
-
         else:
             print("no simulation existing")
 
@@ -2703,9 +2700,10 @@ def update_simulation_rating(request):
 @require_http_methods(["GET"])
 def fetch_simulation_results(request, sim_id):
     simulation = get_object_or_404(Simulation, id=sim_id)
-    are_result_ready = fetch_mvs_simulation_results(simulation)
+    status = fetch_mvs_simulation_results(simulation)
+
     return JsonResponse(
-        dict(areResultReady=are_result_ready),
+        dict(status=status),
         status=200,
         content_type="application/json",
     )

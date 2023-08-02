@@ -31,6 +31,7 @@ django-jsonview
 django-picklefield
 django-q
 django-sass-processor
+django-bootstrap-datepicker-plus
 dnspython
 et-xmlfile
 exchangelib

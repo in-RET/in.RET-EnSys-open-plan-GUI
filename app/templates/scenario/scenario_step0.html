@@ -32,6 +32,7 @@
 <main>
 
     <section class="scenario-create">
+        {{ form.media }}
         <form id="CreateScenarioForm" method="POST" action="{% url 'scenario_select_project' %}">
             {% csrf_token %}
             <div class="row justify-content-center">

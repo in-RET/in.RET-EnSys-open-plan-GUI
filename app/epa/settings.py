@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     "crispy_bootstrap4",
     "django_q",
     "django_plotly_dash.apps.DjangoPlotlyDashConfig",
+    "bootstrap_datepicker_plus",
 ]
 
 if DEBUG is True:
@@ -165,6 +166,18 @@ USE_L10N = True
 
 USE_TZ = False
 
+BOOTSTRAP_DATEPICKER_PLUS = {
+    "options": {
+        "locale": "de",
+        "showClose": True,
+        "showTodayButton": True,
+    },
+    "variant_options": {
+        "date": {
+            "format": "DD-MM",
+        },
+    }
+}
 
 # Other configs
 
@@ -179,7 +192,7 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 MAILER_EMAIL_BACKEND = EMAIL_BACKEND
 
-DEFAULT_FROM_EMAIL = "noreply@hs-nordhausen.de"
+DEFAULT_FROM_EMAIL = "ensys@hs-nordhausen.de"
 EMAIL_HOST = os.getenv("EMAIL_HOST_IP", "127.0.0.1")
 EMAIL_PORT = 25
 EMAIL_USE_TLS = False

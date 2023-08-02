@@ -131,8 +131,8 @@ def user_feedback(request):
             except:
                 feedback.rating = None
             feedback.save()
-            subject = f"[open_plan] Feedback for open_plan tool - {feedback.subject}"
-            body = f"Feedback form for open_plan tool online api\n\nReceived Feedback\n-----------------\n\nTopic: {feedback.subject}\nContent: {feedback.feedback}\n\nInformation about sender\n------------------------\nName: {feedback.name}\n E-mail Address: {feedback.email}"
+            subject = f"[open_plan] Feedback for ensys tool - {feedback.subject}"
+            body = f"Feedback form for ensys tool online api\n\nReceived Feedback\n-----------------\n\nTopic: {feedback.subject}\nContent: {feedback.feedback}\n\nInformation about sender\n------------------------\nName: {feedback.name}\n E-mail Address: {feedback.email}"
             try:
                 send_feedback_email(subject, body)
                 messages.success(request, f"Thank you for your feedback.")

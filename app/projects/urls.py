@@ -139,6 +139,11 @@ urlpatterns = [
         name="get_asset_create_form",
     ),
     re_path(
+        r"asset/adjust_form_expert_trafo/",
+        customising_form_expert_trafo,
+        name="customising_form_expert_trafo",
+    ),
+    re_path(
         r"asset/get_param_suggestion_source/",
         get_inputparameter_suggestion_source,
         name="get_inputparameter_suggestion_source",

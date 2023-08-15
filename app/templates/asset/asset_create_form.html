@@ -12,6 +12,27 @@
 	{% if form.asset_type_name == "myPredefinedTransformer" %}
 		{{ form.trafo_choice|as_crispy_field }}
 	{% endif %}
+	{% if form.asset_type_name == "myTransformer" %}
+		{{ form.trafo_input_output_variation_choice|as_crispy_field }}
+		
+		{{ form.trafo_input_bus_1|as_crispy_field }}
+		{{ form.trafo_input_conversionf_1|as_crispy_field }}
+		<br>
+		{{ form.trafo_input_bus_2|as_crispy_field }}
+		{{ form.trafo_input_conversionf_2|as_crispy_field }}
+		<br>
+		{{ form.trafo_input_bus_3|as_crispy_field }}
+		{{ form.trafo_input_conversionf_3|as_crispy_field }}
+		<br>
+		{{ form.trafo_output_bus_1|as_crispy_field }}
+		{{ form.trafo_output_conversionf_1|as_crispy_field }}
+		<br>
+		{{ form.trafo_output_bus_2|as_crispy_field }}
+		{{ form.trafo_output_conversionf_2|as_crispy_field }}
+		<br>
+		{{ form.trafo_output_bus_3|as_crispy_field }}
+		{{ form.trafo_output_conversionf_3|as_crispy_field }}
+	{% endif %}
   </div>
 
 <div class="container">

@@ -335,6 +335,14 @@ YEAR_CHOICE = (
     (2045, 2045),
 )
 
+TRAFO_I_O_VARIATION_CHOICE = (
+    ("", "Choose..."),
+    ("1:1", "1 input: 1 output"),
+    ("1:2", "1 input: 2 outputs"),
+    ("2:3", "2 inputs: 3 outputs"),
+    ("3:3", "3 inputs: 3 outputs"),
+    ("2:1", "2 inputs: 1 output")
+)
 
 # TIME_CHOICE = (
 #     ("", "Choose..."),

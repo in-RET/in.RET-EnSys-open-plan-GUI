@@ -29,7 +29,7 @@ from epa.settings import (
 from InRetEnsys import *
 from InRetEnsys.types import Solver, Constraints
 from jsonview.decorators import json_view
-from projects.helpers import epc_calc, format_scenario_for_mvs, polate_unknown_capex
+from projects.helpers import epc_calc, format_scenario_for_mvs, polate_unknown_capex, expert_trafo_parameter_visibility
 from projects.models import *
 
 from .constants import DONE, ERROR, MODIFIED, PENDING
@@ -1128,6 +1128,41 @@ def scenario_delete(request, scen_id):
 
 # endregion Scenario
 
+@login_required
+@require_http_methods(["POST", "GET"])
+def customising_form_expert_trafo(request):
+    body_unicode = request.body.decode("utf-8")  # for POST
+    body = json.loads(body_unicode)
+    print(body)
+    combination = body[0]["trafo_input_output_variation"]
+
+    form = AssetCreateForm(
+        asset_type="myTransformer",
+        initial={
+            "name": "",
+            "trafo_input_output_variation_choice": combination
+        },
+    )
+    expert_trafo_parameter_visibility(form, combination)
+    
+    
+    
+    form_html = get_template("asset/asset_create_form.html")
+    return JsonResponse(
+        {
+            "success": True,
+            "form_html": form_html.render(
+                {
+                    "form": form,
+                    # "input_timeseries_data": input_timeseries,
+                    # "input_timeseries_timestamps": 8760,
+                }
+            ),
+        },
+        status=200,
+    )
+    
+
 # region Asset
 @login_required
 @require_http_methods(["POST", "GET"])  # , "POST"
@@ -1643,6 +1678,12 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
                     field2 = form.fields["efficiency_th"]
                     field1.widget = field1.hidden_widget()
                     field2.widget = field2.hidden_widget()
+                    
+            # elif asset_type_name == "myTransformer":
+            #     return render(request, "asset/asset_create_form.html", context)
+            elif asset_type_name == "myTransformer":
+                expert_trafo_parameter_visibility(form, 
+                                                  existing_asset.trafo_input_output_variation_choice)
 
         else:
             print(asset_type_name)

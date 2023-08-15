@@ -132,7 +132,8 @@ class AssetDto:
         unit: str,
         annual_energy_consumption: ValueTypeDto,
         source_choice: str,
-        trafo_choice: str
+        trafo_choice: str,
+        trafo_input_output_variation_choice: str
         # beta: ValueTypeDto = None,
     ):
         self.asset_type = asset_type
@@ -187,6 +188,7 @@ class AssetDto:
         self.annual_energy_consumption = annual_energy_consumption
         self.source_choice = source_choice
         self.trafo_choice = trafo_choice
+        self.trafo_input_output_variation_choice = trafo_input_output_variation_choice
 
         # self.beta = beta
 
@@ -751,6 +753,7 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
             to_value_type(asset, "annual_energy_consumption"),
             asset.source_choice,
             asset.trafo_choice,
+            asset.trafo_input_output_variation_choice,
             **optional_parameters,
         )
 

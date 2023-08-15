@@ -10,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from projects.dtos import convert_to_dto
 from projects.constants import MAP_MVS_EPA
 from dashboard.helpers import KPIFinder
-from projects.models import InputparameterSuggestion
+from projects.models import InputparameterSuggestion, Bus
 
 from oemof.tools import economics
 import scipy
@@ -428,3 +428,33 @@ def parse_input_timeseries(timeseries_file):
                 params={"fname": timeseries_file.name},
             )
     return timeseries_values
+
+
+def expert_trafo_parameter_visibility(form, combination):
+    if combination == "2:3" or combination == "1:2" or combination == "1:1" or combination == "2:1":
+        field = form.fields["trafo_input_bus_3"]
+        field.widget = field.hidden_widget()
+        field = form.fields["trafo_input_conversionf_3"]
+        field.widget = field.hidden_widget()
+        if combination == "1:2" or combination == "1:1" or combination == "2:1":
+            field = form.fields["trafo_output_bus_3"]
+            field.widget = field.hidden_widget()
+            field = form.fields["trafo_output_conversionf_3"]
+            field.widget = field.hidden_widget()
+        if combination == "1:1" or combination == "2:1":
+            field = form.fields["trafo_output_bus_2"]
+            field.widget = field.hidden_widget()
+            field = form.fields["trafo_output_conversionf_2"]
+            field.widget = field.hidden_widget()
+        if combination == "1:2" or combination == "1:1":            
+            field = form.fields["trafo_input_bus_2"]
+            field.widget = field.hidden_widget()
+            field = form.fields["trafo_input_conversionf_2"]
+            field.widget = field.hidden_widget()
+            field = form.fields["trafo_input_conversionf_1"]
+            field.widget = field.hidden_widget()
+        if combination == "2:1":
+            field = form.fields["trafo_output_conversionf_1"]
+            field.widget = field.hidden_widget()
+    
+    

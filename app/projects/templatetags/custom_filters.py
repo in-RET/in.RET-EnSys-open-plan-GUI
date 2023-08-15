@@ -88,6 +88,8 @@ def is_economical_parameter(param):
         "invest_relation_input_capacity",
         "invest_relation_output_capacity",
         "eco_params_flow_choice",
+        "trafo_invest_bus_choice",
+        "trafo_variableCosts_bus_choice"
     ]
 
 
@@ -101,6 +103,19 @@ def is_technical_parameter(param):
         or param == "trafo_choice"
         or param == "year_choice_storage"
         or param == "storage_choice"
+        or param == "trafo_input_bus_1"
+        or param == "trafo_input_bus_2"
+        or param == "trafo_input_bus_3"
+        or param == "trafo_input_conversionf_1"
+        or param == "trafo_input_conversionf_2"
+        or param == "trafo_input_conversionf_3"
+        or param == "trafo_input_output_variation_choice"
+        or param == "trafo_output_bus_1"
+        or param == "trafo_output_bus_2"
+        or param == "trafo_output_bus_3"
+        or param == "trafo_output_conversionf_1"
+        or param == "trafo_output_conversionf_2"
+        or param == "trafo_output_conversionf_3"
     ):
         return False
     else:

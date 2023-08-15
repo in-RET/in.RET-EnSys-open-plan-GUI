@@ -35,7 +35,8 @@ from projects.constants import (
     # TIME_CHOICE,
     USER_MODE,
     MW_KW_CHOICE,
-    CO2_UNIT_CHOICE
+    CO2_UNIT_CHOICE,
+    TRAFO_I_O_VARIATION_CHOICE
 )
 
 
@@ -239,7 +240,7 @@ class Scenario(models.Model):
         null=True, blank=False, validators=[MinValueValidator(0.0)]
     )
 
-    simulation_year = models.IntegerField(validators=[MinValueValidator(2024)])
+    simulation_year = models.IntegerField(validators=[MinValueValidator(2024)], default=2025)
 
     def __str__(self):
         return self.name
@@ -616,6 +617,64 @@ class Asset(TopologyNode):
     annual_energy_consumption = models.FloatField(
         null=True, blank=False, validators=[MinValueValidator(0.0)]
     )
+    ##########
+    # expert trafo
+    trafo_input_output_variation_choice = models.CharField(
+        null=True, blank=False, choices=TRAFO_I_O_VARIATION_CHOICE, max_length=40
+    )
+    # trafo input bus
+    trafo_input_bus_1 = models.CharField(
+        default="Choose", max_length=128 # at least one input
+    )
+    trafo_input_bus_2 = models.CharField(
+        default="Choose", max_length=128, null=True, blank=True
+    )
+    trafo_input_bus_3 = models.CharField(
+        default="Choose", max_length=128, null=True, blank=True
+    )
+    # trafo input conversion factor
+    trafo_input_conversionf_1 = models.FloatField(
+        null=True, blank=True, validators=[MinValueValidator(0.0)]
+    )
+    trafo_input_conversionf_2 = models.FloatField(
+        null=True, blank=True, validators=[MinValueValidator(0.0)]
+    )
+    trafo_input_conversionf_3 = models.FloatField(
+        null=True, blank=True, validators=[MinValueValidator(0.0)]
+    )
+    
+    # trafo output bus
+    trafo_output_bus_1 = models.CharField(
+        default="Choose", max_length=128 # at least one output
+    )
+    trafo_output_bus_2 = models.CharField(
+        default="Choose", max_length=128, null=True, blank=True
+    )
+    trafo_output_bus_3 = models.CharField(
+        default="Choose", max_length=128, null=True, blank=True
+    )    
+    # trafo output conversion factor
+    trafo_output_conversionf_1 = models.FloatField(
+        null=True, blank=True, validators=[MinValueValidator(0.0)]
+    )
+    trafo_output_conversionf_2 = models.FloatField(
+        null=True, blank=True, validators=[MinValueValidator(0.0)]
+    )
+    trafo_output_conversionf_3 = models.FloatField(
+        null=True, blank=True, validators=[MinValueValidator(0.0)]
+    )
+    ###
+    trafo_technicalp_bus_choice = models.CharField(
+        default="Choose", max_length=128, null=True, blank=True
+    )
+    trafo_invest_bus_choice = models.CharField(
+        default="Choose", max_length=128, null=True, blank=True
+    )
+    trafo_variableCosts_bus_choice = models.CharField(
+        default="Choose", max_length=128, null=True, blank=True
+    )
+
+    
 
     @property
     def fields(self):

@@ -30,6 +30,32 @@ var kindOfComponentTrafo = '';
 var kindOfComponentStorage = '';
 
 
+// handling expert trafo
+function get_trafo_variation(value) {
+	alert(value);
+	render_form_expert_trafo(value);
+}
+
+function render_form_expert_trafo(value) {
+    //alert('Called');
+    var server_data = [
+        { "trafo_input_output_variation": value }
+    ];
+
+    $.ajax({
+        type: "POST",
+        url: "/en/asset/adjust_form_expert_trafo/",
+        data: JSON.stringify(server_data),
+        contentType: "application/json",
+        dataType: 'json',
+        success: function (response) {
+            Swal.fire('', "Got response from server ...", 'info');
+            //alert(response['form_html']);
+            $('#act_form_div').html(response['form_html']);
+        }
+    });
+}
+
 // handling predefined sources
 function loadPredefindedDataKindofSource(value) {
     kindOfComponentSource = value;

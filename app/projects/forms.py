@@ -17,7 +17,7 @@ from projects.helpers import (
     parameters_helper,
     PARAMETERS,
     DualNumberField,
-    parse_input_timeseries,
+    parse_input_timeseries
 )
 
 
@@ -717,7 +717,9 @@ class BusForm(OpenPlanModelForm):
 #                 }
 #             ),
 #         }
-
+class UserModelChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return obj.name
 
 class AssetCreateForm(OpenPlanModelForm):
     def __init__(self, *args, **kwargs):
@@ -746,14 +748,42 @@ class AssetCreateForm(OpenPlanModelForm):
                 self.timestamps = qs.get().get_timestamps()
 
         self.fields["inputs"] = forms.CharField(widget=forms.HiddenInput())
+        self.fields["trafo_input_bus_1"] = UserModelChoiceField(queryset = Bus.objects.all())
+        self.fields["trafo_input_bus_2"] = UserModelChoiceField(queryset = Bus.objects.all())
+        self.fields["trafo_input_bus_3"] = UserModelChoiceField(queryset = Bus.objects.all())
+        
+        self.fields["trafo_output_bus_1"] = UserModelChoiceField(queryset = Bus.objects.all())
+        self.fields["trafo_output_bus_2"] = UserModelChoiceField(queryset = Bus.objects.all())
+        self.fields["trafo_output_bus_3"] = UserModelChoiceField(queryset = Bus.objects.all())
+        
+        self.fields["trafo_technicalp_bus_choice"] = UserModelChoiceField(queryset = Bus.objects.all())
+        self.fields["trafo_invest_bus_choice"] = UserModelChoiceField(queryset = Bus.objects.all())
+        self.fields["trafo_variableCosts_bus_choice"] = UserModelChoiceField(queryset = Bus.objects.all())
 
         if self.asset_type_name == "myTransformer":
+            for i in range(1, 4):
+                self.fields[
+                    "trafo_input_bus_"+str(i)
+                ].label = "Input bus "+str(i)
+                self.fields[
+                    "trafo_input_conversionf_"+str(i)
+                ].label = "Input conversion factor "+str(i)
+            
+                self.fields[
+                    "trafo_output_bus_"+str(i)
+                ].label = "Output bus "+str(i)
+                self.fields[
+                    "trafo_output_conversionf_"+str(i)
+                ].label = "Output conversion factor "+str(i)
             self.fields[
-                "eco_params_flow_choice"
-            ].label = "Flow selection for economical parameters"
+                "trafo_technicalp_bus_choice"
+            ].label = "Bus the technical parameters refer to"
             self.fields[
-                "tec_params_flow_choice"
-            ].label = "Flow selection for technical parameters"
+                "trafo_invest_bus_choice"
+            ].label = "Bus the invest modell refers to"
+            self.fields[
+                "trafo_variableCosts_bus_choice"
+            ].label = "Bus the variable costs refer to"
 
         if self.asset_type_name == "heat_pump":
             self.fields["efficiency"] = DualNumberField(
@@ -823,6 +853,24 @@ class AssetCreateForm(OpenPlanModelForm):
                 self.fields[field].required = False  # self.is_input_timeseries_empty()
             if field == "choice_load_profile":
                 self.fields[field].required = False
+            # trafo for expert
+            if field == "trafo_input_bus_2":
+                self.fields[field].required = False
+            if field == "trafo_input_bus_3":
+                self.fields[field].required = False
+                
+            if field == "trafo_output_bus_2":
+                self.fields[field].required = False
+            if field == "trafo_output_bus_3":
+                self.fields[field].required = False
+                
+            if field == "trafo_technicalp_bus_choice":
+                self.fields[field].required = False
+            if field == "trafo_invest_bus_choice":
+                self.fields[field].required = False
+            if field == "trafo_variableCosts_bus_choice":
+                self.fields[field].required = False
+                
             if view_only is True:
                 self.fields[field].disabled = True
         """ ----------------------------------------------------- """
@@ -1575,6 +1623,15 @@ class AssetCreateForm(OpenPlanModelForm):
                     "title": _(""),
                     "style": "font-weight:400; font-size:13px;",
                     "onchange": "loadPredefindedDataKindofStorage(this.value)",
+                },
+            ),
+            "trafo_input_output_variation_choice": forms.Select(
+                choices=TRAFO_I_O_VARIATION_CHOICE,
+                attrs={
+                    "data-bs-toggle": "tooltip",
+                    "title": _(""),
+                    "style": "font-weight:400; font-size:13px;",
+                    "onchange": "get_trafo_variation(this.value)",
                 },
             ),
         }

@@ -748,19 +748,21 @@ class AssetCreateForm(OpenPlanModelForm):
                 self.timestamps = qs.get().get_timestamps()
 
         self.fields["inputs"] = forms.CharField(widget=forms.HiddenInput())
-        self.fields["trafo_input_bus_1"] = UserModelChoiceField(queryset = Bus.objects.all())
-        self.fields["trafo_input_bus_2"] = UserModelChoiceField(queryset = Bus.objects.all())
-        self.fields["trafo_input_bus_3"] = UserModelChoiceField(queryset = Bus.objects.all())
         
-        self.fields["trafo_output_bus_1"] = UserModelChoiceField(queryset = Bus.objects.all())
-        self.fields["trafo_output_bus_2"] = UserModelChoiceField(queryset = Bus.objects.all())
-        self.fields["trafo_output_bus_3"] = UserModelChoiceField(queryset = Bus.objects.all())
-        
-        self.fields["trafo_technicalp_bus_choice"] = UserModelChoiceField(queryset = Bus.objects.all())
-        self.fields["trafo_invest_bus_choice"] = UserModelChoiceField(queryset = Bus.objects.all())
-        self.fields["trafo_variableCosts_bus_choice"] = UserModelChoiceField(queryset = Bus.objects.all())
 
         if self.asset_type_name == "myTransformer":
+            
+            self.fields["trafo_input_bus_1"] = UserModelChoiceField(queryset = Bus.objects.all())
+            self.fields["trafo_input_bus_2"] = UserModelChoiceField(queryset = Bus.objects.all())
+            self.fields["trafo_input_bus_3"] = UserModelChoiceField(queryset = Bus.objects.all())
+            
+            self.fields["trafo_output_bus_1"] = UserModelChoiceField(queryset = Bus.objects.all())
+            self.fields["trafo_output_bus_2"] = UserModelChoiceField(queryset = Bus.objects.all())
+            self.fields["trafo_output_bus_3"] = UserModelChoiceField(queryset = Bus.objects.all())
+            
+            self.fields["trafo_technicalp_bus_choice"] = UserModelChoiceField(queryset = Bus.objects.all())
+            self.fields["trafo_invest_bus_choice"] = UserModelChoiceField(queryset = Bus.objects.all())
+            self.fields["trafo_variableCosts_bus_choice"] = UserModelChoiceField(queryset = Bus.objects.all())
             for i in range(1, 4):
                 self.fields[
                     "trafo_input_bus_"+str(i)

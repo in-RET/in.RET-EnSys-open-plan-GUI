@@ -2515,7 +2515,66 @@ def request_mvs_simulation(request, scen_id=0):
                                                 )
                                                 if bool(ep_costs)
                                                 else None,
+                                            ),
+                                            input_bus_2.name: InRetEnsysFlow(
+                                                # We first assume that it is a base load.
+                                                # fix=i["input_timeseries"]["value"]
+                                                # if i["input_timeseries"]["value"]
+                                                # else None,
+                                                variable_costs=i["variable_costs"]["value"]
+                                                if i["variable_costs"]
+                                                and i["trafo_input_bus_2"] == i["trafo_variableCosts_bus_choice"]
+                                                else None,
+                                                nominal_value=i["nominal_value"]["value"]
+                                                if i["nominal_value"]
+                                                and i["trafo_input_bus_2"] == i["trafo_technicalp_bus_choice"]
+                                                else None,
+                                                summed_max=i["summed_max"]["value"]
+                                                if i["summed_max"]
+                                                and i["trafo_input_bus_2"] == i["trafo_technicalp_bus_choice"]
+                                                else None,
+                                                summed_min=i["summed_min"]["value"]
+                                                if i["summed_min"]
+                                                and i["trafo_input_bus_2"] == i["trafo_technicalp_bus_choice"]
+                                                else None,
+                                                nonconvex=InRetEnsysNonConvex()
+                                                if i["nonconvex"]["value"] == True
+                                                and i["trafo_input_bus_2"] == i["trafo_technicalp_bus_choice"]
+                                                else None,
+                                                _min=i["_min"]["value"]
+                                                if i["_min"]
+                                                and i["trafo_input_bus_2"] == i["trafo_technicalp_bus_choice"]
+                                                else None,
+                                                _max=i["_max"]["value"]
+                                                if i["_max"]
+                                                and i["trafo_input_bus_2"] == i["trafo_technicalp_bus_choice"]
+                                                else None,
+                                                investment=InRetEnsysInvestment(
+                                                    ep_costs=ep_costs,
+                                                    maximum=i["maximum"]["value"]
+                                                    if bool(i["maximum"])
+                                                    and i["trafo_input_bus_2"] == i["trafo_invest_bus_choice"]
+                                                    else 1000000,
+                                                    minimum=i["minimum"]["value"]
+                                                    if bool(i["minimum"])
+                                                    and i["trafo_input_bus_2"] == i["trafo_invest_bus_choice"]
+                                                    else 0,
+                                                    existing=i["existing"]["value"]
+                                                    if bool(i["existing"])
+                                                    and i["trafo_input_bus_2"] == i["trafo_invest_bus_choice"]
+                                                    else 0,
+                                                    offset=i["offset"]["value"]
+                                                    if bool(i["offset"])
+                                                    and i["trafo_input_bus_2"] == i["trafo_invest_bus_choice"]
+                                                    else 0,
+                                                    nonconvex=True
+                                                    if bool(i["offset"])
+                                                    else False,
+                                                )
+                                                if bool(ep_costs)
+                                                else None,
                                             )
+                                            
                                         },
                                         outputs={
                                             output_bus_1.name: InRetEnsysFlow(

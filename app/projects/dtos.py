@@ -142,7 +142,13 @@ class AssetDto:
         trafo_output_bus_3: str,
         trafo_technicalp_bus_choice: str,
         trafo_invest_bus_choice: str,
-        trafo_variableCosts_bus_choice: str
+        trafo_variableCosts_bus_choice: str,
+        trafo_input_conversionf_1: ValueTypeDto,
+        trafo_input_conversionf_2: ValueTypeDto,
+        trafo_input_conversionf_3: ValueTypeDto,
+        trafo_output_conversionf_1: ValueTypeDto,
+        trafo_output_conversionf_2: ValueTypeDto,
+        trafo_output_conversionf_3: ValueTypeDto,
         # beta: ValueTypeDto = None,
     ):
         self.asset_type = asset_type
@@ -207,6 +213,12 @@ class AssetDto:
         self.trafo_technicalp_bus_choice = trafo_technicalp_bus_choice
         self.trafo_invest_bus_choice = trafo_invest_bus_choice
         self.trafo_variableCosts_bus_choice = trafo_variableCosts_bus_choice
+        self.trafo_input_conversionf_1 = trafo_input_conversionf_1
+        self.trafo_input_conversionf_2 = trafo_input_conversionf_2
+        self.trafo_input_conversionf_3 = trafo_input_conversionf_3
+        self.trafo_output_conversionf_1 = trafo_output_conversionf_1
+        self.trafo_output_conversionf_2 = trafo_output_conversionf_2
+        self.trafo_output_conversionf_3 = trafo_output_conversionf_3
 
         # self.beta = beta
 
@@ -768,6 +780,12 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
                 asset.trafo_technicalp_bus_choice,
                 asset.trafo_invest_bus_choice,
                 asset.trafo_variableCosts_bus_choice,
+                asset.trafo_input_conversionf_1,
+                asset.trafo_input_conversionf_2,
+                asset.trafo_input_conversionf_3,
+                asset.trafo_output_conversionf_1, 
+                asset.trafo_output_conversionf_2,
+                asset.trafo_output_conversionf_3,                
                 **optional_parameters,
             )
 
@@ -836,6 +854,12 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
                 asset.trafo_technicalp_bus_choice,
                 asset.trafo_invest_bus_choice,
                 asset.trafo_variableCosts_bus_choice,
+                asset.trafo_input_conversionf_1,
+                asset.trafo_input_conversionf_2,
+                asset.trafo_input_conversionf_3,
+                asset.trafo_output_conversionf_1, 
+                asset.trafo_output_conversionf_2,
+                asset.trafo_output_conversionf_3,
                 **optional_parameters,
             )
 

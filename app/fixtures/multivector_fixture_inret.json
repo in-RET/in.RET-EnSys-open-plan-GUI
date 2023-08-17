@@ -265,7 +265,7 @@
         "asset_category": "energy_conversion",
         "energy_vector": "Electricity",
         "mvs_type": "transformer",
-        "asset_fields": "[name,input_timeseries,nominal_value,variable_costs,_min,_max,nonconvex,summed_max,summed_min,capex,opex,lifetime,offset,maximum,minimum,existing,efficiency,renewable_factor,trafo_input_output_variation_choice,trafo_input_bus_1,trafo_input_bus_2,trafo_input_bus_3,trafo_input_conversionf_1,trafo_input_conversionf_2,trafo_input_conversionf_3,trafo_output_bus_1,trafo_output_bus_2,trafo_output_bus_3,trafo_output_conversionf_1,trafo_output_conversionf_2,trafo_output_conversionf_3,trafo_technicalp_bus_choice,trafo_invest_bus_choice,trafo_variableCosts_bus_choice]",
+        "asset_fields": "[name,input_timeseries,nominal_value,variable_costs,_min,_max,nonconvex,summed_max,summed_min,capex,opex,lifetime,offset,maximum,minimum,existing,renewable_factor,trafo_input_output_variation_choice,trafo_input_bus_1,trafo_input_bus_2,trafo_input_bus_3,trafo_input_conversionf_1,trafo_input_conversionf_2,trafo_input_conversionf_3,trafo_output_bus_1,trafo_output_bus_2,trafo_output_bus_3,trafo_output_conversionf_1,trafo_output_conversionf_2,trafo_output_conversionf_3,trafo_technicalp_bus_choice,trafo_invest_bus_choice,trafo_variableCosts_bus_choice]",
         "unit": null
     }
 },

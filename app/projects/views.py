@@ -1680,9 +1680,46 @@ def get_asset_create_form(request, scen_id=0, asset_type_name="", asset_uuid=Non
                     field1.widget = field1.hidden_widget()
                     field2.widget = field2.hidden_widget()
                     
-            # elif asset_type_name == "myTransformer":
-            #     return render(request, "asset/asset_create_form.html", context)
+
             elif asset_type_name == "myTransformer":
+                bus_number = re.findall(r'\d+', existing_asset.trafo_input_bus_1)
+                bus_object = Bus.objects.filter(id=int(bus_number[0]))
+                for item in bus_object:
+                    trafo_input_bus_1 = item.name
+                    
+                bus_number_output_bus_1 = re.findall(r'\d+', existing_asset.trafo_output_bus_1)
+                bus_object_output_1 = Bus.objects.filter(id=int(bus_number_output_bus_1[0]))
+                for item in bus_object_output_1:
+                    trafo_output_bus_1 = item.name
+                form = AssetCreateForm(asset_type=asset_type_name, instance=existing_asset,
+                                        initial={"trafo_input_bus_1": trafo_input_bus_1,
+                                                 "trafo_output_bus_1": trafo_output_bus_1}
+                                       )
+                if existing_asset.trafo_input_output_variation_choice == "1:2":
+                    bus_number_output_bus_2 = re.findall(r'\d+', existing_asset.trafo_output_bus_2)
+                    bus_object_output_2 = Bus.objects.filter(id=int(bus_number_output_bus_2[0]))
+                    for item in bus_object_output_2:
+                        trafo_output_bus_2 = item.name
+                        
+                    form = AssetCreateForm(asset_type=asset_type_name, instance=existing_asset,
+                                            initial={"trafo_input_bus_1": trafo_input_bus_1,
+                                                     "trafo_output_bus_1": trafo_output_bus_1,
+                                                     "trafo_output_bus_2": trafo_output_bus_2
+                                                     }
+                                           )
+                elif existing_asset.trafo_input_output_variation_choice == "2:1":
+                    bus_number_input_bus_2 = re.findall(r'\d+', existing_asset.trafo_input_bus_2)
+                    bus_object_input_2 = Bus.objects.filter(id=int(bus_number_input_bus_2[0]))
+                    for item in bus_object_input_2:
+                        trafo_input_bus_2 = item.name
+                        
+                    form = AssetCreateForm(asset_type=asset_type_name, instance=existing_asset,
+                                            initial={"trafo_input_bus_1": trafo_input_bus_1,
+                                                     "trafo_input_bus_2": trafo_input_bus_2,
+                                                     "trafo_output_bus_1": trafo_output_bus_1
+                                                     }
+                                            )
+                    
                 expert_trafo_parameter_visibility(form, 
                                                   existing_asset.trafo_input_output_variation_choice)
 

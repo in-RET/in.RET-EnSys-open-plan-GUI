@@ -627,14 +627,10 @@ def scenario_create_parameters(request, proj_id, scen_id=None, step_id=1, max_st
         if scen_id is not None:
             scenario = get_object_or_404(Scenario, id=scen_id)
 
-            if (scenario.project.user != request.user) and (
-                request.user not in scenario.project.viewers.all()
-            ):
+            if (scenario.project.user != request.user) and (request.user not in scenario.project.viewers.all()):
                 raise PermissionDenied
 
-            form = ScenarioUpdateForm(
-                None, instance=scenario, project_queryset=user_projects
-            )
+            form = ScenarioUpdateForm(None, instance=scenario, project_queryset=user_projects)
 
             # if a simulation object linked to this scenario exists, all steps have been already fullfilled
             qs_sim = Simulation.objects.filter(scenario=scenario)
@@ -647,6 +643,7 @@ def scenario_create_parameters(request, proj_id, scen_id=None, step_id=1, max_st
                     max_step = 3
         else:
             scenario = None
+        
         answer = render(
             request,
             f"scenario/scenario_step{step_id}.html",
@@ -663,15 +660,20 @@ def scenario_create_parameters(request, proj_id, scen_id=None, step_id=1, max_st
         )
 
     elif request.method == "POST":
+        print("POST")
+        print(request.POST)
 
-        form = ScenarioCreateForm(request.POST, project_queryset=user_projects)
+
+        if scen_id is None:
+            scenario = Scenario()
+            form = ScenarioCreateForm(request.POST, project_queryset=user_projects)
+        else:
+            scenario = Scenario.objects.get(id=scen_id)
+            form = ScenarioUpdateForm(request.POST, project_queryset=user_projects)
+
+        print(form.errors)
 
         if form.is_valid():
-            if scen_id is None:
-                scenario = Scenario()
-            else:
-                scenario = Scenario.objects.get(id=scen_id)
-
             qs_sim = Simulation.objects.filter(scenario=scenario)
             # update the parameter values which are different from existing values
             for name, value in form.cleaned_data.items():

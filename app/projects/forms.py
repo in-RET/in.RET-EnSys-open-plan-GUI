@@ -435,6 +435,14 @@ scenario_widgets = {
         },
         choices=((2025, "2025"), (2030, "2030"), (2035, "2035"), (2040, "2040"), (2045, "2045"), (2050, "2050")),
     ),
+    "user_mode_choice": forms.Select(
+        attrs={
+            "placeholder": "",
+            "data-bs-toggle": "tooltip",
+            "title": _("user_mode_choice"),
+        },
+        choices=(("Default User", "Default User"), ("Expert", "Expert")),
+    ),
     # "timeframe_choice": forms.Select(
     #     choices=TIME_CHOICE,
     #     attrs={
@@ -538,8 +546,16 @@ class ScenarioUpdateForm(OpenPlanModelForm):
         else:
             self.fields["project"] = forms.ChoiceField(label="Project", choices=())
 
+        # Deactivate Simulation Year and User Mode for changes
+        self.fields["simulation_year"].disabled = True
+        self.fields["user_mode_choice"].disabled = True
+
+        #self.fields["simulation_year"].widget.attrs['readonly'] = 'readonly'
+        #self.fields["user_mode_choice"].widget.attrs['readonly'] = 'readonly'
+        
         for visible in self.visible_fields():
             visible.field.widget.attrs["class"] = "form-control"
+
         self.helper = FormHelper()
         self.helper.form_method = "post"
         self.helper.form_tag = False  # don't include <form> tag

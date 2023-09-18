@@ -2394,20 +2394,27 @@ def request_mvs_simulation(request, scen_id=0):
                         print("{} : {}".format(k, i))                        
                         
                         try:
+                            output_first = ""
+                            output_second = ""
                             queryset = Bus.objects.filter(name=i['outflow_direction'][0])
-                            for item in queryset:
-                                print(item.id, item.name, item.type)
+                            for item_0 in queryset:
+                                print(item_0.type)
                                 
-                            if item.type == "Electricity":
-                                output_first = i['outflow_direction'][0] #first one is considered to be el
-                                output_second = i['outflow_direction'][1] #second one is consideres to be th
-                            elif item.type == "Heat":
-                                output_first = i['outflow_direction'][1]
-                                output_second = i['outflow_direction'][0]
-                            else:
-                                print('The CHP biogas is not connected correctly!')
+                            if item_0.type == "Electricity" or item_0.type == "Heat":
+                                output_first = i['outflow_direction'][0]
                                 
-                            print(output_first, output_second)
+                            queryset = Bus.objects.filter(name=i['outflow_direction'][1])
+                            for item_1 in queryset:
+                                print(item_1.type)
+                                
+                            if item_1.type == "Electricity" or item_1.type == "Heat":
+                                if item_0.type != item_1.type:
+                                    output_second = i['outflow_direction'][1]
+                            
+                            if output_first == "" or output_second == "":
+                                raise Exception("Your Biogas CHP is not connected to the right output buses!")
+                            
+                            # print(output_first, output_second)
                             
                             list_transformers.append(
                                 InRetEnsysTransformer(

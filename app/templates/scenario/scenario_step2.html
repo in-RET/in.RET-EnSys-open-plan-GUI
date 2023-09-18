@@ -246,8 +246,7 @@
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
                     const jsonData = XMLHttpRequest.responseJSON;
                     if (jsonData.specific_obj_type) {
-                        Swal.fire('Grid Model Error', `Please fill in all ${jsonData.specific_obj_type.bold()} fields. \n
-                       Asset ${jsonData.obj_name.bold()} has empty fields or fields with wrong values.`, 'error');
+                        Swal.fire('Grid Model Error', `Please fill in all ${jsonData.specific_obj_type.bold()} fields. \n Asset ${jsonData.obj_name.bold()} has empty fields or fields with wrong values.`, 'error');
                         console.log(jsonData.full_error);
                         //console.log(Object.keys(JSON.parse(a.full_error.replaceAll('\'','"'))));
                     } else {

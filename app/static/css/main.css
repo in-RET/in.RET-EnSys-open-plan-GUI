@@ -1287,13 +1287,14 @@ a.dropdown-item:active {
   flex-shrink: 0;
   width: 100%;
   position: fixed;
-  bottom: 0
+  bottom: 0;
 }
 
 .step-footer>div {
   display: flex;
   flex-direction: row;
   width: 100%;
+  max-width: 90rem;
 }
 
 .step-footer__left,

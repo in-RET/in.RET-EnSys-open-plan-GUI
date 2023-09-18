@@ -23,9 +23,7 @@
                                 <label class="form-label">{{ forms_labels|get_item:constraint_id }} ({{ form.instance.unit }})</label>
                                 {% if constraint_id == 'minimal_renewable_factor' %}
                                     <div class="math_wrapper">
-                                        <img src="{% static 'assets/illustrations/billanziellErneuerbar_1.svg' %}"><br>
-                                        <span>or</span><br>
-                                        <img src="{% static 'assets/illustrations/billanziellErneuerbar_2.svg' %}"><br>
+                                        <img src="{% static 'assets/illustrations/bilanziellErneuerbar.svg' %}"><br>
                                     </div>
                                 {% endif %}
 
@@ -62,7 +60,7 @@
     var form_id = $("#submit_constraints_btn");
 
     function next_btn_clicked(){
-        console.log("clicked");
+        // console.log("clicked");
         form_id.click();
     };
 

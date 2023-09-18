@@ -232,14 +232,17 @@ class Scenario(models.Model):
     #     null=True, blank=False, choices=TIME_CHOICE, max_length=40
     # )
     
+
+    # BUG: Reset of choosen Values via Default Value after editing 
     user_mode_choice = models.CharField(
-        null=True, blank=False, choices=USER_MODE, max_length=40
+        null=True, blank=False, choices=USER_MODE, max_length=40, default="Default User"
     )
     
     interest_rate = models.FloatField(
         null=True, blank=False, validators=[MinValueValidator(0.0)]
     )
 
+    # BUG: Reset of choosen Values via Default Value after editing 
     simulation_year = models.IntegerField(validators=[MinValueValidator(2024)], default=2025)
 
     def __str__(self):

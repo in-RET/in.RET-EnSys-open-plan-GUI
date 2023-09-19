@@ -2398,12 +2398,21 @@ def request_mvs_simulation(request, scen_id=0):
                         try:
                             output_first = ""
                             output_second = ""
+                            
+                            if not isinstance(i['outflow_direction'], list):
+                                raise Exception("Your Biogas CHP is missing an output connection!")
+                            elif len(i['outflow_direction']) > 2:
+                                raise Exception("Your Biogas CHP has too many output connections!")
+                                
                             queryset = Bus.objects.filter(name=i['outflow_direction'][0])
                             for item_0 in queryset:
                                 print(item_0.type)
                                 
                             if item_0.type == "Electricity" or item_0.type == "Heat":
-                                output_first = i['outflow_direction'][0]
+                                if item_0.type == "Electricity":
+                                    output_first = i['outflow_direction'][0]
+                                elif item_0.type == "Heat":
+                                    output_second = i['outflow_direction'][0]
                                 
                             queryset = Bus.objects.filter(name=i['outflow_direction'][1])
                             for item_1 in queryset:
@@ -2411,10 +2420,13 @@ def request_mvs_simulation(request, scen_id=0):
                                 
                             if item_1.type == "Electricity" or item_1.type == "Heat":
                                 if item_0.type != item_1.type:
-                                    output_second = i['outflow_direction'][1]
+                                    if item_1.type == "Electricity":
+                                        output_first = i['outflow_direction'][1]
+                                    elif item_1.type == "Heat":
+                                        output_second = i['outflow_direction'][1]
                             
                             if output_first == "" or output_second == "":
-                                raise Exception("Your Biogas CHP is not connected to the right output buses!")
+                                raise Exception("Your Biogas CHP is not connected to the right output buses! Please also note the selected energy carrier of the buses")
                             
                             # print(output_first, output_second)
                             

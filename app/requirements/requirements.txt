@@ -32,6 +32,7 @@ django-picklefield
 django-q
 django-sass-processor
 django-bootstrap-datepicker-plus
+django_plotly_dash
 dnspython
 et-xmlfile
 exchangelib

@@ -35,7 +35,7 @@ def createDashboard(simulation: Simulation):
         busses = []
         bus_figures = []
 
-        results = es.results["Main"]
+        results = es.results["main"]
 
         flows = [x for x in results.keys() if x[1] is not None]
         nodes = [x for x in results.keys() if x[1] is None]
@@ -90,7 +90,7 @@ def createDashboard(simulation: Simulation):
         dashboard_childs = []
 
         if len(investment_elements) > 0:
-            print(investment_elements)
+            # print(investment_elements)
             dashboard_childs.append(
                 html.Div(
                     style={"box-shadow": "8px 5px 5px lightgray"},
@@ -200,44 +200,3 @@ def createDashboard(simulation: Simulation):
             date_time_index = es.timeindex
 
             return sankey(es, es.results["main"], date_time_index[ts])
-
-    else:
-        try:
-            # /static/working/{{ workdir }}/logs/config.log
-            logfile = wpath = os.path.join(
-                os.getcwd(), "dumps", simulation.mvs_token, "logs", "config.log"
-            )
-
-            file = open(logfile, "r")
-            log_lines = file.readlines()
-        except FileNotFoundError:
-            log_lines = ["General log not found! Something went horrible wrong!"]
-
-        log = []
-
-        for line in log_lines:
-            log.append(html.P(children=line))
-
-        app.layout = html.Div(
-            style={
-                "display": "inline-block",
-                "width": "100%",
-                #'margin': 'auto',
-                "height": "100% !important",
-                "font-family": "Arial, Helvetica, sans-serif",
-            },
-            className="dashboard",
-            children=[
-                html.Div(
-                    style={},
-                    children=[
-                        html.H1(
-                            children="No Simulationdata found, please check the logs.",
-                            style={"textAlign": "center"},
-                        ),
-                        html.H3(children="Logfile:"),
-                        html.Div(children=log),
-                    ],
-                )
-            ],
-        )

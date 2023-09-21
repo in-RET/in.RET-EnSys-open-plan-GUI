@@ -718,16 +718,20 @@ def scenario_create_topology(request, proj_id, scen_id, step_id=2, max_step=3):
     components_expert = {
         "production": {
             "mySource": _("Source"),
+            "myPredefinedSource": _("Predefined Source")
         },
         "conversion": {
             "myTransformer": _("Transformer"),
+            "myPredefinedTransformer": _("Predefined Transformer"),
         },
         "storage": {
             "myGenericStorage": _("GenericStorage"),
+            "myPredefinedStorage": _("Predefined Storage"),
         },
         "demand": {
             "mySink": _("Sink"),
             "myExcess": _("Excess"),
+            "myPredefinedSinkOEP": _("Load profile from the Open Energy Platform")
         },
         "bus": {"bus": _("Bus")},
     }

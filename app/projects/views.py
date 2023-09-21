@@ -1414,7 +1414,7 @@ def get_inputparameter_suggestion_trafo(request):
         form = AssetCreateForm(
             asset_type=asset_type_name,
             initial={
-                "name": "What ever you like",
+                "name": "Placeholder",
                 "trafo_choice": technology,
                 "year_choice_trafo": year,
                 "capex": capex,
@@ -2665,7 +2665,7 @@ def request_mvs_simulation(request, scen_id=0):
 
         model = InRetEnsysModel(
             energysystem=energysystem,
-            solver=Solver.cbc,
+            solver=Solver.gurobi,
             solver_verbose=True,
             constraints=list_constraints,
         )

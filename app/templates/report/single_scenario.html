@@ -12,8 +12,9 @@
 
 
 {% block dashboard %}
-<div class="dashboard">
-	{% load plotly_dash %}
+
+{% load plotly_dash %}
+<div class="{% plotly_class name='dash_example_1' template_type='div-direct' %}">
 	{% plotly_app name='SimpleExample' %}
 </div>
 {% endblock dashboard %}

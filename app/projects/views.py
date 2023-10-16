@@ -2665,7 +2665,7 @@ def request_mvs_simulation(request, scen_id=0):
 
         model = InRetEnsysModel(
             energysystem=energysystem,
-            solver=Solver.gurobi,
+            solver=Solver.cbc,
             solver_verbose=True,
             constraints=list_constraints,
         )

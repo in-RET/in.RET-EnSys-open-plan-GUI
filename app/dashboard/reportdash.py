@@ -22,7 +22,6 @@ def createDashboard(simulation: Simulation):
         print(wpath)
         
         es = solph.EnergySystem()
-
         es.restore(dpath=wpath, filename="config.dump")
     except FileNotFoundError:
         es = None
@@ -34,6 +33,8 @@ def createDashboard(simulation: Simulation):
 
         busses = []
         bus_figures = []
+
+        print("Results:", es.results)
 
         results = es.results["main"]
 

@@ -25,7 +25,6 @@ from dashboard.helpers import (
     format_storage_subasset_name,
 )
 from django.db import models
-from django.utils.translation import gettext_lazy as _
 from projects.constants import (
     MAP_EPA_MVS,
     STORAGE_SUB_CATEGORIES,

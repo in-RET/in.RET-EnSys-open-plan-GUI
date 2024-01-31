@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
-from projects.models import Scenario
 from projects.dtos import convert_to_dto
+from projects.models import Scenario
 
 
 class Command(BaseCommand):

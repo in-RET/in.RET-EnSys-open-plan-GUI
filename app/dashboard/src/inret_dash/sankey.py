@@ -1,5 +1,5 @@
-from oemof import solph
 import plotly.graph_objects as go
+from oemof import solph
 
 
 def sankey(energy_system, results, ts=None):

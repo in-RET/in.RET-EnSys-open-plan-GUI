@@ -1,17 +1,13 @@
-import dash
-from dash import dcc, html
-
-from django_plotly_dash import DjangoDash
-import plotly.graph_objects as go
 import os
-import pandas as pd
+
+import dash
+import plotly.graph_objects as go
+from dash import dcc, html
+from django_plotly_dash import DjangoDash
+from oemof import solph
+from projects.models import Simulation
 
 from .src.inret_dash.sankey import sankey
-from .src.inret_dash.plot import plot
-from .src.inret_dash.es_graph import printEsGraph
-from oemof import solph
-
-from projects.models import Simulation
 
 
 def createDashboard(simulation: Simulation):

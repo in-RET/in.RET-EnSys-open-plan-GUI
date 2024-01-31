@@ -1,15 +1,13 @@
 import logging
 import os
 import traceback
-from django_q.models import Schedule
+from concurrent.futures import ThreadPoolExecutor
+
 from django.contrib import messages
 from django.urls import reverse
-from django.utils.translation import gettext_lazy as _
 from django.utils.safestring import mark_safe
-from projects.models import Simulation, SensitivityAnalysis
-from projects.requests import fetch_mvs_simulation_results
-from projects.constants import PENDING
-from concurrent.futures import ThreadPoolExecutor
+from django.utils.translation import gettext_lazy as _
+from django_q.models import Schedule
 from exchangelib import (
     Account,
     Credentials,
@@ -18,7 +16,9 @@ from exchangelib import (
     EWSTimeZone,
     Configuration,
 )
-
+from projects.constants import PENDING
+from projects.models import Simulation
+from projects.requests import fetch_mvs_simulation_results
 
 logger = logging.getLogger(__name__)
 

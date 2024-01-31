@@ -1,21 +1,21 @@
+import csv
+import io
 import json
 import os
-import io
-import csv
-from openpyxl import load_workbook
+import re
+
+import scipy
+from InRetEnsys import *
+from dashboard.helpers import KPIFinder
 from django import forms
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
-from projects.dtos import convert_to_dto
-from projects.constants import MAP_MVS_EPA
-from dashboard.helpers import KPIFinder
-from projects.models import InputparameterSuggestion, Bus
-
 from oemof.tools import economics
-import scipy
-import re
-from InRetEnsys import *
+from openpyxl import load_workbook
+from projects.constants import MAP_MVS_EPA
+from projects.dtos import convert_to_dto
+from projects.models import InputparameterSuggestion, Bus
 
 PARAMETERS = {}
 if os.path.exists(staticfiles_storage.path("MVS_parameters_list.csv")) is True:

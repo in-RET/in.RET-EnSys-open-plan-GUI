@@ -1,11 +1,8 @@
 import json
 from typing import List
-from django.db.models import Q
-import numpy as np
-from numpy.core import long
-from datetime import date, datetime, time
-import requests
 
+from django.db.models import Q
+from epa.settings import OEP_URL
 from projects.models import (
     ConnectionLink,
     Scenario,
@@ -17,7 +14,7 @@ from projects.models import (
     ValueType,
 )
 
-from epa.settings import OEP_URL
+import requests
 
 
 class ProjectDataDto:

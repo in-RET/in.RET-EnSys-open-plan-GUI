@@ -6,7 +6,6 @@ from projects.scenario_topology_helpers import (
     load_scenario_from_dict,
 )
 
-
 logger = logging.getLogger(__name__)
 
 

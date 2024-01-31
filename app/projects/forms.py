@@ -547,8 +547,8 @@ class ScenarioUpdateForm(OpenPlanModelForm):
             self.fields["project"] = forms.ChoiceField(label="Project", choices=())
 
         # Deactivate Simulation Year and User Mode for changes
-        self.fields["simulation_year"].disabled = True
-        self.fields["user_mode_choice"].disabled = True
+        #self.fields["simulation_year"].disabled = True
+        #self.fields["user_mode_choice"].disabled = True
 
         #self.fields["simulation_year"].widget.attrs['readonly'] = 'readonly'
         #self.fields["user_mode_choice"].widget.attrs['readonly'] = 'readonly'

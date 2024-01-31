@@ -231,7 +231,6 @@ class Scenario(models.Model):
     # timeframe_choice = models.CharField(
     #     null=True, blank=False, choices=TIME_CHOICE, max_length=40
     # )
-    
 
     # BUG: Reset of choosen Values via Default Value after editing 
     user_mode_choice = models.CharField(

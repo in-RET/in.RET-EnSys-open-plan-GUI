@@ -25,14 +25,14 @@ from dashboard.helpers import (
     format_storage_subasset_name,
 )
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from projects.constants import (
     MAP_EPA_MVS,
     STORAGE_SUB_CATEGORIES,
     INPUT_POWER,
     OUTPUT_POWER,
 )
-from projects.models import Bus, SensitivityAnalysis, ConnectionLink, Asset
-from projects.models import Simulation
+from projects.models import Bus, Simulation, SensitivityAnalysis, ConnectionLink, Asset
 
 logger = logging.getLogger(__name__)
 

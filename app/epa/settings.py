@@ -45,8 +45,11 @@ SECRET_KEY = os.getenv(
 ALLOWED_HOSTS = ["*"]
 
 CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:20001",
-    "http://iae.hs-nordhausen.de:20001"
+    "http://localhost:9004",
+    "http://surak.hs-nordhausen.de",
+    "http://ensys.hs-nordhausen.de",
+    "http://iae.hs-nordhausen.de"
+
 ]
 
 # Application definition
@@ -261,15 +264,4 @@ LOGGING = {
         },
         "asyncio": {"level": "WARNING"},
     },
-}
-
-# DJANGO-Q CONFIGURATION
-# source: https://django-q.readthedocs.io/en/latest/configure.html
-Q_CLUSTER = {
-    "name": "django_q_orm",
-    "workers": 4,
-    "timeout": 90,
-    "retry": 120,
-    "queue_limit": 50,
-    "orm": "default",
 }

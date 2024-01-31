@@ -18,3 +18,4 @@ WORKDIR ${APP_ROOT}
 COPY . ${APP_ROOT}
 
 CMD ["python", "manage.py", "collectstatic", "--no-input"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

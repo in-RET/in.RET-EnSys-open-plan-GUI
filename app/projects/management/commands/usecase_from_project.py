@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
-from projects.models import Scenario
 from projects.models import *
+from projects.models import Scenario
 from projects.models.usecases import load_usecase_from_dict
 
 

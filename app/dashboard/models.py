@@ -1,17 +1,11 @@
-import copy
 import json
-import jsonschema
-import traceback
 import logging
+import traceback
+
+import jsonschema
 import numpy as np
 import plotly.graph_objects as go
-
-
-from django.utils.translation import gettext_lazy as _
-from django.shortcuts import get_object_or_404
-from django.db import models
 from dashboard.helpers import (
-    KPI_PARAMETERS,
     KPI_PARAMETERS_ASSETS,
     KPI_helper,
     GRAPH_TIMESERIES,
@@ -30,15 +24,16 @@ from dashboard.helpers import (
     sensitivity_analysis_graph_render_to_json,
     format_storage_subasset_name,
 )
-
-from projects.models import Bus, Simulation, SensitivityAnalysis, ConnectionLink, Asset
+from django.db import models
+from django.utils.translation import gettext_lazy as _
 from projects.constants import (
     MAP_EPA_MVS,
     STORAGE_SUB_CATEGORIES,
     INPUT_POWER,
     OUTPUT_POWER,
 )
-from projects.models import Simulation, Scenario
+from projects.models import Bus, SensitivityAnalysis, ConnectionLink, Asset
+from projects.models import Simulation
 
 logger = logging.getLogger(__name__)
 

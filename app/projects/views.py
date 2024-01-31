@@ -1,16 +1,14 @@
 # pylint: disable=undefined-variable, import-error, wildcard-import
 # from bootstrap_modal_forms.generic import BSModalCreateView
-import json
 import logging
-import traceback
-import shutil
-import numpy as np
-from datetime import datetime
 import re
+import shutil
+import traceback
+from datetime import datetime
 
-import requests
-from requests.exceptions import HTTPError
-from requests import get
+from InRetEnsys import *
+from InRetEnsys.types import Solver, Constraints
+from dashboard.reportdash import createDashboard
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -18,21 +16,22 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.http.response import Http404
 from django.shortcuts import *
+from django.template.loader import get_template
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
-from dashboard.reportdash import createDashboard
 from epa.settings import (
     INRETENSYS_CHECK_URL,
     INRETENSYS_LP_FILE_URL,
     OEP_URL,
 )
-from InRetEnsys import *
-from InRetEnsys.types import Solver, Constraints
 from jsonview.decorators import json_view
-from projects.helpers import epc_calc, format_scenario_for_mvs, polate_unknown_capex, expert_trafo_parameter_visibility, build_oemof_trafo_expert
+from projects.helpers import epc_calc, format_scenario_for_mvs, polate_unknown_capex, expert_trafo_parameter_visibility, \
+    build_oemof_trafo_expert
 from projects.models import *
+from requests.exceptions import HTTPError
 
+from requests import get
 from .constants import DONE, ERROR, MODIFIED, PENDING
 from .forms import *
 from .requests import (
@@ -57,8 +56,6 @@ from .services import (
     get_selected_scenarios_in_cache,
     send_feedback_email,
 )
-from django.template.loader import get_template
-from django.template.loader import render_to_string
 
 logger = logging.getLogger(__name__)
 

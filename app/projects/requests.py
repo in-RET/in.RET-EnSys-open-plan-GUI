@@ -4,12 +4,10 @@ from datetime import datetime
 
 import httpx as requests
 from dashboard.models import AssetsResults, KPICostsMatrixResults, KPIScalarResults
-
 # from requests.exceptions import HTTPError
 from epa.settings import (
     INRETENSYS_CHECK_URL,
     INRETENSYS_POST_URL,
-    PROXY_CONFIG,
 )
 from projects.constants import DONE, ERROR, PENDING
 

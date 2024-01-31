@@ -2,13 +2,13 @@
 # visit http://127.0.0.1:8050/ in your web browser.
 
 import base64
-from dash import Dash, dcc, html, Input, Output
 import os
 
-from .sankey import sankey
-from .plot import plot
-from .es_graph import printEsGraph
+from dash import Dash, dcc, html, Input, Output
 from oemof import solph
+
+from .es_graph import printEsGraph
+from .sankey import sankey
 
 
 def run_app(name):

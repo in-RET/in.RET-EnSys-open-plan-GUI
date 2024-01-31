@@ -1,10 +1,11 @@
-from users.views import user_info
 from django.contrib.auth.models import AnonymousUser
+from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
 from users.forms import CustomUserChangeForm, CustomUserCreationForm
-from django.test import TestCase, override_settings
 from users.models import CustomUser
+from users.views import user_info
+
 
 # Create your tests here.
 

@@ -1,17 +1,13 @@
-import uuid
 import json
-from django.conf import settings
-from django.db import models
-from django.core.validators import MaxValueValidator, MinValueValidator
+import uuid
 from datetime import timedelta
+
+import oemof.thermal.compression_heatpumps_and_chillers as cmpr_hp_chiller
+from django.conf import settings
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
 from django.forms.models import model_to_dict
 from django.utils.translation import gettext_lazy as _
-from django.core.exceptions import ValidationError
-import oemof.thermal.compression_heatpumps_and_chillers as cmpr_hp_chiller
-
-# import jsonfield
-
-from users.models import CustomUser
 from projects.constants import (
     ASSET_CATEGORY,
     ASSET_TYPE,
@@ -29,7 +25,6 @@ from projects.constants import (
     LOAD_PROFILE_CHOICE,
     FLOW_CHOICE,
     SOURCE_CHOICE,
-    YEAR_CHOICE,
     TRAFO_CHOICE,
     STORAGE_CHOICE,
     # TIME_CHOICE,
@@ -38,6 +33,10 @@ from projects.constants import (
     CO2_UNIT_CHOICE,
     TRAFO_I_O_VARIATION_CHOICE
 )
+from users.models import CustomUser
+
+
+# import jsonfield
 
 
 class Feedback(models.Model):

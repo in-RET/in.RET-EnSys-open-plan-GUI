@@ -1,13 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
-from projects.models import Scenario
-from projects.dtos import convert_to_dto
-
 from django.forms.models import model_to_dict
-from django.db import models
 from projects.models import *
-
-
-from projects.scenario_topology_helpers import load_scenario_from_dict
+from projects.models import Scenario
 
 
 class Command(BaseCommand):

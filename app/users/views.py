@@ -14,6 +14,7 @@ from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.views.decorators.http import require_http_methods
+
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 from .models import CustomUser
 

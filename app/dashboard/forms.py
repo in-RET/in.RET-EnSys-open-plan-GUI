@@ -1,26 +1,19 @@
-from crispy_forms.helper import FormHelper
-from django import forms
-from django.utils.translation import gettext_lazy as _
-from django.forms import ModelForm
+from dashboard.helpers import (
+    GRAPH_TIMESERIES,
+    GRAPH_TIMESERIES_STACKED,
+    GRAPH_CAPACITIES,
+    GRAPH_SANKEY,
+    GRAPH_SENSITIVITY_ANALYSIS,
+)
 from dashboard.models import (
     ReportItem,
     AssetsResults,
     SensitivityAnalysisGraph,
     get_project_sensitivity_analysis,
 )
-
-
-from dashboard.helpers import (
-    KPI_PARAMETERS,
-    GRAPH_TIMESERIES,
-    GRAPH_TIMESERIES_STACKED,
-    GRAPH_CAPACITIES,
-    GRAPH_BAR,
-    GRAPH_PIE,
-    GRAPH_LOAD_DURATION,
-    GRAPH_SANKEY,
-    GRAPH_SENSITIVITY_ANALYSIS,
-)
+from django import forms
+from django.forms import ModelForm
+from django.utils.translation import gettext_lazy as _
 from projects.models import ENERGY_VECTOR, Project
 
 

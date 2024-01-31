@@ -1,24 +1,23 @@
-import pickle
-import os
 import json
-import numpy as np
+import os
+import pickle
 
+import numpy as np
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
+from dashboard.helpers import KPI_PARAMETERS_ASSETS
 from django import forms
+from django.conf import settings as django_settings
 from django.forms import ModelForm
 from django.utils.translation import gettext_lazy as _
-from django.conf import settings as django_settings
-from projects.models import *
 from projects.constants import RENEWABLE_ASSETS
-
-from dashboard.helpers import KPI_PARAMETERS_ASSETS
 from projects.helpers import (
     parameters_helper,
     PARAMETERS,
     DualNumberField,
     parse_input_timeseries
 )
+from projects.models import *
 
 
 def gettext_variables(some_string, lang="de"):

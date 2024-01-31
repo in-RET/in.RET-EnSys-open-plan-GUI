@@ -1,5 +1,5 @@
-import sys, os
 import argparse
+import os
 
 POSTGRES = "postgres"
 MYSQL = "mysql"

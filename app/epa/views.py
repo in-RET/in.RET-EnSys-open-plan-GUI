@@ -1,7 +1,7 @@
+import logging
+
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
-import logging
-from projects.services import excuses_design_under_development
 
 logger = logging.getLogger(__name__)
 

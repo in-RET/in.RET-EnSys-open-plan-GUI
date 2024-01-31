@@ -1,11 +1,10 @@
-import os
 import copy
 import csv
+import os
+from numbers import Number
+
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.utils.translation import gettext_lazy as _
-from numbers import Number
-import pickle
-from django.conf import settings as django_settings
 
 #### CONSTANTS ####
 

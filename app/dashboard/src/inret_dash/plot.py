@@ -1,6 +1,3 @@
-from oemof import solph
-import plotly.graph_objects as go
-import plotly
 import matplotlib.pyplot as plt
 
 

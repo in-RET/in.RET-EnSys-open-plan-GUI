@@ -1,19 +1,18 @@
-from projects.models.base_models import AbstractSimulation, Scenario
-
-
 import json
+import logging
+
 import jsonschema
 import numpy as np
-import logging
+from projects.models.base_models import AbstractSimulation, Scenario
 
 logger = logging.getLogger(__name__)
 from django.db import models
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import MinValueValidator
 
 from django.utils.translation import gettext_lazy as _
 from datetime import datetime
 
-from projects.constants import USER_RATING, DONE, PENDING, ERROR
+from projects.constants import USER_RATING, DONE, ERROR
 from projects.helpers import (
     sensitivity_analysis_payload,
     SA_OUPUT_NAMES_SCHEMA,

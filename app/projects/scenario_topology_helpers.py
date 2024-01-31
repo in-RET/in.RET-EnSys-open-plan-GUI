@@ -1,6 +1,14 @@
+import json
+import logging
 import uuid
+
 import numpy as np
+from django.core.exceptions import ValidationError
+# region sent db nodes to js
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from django.template.loader import get_template
+from projects.forms import AssetCreateForm, BusForm, StorageForm
 from projects.models import (
     Bus,
     AssetType,
@@ -12,14 +20,6 @@ from projects.models import (
     COPCalculator,
     InputparameterSuggestion
 )
-import json
-from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
-from projects.forms import AssetCreateForm, BusForm, StorageForm
-from django.template.loader import get_template
-
-# region sent db nodes to js
-from django.http import JsonResponse
-import logging
 
 logger = logging.getLogger(__name__)
 

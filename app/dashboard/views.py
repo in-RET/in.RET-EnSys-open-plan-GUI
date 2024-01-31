@@ -8,26 +8,22 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count
 from django.http import JsonResponse
-from django.shortcuts import HttpResponseRedirect, get_object_or_404, render
+from django.shortcuts import HttpResponseRedirect, get_object_or_404
+from django.shortcuts import render
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
 from jsonview.decorators import json_view
 from projects.constants import COMPARE_VIEW
-
 from projects.models import (
     Project,
     Simulation,
 )
-from projects.services import get_selected_scenarios_in_cache
-
-from django.shortcuts import render
-
-from .reportdash import createDashboard
-
 from projects.services import (
     get_selected_scenarios_in_cache,
 )
+
+from .reportdash import createDashboard
 
 logger = logging.getLogger(__name__)
 @login_required

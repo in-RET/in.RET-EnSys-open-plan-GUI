@@ -36,8 +36,8 @@ def signup(request):
                 "registration/acc_active_email.html",
                 {
                     "user": user,
-                    # "domain": current_site.domain,
-                    "domain": "iae.hs-nordhausen.de:20001",
+                    "domain": current_site.domain,
+                    # "domain": "iae.hs-nordhausen.de:20001",
                     "uid": urlsafe_base64_encode(force_bytes(user.pk)),
                     "token": default_token_generator.make_token(user),
                 },

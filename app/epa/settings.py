@@ -15,19 +15,18 @@ import os
 from django.contrib.messages import constants as messages
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = ast.literal_eval(os.getenv("DEBUG", "True"))
+DEBUG = ast.literal_eval(os.getenv("DEBUG", "False"))
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 print(BASE_DIR)
 
+STATICFILES_FINDERS = ["django.contrib.staticfiles.finders.FileSystemFinder"]
+
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.0/howto/static-files/
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
 STATIC_URL = "static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "cdn_static_root")
-
-STATICFILES_FINDERS = ["django.contrib.staticfiles.finders.FileSystemFinder"]
 
 if DEBUG is True:
     STATICFILES_FINDERS.append("sass_processor.finders.CssFinder")
@@ -68,7 +67,6 @@ INSTALLED_APPS = [
     # 3rd Party
     "crispy_forms",
     "crispy_bootstrap4",
-    "django_q",
     "django_plotly_dash.apps.DjangoPlotlyDashConfig",
     "bootstrap_datepicker_plus",
 ]
@@ -116,6 +114,15 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "epa.wsgi.application"
+
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases

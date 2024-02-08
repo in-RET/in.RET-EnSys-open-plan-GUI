@@ -45,10 +45,9 @@ ALLOWED_HOSTS = ["*"]
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:9004",
-    "http://surak.hs-nordhausen.de",
-    "http://ensys.hs-nordhausen.de",
+    "http://surak.hs-nordhausen.de:9004",
+    "https://ensys.hs-nordhausen.de",
     "http://iae.hs-nordhausen.de"
-
 ]
 
 # Application definition

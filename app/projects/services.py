@@ -7,7 +7,6 @@ from django.contrib import messages
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
-from django_q.models import Schedule
 from exchangelib import (
     Account,
     Credentials,

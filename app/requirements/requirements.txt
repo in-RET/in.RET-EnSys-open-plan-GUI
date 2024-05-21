@@ -29,7 +29,6 @@ django-compressor
 django-crispy-forms
 django-jsonview
 django-picklefield
-django-q
 django-sass-processor
 django-bootstrap-datepicker-plus
 django_plotly_dash

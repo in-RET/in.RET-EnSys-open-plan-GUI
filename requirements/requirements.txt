@@ -71,7 +71,7 @@ Pillow
 pkgutil_resolve_name
 plotly
 ply
-psycopg2
+psycopg
 pvlib
 pycparser
 pydantic

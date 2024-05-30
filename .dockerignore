@@ -5,8 +5,8 @@
 *.log
 compose/*
 node_modules/
-static_src/
-Dockerfile
+app/static_src/
+dockerfile
 package.json
 package-lock.json
 Pipfile

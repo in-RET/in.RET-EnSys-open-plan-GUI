@@ -16,4 +16,4 @@ package.json
 app/InRetEnsys-*.whlsite/
 site/
 
-.env
+default.env

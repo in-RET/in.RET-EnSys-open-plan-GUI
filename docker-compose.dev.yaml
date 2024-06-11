@@ -7,11 +7,9 @@ services:
     volumes:
       - ./data/db:/var/lib/postgresql/data
   web:
-    build: app
+    build: .
     command: python manage.py runserver 0.0.0.0:8000
-    env_file:
-      - path: .env
-        required: true
+    env_file: .env
     volumes:
       - ./app:/app
     ports:

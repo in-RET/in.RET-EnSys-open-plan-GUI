@@ -20,7 +20,7 @@ from django.template.loader import get_template
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
-from epa.settings import (
+from app.settings import (
     INRETENSYS_CHECK_URL,
     INRETENSYS_LP_FILE_URL,
     OEP_URL,

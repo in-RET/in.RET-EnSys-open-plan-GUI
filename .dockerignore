@@ -5,7 +5,6 @@
 *.log
 compose/*
 node_modules/
-app/static_src/
 dockerfile
 package.json
 package-lock.json
@@ -18,12 +17,12 @@ webpack.config.js
 # **
 # !cdn_static_root/
 # !dashboard/**
-# !epa/**
+# !app/**
 # !fixtures/**
 # !projects/**
 # !static/**
 # !templates/**
 # !users/**
-# !epa.env
+# !app.env
 # !manage.py
 # !setup.sh

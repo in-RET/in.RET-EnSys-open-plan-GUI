@@ -34,6 +34,8 @@ from requests.exceptions import HTTPError
 from requests import get
 from .constants import DONE, ERROR, MODIFIED, PENDING
 from .forms import *
+from .models.base_models import Scenario, ConnectionLink
+from .models.simulation_models import Simulation
 from .requests import (
     fetch_mvs_simulation_results,
     mvs_simulation_request,
@@ -607,7 +609,6 @@ def scenario_select_project(request, step_id=0, max_step=1):
 @login_required
 @require_http_methods(["GET", "POST"])
 def scenario_create_parameters(request, proj_id, scen_id=None, step_id=1, max_step=2):
-
     project = get_object_or_404(Project, pk=proj_id)
     # all projects which the user is able to select (the one the user created)
     user_projects = request.user.project_set.all()

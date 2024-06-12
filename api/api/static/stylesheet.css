@@ -1,0 +1,43 @@
+.pagewrapper {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+}
+
+.container {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    min-height: 100vh;
+    min-width: 780px;
+    background-color: #FFEFDF;
+}
+
+.header {
+    color: rgb(103, 189, 0);
+    font-size: 24pt;
+    font-family: Arial, Helvetica, sans-serif;
+    
+    height: 100px;
+    padding-top: 20px;
+    background-color: #F0EFDF;
+}
+
+.footer {
+    height: 25px;
+    text-align: center;
+    background-color: #F0EFDF;
+}
+
+.hs-blue {
+    color: #00599e;
+  }
+  
+.hs-green {
+color: #67bd00;
+}
+
+.hs-gray {
+color: #616263;
+}
+
+  

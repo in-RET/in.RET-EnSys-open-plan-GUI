@@ -45,6 +45,13 @@ nav:
         - 'EnSys': about/ensys.md
         - 'Frontend': about/frontend.md
         - 'Backend': about/backend.md
+
+    - 'API':
+        - 'Overview': api/index.md
+        - 'Usage with Python': api/python.md
+        - 'Functions': api/functions.md
+        - 'Release Notes': api/release-notes.md
+    - 'About': about.md
     - 'Release Notes': release-notes.md
 theme:
     name: material

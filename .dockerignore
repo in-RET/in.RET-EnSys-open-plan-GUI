@@ -5,7 +5,7 @@
 *.log
 compose/*
 node_modules/
-dockerfile
+app/dockerfile
 package.json
 package-lock.json
 Pipfile

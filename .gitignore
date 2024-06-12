@@ -17,3 +17,4 @@ app/InRetEnsys-*.whlsite/
 site/
 
 default.env
+/data/

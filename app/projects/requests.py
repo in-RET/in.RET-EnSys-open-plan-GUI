@@ -33,7 +33,7 @@ def mvs_simulation_request(data):
         logger.error(f"Other error occurred: {err}")
         return None
     else:
-        logger.info("The simulation was sent successfully to Inretensys API.")
+        logger.info("The simulation was sent successfully to inRET.EnSys API.")
         str_results = json.loads(response.content)
 
         return {"token": str_results["folder"][0], "status": PENDING}

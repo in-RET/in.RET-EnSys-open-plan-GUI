@@ -2038,7 +2038,6 @@ def test_mvs_data_input(request, scen_id=0):
 @login_required
 @require_http_methods(["GET", "POST"])
 def request_mvs_simulation(request, scen_id=0):
-
     list_sources = []
     list_busses = []
     list_sinks = []
@@ -2072,7 +2071,6 @@ def request_mvs_simulation(request, scen_id=0):
             freq='quarter_hourly'
             
         print(timesteps)
-
 
         for k, v in data_clean.items():
             for i in v:

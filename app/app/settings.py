@@ -30,7 +30,7 @@ STATICFILES_FINDERS = [
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
 STATIC_URL = "static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "cdn_static_root")
-print(STATIC_ROOT)
+print("STATIC ROOT:", STATIC_ROOT)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/

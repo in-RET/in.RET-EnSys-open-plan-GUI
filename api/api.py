@@ -1,20 +1,21 @@
 from typing import List
 
-from InRetEnsys import *
 from fastapi import FastAPI, File, Request, Response, UploadFile
+from fastapi.staticfiles import StaticFiles
 from fastapi.exceptions import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse
-from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 import docker
-from .constants import *
-from .docker import simulate_docker
-from .helpers import generate_random_folder
+from src.constants import *
+from src.docker import simulate_docker
+from src.helpers import generate_random_folder
 
 app = FastAPI()
-app.mount("/static", StaticFiles(directory="static"), name="static")
+
+print("STATIC_DIR", os.path.join(os.getcwd(), "api", "static"))
+app.mount(os.path.join(os.getcwd(), "static"), StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="/templates")
 

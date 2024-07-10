@@ -20,8 +20,8 @@ RUN pip install --upgrade pip
 RUN pip install -r ${INSTALL_ROOT}/requirements.txt
 RUN pip install --upgrade ${INSTALL_ROOT}/InRetEnsys-0.2a7-py3-none-any.whl
 
-COPY api ${APP_ROOT}/api/
+COPY api/ ${APP_ROOT}/
 
 WORKDIR ${APP_ROOT}/
 
-CMD ["python", "-m", "uvicorn", "api.api.api:app", "--host", "0.0.0.0", "--port", "8001"]
+CMD ["python", "-m", "uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8001"]

@@ -7,6 +7,7 @@
 !app/cdn_static_root/
 **/cdn_static_root/
 **/venv/
+.venv
 .envs/*
 **/node_modules
 

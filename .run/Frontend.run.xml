@@ -1,12 +1,28 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Frontend" type="Python.DjangoServer" factoryName="Django server">
     <module name="ensys-gui" />
-    <option name="ENV_FILES" value="$PROJECT_DIR$/local.env" />
+    <option name="ENV_FILES" value="" />
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
     <envs>
-      <env name="PYTHONUNBUFFERED" value="1" />
+      <env name="DJANGO_DEBUG" value="True" />
+      <env name="DJANGO_PORT" value="9004" />
       <env name="DJANGO_SETTINGS_MODULE" value="app.settings" />
+      <env name="PGADMIN_DEFAULT_EMAIL" value="admin@hs-nordhausen.de" />
+      <env name="PGADMIN_DEFAULT_PASSWORD" value="rootroot" />
+      <env name="PGADMIN_PORT" value="9005" />
+      <env name="POSTGRES_DB" value="ensys" />
+      <env name="POSTGRES_HOST" value="localhost" />
+      <env name="POSTGRES_PASSWORD" value="%.30fpgM" />
+      <env name="POSTGRES_PORT" value="5432" />
+      <env name="POSTGRES_USER" value="pyrokar" />
+      <env name="PYTHONUNBUFFERED" value="1" />
+      <env name="SQL_DATABASE" value="$POSTGRES_DB" />
+      <env name="SQL_ENGINE" value="django.db.backends.postgresql" />
+      <env name="SQL_HOST" value="$POSTGRES_HOST" />
+      <env name="SQL_PASSWORD" value="$POSTGRES_PASSWORD" />
+      <env name="SQL_PORT" value="$POSTGRES_PORT" />
+      <env name="SQL_USER" value="$POSTGRES_USER" />
     </envs>
     <option name="SDK_HOME" value="" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/app/app" />

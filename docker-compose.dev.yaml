@@ -4,6 +4,8 @@ services:
     container_name: db
     env_file: .env
     restart: always
+    networks:
+      - backend
     volumes:
       - ./data/db:/var/lib/postgresql/data
 
@@ -12,6 +14,8 @@ services:
     container_name: pgadmin
     env_file: .env
     restart: always
+    networks:
+      - frontend
     ports:
       - "${PGADMIN_PORT}:80"
     volumes:
@@ -21,14 +25,6 @@ services:
     build:
       context: .
       dockerfile: ./app/dockerfile
-    command: python manage.py runserver 0.0.0.0:8000
-    container_name: ensys-frontend
-    env_file: .env
-    restart: always
-    volumes:
-      - ./app:/app
-    ports:
-      - "${DJANGO_PORT}:8000"
     develop:
       watch:
         - action: sync
@@ -38,6 +34,18 @@ services:
           path: ./requirements/requirements.txt
         - action: rebuild
           path: .env
+    command: python manage.py runserver 0.0.0.0:8000
+    container_name: ensys-frontend
+    env_file: .env
+    restart: always
+    volumes:
+      - ./app:/app
+      - ./${LOCAL_WORKDIR}:/app/dumps
+    networks:
+      - backend
+      - frontend
+    ports:
+      - "${DJANGO_PORT}:8000"
     depends_on:
       - db
 
@@ -45,8 +53,21 @@ services:
     build:
       context: .
       dockerfile: ./api/dockerfile
+    develop:
+      watch:
+        - path: ./api/dockerfile
+          action: rebuild
     container_name: ensys-backend
     env_file: .env
     restart: always
-    ports:
-      - "9006:8001"
+    volumes:
+     - /var/run/docker.sock:/var/run/docker.sock
+     - ./${LOCAL_WORKDIR}:/app/${LOCAL_WORKDIR}
+    networks:
+      - backend
+#    ports:
+#      - "9006:8001"
+
+networks:
+  backend:
+  frontend:

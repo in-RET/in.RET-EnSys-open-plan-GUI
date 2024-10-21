@@ -13,17 +13,17 @@ from src.docker import simulate_docker
 from src.helpers import generate_random_folder
 
 app = FastAPI()
+app.mount(
+    os.path.join(os.getcwd(), "static"), StaticFiles(directory="static"), name="static"
+)
 
-print("STATIC_DIR", os.path.join(os.getcwd(), "api", "static"))
-app.mount(os.path.join(os.getcwd(), "static"), StaticFiles(directory="static"), name="static")
-
-templates = Jinja2Templates(directory="/templates")
+templates = Jinja2Templates(directory="templates")
 
 origins = ["http://localhost", "http://localhost:8000"]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],  # origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -51,22 +51,25 @@ async def upload_file(
 @app.post("/uploadJson")
 async def upload_file(request: Request):
 
-    return run_simulation(
+    response = run_simulation(
         request,
         input=[(await request.json(), FTYPE_JSON)],
         external=True,
     )
 
+    print(response)
+
+    return response
+
 
 def run_simulation(request: Request, input: list = None, external=False) -> Response:
     if input is None:
-        raise HTTPException(
-            status_code=404, detail="No Input given!"
-        )
+        raise HTTPException(status_code=404, detail="No Input given!")
     else:
+        print("run simulation")
         folderlist = []
         workdir = os.path.join(os.getcwd(), "working")
-        
+
         for datafile, ftype in input:
             nameOfJob = generate_random_folder()
 
@@ -93,7 +96,6 @@ def run_simulation(request: Request, input: list = None, external=False) -> Resp
 @app.post("/check/{token}")
 async def check_container(token: str):
     # Verbindung zum Docker-Clienten herstellen (Server/Desktop Version)
-#    try: 
     client = docker.from_env()
     container = client.containers.get(token)
     errors = ""
@@ -117,17 +119,19 @@ async def check_container(token: str):
             log_file = os.path.join("/app/working", token, "logs", "config.log")
 
             if os.path.exists(log_file):
-                xf = open(log_file, 'r')
+                xf = open(log_file, "r")
                 logfile_str = xf.read()
                 xf.close()
 
                 errors += logfile_str
 
     return JSONResponse(
-        content={"status": return_status, "token": token, "error": errors, "exitcode": exitcode},
+        content={
+            "status": return_status,
+            "token": token,
+            "error": errors,
+            "exitcode": exitcode,
+        },
         status_code=200,
         media_type="application/json",
     )
-
-
-    

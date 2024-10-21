@@ -1,4 +1,5 @@
 import json
+import os.path
 
 from InRetEnsys import InRetEnsysModel
 from InRetEnsys.types import Solver
@@ -8,11 +9,21 @@ import docker
 from .constants import *
 
 
-def simulate_docker(nameOfConfigFile, nameOfFolder, ftype, file, req_from_website=False):
-    pathOfInternalWorkDir = "/app/working"
-    pathOfDockerWorkDir = os.path.join(pathOfInternalWorkDir, nameOfFolder)
-    pathOfExternalWorkDir = os.path.join(LOCAL_STORAGE_DIR, nameOfFolder)
-    os.makedirs(pathOfDockerWorkDir)
+def io_file() -> None:
+    pass
+
+def simulate_docker(
+        nameOfConfigFile,
+        nameOfFolder,
+        ftype,
+        file,
+        req_from_website=False):
+
+    pathOfInternalWorkDir = os.path.join("/app", "data", "simulations")
+    pathOfDockerWorkDir = os.path.join("/app", os.getenv("LOCAL_WORKDIR"), nameOfFolder)
+    pathOfExternalWorkDir = os.path.join("/Users", os.getenv("USER"), "Documents", "GitHub", "python", "ensys-gui", os.getenv("LOCAL_WORKDIR"), nameOfFolder)
+
+    os.makedirs(pathOfDockerWorkDir, exist_ok=True)
 
     licensepath = LICENSE_PATH
     pathOfConfigfile = os.path.join(pathOfDockerWorkDir, nameOfConfigFile)
@@ -23,14 +34,14 @@ def simulate_docker(nameOfConfigFile, nameOfFolder, ftype, file, req_from_websit
         MODE = "wb"
     else:
         raise Exception("Fileformat ist not valid!")
-    
+
     savefile = open(pathOfConfigfile, MODE)
     savefile.write(file)
     savefile.close()
 
     # reload the system to get the solvertype
     if req_from_website and ftype == FTYPE_JSON:
-        MODE = "rt"   
+        MODE = "rt"
     elif ftype == FTYPE_JSON:
         MODE = "rb"
     else:
@@ -40,12 +51,14 @@ def simulate_docker(nameOfConfigFile, nameOfFolder, ftype, file, req_from_websit
     model_dict = json.load(xf)
     model = InRetEnsysModel(**model_dict)
     xf.close()
-    
-    volumes_dict = {pathOfExternalWorkDir: {"bind": pathOfInternalWorkDir, "mode": "rw"}}
+
+    volumes_dict = {
+        pathOfExternalWorkDir: {"bind": pathOfInternalWorkDir, "mode": "rw"}
+    }
 
     if model.solver == Solver.gurobi:
         IMAGE_TAG = "inretensys:0.2a7-gurobi"
-        volumes_dict[licensepath] = {"bind": "/opt/gurobi/gurobi.lic", "mode": "ro"}
+        volumes_dict[licensepath] = {"bind": os.path.join("/opt", "gurobi", "gurobi.lic"), "mode": "ro"}
     elif model.solver == Solver.cbc:
         IMAGE_TAG = "inretensys:0.2a7-cbc"
     else:
@@ -55,6 +68,7 @@ def simulate_docker(nameOfConfigFile, nameOfFolder, ftype, file, req_from_websit
 
     # Verbindung zum Docker-Clienten herstellen (Server/Desktop Version)
     docker_client = docker.from_env()
+    print(docker_client)
 
     # Abfragen ob das Image existiert
     image = docker_client.images.list(IMAGE_TAG)
@@ -66,7 +80,7 @@ def simulate_docker(nameOfConfigFile, nameOfFolder, ftype, file, req_from_websit
     print("Verzeichnisübersicht")
     print("Ext.:", pathOfExternalWorkDir)
     print("Int.:", pathOfInternalWorkDir)
-    print("Docker:", pathOfDockerWorkDir)
+    #print("Docker:", pathOfDockerWorkDir)
     print("Config:", pathOfConfigfile)
     print("Int.Config:", internalConfigFile)
     print("Volumes_dict", volumes_dict)
@@ -77,6 +91,8 @@ def simulate_docker(nameOfConfigFile, nameOfFolder, ftype, file, req_from_websit
         entrypoint=["python", "main.py"],
         command="-wdir " + pathOfInternalWorkDir + " " + internalConfigFile,
         detach=True,
+        tty=True,
+        stdin_open=True,
         volumes=volumes_dict,
         name=nameOfFolder,
     )

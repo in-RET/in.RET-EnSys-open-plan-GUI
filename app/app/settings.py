@@ -19,7 +19,6 @@ DEBUG = ast.literal_eval(os.getenv("DJANGO_DEBUG", "False"))
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-print(BASE_DIR)
 
 STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.FileSystemFinder",
@@ -44,6 +43,7 @@ ALLOWED_HOSTS = ["*"]
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:9004",
+    "http://127.0.0.1:9004",
     "http://surak.hs-nordhausen.de:9004",
     "https://ensys.hs-nordhausen.de",
     "http://iae.hs-nordhausen.de"
@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     # 3rd Party
     "crispy_forms",
     "crispy_bootstrap4",
+    "django_q",
     "django_plotly_dash.apps.DjangoPlotlyDashConfig",
     "bootstrap_datepicker_plus",
 ]
@@ -212,12 +213,10 @@ MESSAGE_TAGS = {
 USE_PROXY = ast.literal_eval(os.getenv("USE_PROXY", "True"))
 PROXY_ADDRESS_LINK = os.getenv("PROXY_ADDRESS", "http://proxy:port")
 PROXY_CONFIG = (
-    ({"http://": PROXY_ADDRESS_LINK, "https://": PROXY_ADDRESS_LINK})
-    if USE_PROXY
-    else ({})
+    ({"http://": PROXY_ADDRESS_LINK, "https://": PROXY_ADDRESS_LINK}) if USE_PROXY else ({})
 )
 
-INRETENSYS_API_HOST = "http://fastapi:8001"
+INRETENSYS_API_HOST = "http://api:8001"
 INRETENSYS_POST_URL = f"{INRETENSYS_API_HOST}/uploadJson"
 INRETENSYS_CHECK_URL = f"{INRETENSYS_API_HOST}/check/"
 INRETENSYS_LP_FILE_URL = f"{INRETENSYS_API_HOST}/getLpFile/"
@@ -226,6 +225,17 @@ OEP_URL = "https://openenergy-platform.org/api/v0/schema/model_draft/tables/"
 
 # Allow iframes to show in page
 X_FRAME_OPTIONS = "SAMEORIGIN"
+
+# DJANGO-Q CONFIGURATION
+# source: https://django-q.readthedocs.io/en/latest/configure.html
+Q_CLUSTER = {
+    "name": "django_q_orm",
+    "workers": 4,
+    "timeout": 90,
+    "retry": 120,
+    "queue_limit": 50,
+    "orm": "default",
+}
 
 import sys
 

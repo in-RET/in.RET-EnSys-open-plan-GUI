@@ -5,8 +5,10 @@ import plotly.graph_objects as go
 from dash import dcc, html
 from django_plotly_dash import DjangoDash
 from oemof import solph
-from projects.models import Simulation
+import traceback
 
+from projects.models import Simulation
+from .src.common.automatic_cost_calc import cost_calculation_from_energysystem
 from .src.inret_dash.sankey import sankey
 
 
@@ -16,58 +18,260 @@ def createDashboard(simulation: Simulation):
     try:
         wpath = os.path.join(os.getcwd(), "dumps", simulation.mvs_token, "dumps")
         print(wpath)
-        
+
         es = solph.EnergySystem()
         es.restore(dpath=wpath, filename="config.dump")
-    except FileNotFoundError:
+    except FileNotFoundError as e:
+        traceback.print_exc()
         es = None
-    except Exception:
-        print(Exception.with_traceback)
+    except Exception as e:
+        traceback.print_exc()
+        es = None
 
     if es is not None:
-        # printEsGraph(es, image_directory)
+        #investment_data = cost_calculation_from_energysystem(es)
 
         busses = []
         bus_figures = []
 
-        print("Results:", es.results)
+        investment_elements = []
+        cost_elements = []
+        cost_elements_2 = []
+        cost_elements_3 = []
+        emissions_elements = []
 
         results = es.results["main"]
 
         flows = [x for x in results.keys() if x[1] is not None]
         nodes = [x for x in results.keys() if x[1] is None]
 
-        flows_invest = [
-            x
-            for x in flows
-            if hasattr(results[x]["scalars"], "invest") and isinstance(x[1], solph.Bus)
-        ]
+        for flow in [x for x in flows if hasattr(results[x]["scalars"], "invest") and isinstance(x[1], solph.Bus)]:
+            print(type(flow[0]))
+            print(type(flow[1]))
 
-        investment_elements = []
+            if type(flow[0]) is not solph.components.GenericStorage:
+                UNIT = ("MW", "kW")
+            else:
+                UNIT = ("MWh", "kWh")
 
-        for flow in flows_invest:
-            # investment_df[flow[0].label] = results[flow]['scalars']['invest']
             investment_elements.append(
                 html.Tr(
-                    children=[
-                        html.Td(children=flow[0].label),
-                        html.Td(
-                            children=str(round(results[flow]["scalars"]["invest"], 4))
-                        ),
-                    ],
                     style={"background": "white"},
+                    children=[
+                        html.Td(
+                            style={"width": "75%"},
+                            children=flow[0].label
+                        ),
+                        html.Td(
+                            style={
+                                "text-align": "right"
+                            },
+                            children=str("{:.4f}".format(round(results[flow]["scalars"]["invest"], 4))) + " " + UNIT[0] + " (" + str("{:.4f}".format(round(results[flow]["scalars"]["invest"] * 1000, 4))) + " " + UNIT[1] + ")"
+                        )
+                    ],
                 )
             )
+
+        # battery_power = solph.views.node(results, "Strombus")["scalars"][(("Batteriespeicher", "Strombus"), "invest")]
+        # invest_battery = round(battery_power * 43646.22240281003, 2)
+        #
+        # invest_pv = round(investment_data["investment costs"]["(Photovoltaik, Strombus)"], 2)
+        #
+        # emission_factor = 0.380
+        #
+        # strom_input = round(solph.views.node(results, "Strombus")["sequences"][(("Netzanbieter", "Strombus"), "flow")].sum(), 2)
+        # strom_variable_costs = round(investment_data["variable costs"]["(Netzanbieter, Strombus)"], 2)
+        # strom_last = round(solph.views.node(results, "Strombus")["sequences"][(("Strombus", "Stromverbrauch"), "flow")].sum(), 2)
+        # strom_export = round(solph.views.node(results, "Strombus")["sequences"][(("Strombus", "Export"), "flow")].sum(), 2)
+        #
+        # export_preis = 30
+        # strom_preis = round(strom_variable_costs / strom_input, 0)
+        # print("Strompreis:", strom_preis)
+        #
+        # strom_kosten = round(strom_variable_costs, 2)
+        # strom_kosten_o_EE = round(strom_preis * strom_last, 2)
+        # strom_einnahmen = round(export_preis * strom_export, 2)
+        #
+        # cost_elements.append(
+        #     html.Tr(
+        #         style={"background": "white"},
+        #         children=[
+        #             html.Td(
+        #                 style={"width": "50%"},
+        #                 children="Stromkosten p.a. (ohne Erneuerbare)"
+        #             ),
+        #             html.Td(
+        #                 style={
+        #                     "text-align": "right"
+        #                 },
+        #                 children=str("{:.2f}".format(strom_kosten_o_EE)) + " € p.a."
+        #             )
+        #         ]
+        #     )
+        # )
+        #
+        # cost_elements_2.append(
+        #     html.Tr(
+        #         style={"background": "white"},
+        #         children=[
+        #             html.Td(
+        #                 style={"width": "50%"},
+        #                 children="Stromkosten p.a."
+        #             ),
+        #             html.Td(
+        #                 style={"width": "25%"},
+        #             ),
+        #             html.Td(
+        #                 style={
+        #                     "text-align": "right"
+        #                 },
+        #                 children=str("{:.2f}".format(strom_kosten)) + " € p.a."
+        #             )
+        #         ]
+        #     )
+        # )
+        #
+        # cost_elements_2.append(
+        #     html.Tr(
+        #         style={"background": "white"},
+        #         children=[
+        #             html.Td(
+        #                 style={"width": "50%"},
+        #                 children="Stromerlöse p.a."
+        #             ),
+        #             html.Td(
+        #                 style={"width": "25%"},
+        #             ),
+        #             html.Td(
+        #                 style={
+        #                     "text-align": "right"
+        #                 },
+        #                 children=str("{:.2f}".format(strom_einnahmen)) + " € p.a."
+        #             )
+        #         ]
+        #     )
+        # )
+        #
+        # cost_elements_3.append(
+        #     html.Tr(
+        #         style={"background": "white"},
+        #         children=[
+        #             html.Td(
+        #                 style={
+        #                     "font-weight": "bold",
+        #                     "width": "75%"
+        #                 },
+        #                 children="Kombinierte Kosten p.a."
+        #             ),
+        #             html.Td(
+        #                 style={
+        #                     "font-weight": "bold",
+        #                     "text-align": "right"
+        #                 },
+        #                 children=str("{:.2f}".format(round(strom_kosten + invest_pv + invest_battery - strom_einnahmen, 2))) + " € p.a."
+        #             )
+        #         ]
+        #     )
+        # )
+        #
+        # cost_elements_3.append(
+        #     html.Tr(
+        #         style={"background": "white"},
+        #         children=[
+        #             html.Td(
+        #                 style={"width": "75%"},
+        #                 children="Ersparnis p.a.",
+        #             ),
+        #             html.Td(
+        #                 style={"text-align": "right"},
+        #                 children=str("{:.2f}".format(round(strom_kosten_o_EE - (strom_kosten + invest_pv + invest_battery - strom_einnahmen)), 2)) + " € p.a."
+        #             )
+        #         ]
+        #     )
+        # )
+        #
+        # cost_elements_2.append(
+        #     html.Tr(
+        #         style={"background": "white"},
+        #         children=[
+        #             html.Td(
+        #                 style={"width": "60%"},
+        #                 children="Investitionskosten Photovoltaikanlage"
+        #             ),
+        #             html.Td(
+        #                 style={
+        #                     "width": "20%",
+        #                     "text-align": "right",
+        #                 },
+        #                 children=str("{:.2f}".format(round(invest_pv * 25, 2))) + " €"
+        #             ),
+        #             html.Td(
+        #                 style={
+        #                     "width": "20%",
+        #                     "text-align": "right"
+        #                 },
+        #                 children=str("{:.2f}".format(round(invest_pv, 2))) + " € p.a."
+        #             )
+        #         ]
+        #     )
+        # )
+        #
+        # cost_elements_2.append(
+        #     html.Tr(
+        #         style={"background": "white"},
+        #         children=[
+        #             html.Td(
+        #                 style={"width": "60%"},
+        #                 children="Investitionskosten Batteriespeicher"
+        #             ),
+        #             html.Td(
+        #                 style={
+        #                     "width": "20%",
+        #                     "text-align": "right"
+        #                 },
+        #                 children=str("{:.2f}".format(round(invest_battery * 15, 2))) + " €"
+        #             ),
+        #             html.Td(
+        #                 style={
+        #                     "width": "20%",
+        #                     "text-align": "right"
+        #                 },
+        #                 children=str("{:.2f}".format(round(invest_battery, 2))) + " € p.a."
+        #             )
+        #         ]
+        #     )
+        # )
+        #
+        # input_pv = solph.views.node(results, "Strombus")["sequences"][(("Photovoltaik", "Strombus"), "flow")].sum()
+        #
+        # emissions_elements.append(
+        #     html.Tr(
+        #         children=[
+        #             html.Td(
+        #                 style={
+        #                     "font-weight": "bold",
+        #                     "width": "50%"
+        #                 },
+        #                 children="Emissionsersparnis"
+        #             ),
+        #             html.Td(
+        #                 style={
+        #                     "font-weight": "bold",
+        #                     "text-align": "right"
+        #                 },
+        #                 children=str("{:.4f}".format(round(input_pv * emission_factor, 4))) + " t p.a."
+        #             )
+        #         ]
+        #     )
+        # )
 
         for node in es.nodes:
             if isinstance(node, solph.Bus):
                 busses.append(node)
 
         for bus in busses:
-            fig = go.Figure(layout=dict(title=f"{bus} bus"))
-            for t, g in solph.views.node(es.results["main"], node=bus)[
-                "sequences"
-            ].items():
+            fig = go.Figure(layout=dict(title=f"{bus}"))
+            for t, g in solph.views.node(es.results["main"], node=bus)["sequences"].items():
                 idx_asset = abs(t[0].index(bus) - 1)
 
                 fig.add_trace(
@@ -86,34 +290,91 @@ def createDashboard(simulation: Simulation):
 
         dashboard_childs = []
 
-        if len(investment_elements) > 0:
-            # print(investment_elements)
-            dashboard_childs.append(
-                html.Div(
-                    style={"box-shadow": "8px 5px 5px lightgray"},
-                    children=[
-                        html.H2(
-                            children="Static values", style={"textAlign": "center"}
-                        ),
-                        html.H3(children="Investments"),
-                        html.Table(
-                            style={
-                                "background": "white",
-                                "width": "100%",
-                                "padding": "1em",
-                            },
-                            children=investment_elements,
-                        ),
-                    ],
-                )
-            )
+        style_dict = {
+            "border-bottom": "1px solid gray",
+            "background": "white",
+            "width": "100%",
+            "padding": "0.5em",
+        }
+
+        # if len(investment_elements) > 0:
+        #     # print(investment_elements)
+        #     dashboard_childs.append(
+        #         html.Div(
+        #             children=[
+        #                 html.H2(
+        #                     children="Static values", style={"textAlign": "center"}
+        #                 ),
+        #                 html.H3(children="Installed Power", style={"textAlign": "center"}),
+        #                 html.Table(
+        #                     style=style_dict,
+        #                     children=investment_elements
+        #                 )
+        #             ]
+        #         )
+        #     )
+        #
+        # if len(cost_elements) > 0:
+        #     dashboard_childs.append(
+        #         html.Div(
+        #             children=[
+        #                 html.H3(
+        #                     children="Costs", style={"textAlign": "center"}
+        #                 ),
+        #                 html.Table(
+        #                     style=style_dict,
+        #                     children=cost_elements,
+        #                 ),
+        #             ],
+        #         )
+        #     )
+        #
+        # if len(cost_elements_2) > 0:
+        #     dashboard_childs.append(
+        #         html.Div(
+        #             children=[
+        #                 html.Table(
+        #                     style=style_dict,
+        #                     children=cost_elements_2,
+        #                 ),
+        #             ],
+        #         )
+        #     )
+        #
+        #     if len(cost_elements_3) > 0:
+        #         dashboard_childs.append(
+        #             html.Div(
+        #                 children=[
+        #                     html.Table(
+        #                         style=style_dict,
+        #                         children=cost_elements_3,
+        #                     ),
+        #                 ],
+        #             )
+        #         )
+        #
+        #
+        # if len(emissions_elements) > 0:
+        #     dashboard_childs.append(
+        #         html.Div(
+        #
+        #             children=[
+        #                 html.H3(
+        #                     children="Emissions", style={"textAlign": "center"}
+        #                 ),
+        #                 html.Table(
+        #                     style=style_dict,
+        #                     children=emissions_elements,
+        #                 ),
+        #             ],
+        #         )
+        #     )
 
         dashboard_childs.append(
             html.Div(
                 style={
                     "float": "left",
                     "width": "100%",
-                    "box-shadow": "8px 5px 5px lightgray",
                 },
                 className="row",
                 children=[
@@ -133,7 +394,6 @@ def createDashboard(simulation: Simulation):
                 style={
                     "float": "left",
                     "width": "100%",
-                    "box-shadow": "8px 5px 5px lightgray",
                 },
                 className="row",
                 children=[
@@ -159,7 +419,6 @@ def createDashboard(simulation: Simulation):
                 style={
                     "float": "left",
                     "width": "100%",
-                    "box-shadow": "8px 5px 5px lightgray",
                 },
                 className="row",
                 children=[
@@ -197,3 +456,24 @@ def createDashboard(simulation: Simulation):
             date_time_index = es.timeindex
 
             return sankey(es, es.results["main"], date_time_index[ts])
+
+    else:
+        # Render Error 500
+
+        app.layout = html.Div(
+            style={
+                "display": "inline-block",
+                "width": "100%",
+                #'margin': 'auto',
+                "height": "100% !important",
+                "font-family": "Arial, Helvetica, sans-serif",
+            },
+            className="dashboard",
+            children=[
+                html.H2(
+                    children="Es ist ein Fehler passiert... Badum...",
+                    style={"textAlign": "center"},
+                )
+            ]
+        )
+        pass

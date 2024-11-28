@@ -5,6 +5,7 @@
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
     <envs>
+      <env name="PYTHONUNBUFFERED" value="1" />
       <env name="DJANGO_DEBUG" value="True" />
       <env name="DJANGO_PORT" value="9004" />
       <env name="DJANGO_SETTINGS_MODULE" value="app.settings" />
@@ -16,7 +17,6 @@
       <env name="POSTGRES_PASSWORD" value="%.30fpgM" />
       <env name="POSTGRES_PORT" value="5432" />
       <env name="POSTGRES_USER" value="pyrokar" />
-      <env name="PYTHONUNBUFFERED" value="1" />
       <env name="SQL_DATABASE" value="$POSTGRES_DB" />
       <env name="SQL_ENGINE" value="django.db.backends.postgresql" />
       <env name="SQL_HOST" value="$POSTGRES_HOST" />
@@ -29,6 +29,35 @@
     <option name="IS_MODULE_SDK" value="true" />
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />
+    <EXTENSION ID="DockerContainerSettingsRunConfigurationExtension">
+      <option name="envVars">
+        <list />
+      </option>
+      <option name="extraHosts">
+        <list />
+      </option>
+      <option name="links">
+        <list />
+      </option>
+      <option name="networkDisabled" value="false" />
+      <option name="networkMode" value="bridge" />
+      <option name="portBindings">
+        <list />
+      </option>
+      <option name="publishAllPorts" value="false" />
+      <option name="runCliOptions" value="--entrypoint= --rm" />
+      <option name="version" value="2" />
+      <option name="volumeBindings">
+        <list>
+          <DockerVolumeBindingImpl>
+            <option name="containerPath" value="/opt/project" />
+            <option name="editable" value="true" />
+            <option name="hostPath" value="$PROJECT_DIR$" />
+            <option name="readOnly" value="false" />
+          </DockerVolumeBindingImpl>
+        </list>
+      </option>
+    </EXTENSION>
     <option name="launchJavascriptDebuger" value="false" />
     <option name="port" value="9004" />
     <option name="host" value="localhost" />

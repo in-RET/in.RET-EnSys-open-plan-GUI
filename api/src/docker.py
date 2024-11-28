@@ -68,22 +68,22 @@ def simulate_docker(
 
     # Verbindung zum Docker-Clienten herstellen (Server/Desktop Version)
     docker_client = docker.from_env()
-    print(docker_client)
 
     # Abfragen ob das Image existiert
     image = docker_client.images.list(IMAGE_TAG)
 
     # Wenn lokal kein Image existiert
+    #print("Images:", image)
     if image == []:
         raise HTTPException(status_code=404, detail="Docker image not found")
 
-    print("Verzeichnisübersicht")
-    print("Ext.:", pathOfExternalWorkDir)
-    print("Int.:", pathOfInternalWorkDir)
+    #print("Verzeichnisübersicht")
+    #print("Ext.:", pathOfExternalWorkDir)
+    #print("Int.:", pathOfInternalWorkDir)
     #print("Docker:", pathOfDockerWorkDir)
-    print("Config:", pathOfConfigfile)
-    print("Int.Config:", internalConfigFile)
-    print("Volumes_dict", volumes_dict)
+    #print("Config:", pathOfConfigfile)
+    #print("Int.Config:", internalConfigFile)
+    #print("Volumes_dict", volumes_dict)
 
     # Starten des docker-containers, im detach Mode, damit dieser das Python-Programm nicht blockiert
     container = docker_client.containers.run(

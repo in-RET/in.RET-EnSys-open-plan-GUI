@@ -13,7 +13,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
 from django.http.response import Http404
 from django.shortcuts import *
 from django.template.loader import get_template
@@ -729,6 +729,7 @@ def scenario_create_topology(request, proj_id, scen_id, step_id=2, max_step=3):
         "demand": {
             "mySink": _("Sink"),
             "myExcess": _("Excess"),
+            "myExport": _("Export"),
             "myPredefinedSinkOEP": _("Load profile from the Open Energy Platform")
         },
         "bus": {"bus": _("Bus")},
@@ -1464,7 +1465,7 @@ def get_inputparameter_suggestion_trafo(request):
 def get_inputparameter_suggestion_storage(request):
     body_unicode = request.body.decode("utf-8")  # for POST
     body = json.loads(body_unicode)
-    print(body)
+    #print(body)
     capex, opex, lifetime, crate, efficiency, efficiency_el, efficiency_th, thermal_loss_rate, fixed_losses_relative_gamma, fixed_losses_absolute_delta = (None,) * 10
     # input_timeseries = ""
     technology = body[0]["kindOfComponentStorage"]
@@ -1479,7 +1480,7 @@ def get_inputparameter_suggestion_storage(request):
         #2030, 2040, 2045
         queryset = InputparameterSuggestion.objects.filter(technology=technology, year=year)
         for item in queryset:
-            print(item.unique_id, item.capex, item.fixed_losses_relative_gamma)
+            #print(item.unique_id, item.capex, item.fixed_losses_relative_gamma)
             capex = item.capex
             opex = item.opex
             lifetime = item.lifetime
@@ -2324,6 +2325,7 @@ def request_mvs_simulation(request, scen_id=0):
                             i["opex"]["value"],
                             interest_rate
                         )
+                        print("EP_Costs:", ep_costs)
                     else:
                         ep_costs = None
 
@@ -2681,9 +2683,11 @@ def request_mvs_simulation(request, scen_id=0):
         
         raise Exception(error_msg + " - 407")
 
-    print(results)
-    
-    try:
+    if results == None:
+        error_msg = "Could not communicate with the simulation server."
+        logger.error(error_msg)
+        messages.error(request, error_msg)
+    else:
         # delete existing simulation
         Simulation.objects.filter(scenario_id=scen_id).delete()
         # Create empty Simulation model object
@@ -2704,18 +2708,7 @@ def request_mvs_simulation(request, scen_id=0):
         simulation.elapsed_seconds = (datetime.now() - simulation.start_date).seconds
         simulation.save()
 
-        answer = HttpResponseRedirect(
-            reverse("scenario_review", args=[scenario.project.id, scen_id])
-        )
-    except Exception as e:
-        error_msg = "Could not communicate with the simulation server."
-        logger.error(error_msg)
-        messages.error(request, error_msg)
-        # TODO redirect to prefilled feedback form / bug form
-
-        raise Exception(error_msg + " - 407")
-
-    return answer
+    return HttpResponseRedirect(reverse("scenario_review", args=[scenario.project.id, scen_id]))
 
 
 @json_view

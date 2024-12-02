@@ -17,5 +17,5 @@ package.json
 app/InRetEnsys-*.whlsite/
 site/
 
-default.env
+production.env
 /data/

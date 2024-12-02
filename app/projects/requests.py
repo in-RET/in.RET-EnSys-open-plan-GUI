@@ -5,7 +5,7 @@ from datetime import datetime
 import httpx as requests
 from dashboard.models import AssetsResults, KPICostsMatrixResults, KPIScalarResults
 # from requests.exceptions import HTTPError
-from epa.settings import (
+from app.settings import (
     INRETENSYS_CHECK_URL,
     INRETENSYS_POST_URL,
 )
@@ -15,7 +15,6 @@ logger = logging.getLogger(__name__)
 
 
 def mvs_simulation_request(data):
-
     try:
         # TODO: request without docker etc.
         response = requests.post(
@@ -33,7 +32,7 @@ def mvs_simulation_request(data):
         logger.error(f"Other error occurred: {err}")
         return None
     else:
-        logger.info("The simulation was sent successfully to Inretensys API.")
+        logger.info("The simulation was sent successfully to EnSys API.")
         str_results = json.loads(response.content)
 
         return {"token": str_results["folder"][0], "status": PENDING}

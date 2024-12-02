@@ -20,31 +20,25 @@
                         <form method="post">
                             {% csrf_token %}
                             {{ form|crispy }}
-                            <br>
                             <div class="row">
                                 <div class="col-sm-4"></div>
                                 <div class="col-sm-4">
-                                    <button class="btn btn-primary btn-lg"
-                                            type="submit">Save Changes
-                                    </button>
+                                    <button class="btn btn-primary btn-lg" type="submit">Save Changes</button>
                                 </div>
                                 <div class="col-sm-4"></div>
                             </div>
-                            <br>
                         </form>
                     </div>
                 </div>
-            </div>
-        </section>
-        <section class="standard-layout">
-            <div>
+                <br>
                 <div class="account">
+                    <div class="col-sm-4"></div>
                     <div>
-                        <a href="{% url 'password_reset' %}">
-                            <button class="btn btn-primary btn-lg"
-                                    type="submit">{% trans "Reset Password" %}</button>
+                        <a href="{% url 'password_reset' %}" class="btn btn-primary btn-lg">
+                            {% trans "Reset Password" %}
                         </a>
                     </div>
+                    <div class="col-sm-4"></div>
                 </div>
             </div>
         </section>

@@ -1,0 +1,90 @@
+services:
+  db:
+    image: postgres:16
+    container_name: db
+    env_file: .env
+    restart: always
+    networks:
+      - backend
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    env_file: .env
+    restart: always
+    networks:
+      - frontend
+    ports:
+      - "${PGADMIN_PORT}:80"
+    volumes:
+      - ./data/pgadmin:/var/lib/pgadmin
+
+  web:
+    build:
+      context: .
+      dockerfile: ./app/dockerfile
+    develop:
+      watch:
+        - action: sync
+          path: ./app
+          target: ./app
+        - action: rebuild
+          path: ./requirements/requirements.txt
+        - action: rebuild
+          path: .env
+    command: python manage.py runserver 0.0.0.0:8000
+    container_name: ensys-frontend
+    env_file: .env
+    restart: always
+    volumes:
+      - ./app:/app
+      - ./${LOCAL_WORKDIR}:/app/dumps
+      - static_volume:/app/cdn_static_root
+    networks:
+      - backend
+      - frontend
+    ports:
+      - "${DJANGO_PORT}:8000"
+    depends_on:
+      - db
+
+  api:
+    build:
+      context: .
+      dockerfile: ./api/dockerfile
+    develop:
+      watch:
+        - path: ./api/dockerfile
+          action: rebuild
+    container_name: ensys-backend
+    env_file: .env
+    restart: always
+    volumes:
+     - /var/run/docker.sock:/var/run/docker.sock
+     - ./${LOCAL_WORKDIR}:/app/${LOCAL_WORKDIR}
+    networks:
+      - backend
+
+  proxy:
+    build: ./proxy
+    container_name: gui_proxy
+    restart: always
+    ports:
+        - ${PROXY_PORT}:80
+    depends_on:
+        - web
+    volumes:
+        - static_volume:/static
+        #- ./${LOCAL_WORKDIR}:/static/dumps
+    networks:
+        - backend
+        - frontend
+
+networks:
+  backend:
+  frontend:
+
+volumes:
+  static_volume:

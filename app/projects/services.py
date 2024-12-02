@@ -3,6 +3,7 @@ import os
 import traceback
 from concurrent.futures import ThreadPoolExecutor
 
+from django_q.models import Schedule
 from django.contrib import messages
 from django.urls import reverse
 from django.utils.safestring import mark_safe

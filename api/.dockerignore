@@ -1,0 +1,29 @@
+.vscode/
+**/__pycache__/
+**/*.py[cod]
+*.sqlite3
+*.log
+compose/*
+node_modules/
+app/dockerfile
+package.json
+package-lock.json
+Pipfile
+Pipfile.lock
+webpack.config.js
+.babelrc.json
+.dockerignore
+dockerfile
+**/node_modules
+# **
+# !cdn_static_root/
+# !dashboard/**
+# !app/**
+# !fixtures/**
+# !projects/**
+# !static/**
+# !templates/**
+# !users/**
+# !app.env
+# !manage.py
+# !setup.sh

@@ -11,27 +11,10 @@ This repository contains the code for the user interface. The simulations are pe
 
 # Getting Started
 
-## Deploy locally using and using our inretensys-fastapi
+## Deploy locally
 
-Prior to be able to develop locally, you might need to install postgres, simply google `install postgres` followed by your os name (`linux/mac/windows`)
+To do!
 
-1. Create a virtual environment
-2. Activate your virtual environment
-3. Install the dependencies with `pip install -r app/requirements/postgres.txt`
-4. Install extra local development dependencies with `pip install -r app/dev_requirements.txt`
-5. Move to the `app` folder with `cd app`
-6. Create environment variables (only replace content surrounded by `<>`)
-```
-SQL_ENGINE=django.db.backends.postgresql
-SQL_DATABASE=<your db name>
-SQL_USER=<your user name>
-SQL_PASSWORD=<your password>
-SQL_HOST=localhost
-SQL_PORT=5432
-DEBUG=(True|False)
-```
-8. Execute the `local_setup.sh` file (`. local_setup.sh` on linux/mac `bash local_setup.sh` on windows) you might have to make it executable first. Answer yes to the question
-9. Start the local server with `python manage.py runserver`
 10. You can then login with `testUser` and `ASas12,.` or create your own account
 
 ## Deploy using Docker Compose

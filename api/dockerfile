@@ -1,4 +1,4 @@
-FROM python:3.11
+FROM python:3.12
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
@@ -14,16 +14,14 @@ RUN apt-get -y install python3-h5py
 RUN apt autoclean
 
 RUN mkdir ${INSTALL_ROOT}
-COPY requirements/ ${INSTALL_ROOT}/
+COPY requirements/ ${INSTALL_ROOT}
 
 RUN pip install --upgrade pip
 RUN pip install -r ${INSTALL_ROOT}/requirements.txt
 RUN pip install --upgrade ${INSTALL_ROOT}/InRetEnsys-0.2a7-py3-none-any.whl
 
-WORKDIR ${APP_ROOT}
+COPY api/ ${APP_ROOT}/
 
-COPY /app/ ${APP_ROOT}
+WORKDIR ${APP_ROOT}/
 
-RUN python manage.py migrate
-RUN python manage.py collectstatic --no-input
-RUN python manage.py loaddata 'fixtures/fixture.json'
+CMD ["python", "-m", "uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8001"]

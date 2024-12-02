@@ -7,6 +7,7 @@
 !app/cdn_static_root/
 **/cdn_static_root/
 **/venv/
+.venv
 .envs/*
 **/node_modules
 
@@ -15,3 +16,6 @@ package.json
 
 app/InRetEnsys-*.whlsite/
 site/
+
+default.env
+/data/

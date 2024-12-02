@@ -2,7 +2,7 @@ import json
 from typing import List
 
 from django.db.models import Q
-from epa.settings import OEP_URL
+from app.settings import OEP_URL
 from projects.models import (
     ConnectionLink,
     Scenario,

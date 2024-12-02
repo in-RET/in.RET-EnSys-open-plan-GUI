@@ -36,11 +36,30 @@
     <div class="step-footer__left"></div>
     <div class="step-footer__center">
       <a class="btn btn--medium btn--hollow btn--previous" href="{% url 'scenario_steps_edit' proj_id scen_id step_id|add:-1 %}" aria-disabled="true">{% translate "Previous" %}</a>
-      <a class="btn btn--medium" href="{% url 'simulation_cancel' scen_id %}" onclick="return confirm('Are you sure?')">{% translate "Reset simulation" %}</a>
+      <!-- <a class="btn btn--medium" href="{% url 'simulation_cancel' scen_id %}" onclick="confirmation()">{% translate "Reset simulation" %}</a> -->
+      <a class="btn btn--medium" onclick="confirmation()">{% translate "Reset simulation" %}</a>
       <!-- <a class="btn btn--medium btn--hollow" href="{% url 'view_mvs_data_input' scen_id %}" >{% translate "Proof parameters JSON file" %} </a> -->
       <a class="btn btn--medium btn--hollow btb--disabled" href="{% url 'not_implemented' %}?url={{ request.get_full_path }}" >{% translate "Link to send bug report automatically" %} </a>
     </div>
     <div class="step-footer__right"></div>
   </div>
 </footer>
+
+<script>
+    function confirmation() {
+        Swal.fire({
+            title: "",
+            text: "Are you sure?",
+            icon: "question",
+            toast: false,
+            showCancelButton: true,
+            showConfirmButton: true,
+        }).then((result) => {
+            console.log(result);
+            if (result.isConfirmed) {
+                window.location = "{% url 'simulation_cancel' scen_id %}"
+            }
+        });
+    }
+</script>
 {% endblock footer %}

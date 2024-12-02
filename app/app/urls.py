@@ -19,7 +19,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path, re_path
 
-from .settings import STATIC_ROOT, STATIC_URL
+from .settings import STATIC_ROOT, STATIC_URL, DEBUG
 from .views import about, imprint, license, privacy, faq
 
 urlpatterns = (
@@ -38,6 +38,8 @@ urlpatterns = (
         path("django_plotly_dash/", include("django_plotly_dash.urls")),
     )
     + [re_path(r"^i18n/", include("django.conf.urls.i18n"))]
-#    + staticfiles_urlpatterns()
-    + static(STATIC_URL, document_root=STATIC_ROOT)
 )
+
+if DEBUG:
+        urlpatterns += static(STATIC_URL, document_root=STATIC_ROOT)
+

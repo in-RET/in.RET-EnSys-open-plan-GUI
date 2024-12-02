@@ -13,14 +13,14 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
 from django.http.response import Http404
 from django.shortcuts import *
 from django.template.loader import get_template
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
-from epa.settings import (
+from app.settings import (
     INRETENSYS_CHECK_URL,
     INRETENSYS_LP_FILE_URL,
     OEP_URL,
@@ -34,6 +34,8 @@ from requests.exceptions import HTTPError
 from requests import get
 from .constants import DONE, ERROR, MODIFIED, PENDING
 from .forms import *
+from .models.base_models import Scenario, ConnectionLink
+from .models.simulation_models import Simulation
 from .requests import (
     fetch_mvs_simulation_results,
     mvs_simulation_request,
@@ -607,7 +609,6 @@ def scenario_select_project(request, step_id=0, max_step=1):
 @login_required
 @require_http_methods(["GET", "POST"])
 def scenario_create_parameters(request, proj_id, scen_id=None, step_id=1, max_step=2):
-
     project = get_object_or_404(Project, pk=proj_id)
     # all projects which the user is able to select (the one the user created)
     user_projects = request.user.project_set.all()
@@ -728,6 +729,7 @@ def scenario_create_topology(request, proj_id, scen_id, step_id=2, max_step=3):
         "demand": {
             "mySink": _("Sink"),
             "myExcess": _("Excess"),
+            "myExport": _("Export"),
             "myPredefinedSinkOEP": _("Load profile from the Open Energy Platform")
         },
         "bus": {"bus": _("Bus")},
@@ -757,7 +759,6 @@ def scenario_create_topology(request, proj_id, scen_id, step_id=2, max_step=3):
             # node_obj.assign_asset_to_proper_group(node_to_db_mapping_dict)
         return JsonResponse({"success": True}, status=200)
     else:
-
         scenario = get_object_or_404(Scenario, pk=scen_id)
         print(scenario.user_mode_choice)
         print(scenario.simulation_year)
@@ -1464,7 +1465,7 @@ def get_inputparameter_suggestion_trafo(request):
 def get_inputparameter_suggestion_storage(request):
     body_unicode = request.body.decode("utf-8")  # for POST
     body = json.loads(body_unicode)
-    print(body)
+    #print(body)
     capex, opex, lifetime, crate, efficiency, efficiency_el, efficiency_th, thermal_loss_rate, fixed_losses_relative_gamma, fixed_losses_absolute_delta = (None,) * 10
     # input_timeseries = ""
     technology = body[0]["kindOfComponentStorage"]
@@ -1479,7 +1480,7 @@ def get_inputparameter_suggestion_storage(request):
         #2030, 2040, 2045
         queryset = InputparameterSuggestion.objects.filter(technology=technology, year=year)
         for item in queryset:
-            print(item.unique_id, item.capex, item.fixed_losses_relative_gamma)
+            #print(item.unique_id, item.capex, item.fixed_losses_relative_gamma)
             capex = item.capex
             opex = item.opex
             lifetime = item.lifetime
@@ -2037,7 +2038,6 @@ def test_mvs_data_input(request, scen_id=0):
 @login_required
 @require_http_methods(["GET", "POST"])
 def request_mvs_simulation(request, scen_id=0):
-
     list_sources = []
     list_busses = []
     list_sinks = []
@@ -2070,8 +2070,7 @@ def request_mvs_simulation(request, scen_id=0):
             )
             freq='quarter_hourly'
             
-        print(timesteps)
-
+        # print(timesteps)
 
         for k, v in data_clean.items():
             for i in v:
@@ -2086,18 +2085,16 @@ def request_mvs_simulation(request, scen_id=0):
                     if i['source_choice'] == "Biomass supply":
                         summed_max = i["summed_max"]["value"] if i["summed_max"] else None,
                         # print(summed_max[0])
-                        nominal_value = summed_max[0]/timesteps,
+                        nominal_value = summed_max[0] / timesteps
                         # print(nominal_value[0])
                         list_sources.append(
                             InRetEnsysSource(
                                 label=i["label"],
                                 outputs={
                                     i["outflow_direction"]: InRetEnsysFlow(
-                                        variable_costs=i["variable_costs"]["value"]
-                                        if i["variable_costs"]
-                                        else None,
-                                        nominal_value=nominal_value[0],
-                                        summed_max=summed_max[0]/nominal_value[0],
+                                        variable_costs=i["variable_costs"]["value"] if i["variable_costs"] else None,
+                                        nominal_value=nominal_value,
+                                        summed_max=summed_max[0] / nominal_value,
                                         summed_min=i["summed_min"]["value"]
                                         if i["summed_min"]
                                         else None,
@@ -2115,8 +2112,8 @@ def request_mvs_simulation(request, scen_id=0):
                             )
                         )
                         
-                        print("\nEnergy Production (Biomass Import): \n")
-                        print("{} : {}".format(k, i))
+                        # print("\nEnergy Production (Biomass Import): \n")
+                        # print("{} : {}".format(k, i))
                         
                     elif i['source_choice'] == "Import Grid":
                         list_sources.append(
@@ -2172,8 +2169,8 @@ def request_mvs_simulation(request, scen_id=0):
                                 },
                             )
                         )
-                        print("\nEnergy Production (Grid): \n")
-                        print("{} : {}".format(k, i))
+                        # print("\nEnergy Production (Grid): \n")
+                        # print("{} : {}".format(k, i))
                         
                     else:
                         
@@ -2247,8 +2244,8 @@ def request_mvs_simulation(request, scen_id=0):
                             messages.error(request, error_msg)
                             raise Exception(error_msg + " - 407")
                         
-                        print("\nEnergy Production (all other): \n")
-                        print("{} : {}".format(k, i))
+                        # print("\nEnergy Production (all other): \n")
+                        # print("{} : {}".format(k, i))
 
                 elif k == "energy_consumption":
                     try:
@@ -2328,6 +2325,7 @@ def request_mvs_simulation(request, scen_id=0):
                             i["opex"]["value"],
                             interest_rate
                         )
+                        print("EP_Costs:", ep_costs)
                     else:
                         ep_costs = None
 
@@ -2393,9 +2391,9 @@ def request_mvs_simulation(request, scen_id=0):
                         ep_costs = None
                         
                     if i['trafo_choice'] == "Biogas CHP":
-                        print("\nEnergy Conversion (Biogas CHP): \n")
-                        print("{} : {}".format(k, i))                        
-                        
+                        # print("\nEnergy Conversion (Biogas CHP): \n")
+                        # print("{} : {}".format(k, i))
+
                         try:
                             output_first = ""
                             output_second = ""
@@ -2407,24 +2405,23 @@ def request_mvs_simulation(request, scen_id=0):
                                 
                             queryset = Bus.objects.filter(name=i['outflow_direction'][0])
                             for item_0 in queryset:
-                                print(item_0.type)
+                                # print(item_0.type)
                                 
-                            if item_0.type == "Electricity" or item_0.type == "Heat":
-                                if item_0.type == "Electricity":
-                                    output_first = i['outflow_direction'][0]
-                                elif item_0.type == "Heat":
-                                    output_second = i['outflow_direction'][0]
-                                
+                                if item_0.type == "Electricity" or item_0.type == "Heat":
+                                    if item_0.type == "Electricity":
+                                        output_first = i['outflow_direction'][0]
+                                    elif item_0.type == "Heat":
+                                        output_second = i['outflow_direction'][0]
+
                             queryset = Bus.objects.filter(name=i['outflow_direction'][1])
                             for item_1 in queryset:
-                                print(item_1.type)
-                                
-                            if item_1.type == "Electricity" or item_1.type == "Heat":
-                                if item_0.type != item_1.type:
-                                    if item_1.type == "Electricity":
-                                        output_first = i['outflow_direction'][1]
-                                    elif item_1.type == "Heat":
-                                        output_second = i['outflow_direction'][1]
+                                # print(item_1.type)
+                                if item_1.type == "Electricity" or item_1.type == "Heat":
+                                    if item_0.type != item_1.type:
+                                        if item_1.type == "Electricity":
+                                            output_first = i['outflow_direction'][1]
+                                        elif item_1.type == "Heat":
+                                            output_second = i['outflow_direction'][1]
                             
                             if output_first == "" or output_second == "":
                                 raise Exception("Your Biogas CHP is not connected to the right output buses! Please also note the selected energy carrier of the buses")
@@ -2493,7 +2490,7 @@ def request_mvs_simulation(request, scen_id=0):
                         list_transformers = build_oemof_trafo_expert(list_transformers, k, 
                                                                      i, ep_costs)
                         
-                        print(list_transformers)
+                       # print(list_transformers)
                         
                     
                     else: # predefined trafos with one input and one output
@@ -2608,8 +2605,8 @@ def request_mvs_simulation(request, scen_id=0):
                                 )
                             )
                             
-                            print("\nEnergy Conversion: \n")
-                            print("{} : {}".format(k, i))                        
+                            #print("\nEnergy Conversion: \n")
+                            #print("{} : {}".format(k, i))
                             
                         except Exception as e:
                             error_msg = f"Trafo Scenario Serialization ERROR! User: {scenario.project.user.username}. Scenario Id: {scenario.id}. Thrown Exception: {e}."
@@ -2617,11 +2614,11 @@ def request_mvs_simulation(request, scen_id=0):
     
                             raise Exception(error_msg + " - 407")
 
-        print(data_clean["constraints"])
-        print(data_clean["economic_data"])
-        print(data_clean["simulation_settings"])
-        print(data_clean["simulation_settings"]["evaluated_period"])
-        print(data_clean["simulation_settings"]["evaluated_period"]["value"])
+        #print(data_clean["constraints"])
+        #print(data_clean["economic_data"])
+        #print(data_clean["simulation_settings"])
+        #print(data_clean["simulation_settings"]["evaluated_period"])
+        #print(data_clean["simulation_settings"]["evaluated_period"]["value"])
         
         
         energysystem = InRetEnsysEnergysystem(
@@ -2685,8 +2682,12 @@ def request_mvs_simulation(request, scen_id=0):
         messages.error(request, error_msg)
         
         raise Exception(error_msg + " - 407")
-    
-    try:
+
+    if results == None:
+        error_msg = "Could not communicate with the simulation server."
+        logger.error(error_msg)
+        messages.error(request, error_msg)
+    else:
         # delete existing simulation
         Simulation.objects.filter(scenario_id=scen_id).delete()
         # Create empty Simulation model object
@@ -2707,18 +2708,7 @@ def request_mvs_simulation(request, scen_id=0):
         simulation.elapsed_seconds = (datetime.now() - simulation.start_date).seconds
         simulation.save()
 
-        answer = HttpResponseRedirect(
-            reverse("scenario_review", args=[scenario.project.id, scen_id])
-        )
-    except Exception as e:
-        error_msg = "Could not communicate with the simulation server."
-        logger.error(error_msg)
-        messages.error(request, error_msg)
-        # TODO redirect to prefilled feedback form / bug form
-
-        raise Exception(error_msg + " - 407")
-
-    return answer
+    return HttpResponseRedirect(reverse("scenario_review", args=[scenario.project.id, scen_id]))
 
 
 @json_view

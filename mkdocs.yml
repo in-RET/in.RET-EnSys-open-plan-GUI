@@ -36,6 +36,7 @@ extra_javascript:
 nav:
     - 'Home': index.md
     - 'Possibilities': 'possibilities.md'
+    - 'Overview': project_overview.md
     - 'Introduction':
         - 'Installation': getting_started/installation.md
         - 'First Steps': getting_started/first_steps.md

@@ -32,7 +32,7 @@ table.table {
     }
   }
 
-  &>:not(caption)>*>* {
+  & > :not(caption) > * > * {
     padding: $dashboard-table-cell-padding;
   }
 }

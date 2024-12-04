@@ -1,7 +1,9 @@
 import json
 from typing import List
 
+import requests
 from django.db.models import Q
+
 from app.settings import OEP_URL
 from projects.models import (
     ConnectionLink,
@@ -13,8 +15,6 @@ from projects.models import (
     Constraint,
     ValueType,
 )
-
-import requests
 
 
 class ProjectDataDto:
@@ -60,8 +60,13 @@ class EconomicDataDto:
 
 
 class SimulationSettingsDto:
-    def __init__(self, start_date: str, time_step: int, evaluated_period: ValueTypeDto,
-                 interest_rate: float):
+    def __init__(
+        self,
+        start_date: str,
+        time_step: int,
+        evaluated_period: ValueTypeDto,
+        interest_rate: float,
+    ):
         self.start_date = start_date
         # self.end_date = end_date
         self.time_step = time_step
@@ -286,9 +291,7 @@ class EssDto:
 
 
 class BusDto:
-    def __init__(self, label: str, 
-                 energy_vector: str, 
-                 assets: List[AssetDto]):
+    def __init__(self, label: str, energy_vector: str, assets: List[AssetDto]):
         self.label = label
         self.energy_vector = energy_vector
         self.assets = assets
@@ -383,7 +386,7 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
     ess_list_II = Asset.objects.filter(
         Q(scenario=scenario), Q(asset_type__asset_type__contains="myPredefinedStorage")
     )
-    
+
     # Exclude ESS related assets
     asset_list = Asset.objects.filter(Q(scenario=scenario)).exclude(
         Q(asset_type__asset_type__contains="myGenericStorage")
@@ -434,7 +437,7 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
         ),  # datetime.combine(scenario.start_date, time()).timestamp(),
         scenario.time_step,
         evaluated_period,
-        interest_rate
+        interest_rate,
     )
 
     # map_to_dto(economic_data, economic_data_dto)
@@ -554,8 +557,7 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
         )
 
         energy_storage.append(ess_dto)
-        
-        
+
     for ess in ess_list_II:
         # Find all connections to ess
         input_connection = ConnectionLink.objects.filter(
@@ -635,7 +637,7 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
                 n for n in output_connection.values_list("bus__name", flat=True)
             ]
 
-        #asset_efficiency = to_value_type(asset, "efficiency")
+        # asset_efficiency = to_value_type(asset, "efficiency")
 
         optional_parameters = {}
         # if asset.asset_type.asset_type in ("chp", "chp_fixed_ratio"):
@@ -726,9 +728,9 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
         # if "dso" in asset.asset_type.asset_type:
         #     dso_energy_price.value = json.loads(dso_energy_price.value)
         #     dso_feedin_tariff.value = json.loads(dso_feedin_tariff.value)
-        
+
         if asset.asset_type.asset_type == "myTransformer":
-            print('dtos')
+            print("dtos")
             print(asset.trafo_input_bus_2)
             asset_dto = AssetDto(
                 asset.asset_type.asset_type,
@@ -780,13 +782,13 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
                 asset.trafo_input_conversionf_1,
                 asset.trafo_input_conversionf_2,
                 asset.trafo_input_conversionf_3,
-                asset.trafo_output_conversionf_1, 
+                asset.trafo_output_conversionf_1,
                 asset.trafo_output_conversionf_2,
-                asset.trafo_output_conversionf_3,                
+                asset.trafo_output_conversionf_3,
                 **optional_parameters,
             )
 
-        else:            
+        else:
 
             asset_dto = AssetDto(
                 asset.asset_type.asset_type,
@@ -854,7 +856,7 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
                 asset.trafo_input_conversionf_1,
                 asset.trafo_input_conversionf_2,
                 asset.trafo_input_conversionf_3,
-                asset.trafo_output_conversionf_1, 
+                asset.trafo_output_conversionf_1,
                 asset.trafo_output_conversionf_2,
                 asset.trafo_output_conversionf_3,
                 **optional_parameters,
@@ -869,7 +871,10 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
         choice_load_profile = asset_dto.choice_load_profile
         oep_table_name = asset_dto.oep_table_name
         oep_column_name = asset_dto.oep_column_name
-        if asset.asset_type.asset_type == "myPredefinedSink" or asset.asset_type.asset_type == "myPredefinedSinkOEP":
+        if (
+            asset.asset_type.asset_type == "myPredefinedSink"
+            or asset.asset_type.asset_type == "myPredefinedSinkOEP"
+        ):
             if choice_load_profile is not None:
                 print(choice_load_profile)
                 asset_dto.input_timeseries = to_timeseries_data_for_predefined_profile(
@@ -916,9 +921,7 @@ def convert_to_dto(scenario: Scenario, testing: bool = False):
             set([connection.asset.name for connection in connections_list])
         )
 
-        bus_dto = BusDto(bus.name, 
-                         bus.type, 
-                         bus_asset_list)
+        bus_dto = BusDto(bus.name, bus.type, bus_asset_list)
 
         bus_dto_list.append(bus_dto)
 
@@ -957,7 +960,7 @@ def to_value_type(model_obj, field_name):
     value = getattr(model_obj, field_name)
     if field_name == "efficiency":
         if model_obj.trafo_choice == "Biogas CHP" or model_obj.trafo_choice == "GuD":
-            value=None
+            value = None
             # print(model_obj.trafo_choice, value)
 
     if value is not None:

@@ -1,13 +1,13 @@
 ////////////////////////////////////////////// Animations on scroll
 AOS.init({
-  duration: 1000,
-  disable: "mobile"
+    duration: 1000,
+    disable: "mobile"
 });
 
 ////////////////////////////////////////////// Enable tooltips everywhere
 var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
 var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-  return new bootstrap.Tooltip(tooltipTriggerEl)
+    return new bootstrap.Tooltip(tooltipTriggerEl)
 })
 
 ////////////////////////////////////////////// Show up system design error modal
@@ -15,10 +15,10 @@ var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
 const systemDesignError = document.getElementById("js-system-design-error");
 
 if (systemDesignError) {
-  let designError = new bootstrap.Modal(systemDesignError, {});
-  window.onload = function () {
-    designError.show();
-  };
+    let designError = new bootstrap.Modal(systemDesignError, {});
+    window.onload = function () {
+        designError.show();
+    };
 }
 
 ////////////////////////////////////////////// Dummy highlight animation after duplicating scenario in project view
@@ -26,10 +26,10 @@ const testDuplicateScenario = document.getElementById("testDuplicateScenario");
 const testDuplicatedScenario = document.getElementById("testDuplicatedScenario");
 
 function testEndDuplicatedHighlight() {
-  testDuplicatedScenario.style.backgroundColor = "#FFF";
-  setTimeout(() => {
-    testDuplicatedScenario.classList.remove("scenario-duplicated");
-  }, 1000);
+    testDuplicatedScenario.style.backgroundColor = "#FFF";
+    setTimeout(() => {
+        testDuplicatedScenario.classList.remove("scenario-duplicated");
+    }, 1000);
 };
 
 /*

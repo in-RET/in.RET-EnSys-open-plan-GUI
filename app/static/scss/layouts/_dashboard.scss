@@ -4,7 +4,7 @@
 .dashboard-tabs {
   @include flex-row-justify-center;
 
-  &> div {
+  & > div {
     @include section-width;
   }
 
@@ -31,7 +31,7 @@
   @include flex-row-justify-center;
   background-color: $primary-gray-color-2;
 
-  &> div {
+  & > div {
     @include section-width;
   }
 
@@ -46,7 +46,7 @@
   min-height: calc(100vh - #{$main-padding-top} - #{$header-dashboard-height} - #{$header-dashboard-margin-bottom} - #{$footer-height});
   padding: 3rem 0 4rem;
 
-  &> div {
+  & > div {
     @include section-width;
   }
 
@@ -92,7 +92,7 @@
 
     &__item {
       background-color: $primary-gray-color-2;
-      border-radius:3px;
+      border-radius: 3px;
       color: $primary-gray-color-4;
       padding: 0.25rem 0.5rem;
       margin-top: .75rem;

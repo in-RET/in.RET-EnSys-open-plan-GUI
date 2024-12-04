@@ -6,32 +6,41 @@ var timeseriesCapacityTitle = "Capacity";
 var timeseriesChargeDischargeTitle = "Charge/discharge";
 
 
-
-function addReportItemGraphToDOM(parameters, reportDOMId="report_items"){
+function addReportItemGraphToDOM(parameters, reportDOMId = "report_items") {
 
 // todo: use DOMsanitize to counter XSS
 
     const graphId = parameters.id + "_plot";
 
     // generate html elements of a graph area
-    var newReportItemDOM = ml("div", { id: parameters.id, class: "chart", style: "height: fit-content;"}, [
-            ml("div", { class: "chart__header"}, [
+    var newReportItemDOM = ml("div", {id: parameters.id, class: "chart", style: "height: fit-content;"}, [
+            ml("div", {class: "chart__header"}, [
                 ml("div", {}, [
-                    ml("span", { class: "title"}, parameters.title)
+                    ml("span", {class: "title"}, parameters.title)
                 ]),
-                ml("div", { class: "dropdown"}, [
-                    ml("button", { class: "btn dropdown-toggle btn--transparent", type: "button", id: "dropdownMenuTS", 'data-bs-toggle': "dropdown", 'aria-expanded': "false"}, [
-                       ml("span", { class: "icon icon-more"}, [])
+                ml("div", {class: "dropdown"}, [
+                    ml("button", {
+                        class: "btn dropdown-toggle btn--transparent",
+                        type: "button",
+                        id: "dropdownMenuTS",
+                        'data-bs-toggle': "dropdown",
+                        'aria-expanded': "false"
+                    }, [
+                        ml("span", {class: "icon icon-more"}, [])
                     ]),
-                    ml("ul", { class: "dropdown-menu", 'aria-labelledby': "dropdownMenuTS"}, [
-                        ml("li", {}, ml("a", { class: "dropdown-item", href: urlNotImplemented}, "Export as .xls")),
-                        ml("li", {}, ml("a", { class: "dropdown-item", href: urlNotImplemented}, "Export as .pdf")),
-                        ml("li", {}, ml("a", { class: "dropdown-item", href: urlCopyReportItem}, "Copy item")),
-                        ml("li", {}, ml("button", { class: "dropdown-item", onclick: deleteReportItem, "data-report-item-id": parameters.id }, "Delete item")),
+                    ml("ul", {class: "dropdown-menu", 'aria-labelledby': "dropdownMenuTS"}, [
+                        ml("li", {}, ml("a", {class: "dropdown-item", href: urlNotImplemented}, "Export as .xls")),
+                        ml("li", {}, ml("a", {class: "dropdown-item", href: urlNotImplemented}, "Export as .pdf")),
+                        ml("li", {}, ml("a", {class: "dropdown-item", href: urlCopyReportItem}, "Copy item")),
+                        ml("li", {}, ml("button", {
+                            class: "dropdown-item",
+                            onclick: deleteReportItem,
+                            "data-report-item-id": parameters.id
+                        }, "Delete item")),
                     ]),
                 ]),
             ]),
-            ml("div", { class: "chart__plot"}, ml("div", {id: graphId}, [])),
+            ml("div", {class: "chart__plot"}, ml("div", {id: graphId}, [])),
         ]
     );
 
@@ -43,13 +52,12 @@ function addReportItemGraphToDOM(parameters, reportDOMId="report_items"){
 };
 
 
-
 // credits: https://idiallo.com/javascript/create-dom-elements-faster
 function ml(tagName, props, nest) {
     var el = document.createElement(tagName);
-    if(props) {
-        for(var name in props) {
-            if(name.indexOf("on") === 0) {
+    if (props) {
+        for (var name in props) {
+            if (name.indexOf("on") === 0) {
                 el.addEventListener(name.substr(2).toLowerCase(), props[name], false)
             } else {
                 el.setAttribute(name, props[name]);
@@ -68,24 +76,24 @@ function nester(el, n) {
         var t = document.createTextNode(n);
         el.appendChild(t);
     } else if (n instanceof Array) {
-        for(var i = 0; i < n.length; i++) {
+        for (var i = 0; i < n.length; i++) {
             if (typeof n[i] === "string") {
                 var t = document.createTextNode(n[i]);
                 el.appendChild(t);
-            } else if (n[i] instanceof Node){
+            } else if (n[i] instanceof Node) {
                 el.appendChild(n[i]);
             }
         }
-    } else if (n instanceof Node){
+    } else if (n instanceof Node) {
         el.appendChild(n)
     }
     return el;
 }
 
-function format_trace_name(scenario_name, label, unit, compare=false){
+function format_trace_name(scenario_name, label, unit, compare = false) {
 
-    var trace_name = label + ' (' + unit + ')' ;
-    if(compare == true){
+    var trace_name = label + ' (' + unit + ')';
+    if (compare == true) {
         trace_name = scenario_name + ' ' + trace_name;
     }
     return trace_name;
@@ -93,12 +101,12 @@ function format_trace_name(scenario_name, label, unit, compare=false){
 }
 
 
-function addTimeseriesGraph(graphId, parameters){
+function addTimeseriesGraph(graphId, parameters) {
     // prepare traces in ploty format
     var data = []
 
     var compare = true;
-    if(parameters.data.length == 1){
+    if (parameters.data.length == 1) {
         compare = false;
         parameters.title = "Scenario " + parameters.data[0].scenario_name;
     }
@@ -106,23 +114,24 @@ function addTimeseriesGraph(graphId, parameters){
     parameters.data.forEach(scenario => {
         scenario.timeseries.forEach(timeseries => {
             // todo provide a function to format the name of the timeseries
-            var trace = {x: scenario.timestamps,
+            var trace = {
+                x: scenario.timestamps,
                 y: timeseries.value,
-                name:"",
+                name: "",
                 type: 'scatter',
                 line: {shape: 'hv'},
             };
-            trace.name = format_trace_name(scenario.scenario_name, timeseries.label, timeseries.unit, compare=compare);
+            trace.name = format_trace_name(scenario.scenario_name, timeseries.label, timeseries.unit, compare = compare);
             data.push(trace);
         });
     });
     // prepare graph layout in plotly format
-    const layout= {
+    const layout = {
         title: parameters.title,
-        xaxis:{
+        xaxis: {
             title: parameters.x_label,
         },
-        yaxis:{
+        yaxis: {
             title: parameters.y_label,
         },
         showlegend: true
@@ -132,11 +141,11 @@ function addTimeseriesGraph(graphId, parameters){
 };
 
 
-function addStackedTimeseriesGraph(graphId, parameters){
+function addStackedTimeseriesGraph(graphId, parameters) {
     // prepare traces in ploty format
     var data = []
 
-    if(parameters.data.length == 1){
+    if (parameters.data.length == 1) {
         compare = false;
         parameters.title = parameters.title + " sector of scenario " + parameters.data[0].scenario_name;
     }
@@ -144,7 +153,8 @@ function addStackedTimeseriesGraph(graphId, parameters){
     parameters.data.forEach(scenario => {
         scenario.timeseries.forEach(timeseries => {
             // todo provide a function to format the name of the timeseries
-            var trace = {x: scenario.timestamps,
+            var trace = {
+                x: scenario.timestamps,
                 y: timeseries.value,
                 name: '',
                 type: 'scatter',
@@ -152,17 +162,17 @@ function addStackedTimeseriesGraph(graphId, parameters){
                 stackgroup: timeseries.asset_type,
                 fill: timeseries.fill
             };
-            trace.name = format_trace_name(scenario.scenario_name, timeseries.label, timeseries.unit, compare=compare);
+            trace.name = format_trace_name(scenario.scenario_name, timeseries.label, timeseries.unit, compare = compare);
             data.push(trace);
         });
     });
     // prepare graph layout in plotly format
-    const layout= {
+    const layout = {
         title: parameters.title,
-        xaxis:{
+        xaxis: {
             title: parameters.x_label,
         },
-        yaxis:{
+        yaxis: {
             title: parameters.y_label,
         }
     }
@@ -170,10 +180,10 @@ function addStackedTimeseriesGraph(graphId, parameters){
     Plotly.newPlot(graphId, data, layout);
 };
 
-function storageResultGraph(x, ts_data, plot_id="",userLayout=null){
+function storageResultGraph(x, ts_data, plot_id = "", userLayout = null) {
 
     // get the handle of the plotly plot
-    if(plot_id == ""){
+    if (plot_id == "") {
         plot_id = PLOT_ID;
     }
     var plotDiv = document.getElementById(plot_id);
@@ -189,23 +199,23 @@ function storageResultGraph(x, ts_data, plot_id="",userLayout=null){
 
     var plotLayout = {
         height: 220,
-        margin:{
-            b:45,
-            l:60,
-            r:60,
-            t:15,
+        margin: {
+            b: 45,
+            l: 60,
+            r: 60,
+            t: 15,
         },
-        xaxis:{
+        xaxis: {
             type: "date",
             title: timeseriesFlowTitle,
             autorange: "true",
         },
-        yaxis:{
+        yaxis: {
             title: timeseriesChargeDischargeTitle,
             autorange: "true",
         },
-        yaxis2:{
-            title: timeseriesCapacityTitle ,
+        yaxis2: {
+            title: timeseriesCapacityTitle,
             overlaying: "y",
             side: "right",
             autorange: "true",
@@ -215,10 +225,16 @@ function storageResultGraph(x, ts_data, plot_id="",userLayout=null){
     plotLayout = {...plotLayout, ...userLayout};
     var traces = [];
     var plot_y_axis = "y";
-    for(var i=0; i<ts_data.length;++i){
-    // change legend layout
+    for (var i = 0; i < ts_data.length; ++i) {
+        // change legend layout
         plot_y_axis = (ts_data[i].name.includes("capacity") ? "y2" : "y");
-        traces.push({type: "scatter", x: x, y: ts_data[i].value, name: ts_data[i].name + "(" + ts_data[i].unit + ")", yaxis: plot_y_axis});
+        traces.push({
+            type: "scatter",
+            x: x,
+            y: ts_data[i].value,
+            name: ts_data[i].name + "(" + ts_data[i].unit + ")",
+            yaxis: plot_y_axis
+        });
     }
 
     Plotly.newPlot(plotDiv, traces, plotLayout, config);
@@ -226,28 +242,28 @@ function storageResultGraph(x, ts_data, plot_id="",userLayout=null){
     plotDiv.querySelector('[data-title="Autoscale"]').click()
 };
 
-function plotTimeseries(x, ts_data, plot_id="",userLayout=null){
+function plotTimeseries(x, ts_data, plot_id = "", userLayout = null) {
 
     // get the handle of the plotly plot
-    if(plot_id == ""){
+    if (plot_id == "") {
         plot_id = PLOT_ID;
     }
     var plotDiv = document.getElementById(plot_id);
 
     var plotLayout = {
         height: 220,
-        margin:{
-            b:45,
-            l:60,
-            r:60,
-            t:15,
+        margin: {
+            b: 45,
+            l: 60,
+            r: 60,
+            t: 15,
         },
-        xaxis:{
+        xaxis: {
             type: "date",
             title: timeseriesTimeTitle,
             autorange: "true",
         },
-        yaxis:{
+        yaxis: {
             title: timeseriesFlowTitle,
             autorange: "true",
         },
@@ -257,15 +273,22 @@ function plotTimeseries(x, ts_data, plot_id="",userLayout=null){
     var traces = [];
     var plot_y_axis = "y";
     var trace_label = "";
-    for(var i=0; i<ts_data.length;++i){
+    for (var i = 0; i < ts_data.length; ++i) {
         trace_label = "";
-        if(ts_data[i].name){
+        if (ts_data[i].name) {
             trace_label = ts_data[i].name;
-            if(ts_data[i].unit){
+            if (ts_data[i].unit) {
                 trace_label += "(" + ts_data[i].unit + ")";
             }
-        };
-        traces.push({type: "scatter", x: x, y: ts_data[i].value, name: trace_label , yaxis: plot_y_axis, ...ts_data[i].options});
+        }
+        ;
+        traces.push({
+            type: "scatter",
+            x: x,
+            y: ts_data[i].value,
+            name: trace_label,
+            yaxis: plot_y_axis, ...ts_data[i].options
+        });
     }
 
     Plotly.newPlot(plotDiv, traces, plotLayout, config);
@@ -274,8 +297,7 @@ function plotTimeseries(x, ts_data, plot_id="",userLayout=null){
 };
 
 
-
-function addCapacitiyGraph(graphId, parameters){
+function addCapacitiyGraph(graphId, parameters) {
     // prepare traces in ploty format
     var data = []
     parameters.data.forEach(scenario => {
@@ -285,7 +307,7 @@ function addCapacitiyGraph(graphId, parameters){
             data.push({
                 x: scenario.timestamps,
                 y: timeseries.capacity,
-                name:timeseries.name,
+                name: timeseries.name,
                 type: 'bar',
                 // line: {shape: 'hv'},
                 // stackgroup: timeseries.asset_type,
@@ -295,12 +317,12 @@ function addCapacitiyGraph(graphId, parameters){
     });
 
     // prepare graph layout in plotly format
-    const layout= {
+    const layout = {
         title: parameters.title,
-        xaxis:{
+        xaxis: {
             title: parameters.x_label,
         },
-        yaxis:{
+        yaxis: {
             title: parameters.y_label,
         },
         barmode: 'stack',
@@ -311,12 +333,12 @@ function addCapacitiyGraph(graphId, parameters){
     Plotly.newPlot(graphId, data, layout);
 };
 
-function addSankeyDiagram(graphId, parameters){
+function addSankeyDiagram(graphId, parameters) {
 
 
     console.log(parameters)
     // prepare graph layout in plotly format
-    const layout= {
+    const layout = {
         title: parameters.title,
     }
     // create plot
@@ -324,14 +346,14 @@ function addSankeyDiagram(graphId, parameters){
 };
 
 
-function addSensitivityAnalysisGraph(graphId, parameters){
+function addSensitivityAnalysisGraph(graphId, parameters) {
     // prepare graph layout in plotly format
-    const layout= {
+    const layout = {
         title: parameters.title,
-        xaxis:{
+        xaxis: {
             title: parameters.x_label,
         },
-        yaxis:{
+        yaxis: {
             title: parameters.y_label,
         }
     }
@@ -342,7 +364,7 @@ function addSensitivityAnalysisGraph(graphId, parameters){
 
 
 // TODO write functions for other report types
-const graph_type_mapping={
+const graph_type_mapping = {
     timeseries: addTimeseriesGraph,
     timeseries_stacked: addStackedTimeseriesGraph,
     capacities: addCapacitiyGraph,
@@ -361,10 +383,9 @@ const graph_type_mapping={
 var existingReportItemsData = JSON.parse(document.getElementById('existingReportItemsData').textContent);
 existingReportItemsData.forEach(reportItem => {
     var graphId = addReportItemGraphToDOM(reportItem);
-    if(reportItem.type in graph_type_mapping){
+    if (reportItem.type in graph_type_mapping) {
         graph_type_mapping[reportItem.type](graphId, reportItem);
-    }
-    else{
+    } else {
         console.log("the report type '" + reportItem.type + "' is not yet supported, sorry");
     }
 

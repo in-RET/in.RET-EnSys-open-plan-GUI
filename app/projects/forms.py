@@ -1,21 +1,21 @@
-import json
 import os
 import pickle
 
 import numpy as np
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
-from dashboard.helpers import KPI_PARAMETERS_ASSETS
 from django import forms
 from django.conf import settings as django_settings
 from django.forms import ModelForm
 from django.utils.translation import gettext_lazy as _
+
+from dashboard.helpers import KPI_PARAMETERS_ASSETS
 from projects.constants import RENEWABLE_ASSETS
 from projects.helpers import (
     parameters_helper,
     PARAMETERS,
     DualNumberField,
-    parse_input_timeseries
+    parse_input_timeseries,
 )
 from projects.models import *
 
@@ -272,9 +272,7 @@ class ProjectCreateForm(OpenPlanForm):
         widget=forms.Select(
             attrs={
                 "data-bs-toggle": "tooltip",
-                "title": _(
-                    ""
-                ),
+                "title": _(""),
             }
         ),
     )
@@ -283,9 +281,7 @@ class ProjectCreateForm(OpenPlanForm):
         widget=forms.Select(
             attrs={
                 "data-bs-toggle": "tooltip",
-                "title": _(
-                    ""
-                ),
+                "title": _(""),
             }
         ),
     )
@@ -302,19 +298,23 @@ class ProjectCreateForm(OpenPlanForm):
         self.helper.form_class = "form-horizontal"
         self.helper.label_class = "col-lg-8"
         self.helper.field_class = "col-lg-10"
-        self.fields['unit_choice'].label = "Unit Choice for all Scenarios of the Project - Please ensure that all technology parameters have the same unit prefix"
-        self.fields['unit_choice_co2'].label = "Unit Choice for CO2 amounts"
+        self.fields["unit_choice"].label = (
+            "Unit Choice for all Scenarios of the Project - Please ensure that all technology parameters have the same unit prefix"
+        )
+        self.fields["unit_choice_co2"].label = "Unit Choice for CO2 amounts"
 
 
 class ProjectUpdateForm(OpenPlanModelForm):
     class Meta:
         model = Project
         exclude = ["date_created", "date_updated", "economic_data", "user", "viewers"]
-        
+
     def __init__(self, *args, **kwargs):
         super(ProjectUpdateForm, self).__init__(*args, **kwargs)
-        self.fields['unit_choice'].label = "Unit Choice for all Scenarios of the Project - Please ensure that all technology parameters have the same unit prefix"
-        self.fields['unit_choice_co2'].label = "Unit Choice for CO2 amounts"
+        self.fields["unit_choice"].label = (
+            "Unit Choice for all Scenarios of the Project - Please ensure that all technology parameters have the same unit prefix"
+        )
+        self.fields["unit_choice_co2"].label = "Unit Choice for CO2 amounts"
 
 
 class ProjectShareForm(ModelForm):
@@ -392,7 +392,7 @@ scenario_widgets = {
         attrs={
             "class": "TestDateClass",
             "placeholder": "Select a start date",
-            "type": "date", #The standard HTML5 input tag type="date" doesn’t allow for customization.
+            "type": "date",  # The standard HTML5 input tag type="date" doesn’t allow for customization.
         },
     ),
     "time_step": forms.Select(
@@ -422,7 +422,9 @@ scenario_widgets = {
             "placeholder": "",
             "min": "0",
             "data-bs-toggle": "tooltip",
-            "title": _("interest rate in % - is used for the interest calculation of the annuities of the technologies")
+            "title": _(
+                "interest rate in % - is used for the interest calculation of the annuities of the technologies"
+            ),
         }
     ),
     "simulation_year": forms.Select(
@@ -432,7 +434,14 @@ scenario_widgets = {
             "data-bs-toggle": "tooltip",
             "title": _("Simulationyear"),
         },
-        choices=((2025, "2025"), (2030, "2030"), (2035, "2035"), (2040, "2040"), (2045, "2045"), (2050, "2050")),
+        choices=(
+            (2025, "2025"),
+            (2030, "2030"),
+            (2035, "2035"),
+            (2040, "2040"),
+            (2045, "2045"),
+            (2050, "2050"),
+        ),
     ),
     "user_mode_choice": forms.Select(
         attrs={
@@ -466,13 +475,15 @@ scenario_widgets = {
 scenario_labels = {
     "project": _("Project"),
     "name": _("Scenario name"),
-    "evaluated_period": _("Simulation period of one year"), #(Note that a very short simulation period can lead to unrealistic results.)
+    "evaluated_period": _(
+        "Simulation period of one year"
+    ),  # (Note that a very short simulation period can lead to unrealistic results.)
     "time_step": _("Time Step"),
     "start_date": _("Start Date"),
     # "capex_fix": _("Development costs"),
     # "timeframe_choice": _(""),
     "interest_rate": _("Interest Rate"),
-    #"simulation_year": _("Year of Simulation"),
+    # "simulation_year": _("Year of Simulation"),
 }
 
 scenario_field_order = [
@@ -484,7 +495,7 @@ scenario_field_order = [
     "start_date",
     # "capex_fix",
     "interest_rate",
-    #"simulation_year"
+    # "simulation_year"
 ]
 
 
@@ -546,12 +557,12 @@ class ScenarioUpdateForm(OpenPlanModelForm):
             self.fields["project"] = forms.ChoiceField(label="Project", choices=())
 
         # Deactivate Simulation Year and User Mode for changes
-        #self.fields["simulation_year"].disabled = True
-        #self.fields["user_mode_choice"].disabled = True
+        # self.fields["simulation_year"].disabled = True
+        # self.fields["user_mode_choice"].disabled = True
 
-        #self.fields["simulation_year"].widget.attrs['readonly'] = 'readonly'
-        #self.fields["user_mode_choice"].widget.attrs['readonly'] = 'readonly'
-        
+        # self.fields["simulation_year"].widget.attrs['readonly'] = 'readonly'
+        # self.fields["user_mode_choice"].widget.attrs['readonly'] = 'readonly'
+
         for visible in self.visible_fields():
             visible.field.widget.attrs["class"] = "form-control"
 
@@ -681,15 +692,15 @@ class BusForm(OpenPlanModelForm):
                     "title": _("The energy Vector of the connected assets."),
                     "style": "font-weight:400; font-size:13px;",
                 },
-            )
+            ),
         }
-        labels = {"name": _("Name"), 
-                  "type": _("Energy carrier")}
+        labels = {"name": _("Name"), "type": _("Energy carrier")}
 
 
 # class SuggestionForm(OpenPlanModelForm):
 #     def __init__(self, *args, **kwargs):
 #         super().__init__(*args, **kwargs)
+
 
 #     class Meta:
 #         model = Asset
@@ -736,6 +747,7 @@ class UserModelChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
         return obj.name
 
+
 class AssetCreateForm(OpenPlanModelForm):
     def __init__(self, *args, **kwargs):
         self.asset_type_name = kwargs.pop("asset_type", None)
@@ -763,46 +775,59 @@ class AssetCreateForm(OpenPlanModelForm):
                 self.timestamps = qs.get().get_timestamps()
 
         self.fields["inputs"] = forms.CharField(widget=forms.HiddenInput())
-        
 
         if self.asset_type_name == "myTransformer":
-            
+
             if self.existing_asset is None:
-            
-                self.fields["trafo_input_bus_1"] = UserModelChoiceField(queryset = Bus.objects.all())
-                self.fields["trafo_input_bus_2"] = UserModelChoiceField(queryset = Bus.objects.all())
-                self.fields["trafo_input_bus_3"] = UserModelChoiceField(queryset = Bus.objects.all())
-                
-                self.fields["trafo_output_bus_1"] = UserModelChoiceField(queryset = Bus.objects.all())
-                self.fields["trafo_output_bus_2"] = UserModelChoiceField(queryset = Bus.objects.all())
-                self.fields["trafo_output_bus_3"] = UserModelChoiceField(queryset = Bus.objects.all())
-                
-                self.fields["trafo_technicalp_bus_choice"] = UserModelChoiceField(queryset = Bus.objects.all())
-                self.fields["trafo_invest_bus_choice"] = UserModelChoiceField(queryset = Bus.objects.all())
-                self.fields["trafo_variableCosts_bus_choice"] = UserModelChoiceField(queryset = Bus.objects.all())
+
+                self.fields["trafo_input_bus_1"] = UserModelChoiceField(
+                    queryset=Bus.objects.all()
+                )
+                self.fields["trafo_input_bus_2"] = UserModelChoiceField(
+                    queryset=Bus.objects.all()
+                )
+                self.fields["trafo_input_bus_3"] = UserModelChoiceField(
+                    queryset=Bus.objects.all()
+                )
+
+                self.fields["trafo_output_bus_1"] = UserModelChoiceField(
+                    queryset=Bus.objects.all()
+                )
+                self.fields["trafo_output_bus_2"] = UserModelChoiceField(
+                    queryset=Bus.objects.all()
+                )
+                self.fields["trafo_output_bus_3"] = UserModelChoiceField(
+                    queryset=Bus.objects.all()
+                )
+
+                self.fields["trafo_technicalp_bus_choice"] = UserModelChoiceField(
+                    queryset=Bus.objects.all()
+                )
+                self.fields["trafo_invest_bus_choice"] = UserModelChoiceField(
+                    queryset=Bus.objects.all()
+                )
+                self.fields["trafo_variableCosts_bus_choice"] = UserModelChoiceField(
+                    queryset=Bus.objects.all()
+                )
             for i in range(1, 4):
-                self.fields[
-                    "trafo_input_bus_"+str(i)
-                ].label = "Input bus "+str(i)
-                self.fields[
-                    "trafo_input_conversionf_"+str(i)
-                ].label = "Input conversion factor "+str(i)
-            
-                self.fields[
-                    "trafo_output_bus_"+str(i)
-                ].label = "Output bus "+str(i)
-                self.fields[
-                    "trafo_output_conversionf_"+str(i)
-                ].label = "Output conversion factor "+str(i)
-            self.fields[
-                "trafo_technicalp_bus_choice"
-            ].label = "Bus the technical parameters refer to"
-            self.fields[
-                "trafo_invest_bus_choice"
-            ].label = "Bus the invest modell refers to"
-            self.fields[
-                "trafo_variableCosts_bus_choice"
-            ].label = "Bus the variable costs refer to"
+                self.fields["trafo_input_bus_" + str(i)].label = "Input bus " + str(i)
+                self.fields["trafo_input_conversionf_" + str(i)].label = (
+                    "Input conversion factor " + str(i)
+                )
+
+                self.fields["trafo_output_bus_" + str(i)].label = "Output bus " + str(i)
+                self.fields["trafo_output_conversionf_" + str(i)].label = (
+                    "Output conversion factor " + str(i)
+                )
+            self.fields["trafo_technicalp_bus_choice"].label = (
+                "Bus the technical parameters refer to"
+            )
+            self.fields["trafo_invest_bus_choice"].label = (
+                "Bus the invest modell refers to"
+            )
+            self.fields["trafo_variableCosts_bus_choice"].label = (
+                "Bus the variable costs refer to"
+            )
 
         if self.asset_type_name == "heat_pump":
             self.fields["efficiency"] = DualNumberField(
@@ -818,9 +843,9 @@ class AssetCreateForm(OpenPlanModelForm):
                 "Electrical efficiency with no heat extraction"
             )
 
-            self.fields[
-                "efficiency"
-            ].help_text = "This is the custom help text for chp efficiency"
+            self.fields["efficiency"].help_text = (
+                "This is the custom help text for chp efficiency"
+            )
 
             self.fields["efficiency_multiple"] = DualNumberField(
                 default=1, min=0, max=1, param_name="efficiency_multiple"
@@ -836,9 +861,9 @@ class AssetCreateForm(OpenPlanModelForm):
             self.fields["efficiency"].label = _("Efficiency gaz to electricity")
 
             # TODO
-            self.fields[
-                "efficiency"
-            ].help_text = "This is the custom help text for chp efficiency"
+            self.fields["efficiency"].help_text = (
+                "This is the custom help text for chp efficiency"
+            )
 
             self.fields["efficiency_multiple"].widget = forms.NumberInput(
                 attrs={
@@ -877,19 +902,19 @@ class AssetCreateForm(OpenPlanModelForm):
                 self.fields[field].required = False
             if field == "trafo_input_bus_3":
                 self.fields[field].required = False
-                
+
             if field == "trafo_output_bus_2":
                 self.fields[field].required = False
             if field == "trafo_output_bus_3":
                 self.fields[field].required = False
-                
+
             if field == "trafo_technicalp_bus_choice":
                 self.fields[field].required = False
             if field == "trafo_invest_bus_choice":
                 self.fields[field].required = False
             if field == "trafo_variableCosts_bus_choice":
                 self.fields[field].required = False
-                
+
             if view_only is True:
                 self.fields[field].disabled = True
         """ ----------------------------------------------------- """
@@ -1254,7 +1279,7 @@ class AssetCreateForm(OpenPlanModelForm):
             #########################################################################
             "variable_costs": forms.NumberInput(
                 attrs={
-                    "placeholder": "e. g. 50 €/"+unit+"h",
+                    "placeholder": "e. g. 50 €/" + unit + "h",
                     "min": "0.0",
                     "step": ".01",
                     "data-bs-toggle": "tooltip",
@@ -1266,7 +1291,7 @@ class AssetCreateForm(OpenPlanModelForm):
             ),
             "nominal_value": forms.NumberInput(
                 attrs={
-                    "placeholder": "e.g. 50 "+unit,
+                    "placeholder": "e.g. 50 " + unit,
                     "min": "0.0",
                     "step": ".01",
                     "data-bs-toggle": "tooltip",
@@ -1276,7 +1301,7 @@ class AssetCreateForm(OpenPlanModelForm):
             ),
             "_min": forms.NumberInput(
                 attrs={
-                    "placeholder": "factor of energy flow ("+unit+"h) e.g. 0.7",
+                    "placeholder": "factor of energy flow (" + unit + "h) e.g. 0.7",
                     "min": "0.0",
                     "max": "1.0",
                     "step": ".0001",
@@ -1287,7 +1312,7 @@ class AssetCreateForm(OpenPlanModelForm):
             ),
             "_max": forms.NumberInput(
                 attrs={
-                    "placeholder": "factor of energy flow ("+unit+"h) e.g. 0.7",
+                    "placeholder": "factor of energy flow (" + unit + "h) e.g. 0.7",
                     "min": "0.0",
                     "max": "1.0",
                     "step": ".0001",
@@ -1308,7 +1333,7 @@ class AssetCreateForm(OpenPlanModelForm):
             ),
             "summed_max": forms.NumberInput(
                 attrs={
-                    "placeholder": "e.g. 1000 "+unit+"h",
+                    "placeholder": "e.g. 1000 " + unit + "h",
                     "min": "0.0",
                     "step": ".01",
                     "data-bs-toggle": "tooltip",
@@ -1320,7 +1345,7 @@ class AssetCreateForm(OpenPlanModelForm):
             ),
             "summed_min": forms.NumberInput(
                 attrs={
-                    "placeholder": "e.g. 1000 "+unit+"h",
+                    "placeholder": "e.g. 1000 " + unit + "h",
                     "min": "0.0",
                     "step": ".01",
                     "data-bs-toggle": "tooltip",
@@ -1351,7 +1376,7 @@ class AssetCreateForm(OpenPlanModelForm):
             ),
             "annual_energy_consumption": forms.NumberInput(
                 attrs={
-                    "placeholder": "e.g. 5000 "+unit+"h",
+                    "placeholder": "e.g. 5000 " + unit + "h",
                     "min": "0.0",
                     "step": ".01",
                     "data-bs-toggle": "tooltip",
@@ -1367,7 +1392,11 @@ class AssetCreateForm(OpenPlanModelForm):
             ),
             "capex": forms.NumberInput(
                 attrs={
-                    "placeholder": "e.g. 50000 €/"+unit+" resp. €/"+unit+"h for storage",
+                    "placeholder": "e.g. 50000 €/"
+                    + unit
+                    + " resp. €/"
+                    + unit
+                    + "h for storage",
                     "min": "0.0",
                     "step": ".01",
                     "data-bs-toggle": "tooltip",
@@ -1403,7 +1432,11 @@ class AssetCreateForm(OpenPlanModelForm):
             ),
             "maximum": forms.NumberInput(
                 attrs={
-                    "placeholder": "e.g. 100 "+unit+" resp. "+unit+"h for storage",
+                    "placeholder": "e.g. 100 "
+                    + unit
+                    + " resp. "
+                    + unit
+                    + "h for storage",
                     "min": "0.0",
                     "step": ".01",
                     "data-bs-toggle": "tooltip",
@@ -1413,7 +1446,11 @@ class AssetCreateForm(OpenPlanModelForm):
             ),
             "minimum": forms.NumberInput(
                 attrs={
-                    "placeholder": "e.g. 100 "+unit+" resp. "+unit+"h for storage",
+                    "placeholder": "e.g. 100 "
+                    + unit
+                    + " resp. "
+                    + unit
+                    + "h for storage",
                     "min": "0.0",
                     "step": ".01",
                     "data-bs-toggle": "tooltip",
@@ -1423,7 +1460,11 @@ class AssetCreateForm(OpenPlanModelForm):
             ),
             "existing": forms.NumberInput(
                 attrs={
-                    "placeholder": "e.g. 100 "+unit+" resp. "+unit+"h for storage",
+                    "placeholder": "e.g. 100 "
+                    + unit
+                    + " resp. "
+                    + unit
+                    + "h for storage",
                     "min": "0.0",
                     "step": ".01",
                     "data-bs-toggle": "tooltip",
@@ -1441,7 +1482,7 @@ class AssetCreateForm(OpenPlanModelForm):
             ),
             "nominal_storage_capacity": forms.NumberInput(
                 attrs={
-                    "placeholder": "e.g. 100 "+unit+"h",
+                    "placeholder": "e.g. 100 " + unit + "h",
                     "min": "0.0",
                     "step": ".01",
                     "data-bs-toggle": "tooltip",
@@ -1473,7 +1514,7 @@ class AssetCreateForm(OpenPlanModelForm):
             ),
             "invest_relation_input_capacity": forms.NumberInput(
                 attrs={
-                    "placeholder": "factor of total capacity ("+unit+"h), e.g. 0.7",
+                    "placeholder": "factor of total capacity (" + unit + "h), e.g. 0.7",
                     "min": "0.0",
                     "max": "1.0",
                     "step": ".0001",
@@ -1486,7 +1527,7 @@ class AssetCreateForm(OpenPlanModelForm):
             ),
             "invest_relation_output_capacity": forms.NumberInput(
                 attrs={
-                    "placeholder": "factor of total capacity ("+unit+"h), e.g. 0.7",
+                    "placeholder": "factor of total capacity (" + unit + "h), e.g. 0.7",
                     "min": "0.0",
                     "max": "1.0",
                     "step": ".0001",
@@ -1499,7 +1540,9 @@ class AssetCreateForm(OpenPlanModelForm):
             ),
             "initial_storage_level": forms.NumberInput(
                 attrs={
-                    "placeholder": "factor of total capacity ("+unit+"h), e.g. 0.5 means half full",
+                    "placeholder": "factor of total capacity ("
+                    + unit
+                    + "h), e.g. 0.5 means half full",
                     "min": "0.0",
                     "max": "1.0",
                     "step": ".01",
@@ -1530,7 +1573,7 @@ class AssetCreateForm(OpenPlanModelForm):
             ),
             "emission_factor": forms.NumberInput(
                 attrs={
-                    "placeholder": "e.g. 0.201 in t_CO2/"+unit+"h",
+                    "placeholder": "e.g. 0.201 in t_CO2/" + unit + "h",
                     "min": "0.0",
                     "max": "1.0",
                     "step": ".0001",
@@ -1654,8 +1697,10 @@ class AssetCreateForm(OpenPlanModelForm):
                 },
             ),
         }
-        labels = {"input_timeseries": _("Timeseries vector"),
-                  "oep_table_name": _("OEP table name in Model draft")}
+        labels = {
+            "input_timeseries": _("Timeseries vector"),
+            "oep_table_name": _("OEP table name in Model draft"),
+        }
         help_texts = {
             "input_timeseries": _(
                 "You can upload your timeseries as xls(x), csv or json format. Either there is one column with the values of the timeseries matching the scenario timesteps, or there are two columns, the first one being the timestamps and the second one the values of the timeseries. If you upload a spreadsheet with more than one tab only the first tab will be considered. The timeseries in csv format is expected to be in comma separated values with dot as decimal separator."

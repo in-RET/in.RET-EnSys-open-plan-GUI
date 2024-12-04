@@ -32,14 +32,14 @@ var kindOfComponentStorage = '';
 
 // handling expert trafo
 function get_trafo_variation(value) {
-	alert(value);
-	render_form_expert_trafo(value);
+    alert(value);
+    render_form_expert_trafo(value);
 }
 
 function render_form_expert_trafo(value) {
     //alert('Called');
     var server_data = [
-        { "trafo_input_output_variation": value }
+        {"trafo_input_output_variation": value}
     ];
 
     $.ajax({
@@ -100,6 +100,7 @@ $.ajaxSetup({
             }
             return cookieValue;
         }
+
         if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
             // Only send the token to relative URLs i.e. locally.
             xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
@@ -111,8 +112,8 @@ $.ajaxSetup({
 function fill_out_form_source() {
     //alert('Called');
     var server_data = [
-        { "kindOfComponentSource": kindOfComponentSource },
-        { "choosenTimestampSource": choosenYear },
+        {"kindOfComponentSource": kindOfComponentSource},
+        {"choosenTimestampSource": choosenYear},
     ];
 
     $.ajax({
@@ -132,8 +133,8 @@ function fill_out_form_source() {
 function fill_out_form_trafo() {
     //alert('Called');
     var server_data = [
-        { "kindOfComponentTrafo": kindOfComponentTrafo },
-        { "choosenTimestampTrafo": choosenYear },
+        {"kindOfComponentTrafo": kindOfComponentTrafo},
+        {"choosenTimestampTrafo": choosenYear},
     ];
 
     $.ajax({
@@ -153,8 +154,8 @@ function fill_out_form_trafo() {
 function fill_out_form_storage() {
     //alert('Called');
     var server_data = [
-        { "kindOfComponentStorage": kindOfComponentStorage },
-        { "choosenTimestampStorage": choosenYear },
+        {"kindOfComponentStorage": kindOfComponentStorage},
+        {"choosenTimestampStorage": choosenYear},
     ];
 
     $.ajax({
@@ -193,11 +194,9 @@ function makePlotlyLoadProfile(value) {
 
     if (value == "load_profile_1") {
         data = [trace1];
-    }
-    else if (value == "load_profile_2") {
+    } else if (value == "load_profile_2") {
         data = [trace2];
-    }
-    else if (value == "load_profile_3") {
+    } else if (value == "load_profile_3") {
         data = [trace3];
     }
 
@@ -220,14 +219,13 @@ function makePlotly(x, y, plot_id = "", userLayout = null) {
 
     if (ts_timestamps_div) {
         var ts_timestamps = JSON.parse(ts_timestamps_div.querySelector("textarea").value);
-       
+
         //console.log(ts_timestamps);
         // only replace the x values with timestamps if they match the y values, otherwise the error
         // will be confusing to the enduser
         if (ts_timestamps.length == y.length) {
             x = ts_timestamps;
-        }
-        else if (y.length == 0) {
+        } else if (y.length == 0) {
             Swal.fire({
                 title: "You have not uploaded a time series for this component! But you don't have to.",
                 icon: "info",
@@ -246,21 +244,22 @@ function makePlotly(x, y, plot_id = "", userLayout = null) {
                 timer: 1200,
                 showCancelButton: false,
                 showConfirmButton: true,
-        })};
+            })
+        }
+        ;
     }
 
-    var plotLayout = { ...layout };
+    var plotLayout = {...layout};
     // guess whether x is a number or a date and adjust the axis type accordingly
     if (isNaN(x[0]) == false) {
         plotLayout.xaxis.type = "linear";
-    }
-    else {
+    } else {
         plotLayout.xaxis.type = "date";
     }
     plotLayout.xaxis.autorange = "true";
-    plotLayout["yaxis"] = { autorange: "true" };
-    plotLayout = { ...plotLayout, ...userLayout };
-    var traces = [{ type: "scatter", x: x, y: y }];
+    plotLayout["yaxis"] = {autorange: "true"};
+    plotLayout = {...plotLayout, ...userLayout};
+    var traces = [{type: "scatter", x: x, y: y}];
 
     Plotly.newPlot(plotDiv, traces, plotLayout, config);
     // simulate a click on autoscale
@@ -285,17 +284,16 @@ function plotDualInputTrace(obj, param_name = "") {
         jsObj.forEach(el => myarray.push([el]))
 
 
-
         processData(myarray);
         graphDOM.style.display = "block";
-    }
-    else {
+    } else {
         graphDOM.style.display = "none";
         // reset file in memory if the user inputs a scalar after uploading a file
         var fileID = "id_" + param_name + "_1";
         var file_input = document.getElementById(fileID);
         file_input.value = "";
-    };
+    }
+    ;
 
 }
 
@@ -310,12 +308,16 @@ function uploadDualInputTrace(obj, param_name = "") {
         var myfile = flist[0];
         if (myfile) {
             if (myfile.name.includes(".csv") || myfile.name.includes(".txt")) {
-                Promise.resolve(getAsText(myfile, plot = false)).then(async (array) => { updateScalarInput(array); });
-            }
-            else if (myfile.name.includes(".xls")) {
-                Promise.resolve(getAsExcel(myfile, plot = false)).then(async (array) => { updateScalarInput(array); });
+                Promise.resolve(getAsText(myfile, plot = false)).then(async (array) => {
+                    updateScalarInput(array);
+                });
+            } else if (myfile.name.includes(".xls")) {
+                Promise.resolve(getAsExcel(myfile, plot = false)).then(async (array) => {
+                    updateScalarInput(array);
+                });
             }
         }
+
         function updateScalarInput(array) {
             // write the array as json inside the scalar input field and trigger the change event
             var scalarID = "id_" + param_name + "_0";
@@ -342,15 +344,20 @@ function plot_file_trace(obj, plot_id = "") {
 
         var myfile = flist[0];
         if (myfile) {
-            if (myfile.name.includes(".csv")) { getAsText(myfile); }
-            else if (myfile.name.includes(".txt")) { getAsText(myfile); }
-            else if (myfile.name.includes(".xls")) { getAsExcel(myfile); }
+            if (myfile.name.includes(".csv")) {
+                getAsText(myfile);
+            } else if (myfile.name.includes(".txt")) {
+                getAsText(myfile);
+            } else if (myfile.name.includes(".xls")) {
+                getAsExcel(myfile);
+            }
         }
 
     } else {
         alert('FileReader are not supported in this browser.');
     }
 }
+
 function getAsExcel(fileToRead, plot = true) {
     var reader = new FileReader();
 
@@ -363,8 +370,7 @@ function getAsExcel(fileToRead, plot = true) {
             // Read file into memory as UTF-8
             reader.readAsBinaryString(fileToRead);
         });
-    }
-    else {
+    } else {
         reader.onload = function (e) {
             processData(parseExcelData(e.target.result));
         };
@@ -374,7 +380,6 @@ function getAsExcel(fileToRead, plot = true) {
     reader.onerror = function (ex) {
         console.log(ex);
     };
-
 
 
 };
@@ -396,7 +401,6 @@ function parseExcelData(data) {
 }
 
 
-
 // taken from https://github.com/MounirMesselmeni/html-fileapi
 function getAsText(fileToRead, plot = true) {
     var reader = new FileReader();
@@ -413,8 +417,7 @@ function getAsText(fileToRead, plot = true) {
             // Read file into memory as UTF-8
             reader.readAsText(fileToRead);
         });
-    }
-    else {
+    } else {
 
         reader.onload = loadHandler;
         // Read file into memory as UTF-8
@@ -456,8 +459,7 @@ function processData(array_2D) {
             x.push(line[0]);
             y.push(line[1]);
         }
-    }
-    else {
+    } else {
         alert("File has more than 2 columns.\nIt is expected one column: the timeseries values\nOr two columns: the first one with timestamps and the second one with the timeseries values");
     }
     // provide x and y to plotly maker

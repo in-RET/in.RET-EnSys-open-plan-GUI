@@ -1,13 +1,13 @@
 from typing import List
 
+import docker
 from fastapi import FastAPI, File, Request, Response, UploadFile
-from fastapi.staticfiles import StaticFiles
 from fastapi.exceptions import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-import docker
 from src.constants import *
 from src.docker import simulate_docker
 from src.helpers import generate_random_folder

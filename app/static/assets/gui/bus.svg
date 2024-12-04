@@ -1,3 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="138px" height="124px" viewBox="-0.5 -0.5 138 124"><defs/><g><path d="M 8 60.89 L 36.65 60.97" fill="none" stroke="rgb(0, 0, 0)" stroke-width="3" stroke-miterlimit="10" pointer-events="stroke"/><path d="M 43.4 60.99 L 34.38 65.46 L 36.65 60.97 L 34.41 56.46 Z" fill="rgb(0, 0, 0)" stroke="rgb(0, 0, 0)" stroke-width="3" stroke-miterlimit="10" pointer-events="all"/><path d="M 89.25 61 L 117.9 61" fill="none" stroke="rgb(0, 0, 0)" stroke-width="3" stroke-miterlimit="10" pointer-events="stroke"/><path d="M 124.65 61 L 115.65 65.5 L 117.9 61 L 115.65 56.5 Z" fill="rgb(0, 0, 0)" stroke="rgb(0, 0, 0)" stroke-width="3" stroke-miterlimit="10" pointer-events="all"/><ellipse cx="68" cy="61" rx="60.00000000000001" ry="20" fill="transparent" stroke="rgb(0, 0, 0)" stroke-width="3" transform="rotate(90,68,61)" pointer-events="all"/><path d="M 8 31 L 40.46 31.55" fill="none" stroke="rgb(0, 0, 0)" stroke-width="3" stroke-miterlimit="10" pointer-events="stroke"/><path d="M 47.21 31.66 L 38.13 36.01 L 40.46 31.55 L 38.28 27.01 Z" fill="rgb(0, 0, 0)" stroke="rgb(0, 0, 0)" stroke-width="3" stroke-miterlimit="10" pointer-events="all"/><path d="M 8 91 L 40.94 91.37" fill="none" stroke="rgb(0, 0, 0)" stroke-width="3" stroke-miterlimit="10" pointer-events="stroke"/><path d="M 47.69 91.44 L 38.64 95.84 L 40.94 91.37 L 38.74 86.84 Z" fill="rgb(0, 0, 0)" stroke="rgb(0, 0, 0)" stroke-width="3" stroke-miterlimit="10" pointer-events="all"/><path d="M 84.12 31.48 L 117.9 31.2" fill="none" stroke="rgb(0, 0, 0)" stroke-width="3" stroke-miterlimit="10" pointer-events="stroke"/><path d="M 124.65 31.14 L 115.68 35.71 L 117.9 31.2 L 115.61 26.71 Z" fill="rgb(0, 0, 0)" stroke="rgb(0, 0, 0)" stroke-width="3" stroke-miterlimit="10" pointer-events="all"/><path d="M 86.44 91.48 L 117.9 91.2" fill="none" stroke="rgb(0, 0, 0)" stroke-width="3" stroke-miterlimit="10" pointer-events="stroke"/><path d="M 124.65 91.14 L 115.69 95.72 L 117.9 91.2 L 115.61 86.72 Z" fill="rgb(0, 0, 0)" stroke="rgb(0, 0, 0)" stroke-width="3" stroke-miterlimit="10" pointer-events="all"/></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="138px" height="124px" viewBox="-0.5 -0.5 138 124">
+    <defs/>
+    <g>
+        <path d="M 8 60.89 L 36.65 60.97" fill="none" stroke="rgb(0, 0, 0)" stroke-width="3" stroke-miterlimit="10"
+              pointer-events="stroke"/>
+        <path d="M 43.4 60.99 L 34.38 65.46 L 36.65 60.97 L 34.41 56.46 Z" fill="rgb(0, 0, 0)" stroke="rgb(0, 0, 0)"
+              stroke-width="3" stroke-miterlimit="10" pointer-events="all"/>
+        <path d="M 89.25 61 L 117.9 61" fill="none" stroke="rgb(0, 0, 0)" stroke-width="3" stroke-miterlimit="10"
+              pointer-events="stroke"/>
+        <path d="M 124.65 61 L 115.65 65.5 L 117.9 61 L 115.65 56.5 Z" fill="rgb(0, 0, 0)" stroke="rgb(0, 0, 0)"
+              stroke-width="3" stroke-miterlimit="10" pointer-events="all"/>
+        <ellipse cx="68" cy="61" rx="60.00000000000001" ry="20" fill="transparent" stroke="rgb(0, 0, 0)"
+                 stroke-width="3" transform="rotate(90,68,61)" pointer-events="all"/>
+        <path d="M 8 31 L 40.46 31.55" fill="none" stroke="rgb(0, 0, 0)" stroke-width="3" stroke-miterlimit="10"
+              pointer-events="stroke"/>
+        <path d="M 47.21 31.66 L 38.13 36.01 L 40.46 31.55 L 38.28 27.01 Z" fill="rgb(0, 0, 0)" stroke="rgb(0, 0, 0)"
+              stroke-width="3" stroke-miterlimit="10" pointer-events="all"/>
+        <path d="M 8 91 L 40.94 91.37" fill="none" stroke="rgb(0, 0, 0)" stroke-width="3" stroke-miterlimit="10"
+              pointer-events="stroke"/>
+        <path d="M 47.69 91.44 L 38.64 95.84 L 40.94 91.37 L 38.74 86.84 Z" fill="rgb(0, 0, 0)" stroke="rgb(0, 0, 0)"
+              stroke-width="3" stroke-miterlimit="10" pointer-events="all"/>
+        <path d="M 84.12 31.48 L 117.9 31.2" fill="none" stroke="rgb(0, 0, 0)" stroke-width="3" stroke-miterlimit="10"
+              pointer-events="stroke"/>
+        <path d="M 124.65 31.14 L 115.68 35.71 L 117.9 31.2 L 115.61 26.71 Z" fill="rgb(0, 0, 0)" stroke="rgb(0, 0, 0)"
+              stroke-width="3" stroke-miterlimit="10" pointer-events="all"/>
+        <path d="M 86.44 91.48 L 117.9 91.2" fill="none" stroke="rgb(0, 0, 0)" stroke-width="3" stroke-miterlimit="10"
+              pointer-events="stroke"/>
+        <path d="M 124.65 91.14 L 115.69 95.72 L 117.9 91.2 L 115.61 86.72 Z" fill="rgb(0, 0, 0)" stroke="rgb(0, 0, 0)"
+              stroke-width="3" stroke-miterlimit="10" pointer-events="all"/>
+    </g>
+</svg>

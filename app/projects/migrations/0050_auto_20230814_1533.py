@@ -7,28 +7,68 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('projects', '0049_auto_20230705_1807'),
+        ("projects", "0049_auto_20230705_1807"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='scenario',
-            name='simulation_year',
-            field=models.IntegerField(default=2025, validators=[django.core.validators.MinValueValidator(2024)]),
+            model_name="scenario",
+            name="simulation_year",
+            field=models.IntegerField(
+                default=2025,
+                validators=[django.core.validators.MinValueValidator(2024)],
+            ),
         ),
         migrations.AlterField(
-            model_name='asset',
-            name='source_choice',
-            field=models.CharField(choices=[('', 'Choose...'), ('Wind', 'Wind power plant'), ('Photovoltaic Free Field', 'Ground Mounted Photovoltaic'), ('Roof Mounted Photovoltaic', 'Roof Mounted Photovoltaic'), ('Import Grid', 'Import from the power grid'), ('Biomass supply', 'Biomass supply'), ('Solar thermal system', 'Solar thermal system'), ('Run-of-river power plant', 'Run-of-river power plant'), ('Other', 'Other')], max_length=40, null=True),
+            model_name="asset",
+            name="source_choice",
+            field=models.CharField(
+                choices=[
+                    ("", "Choose..."),
+                    ("Wind", "Wind power plant"),
+                    ("Photovoltaic Free Field", "Ground Mounted Photovoltaic"),
+                    ("Roof Mounted Photovoltaic", "Roof Mounted Photovoltaic"),
+                    ("Import Grid", "Import from the power grid"),
+                    ("Biomass supply", "Biomass supply"),
+                    ("Solar thermal system", "Solar thermal system"),
+                    ("Run-of-river power plant", "Run-of-river power plant"),
+                    ("Other", "Other"),
+                ],
+                max_length=40,
+                null=True,
+            ),
         ),
         migrations.AlterField(
-            model_name='assettype',
-            name='energy_vector',
-            field=models.CharField(choices=[('', 'Choose...'), ('Electricity', 'Electricity'), ('Heat', 'Heat'), ('Gas', 'Gas'), ('H2', 'H2'), ('Biomass', 'Biomass'), ('Other', 'Other')], max_length=20),
+            model_name="assettype",
+            name="energy_vector",
+            field=models.CharField(
+                choices=[
+                    ("", "Choose..."),
+                    ("Electricity", "Electricity"),
+                    ("Heat", "Heat"),
+                    ("Gas", "Gas"),
+                    ("H2", "H2"),
+                    ("Biomass", "Biomass"),
+                    ("Other", "Other"),
+                ],
+                max_length=20,
+            ),
         ),
         migrations.AlterField(
-            model_name='bus',
-            name='type',
-            field=models.CharField(choices=[('', 'Choose...'), ('Electricity', 'Electricity'), ('Heat', 'Heat'), ('Gas', 'Gas'), ('H2', 'H2'), ('Biomass', 'Biomass'), ('Other', 'Other')], default='Electricity', max_length=20),
+            model_name="bus",
+            name="type",
+            field=models.CharField(
+                choices=[
+                    ("", "Choose..."),
+                    ("Electricity", "Electricity"),
+                    ("Heat", "Heat"),
+                    ("Gas", "Gas"),
+                    ("H2", "H2"),
+                    ("Biomass", "Biomass"),
+                    ("Other", "Other"),
+                ],
+                default="Electricity",
+                max_length=20,
+            ),
         ),
     ]

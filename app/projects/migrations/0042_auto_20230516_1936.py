@@ -6,30 +6,38 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('projects', '0041_project_economic_data'),
+        ("projects", "0041_project_economic_data"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='economicdata',
-            name='discount',
+            model_name="economicdata",
+            name="discount",
         ),
         migrations.RemoveField(
-            model_name='economicdata',
-            name='duration',
+            model_name="economicdata",
+            name="duration",
         ),
         migrations.RemoveField(
-            model_name='economicdata',
-            name='tax',
+            model_name="economicdata",
+            name="tax",
         ),
         migrations.AddField(
-            model_name='project',
-            name='unit_choice',
-            field=models.CharField(choices=[('', 'Choose...'), ('kW/kWh', 'kW/kWh'), ('MW/MWh', 'MW/MWh')], max_length=40, null=True),
+            model_name="project",
+            name="unit_choice",
+            field=models.CharField(
+                choices=[("", "Choose..."), ("kW/kWh", "kW/kWh"), ("MW/MWh", "MW/MWh")],
+                max_length=40,
+                null=True,
+            ),
         ),
         migrations.AddField(
-            model_name='project',
-            name='unit_choice_co2',
-            field=models.CharField(choices=[('', 'Choose...'), ('kg CO2', 'kg CO2'), ('t CO2', 't CO2')], max_length=40, null=True),
+            model_name="project",
+            name="unit_choice_co2",
+            field=models.CharField(
+                choices=[("", "Choose..."), ("kg CO2", "kg CO2"), ("t CO2", "t CO2")],
+                max_length=40,
+                null=True,
+            ),
         ),
     ]

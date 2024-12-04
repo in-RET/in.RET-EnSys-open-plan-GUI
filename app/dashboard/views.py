@@ -26,6 +26,8 @@ from projects.services import (
 from .reportdash import createDashboard
 
 logger = logging.getLogger(__name__)
+
+
 @login_required
 @require_http_methods(["POST"])
 def result_change_project(request):
@@ -92,6 +94,7 @@ def project_compare_results(request, proj_id):
             "table_styles": TABLES,
         },
     )
+
 
 @login_required
 @json_view

@@ -7,13 +7,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('projects', '0045_auto_20230606_1603'),
+        ("projects", "0045_auto_20230606_1603"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='asset',
-            name='annual_energy_consumption',
-            field=models.FloatField(null=True, validators=[django.core.validators.MinValueValidator(0.0)]),
+            model_name="asset",
+            name="annual_energy_consumption",
+            field=models.FloatField(
+                null=True, validators=[django.core.validators.MinValueValidator(0.0)]
+            ),
         ),
     ]

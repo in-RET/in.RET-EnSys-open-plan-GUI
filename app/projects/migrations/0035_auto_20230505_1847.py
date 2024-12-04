@@ -7,18 +7,34 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('projects', '0034_auto_20230504_2008'),
+        ("projects", "0034_auto_20230504_2008"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='inputparametersuggestion',
-            name='thermal_loss_rate',
-            field=models.FloatField(blank=True, null=True, validators=[django.core.validators.MinValueValidator(0.0)]),
+            model_name="inputparametersuggestion",
+            name="thermal_loss_rate",
+            field=models.FloatField(
+                blank=True,
+                null=True,
+                validators=[django.core.validators.MinValueValidator(0.0)],
+            ),
         ),
         migrations.AlterField(
-            model_name='asset',
-            name='storage_choice',
-            field=models.CharField(choices=[('', 'Choose...'), ('Sodium storage', 'Sodium storage'), ('Lithium Ion Battery Storage', 'Lithium Ion Battery Storage'), ('Pumped storage power plant', 'Pumped storage power plant'), ('Heat storage', 'Heat storage (seasonal)'), ('Gas storage', 'Gas storage'), ('Hydrogen storage', 'Hydrogen storage')], max_length=40, null=True),
+            model_name="asset",
+            name="storage_choice",
+            field=models.CharField(
+                choices=[
+                    ("", "Choose..."),
+                    ("Sodium storage", "Sodium storage"),
+                    ("Lithium Ion Battery Storage", "Lithium Ion Battery Storage"),
+                    ("Pumped storage power plant", "Pumped storage power plant"),
+                    ("Heat storage", "Heat storage (seasonal)"),
+                    ("Gas storage", "Gas storage"),
+                    ("Hydrogen storage", "Hydrogen storage"),
+                ],
+                max_length=40,
+                null=True,
+            ),
         ),
     ]

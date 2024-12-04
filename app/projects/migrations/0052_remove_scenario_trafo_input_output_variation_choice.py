@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('projects', '0051_scenario_trafo_input_output_variation_choice'),
+        ("projects", "0051_scenario_trafo_input_output_variation_choice"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='scenario',
-            name='trafo_input_output_variation_choice',
+            model_name="scenario",
+            name="trafo_input_output_variation_choice",
         ),
     ]

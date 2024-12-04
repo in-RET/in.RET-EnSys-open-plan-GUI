@@ -1,3 +1,5 @@
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/8cc4f1ada4e4462e8d01605b6a365d08)](https://app.codacy.com/gh/in-RET/in.RET-EnSys-open-plan-GUI/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+
 # Welcome to the inretensys-open-plan gui repository
 This is a modified version of the open_plan user interface to map the components from oemof.solph directly to the user interface. 
 

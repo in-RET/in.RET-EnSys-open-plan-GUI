@@ -44,7 +44,7 @@ dpd_components==0.1.0
 email_validator==2.1.1
 et-xmlfile==1.1.0
 exchangelib==4.9.0
-fastapi==0.111.0
+fastapi>=0.111.0
 fastapi-cli==0.0.4
 feedinlib==0.0.12
 Flask==3.0.3

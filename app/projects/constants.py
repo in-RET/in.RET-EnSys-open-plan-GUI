@@ -296,7 +296,7 @@ SOURCE_CHOICE = (
     ("Biomass supply", "Biomass supply"),
     ("Solar thermal system", "Solar thermal system"),
     ("Run-of-river power plant", "Run-of-river power plant"),
-    ("Other", "Other")
+    ("Other", "Other"),
 )
 
 TRAFO_CHOICE = (
@@ -310,7 +310,7 @@ TRAFO_CHOICE = (
     ("Fuel cell", "Fuel cell"),
     ("Air source heat pump (large-scale)", "Air source heat pump (large-scale)"),
     ("Electrode heating boiler", "Electrode heating boiler"),
-    ("Other", "Other")
+    ("Other", "Other"),
 )
 
 STORAGE_CHOICE = (
@@ -322,7 +322,7 @@ STORAGE_CHOICE = (
     ("Heat storage (short term)", "Heat storage (short term)"),
     ("Gas storage", "Gas storage"),
     ("Hydrogen storage", "Hydrogen storage"),
-    ("Other", "Other")
+    ("Other", "Other"),
 )
 
 
@@ -341,7 +341,7 @@ TRAFO_I_O_VARIATION_CHOICE = (
     ("1:2", "1 input: 2 outputs"),
     ("2:3", "2 inputs: 3 outputs"),
     ("3:3", "3 inputs: 3 outputs"),
-    ("2:1", "2 inputs: 1 output")
+    ("2:1", "2 inputs: 1 output"),
 )
 
 # TIME_CHOICE = (
@@ -353,22 +353,18 @@ TRAFO_I_O_VARIATION_CHOICE = (
 #     ("Year", "Year")
 # )
 
-USER_MODE = (
-    ("", "Choose..."),
-    ("Default User", "Default User"),
-    ("Expert", "Expert")
-)
+USER_MODE = (("", "Choose..."), ("Default User", "Default User"), ("Expert", "Expert"))
 
 MW_KW_CHOICE = (
     ("", "Choose..."),
     # ("kW/kWh", "kW/kWh"),
-    ("MW/MWh", "MW/MWh")
+    ("MW/MWh", "MW/MWh"),
 )
 
 CO2_UNIT_CHOICE = (
     ("", "Choose..."),
     # ("kg CO2", "kg CO2"),
-    ("t CO2", "t CO2")
+    ("t CO2", "t CO2"),
 )
 
 COP_MODES = (("Heat pump", "heat_pump"), ("Chiller", "chiller"))

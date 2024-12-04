@@ -3,6 +3,7 @@ import logging
 
 import jsonschema
 import numpy as np
+
 from projects.models.base_models import AbstractSimulation, Scenario
 
 logger = logging.getLogger(__name__)

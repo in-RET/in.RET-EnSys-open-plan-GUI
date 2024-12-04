@@ -8,6 +8,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.forms.models import model_to_dict
 from django.utils.translation import gettext_lazy as _
+
 from projects.constants import (
     ASSET_CATEGORY,
     ASSET_TYPE,
@@ -31,7 +32,7 @@ from projects.constants import (
     USER_MODE,
     MW_KW_CHOICE,
     CO2_UNIT_CHOICE,
-    TRAFO_I_O_VARIATION_CHOICE
+    TRAFO_I_O_VARIATION_CHOICE,
 )
 from users.models import CustomUser
 
@@ -226,22 +227,24 @@ class Scenario(models.Model):
     )
     evaluated_period = models.IntegerField(validators=[MinValueValidator(0)])
     project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
-    
+
     # timeframe_choice = models.CharField(
     #     null=True, blank=False, choices=TIME_CHOICE, max_length=40
     # )
 
-    # BUG: Reset of choosen Values via Default Value after editing 
+    # BUG: Reset of choosen Values via Default Value after editing
     user_mode_choice = models.CharField(
         null=True, blank=False, choices=USER_MODE, max_length=40, default="Default User"
     )
-    
+
     interest_rate = models.FloatField(
         null=True, blank=False, validators=[MinValueValidator(0.0)]
     )
 
-    # BUG: Reset of choosen Values via Default Value after editing 
-    simulation_year = models.IntegerField(validators=[MinValueValidator(2024)], default=2025)
+    # BUG: Reset of choosen Values via Default Value after editing
+    simulation_year = models.IntegerField(
+        validators=[MinValueValidator(2024)], default=2025
+    )
 
     def __str__(self):
         return self.name
@@ -625,7 +628,7 @@ class Asset(TopologyNode):
     )
     # trafo input bus
     trafo_input_bus_1 = models.CharField(
-        default="Choose", max_length=128 # at least one input
+        default="Choose", max_length=128  # at least one input
     )
     trafo_input_bus_2 = models.CharField(
         default="Choose", max_length=128, null=True, blank=True
@@ -643,17 +646,17 @@ class Asset(TopologyNode):
     trafo_input_conversionf_3 = models.FloatField(
         null=True, blank=True, validators=[MinValueValidator(0.0)]
     )
-    
+
     # trafo output bus
     trafo_output_bus_1 = models.CharField(
-        default="Choose", max_length=128 # at least one output
+        default="Choose", max_length=128  # at least one output
     )
     trafo_output_bus_2 = models.CharField(
         default="Choose", max_length=128, null=True, blank=True
     )
     trafo_output_bus_3 = models.CharField(
         default="Choose", max_length=128, null=True, blank=True
-    )    
+    )
     # trafo output conversion factor
     trafo_output_conversionf_1 = models.FloatField(
         null=True, blank=True, validators=[MinValueValidator(0.0)]
@@ -674,8 +677,6 @@ class Asset(TopologyNode):
     trafo_variableCosts_bus_choice = models.CharField(
         default="Choose", max_length=128, null=True, blank=True
     )
-
-    
 
     @property
     def fields(self):

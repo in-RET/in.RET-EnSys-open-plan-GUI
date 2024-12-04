@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/3.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
+
 import ast
 import os
 
@@ -46,7 +47,7 @@ CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:9004",
     "http://surak.hs-nordhausen.de:9004",
     "https://ensys.hs-nordhausen.de",
-    "http://iae.hs-nordhausen.de"
+    "http://iae.hs-nordhausen.de",
 ]
 
 # Application definition
@@ -181,7 +182,7 @@ BOOTSTRAP_DATEPICKER_PLUS = {
         "date": {
             "format": "DD-MM",
         },
-    }
+    },
 }
 
 # Other configs
@@ -213,7 +214,9 @@ MESSAGE_TAGS = {
 USE_PROXY = ast.literal_eval(os.getenv("USE_PROXY", "True"))
 PROXY_ADDRESS_LINK = os.getenv("PROXY_ADDRESS", "http://proxy:port")
 PROXY_CONFIG = (
-    ({"http://": PROXY_ADDRESS_LINK, "https://": PROXY_ADDRESS_LINK}) if USE_PROXY else ({})
+    ({"http://": PROXY_ADDRESS_LINK, "https://": PROXY_ADDRESS_LINK})
+    if USE_PROXY
+    else ({})
 )
 
 INRETENSYS_API_HOST = "http://api:8001"

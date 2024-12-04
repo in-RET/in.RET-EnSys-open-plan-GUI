@@ -29,12 +29,12 @@
   &__description {
     padding-top: 1.5rem;
     @include flex-row;
-    
+
     @media only screen and (min-width: $medium-screen) {
       flex: 1 1 0;
     }
 
-    &> div {
+    & > div {
       width: 100%;
       max-width: calc(#{$section-max-width} / 2);
     }
@@ -43,7 +43,7 @@
   &__form {
     justify-content: flex-end;
 
-    &> div {
+    & > div {
       padding-left: 1rem;
       padding-right: $space-between-project-elements;
     }
@@ -74,7 +74,7 @@
     justify-content: flex-start;
     background-color: $primary-gray-color-1;
 
-    &> div {
+    & > div {
       padding-right: 1rem;
       padding-left: $space-between-project-elements;
     }

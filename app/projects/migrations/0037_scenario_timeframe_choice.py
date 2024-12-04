@@ -6,13 +6,24 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('projects', '0036_remove_scenario_capex_fix'),
+        ("projects", "0036_remove_scenario_capex_fix"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='scenario',
-            name='timeframe_choice',
-            field=models.CharField(choices=[('', 'Choose...'), ('Hour(s)', 'Hour(s)'), ('Day(s)', 'Day(s)'), ('Week(s)', 'Week(s)'), ('Month(s)', 'Month(s)'), ('Year', 'Year')], max_length=40, null=True),
+            model_name="scenario",
+            name="timeframe_choice",
+            field=models.CharField(
+                choices=[
+                    ("", "Choose..."),
+                    ("Hour(s)", "Hour(s)"),
+                    ("Day(s)", "Day(s)"),
+                    ("Week(s)", "Week(s)"),
+                    ("Month(s)", "Month(s)"),
+                    ("Year", "Year"),
+                ],
+                max_length=40,
+                null=True,
+            ),
         ),
     ]

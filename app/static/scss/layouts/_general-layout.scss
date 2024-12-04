@@ -17,7 +17,7 @@
   padding-bottom: 4rem;
   @include flex-row-justify-center;
 
-  &> div {
+  & > div {
     max-width: $section-max-width-small;
     padding-top: 10rem;
 
@@ -74,7 +74,7 @@
   .account {
     @include flex-row-justify-center;
 
-    &> div {
+    & > div {
       max-width: 28rem;
       width: 100%;
     }

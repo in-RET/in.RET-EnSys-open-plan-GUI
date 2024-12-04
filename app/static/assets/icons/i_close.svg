@@ -22,26 +22,35 @@
         overflow="visible"
         version="1.1"
         id="svg12"><defs
-     id="defs16" /><metadata
-     id="metadata2"><ns:variableSets><ns:variableSet
+     id="defs16" />
+    <metadata
+            id="metadata2"><ns:variableSets><ns:variableSet
          varSetName="binding1"
-         locked="none"><ns:variables /><ns:sampleDataSets /></ns:variableSet></ns:variableSets><ns0:sfw><ns0:slices /><ns0:sliceSourceBounds
-         y="0"
-         x="3"
-         width="10.5"
-         height="16"
-         bottomLeftOrigin="true" /></ns0:sfw><?xpacket begin='&#65279;' id='W5M0MpCehiHzreSzNTczkc9d'?><x:xmpmeta
-       x:xmptk="XMP toolkit 3.0-29, framework 1.6" /><?xpacket end='w'?><rdf:RDF><cc:Work
+         locked="none"><ns:variables /><ns:sampleDataSets/></ns:variableSet></ns:variableSets>
+        <ns0:sfw><ns0:slices />
+            <ns0:sliceSourceBounds
+                    y="0"
+                    x="3"
+                    width="10.5"
+                    height="16"
+                    bottomLeftOrigin="true"/></ns0:sfw>
+        <?xpacket begin='&#65279;' id='W5M0MpCehiHzreSzNTczkc9d'?>
+        <x:xmpmeta
+                x:xmptk="XMP toolkit 3.0-29, framework 1.6"/>
+        <?xpacket end='w'?>
+        <rdf:RDF><cc:Work
          rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><g
-     id="g10"><g
+                rdf:resource="http://purl.org/dc/dcmitype/StillImage"/><dc:title></dc:title></cc:Work></rdf:RDF></metadata>
+    <g
+            id="g10"><g
        i:extraneous="self"
        id="g8"><g
          i:layer="yes"
          i:dimmedPercent="50"
          i:rgbTrio="#4F008000FFFF"
-         id="g6" /></g></g><path
-     id="path819"
-     transform="matrix(0.16,0,0,0.16,-2.75,0)"
-     d="M 16.662109 2.6484375 L 2.515625 16.785156 L 35.810547 50.080078 L 2.515625 83.375 L 16.662109 97.509766 L 49.949219 64.21875 L 83.240234 97.509766 L 97.375 83.375 L 64.085938 50.080078 L 97.375 16.785156 L 83.240234 2.6484375 L 49.949219 35.941406 L 16.662109 2.6484375 z "
-     style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:medium;line-height:normal;font-family:sans-serif;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-feature-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;vector-effect:none;fill:#1f567d;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:20;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate" /></svg>
+         id="g6" /></g></g>
+    <path
+            id="path819"
+            transform="matrix(0.16,0,0,0.16,-2.75,0)"
+            d="M 16.662109 2.6484375 L 2.515625 16.785156 L 35.810547 50.080078 L 2.515625 83.375 L 16.662109 97.509766 L 49.949219 64.21875 L 83.240234 97.509766 L 97.375 83.375 L 64.085938 50.080078 L 97.375 16.785156 L 83.240234 2.6484375 L 49.949219 35.941406 L 16.662109 2.6484375 z "
+            style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:medium;line-height:normal;font-family:sans-serif;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-feature-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;vector-effect:none;fill:#1f567d;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:20;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"/></svg>

@@ -7,18 +7,22 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('projects', '0059_auto_20230814_1627'),
+        ("projects", "0059_auto_20230814_1627"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='asset',
-            name='trafo_input_conversionf_1',
-            field=models.FloatField(null=True, validators=[django.core.validators.MinValueValidator(0.0)]),
+            model_name="asset",
+            name="trafo_input_conversionf_1",
+            field=models.FloatField(
+                null=True, validators=[django.core.validators.MinValueValidator(0.0)]
+            ),
         ),
         migrations.AlterField(
-            model_name='asset',
-            name='trafo_output_conversionf_1',
-            field=models.FloatField(null=True, validators=[django.core.validators.MinValueValidator(0.0)]),
+            model_name="asset",
+            name="trafo_output_conversionf_1",
+            field=models.FloatField(
+                null=True, validators=[django.core.validators.MinValueValidator(0.0)]
+            ),
         ),
     ]

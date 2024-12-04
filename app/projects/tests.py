@@ -4,6 +4,7 @@ import pytest
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
+
 from projects.models import Project, Scenario, Asset
 from projects.scenario_topology_helpers import (
     load_scenario_from_dict,

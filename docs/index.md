@@ -1,12 +1,11 @@
-!!! warning
-    This is a prototype. Under Construction!
+!!! info
+    If you find some bugs don't hesitate to mail at <a href="mailto:ensys@hs-nordhausen.de">Hochschule Nordhausen</a>
 
 <figure markdown>
   ![Image title](assets/Ensys_Logo.svg){ width="650" }
 </figure>
 
 The graphical user interface for oemof.solph.
-
 
 ## Developed and maintained by 
 

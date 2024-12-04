@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('projects', '0035_auto_20230505_1847'),
+        ("projects", "0035_auto_20230505_1847"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='scenario',
-            name='capex_fix',
+            model_name="scenario",
+            name="capex_fix",
         ),
     ]

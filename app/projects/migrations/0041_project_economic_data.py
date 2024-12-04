@@ -7,13 +7,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('projects', '0040_remove_project_economic_data'),
+        ("projects", "0040_remove_project_economic_data"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='project',
-            name='economic_data',
-            field=models.OneToOneField(null=True, on_delete=django.db.models.deletion.SET_NULL, to='projects.economicdata'),
+            model_name="project",
+            name="economic_data",
+            field=models.OneToOneField(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="projects.economicdata",
+            ),
         ),
     ]

@@ -17,7 +17,7 @@ This path is used by websites which provide a graphical user interface, like the
 The python function reads all provided datafiles in and runs the simulations depending on the flag 'docker' which is a radio box on the given gui. (See the picture above.)
 Listed below is the a code example for the graphical user interface above.
 
-```html
+```html linenums="1"
 <div class="row">
   <div>
     <h1>Upload verschiedener Dateiformate</h1>

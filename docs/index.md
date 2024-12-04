@@ -7,7 +7,6 @@
 
 The graphical user interface for oemof.solph.
 
-
 ## Developed and maintained by 
 
 ### Contact

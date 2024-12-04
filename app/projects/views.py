@@ -62,6 +62,8 @@ from .services import (
     send_feedback_email,
 )
 
+from .models.usecases import UseCase
+
 logger = logging.getLogger(__name__)
 
 

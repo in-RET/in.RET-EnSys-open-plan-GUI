@@ -35,25 +35,23 @@ extra_javascript:
     - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
 nav:
     - 'Home': index.md
-    - 'Possibilities': 'possibilities.md'
     - 'Overview': project_overview.md
     - 'Introduction':
         - 'Installation': getting_started/installation.md
         - 'First Steps': getting_started/first_steps.md
-        - 'FAQ': getting_started/faq.md
-    - 'About': 
+    - 'About':
         - 'in.RET': about/inret.md
         - 'EnSys': about/ensys.md
         - 'Frontend': about/frontend.md
-        - 'Backend': about/backend.md
-
     - 'API':
         - 'Overview': api/index.md
         - 'Usage with Python': api/python.md
         - 'Functions': api/functions.md
         - 'Release Notes': api/release-notes.md
-    - 'About': about.md
+    - 'FAQ': faq.md
     - 'Release Notes': release-notes.md
+    - 'Developer Doc Help': possibilities.md
+
 theme:
     name: material
     favicon: assets/favicon.svg
@@ -85,6 +83,7 @@ theme:
     language: en
     features:
         - content.tabs.link
+        - content.code.copy
 
 extra:
     social:

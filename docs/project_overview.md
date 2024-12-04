@@ -35,6 +35,6 @@ Contains the virtual environment for python.
 Version 3.11.
 
 ### data
-Storage folder which is automatically created for storage of simulations data.
+Folder that is automatically created to store simulation data.
 
-This folder is also used in Debugging for the database and pgadmin files.
+This folder is also used in Debugging for database and pgadmin files.

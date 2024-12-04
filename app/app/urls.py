@@ -22,24 +22,20 @@ from django.urls import include, path, re_path
 from .settings import STATIC_ROOT, STATIC_URL, DEBUG
 from .views import about, imprint, license, privacy, faq
 
-urlpatterns = (
-    i18n_patterns(
-        path("admin/", admin.site.urls),
-        path("users/", include("users.urls")),
-        path("users/", include("django.contrib.auth.urls")),
-        path("", include("projects.urls")),
-        path("dashboard/", include("dashboard.urls")),
-        path("imprint/", imprint, name="imprint"),
-        path("privacy/", privacy, name="privacy"),
-        path("about/", about, name="about"),
-        path("license/", license, name="license"),
-        path("faq", faq, name="faq"),
-        # path('plotly_dash/', include('dashplots.urls')),
-        path("django_plotly_dash/", include("django_plotly_dash.urls")),
-    )
-    + [re_path(r"^i18n/", include("django.conf.urls.i18n"))]
-)
+urlpatterns = i18n_patterns(
+    path("admin/", admin.site.urls),
+    path("users/", include("users.urls")),
+    path("users/", include("django.contrib.auth.urls")),
+    path("", include("projects.urls")),
+    path("dashboard/", include("dashboard.urls")),
+    path("imprint/", imprint, name="imprint"),
+    path("privacy/", privacy, name="privacy"),
+    path("about/", about, name="about"),
+    path("license/", license, name="license"),
+    path("faq", faq, name="faq"),
+    # path('plotly_dash/', include('dashplots.urls')),
+    path("django_plotly_dash/", include("django_plotly_dash.urls")),
+) + [re_path(r"^i18n/", include("django.conf.urls.i18n"))]
 
 if DEBUG:
-        urlpatterns += static(STATIC_URL, document_root=STATIC_ROOT)
-
+    urlpatterns += static(STATIC_URL, document_root=STATIC_ROOT)

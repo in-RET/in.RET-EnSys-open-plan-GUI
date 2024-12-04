@@ -8,15 +8,19 @@ var guiModalDOM = document.getElementById("guiModal");
 var guiModal = new bootstrap.Modal(guiModalDOM);
 
 var copCollapseDOM = document.getElementById('form-computeCOP');
-if(copCollapseDOM){
+if (copCollapseDOM) {
     var copCollapse = new bootstrap.Collapse(copCollapseDOM);
     // refresh the field of the projects/forms.py::COPCalculatorForm to plot the data if any
     copCollapseDOM.addEventListener('shown.bs.collapse', function () {
-    tHighDOM = guiModalDOM.querySelector('input[name="temperature_high_scalar"]');
-    if(tHighDOM){tHighDOM.dispatchEvent(new Event('change'));}
-    tLowDOM = guiModalDOM.querySelector('input[name="temperature_low_scalar"]');
-    if(tLowDOM){tLowDOM.dispatchEvent(new Event('change'));}
-})
+        tHighDOM = guiModalDOM.querySelector('input[name="temperature_high_scalar"]');
+        if (tHighDOM) {
+            tHighDOM.dispatchEvent(new Event('change'));
+        }
+        tLowDOM = guiModalDOM.querySelector('input[name="temperature_low_scalar"]');
+        if (tLowDOM) {
+            tLowDOM.dispatchEvent(new Event('change'));
+        }
+    })
 }
 
 // Initialize Drawflow
@@ -37,6 +41,7 @@ for (let i = 0; i < elements.length; i++) {
     elements[i].addEventListener('touchend', drop, false);
     elements[i].addEventListener('touchstart', drag, false);
 }
+
 function allowDrop(ev) {
     ev.preventDefault();
 }
@@ -50,7 +55,7 @@ function drop(ev) {
     ev.preventDefault();
     // corresponds to data-node defined in templates/scenario/topology_drag_items.html
     const nodeName = ev.dataTransfer.getData("node");
-	//alert('Drop event');
+    //alert('Drop event');
     addNodeToDrawFlow(nodeName, ev.clientX, ev.clientY);
 }
 
@@ -89,7 +94,7 @@ editor.on('nodeCreated', function (nodeID) {
 
 editor.on('nodeRemoved', function (nodeID) {
     // remove nodeID from nodesToDB
-    nodesToDB.delete('node-'+nodeID);
+    nodesToDB.delete('node-' + nodeID);
 })
 
 
@@ -98,73 +103,80 @@ async function addNodeToDrawFlow(name, pos_x, pos_y, nodeInputs = 1, nodeOutputs
         return false;
     pos_x = pos_x * (editor.precanvas.clientWidth / (editor.precanvas.clientWidth * editor.zoom)) - (editor.precanvas.getBoundingClientRect().x * (editor.precanvas.clientWidth / (editor.precanvas.clientWidth * editor.zoom)));
     pos_y = pos_y * (editor.precanvas.clientHeight / (editor.precanvas.clientHeight * editor.zoom)) - (editor.precanvas.getBoundingClientRect().y * (editor.precanvas.clientHeight / (editor.precanvas.clientHeight * editor.zoom)));
-	//alert('inside addNodeToDrawFlow()');
-	if (name=="myPredefinedSource" || name=="mySource"){
-		nodeInputs=0;
-		return createNodeObject(name, nodeInputs, nodeOutputs, nodeData, pos_x, pos_y);
-	}
-	else if (name=="myPredefinedSink" || name=="myPredefinedSinkOEP" || name=="mySink" || name=="myExport" || name=="myExcess"){
-		nodeOutputs=0;
-		return createNodeObject(name, nodeInputs, nodeOutputs, nodeData, pos_x, pos_y);
-	}
-	else{
-		return createNodeObject(name, nodeInputs, nodeOutputs, nodeData, pos_x, pos_y);		
-	}
-    
+    //alert('inside addNodeToDrawFlow()');
+    if (name == "myPredefinedSource" || name == "mySource") {
+        nodeInputs = 0;
+        return createNodeObject(name, nodeInputs, nodeOutputs, nodeData, pos_x, pos_y);
+    } else if (name == "myPredefinedSink" || name == "myPredefinedSinkOEP" || name == "mySink" || name == "myExport" || name == "myExcess") {
+        nodeOutputs = 0;
+        return createNodeObject(name, nodeInputs, nodeOutputs, nodeData, pos_x, pos_y);
+    } else {
+        return createNodeObject(name, nodeInputs, nodeOutputs, nodeData, pos_x, pos_y);
+    }
+
 }
 
-function updateInputTimeseries(nodeType){
+function updateInputTimeseries(nodeType) {
     //connected to the templates/asset/asset_create_form.html content
-	if(nodeType == "myPredefinedSink" || nodeType == "myPredefinedSinkOEP"){
-		ts_data_div = document.getElementById("choice_load_profile_data");
-		if(ts_data_div){
-			var ts_data = JSON.parse(ts_data_div.querySelector("textarea").value);
-			var ts_data = ts_data.map(String);
-			var ts_idx = [...Array(ts_data.length).keys()];
-			ts_idx = ts_idx.map(String);
-			makePlotly( ts_idx, ts_data, plot_id="load_profile_trace")
-		}
-	}
-	else{
-		ts_data_div = document.getElementById("input_timeseries_data");
-		if(ts_data_div){
-			var ts_data = JSON.parse(ts_data_div.querySelector("textarea").value);
-			var ts_data = ts_data.map(String);
-			var ts_idx = [...Array(ts_data.length).keys()];
-			ts_idx = ts_idx.map(String);
-			makePlotly( ts_idx, ts_data, plot_id="timeseries_trace")
-		}
-	}
+    if (nodeType == "myPredefinedSink" || nodeType == "myPredefinedSinkOEP") {
+        ts_data_div = document.getElementById("choice_load_profile_data");
+        if (ts_data_div) {
+            var ts_data = JSON.parse(ts_data_div.querySelector("textarea").value);
+            var ts_data = ts_data.map(String);
+            var ts_idx = [...Array(ts_data.length).keys()];
+            ts_idx = ts_idx.map(String);
+            makePlotly(ts_idx, ts_data, plot_id = "load_profile_trace")
+        }
+    } else {
+        ts_data_div = document.getElementById("input_timeseries_data");
+        if (ts_data_div) {
+            var ts_data = JSON.parse(ts_data_div.querySelector("textarea").value);
+            var ts_data = ts_data.map(String);
+            var ts_idx = [...Array(ts_data.length).keys()];
+            ts_idx = ts_idx.map(String);
+            makePlotly(ts_idx, ts_data, plot_id = "timeseries_trace")
+        }
+    }
 }
 
 // find out the name of the other nodes the given node is connected to
-function getInputOutputMapping(nodeId, nodeType){
-	if (nodeType=="myPredefinedSource" || nodeType=="mySource"){
-		var input_output_mapping = {"outputs": {}};
-		//editor.getNodeFromId(nodeId).inputs.input_1.connections.map(c => {const nodeIn = editor.getNodeFromId(parseInt(c.node)); input_output_mapping["inputs"][nodeIn.data.bustype] = nodeIn.data.name;});
-		editor.getNodeFromId(nodeId).outputs.output_1.connections.map(c => {const nodeOut = editor.getNodeFromId(parseInt(c.node)); input_output_mapping["outputs"][nodeOut.data.bustype] = nodeOut.data.name;});
-		//input_output_mapping["inputs"] = JSON.stringify(input_output_mapping["inputs"]);
-		input_output_mapping["outputs"] = JSON.stringify(input_output_mapping["outputs"]);		
-	}
-	else if (nodeType=="myPredefinedSink" || nodeType=="myPredefinedSinkOEP" || nodeType=="mySink" || nodeType=="myExport" || nodeType=="myExcess"){
-		var input_output_mapping = {"inputs": {}};
-		editor.getNodeFromId(nodeId).inputs.input_1.connections.map(c => {const nodeIn = editor.getNodeFromId(parseInt(c.node)); input_output_mapping["inputs"][nodeIn.data.bustype] = nodeIn.data.name;});
-		//editor.getNodeFromId(nodeId).outputs.output_1.connections.map(c => {const nodeOut = editor.getNodeFromId(parseInt(c.node)); input_output_mapping["outputs"][nodeOut.data.bustype] = nodeOut.data.name;});
-		input_output_mapping["inputs"] = JSON.stringify(input_output_mapping["inputs"]);
-		//input_output_mapping["outputs"] = JSON.stringify(input_output_mapping["outputs"]);		
-	}
-	else{
-		var input_output_mapping = {"inputs": {}, "outputs": {}};
-		editor.getNodeFromId(nodeId).inputs.input_1.connections.map(c => {const nodeIn = editor.getNodeFromId(parseInt(c.node)); input_output_mapping["inputs"][nodeIn.data.bustype] = nodeIn.data.name;});
-		editor.getNodeFromId(nodeId).outputs.output_1.connections.map(c => {const nodeOut = editor.getNodeFromId(parseInt(c.node)); input_output_mapping["outputs"][nodeOut.data.bustype] = nodeOut.data.name;});
-		input_output_mapping["inputs"] = JSON.stringify(input_output_mapping["inputs"]);
-		input_output_mapping["outputs"] = JSON.stringify(input_output_mapping["outputs"]);		
-	}
+function getInputOutputMapping(nodeId, nodeType) {
+    if (nodeType == "myPredefinedSource" || nodeType == "mySource") {
+        var input_output_mapping = {"outputs": {}};
+        //editor.getNodeFromId(nodeId).inputs.input_1.connections.map(c => {const nodeIn = editor.getNodeFromId(parseInt(c.node)); input_output_mapping["inputs"][nodeIn.data.bustype] = nodeIn.data.name;});
+        editor.getNodeFromId(nodeId).outputs.output_1.connections.map(c => {
+            const nodeOut = editor.getNodeFromId(parseInt(c.node));
+            input_output_mapping["outputs"][nodeOut.data.bustype] = nodeOut.data.name;
+        });
+        //input_output_mapping["inputs"] = JSON.stringify(input_output_mapping["inputs"]);
+        input_output_mapping["outputs"] = JSON.stringify(input_output_mapping["outputs"]);
+    } else if (nodeType == "myPredefinedSink" || nodeType == "myPredefinedSinkOEP" || nodeType == "mySink" || nodeType == "myExport" || nodeType == "myExcess") {
+        var input_output_mapping = {"inputs": {}};
+        editor.getNodeFromId(nodeId).inputs.input_1.connections.map(c => {
+            const nodeIn = editor.getNodeFromId(parseInt(c.node));
+            input_output_mapping["inputs"][nodeIn.data.bustype] = nodeIn.data.name;
+        });
+        //editor.getNodeFromId(nodeId).outputs.output_1.connections.map(c => {const nodeOut = editor.getNodeFromId(parseInt(c.node)); input_output_mapping["outputs"][nodeOut.data.bustype] = nodeOut.data.name;});
+        input_output_mapping["inputs"] = JSON.stringify(input_output_mapping["inputs"]);
+        //input_output_mapping["outputs"] = JSON.stringify(input_output_mapping["outputs"]);
+    } else {
+        var input_output_mapping = {"inputs": {}, "outputs": {}};
+        editor.getNodeFromId(nodeId).inputs.input_1.connections.map(c => {
+            const nodeIn = editor.getNodeFromId(parseInt(c.node));
+            input_output_mapping["inputs"][nodeIn.data.bustype] = nodeIn.data.name;
+        });
+        editor.getNodeFromId(nodeId).outputs.output_1.connections.map(c => {
+            const nodeOut = editor.getNodeFromId(parseInt(c.node));
+            input_output_mapping["outputs"][nodeOut.data.bustype] = nodeOut.data.name;
+        });
+        input_output_mapping["inputs"] = JSON.stringify(input_output_mapping["inputs"]);
+        input_output_mapping["outputs"] = JSON.stringify(input_output_mapping["outputs"]);
+    }
     return input_output_mapping;
 }
 
 // COP calculation from temperature
-function toggle_cop_modal(event){
+function toggle_cop_modal(event) {
 
     // get the parameters which uniquely identify the asset
     const assetTypeName = guiModalDOM.getAttribute("data-node-type");
@@ -177,15 +189,15 @@ function toggle_cop_modal(event){
         type: "GET",
         url: getUrl,
         success: function (formContent) {
-                // assign the content of the form to the form tag of the modal
-                guiModalDOM.querySelector('form .modal-addendum').innerHTML = formContent;
-                //make this invisible then
+            // assign the content of the form to the form tag of the modal
+            guiModalDOM.querySelector('form .modal-addendum').innerHTML = formContent;
+            //make this invisible then
         },
     })
 }
 
 // function to compute the COP of a heat pump linked with the button of id="btn-computeCOP" in templates/scenario//scenario_step2.html
-function computeCOP(event){
+function computeCOP(event) {
     // get the parameters which uniquely identify the asset
     const assetTypeName = guiModalDOM.getAttribute("data-node-type");
     const topologyNodeId = guiModalDOM.getAttribute("data-node-topo-id"); // e.g. 'node-2'
@@ -196,11 +208,11 @@ function computeCOP(event){
 
     // copPostUrl is defined in scenario_step2.html
     const postUrl = copPostUrl + assetTypeName
-            + (nodesToDB.has(topologyNodeId) ? "/" + nodesToDB.get(topologyNodeId).uid : "");
+        + (nodesToDB.has(topologyNodeId) ? "/" + nodesToDB.get(topologyNodeId).uid : "");
 
     // send the form of the asset to be saved in database (projects/views.py::asset_cops_create_or_update)
     $.ajax({
-        headers: {'X-CSRFToken': csrfToken },
+        headers: {'X-CSRFToken': csrfToken},
         type: "POST",
         url: postUrl,
         data: formData,
@@ -208,35 +220,36 @@ function computeCOP(event){
         contentType: false,   // tells jQuery not to define contentType
         success: function (jsonRes) {
             if (jsonRes.success) {
-            console.log(jsonRes.cops);
-            console.log(jsonRes.cop_id);
+                console.log(jsonRes.cops);
+                console.log(jsonRes.cop_id);
                 // close the cop area
                 copCollapse.hide();
 
                 efficiencyDOM = guiModalDOM.querySelector('input[name="efficiency_scalar"]');
-                if(efficiencyDOM){
+                if (efficiencyDOM) {
                     efficiencyDOM.value = jsonRes.cops;
                     efficiencyDOM.dispatchEvent(new Event('change'));
                 }
                 copDOM = guiModalDOM.querySelector('input[name="copId"]');
-                if(copDOM){
+                if (copDOM) {
                     copDOM.value = jsonRes.cop_id
                 }
 
             } else {
-                    // assign the content of the form to the form tag of the modal
-                    guiModalDOM.querySelector('form .modal-addendum').innerHTML = jsonRes.form_html;
+                // assign the content of the form to the form tag of the modal
+                guiModalDOM.querySelector('form .modal-addendum').innerHTML = jsonRes.form_html;
             }
 
         },
         error: function (err) {
-                guiModalDOM.querySelector('form .modal-body').innerHTML = err.responseJSON.form_html;}, //err => {alert("Modal form JS Error: " + err);console.log(err);}
+            guiModalDOM.querySelector('form .modal-body').innerHTML = err.responseJSON.form_html;
+        }, //err => {alert("Modal form JS Error: " + err);console.log(err);}
     })
 }
 
 // one needs to add this function as event with eventListener (<some jquery div>.addEventListener("dblclick", dblClick))
 const dblClick = (e) => {
-	//alert('dblClick');
+    //alert('dblClick');
 
     const closestNode = e.target.closest('.drawflow-node');
     const nodeType = closestNode.querySelector('.box').getAttribute(ASSET_TYPE_NAME);
@@ -246,14 +259,14 @@ const dblClick = (e) => {
 
         const nodeId = parseInt(topologyNodeId.split("-").pop());
         const input_output_mapping = getInputOutputMapping(nodeId, nodeType);
-		
+
         // formGetUrl is defined in scenario_step2.html
         const getUrl = formGetUrl + nodeType +
             (nodesToDB.has(topologyNodeId) ? "/" + nodesToDB.get(topologyNodeId).uid : "");
-		//alert(getUrl);
+        //alert(getUrl);
 
         // get the form of the asset of the type "nodeType" (projects/views.py::get_asset_create_form)
-         $.ajax({
+        $.ajax({
             //headers: {'X-CSRFToken': csrfToken },
             type: "GET",
             url: getUrl,
@@ -271,13 +284,13 @@ const dblClick = (e) => {
                 updateInputTimeseries(nodeType);
 
                 guiModal.show();
-                if(copCollapseDOM){
+                if (copCollapseDOM) {
                     copCollapse.hide();
                 }
                 $('[data-bs-toggle="tooltip"]').tooltip()
             },
-         })
-		 //alert('Modal opens!');
+        })
+        //alert('Modal opens!');
     }
 };
 // endregion
@@ -288,7 +301,7 @@ const mirroring = (e) => {
         e.preventDefault();
 
         const closestNode = e.target.closest('.drawflow-node');
-        
+
         if (closestNode) {
             console.log(closestNode)
             if (closestNode.style.flexDirection == 'row-reverse') {
@@ -298,7 +311,7 @@ const mirroring = (e) => {
                 closestNode.children[2].children[0].classList.remove("mirrored");
             } else {
                 closestNode.style.flexDirection = 'row-reverse';
-             
+
                 closestNode.children[0].children[0].classList.add("mirrored");
                 closestNode.children[2].children[0].classList.add("mirrored");
             }
@@ -309,11 +322,11 @@ const mirroring = (e) => {
                 toast: true,
                 icon: "info"
             })
-            */   
-    
+            */
+
+        }
+
     }
-    
-}
 }
 
 /* onclick method associated to the save button of the modal */
@@ -344,11 +357,10 @@ const submitForm = (e) => {
         const nodeOutputs = Object.keys(editor.drawflow.drawflow.Home.data[drawflowNodeId].outputs).length
         formData.set('input_ports', nodeInputs);
         formData.set('output_ports', nodeOutputs);
-    }
-    else{
+    } else {
         const nodeId = parseInt(topologyNodeId.split("-").pop());
         const input_output_mapping = getInputOutputMapping(nodeId, assetTypeName);
-		//alert(input_output_mapping.inputs);
+        //alert(input_output_mapping.inputs);
         formData.set("inputs", input_output_mapping.inputs);
         formData.set("outputs", input_output_mapping.outputs);
     }
@@ -359,7 +371,7 @@ const submitForm = (e) => {
 
     // send the form of the asset to be saved in database (projects/views.py::asset_create_or_update)
     $.ajax({
-        headers: {'X-CSRFToken': csrfToken },
+        headers: {'X-CSRFToken': csrfToken},
         type: "POST",
         url: postUrl,
         data: formData,
@@ -369,10 +381,10 @@ const submitForm = (e) => {
             if (jsonRes.success) {
                 // add the node id to the nodesToDB mapping
                 if (nodesToDB.has(topologyNodeId) === false)
-                    nodesToDB.set(topologyNodeId, {uid:jsonRes.asset_id, assetTypeName: assetTypeName });
+                    nodesToDB.set(topologyNodeId, {uid: jsonRes.asset_id, assetTypeName: assetTypeName});
 
                 guiModal.hide();
-                if(copCollapseDOM){
+                if (copCollapseDOM) {
                     copCollapse.hide();
                 }
 
@@ -383,43 +395,46 @@ const submitForm = (e) => {
 
         },
         error: function (err) {
-            guiModalDOM.querySelector('form .modal-body').innerHTML = err.responseJSON.form_html;}, //err => {alert("Modal form JS Error: " + err);console.log(err);}
+            guiModalDOM.querySelector('form .modal-body').innerHTML = err.responseJSON.form_html;
+        }, //err => {alert("Modal form JS Error: " + err);console.log(err);}
     })
 }
 
 $("#guiModal").on('shown.bs.modal', function (event) {
-     var formDiv = document.getElementsByClassName("form-group");
-     var plotDiv = null;
+    var formDiv = document.getElementsByClassName("form-group");
+    var plotDiv = null;
 
-     var plotDivIds = ["flow_trace", "timeseries_trace", "soc_traces"];
+    var plotDivIds = ["flow_trace", "timeseries_trace", "soc_traces"];
 
-     for(i=0;i<plotDivIds.length;++i){
-         plotDiv = document.getElementById(plotDivIds[i]);
-         if (plotDiv){
+    for (i = 0; i < plotDivIds.length; ++i) {
+        plotDiv = document.getElementById(plotDivIds[i]);
+        if (plotDiv) {
             Plotly.relayout(plotDiv, {width: plotDiv.clientWidth});
-         }
-     }
-     const evt = new Event("change");
-	 // look only for the form with the provided class to be extra safe
-	 document.querySelectorAll("input[name$='_scalar']").forEach(node => { node.dispatchEvent(evt); });
+        }
+    }
+    const evt = new Event("change");
+    // look only for the form with the provided class to be extra safe
+    document.querySelectorAll("input[name$='_scalar']").forEach(node => {
+        node.dispatchEvent(evt);
+    });
 
- })
+})
 
 /* Triggered before the modal opens */
 $("#guiModal").on('show.bs.modal', function (event) {
-  var modal = $(event.target)
-  // rename the node on the fly (to avoid the need of refreshing the page)
-  const nodeName = guiModalDOM.querySelector('input[df-name]');
-  if(nodeName){
-    modal.find('.modal-title').text(nodeName.value.replaceAll("_", " "));
-  }
+    var modal = $(event.target)
+    // rename the node on the fly (to avoid the need of refreshing the page)
+    const nodeName = guiModalDOM.querySelector('input[df-name]');
+    if (nodeName) {
+        modal.find('.modal-title').text(nodeName.value.replaceAll("_", " "));
+    }
 })
 
 /* Triggered before the modal hides */
 $("#guiModal").on('hide.bs.modal', function (event) {
-  // reset the modal form to empty
-  guiModalDOM.querySelector('form .modal-body').innerHTML = "";
-  editor.editor_mode = "edit";
+    // reset the modal form to empty
+    guiModalDOM.querySelector('form .modal-body').innerHTML = "";
+    editor.editor_mode = "edit";
 })
 
 
@@ -432,19 +447,21 @@ async function createNodeObject(nodeName, connectionInputs, connectionOutputs, n
     const node_list = Object.values(editorData);
     const node_classes = node_list.map(obj => obj.class);
     let existing_items = 0;
-    node_classes.map(name => {if(name.includes(nodeName)){++existing_items}});
+    node_classes.map(name => {
+        if (name.includes(nodeName)) {
+            ++existing_items
+        }
+    });
 
     let shownName;
-    if(typeof nodeData.name === "undefined"){
-        if(existing_items == 0){
+    if (typeof nodeData.name === "undefined") {
+        if (existing_items == 0) {
             shownName = nodeName + "-0"
-        }
-        else{
+        } else {
             shownName = nodeName + "-" + existing_items
         }
         nodeData.name = shownName;
-    }
-    else{
+    } else {
         shownName = nodeData.name;
     }
 
@@ -457,31 +474,29 @@ async function createNodeObject(nodeName, connectionInputs, connectionOutputs, n
         </span>
     </div>
     <div class="img"></div>`;
-	
-	if (nodeName=="myPredefinedSource" || nodeName=="mySource"){
-		connectionInputs=0;
-		connectionOutputs=1;
-		return {
-        "editorNodeId": editor.addNode(nodeName, connectionInputs, connectionOutputs, pos_x, pos_y, nodeName, nodeData, source_html),
-        "specificNodeType": nodeName
-    };		
-	}
-	else if (nodeName=="myPredefinedSink" || nodeName=="myPredefinedSinkOEP" || nodeName=="mySink" || nodeName=="myExport" || nodeName=="myExcess"){
-		connectionInputs=1;
-		connectionOutputs=0;
-		return {
-        "editorNodeId": editor.addNode(nodeName, connectionInputs, connectionOutputs, pos_x, pos_y, nodeName, nodeData, source_html),
-        "specificNodeType": nodeName
-    };		
-	}
-	else{
-		connectionInputs=1;
-		connectionOutputs=1;
-		return {
-        "editorNodeId": editor.addNode(nodeName, connectionInputs, connectionOutputs, pos_x, pos_y, nodeName, nodeData, source_html),
-        "specificNodeType": nodeName
-    };
-	}
+
+    if (nodeName == "myPredefinedSource" || nodeName == "mySource") {
+        connectionInputs = 0;
+        connectionOutputs = 1;
+        return {
+            "editorNodeId": editor.addNode(nodeName, connectionInputs, connectionOutputs, pos_x, pos_y, nodeName, nodeData, source_html),
+            "specificNodeType": nodeName
+        };
+    } else if (nodeName == "myPredefinedSink" || nodeName == "myPredefinedSinkOEP" || nodeName == "mySink" || nodeName == "myExport" || nodeName == "myExcess") {
+        connectionInputs = 1;
+        connectionOutputs = 0;
+        return {
+            "editorNodeId": editor.addNode(nodeName, connectionInputs, connectionOutputs, pos_x, pos_y, nodeName, nodeData, source_html),
+            "specificNodeType": nodeName
+        };
+    } else {
+        connectionInputs = 1;
+        connectionOutputs = 1;
+        return {
+            "editorNodeId": editor.addNode(nodeName, connectionInputs, connectionOutputs, pos_x, pos_y, nodeName, nodeData, source_html),
+            "specificNodeType": nodeName
+        };
+    }
 }
 
 
@@ -490,20 +505,20 @@ async function createNodeObject(nodeName, connectionInputs, connectionOutputs, n
 const addBusses = async (data) =>
     await Promise.all(data.map(async nodeData => {
         const result = await createNodeObject(nodeData.name, nodeData.input_ports, nodeData.output_ports, nodeData.data, nodeData.pos_x, nodeData.pos_y);
-        nodesToDB.set(`node-${result.editorNodeId}`, {uid:nodeData.data.databaseId, assetTypeName: "bus" });
+        nodesToDB.set(`node-${result.editorNodeId}`, {uid: nodeData.data.databaseId, assetTypeName: "bus"});
     }));
 
 const addAssets = async (data) =>
     await Promise.all(data.map(async nodeData => {
-		//alert('await createNodeObject()');
+        //alert('await createNodeObject()');
         const result = await createNodeObject(nodeData.name, 1, 1, nodeData.data, nodeData.pos_x, nodeData.pos_y);
-        nodesToDB.set(`node-${result.editorNodeId}`, {uid:nodeData.data.unique_id, assetTypeName: nodeData.name });
+        nodesToDB.set(`node-${result.editorNodeId}`, {uid: nodeData.data.unique_id, assetTypeName: nodeData.name});
     }));
 
 /* 'editor' is the variable name of the DrawFlow instance used here as a global variable */
 const addLinks = async (data) => data.map(async linkData => {
-    const busNodeId = [...nodesToDB.entries()].filter(([key,val])=>val.uid===linkData.bus_id).map(([k,v])=>k)[0].split("-").pop();
-    const assetNodeId = [...nodesToDB.entries()].filter(([key,val])=>val.uid===linkData.asset_id).map(([k,v])=>k)[0].split("-").pop();
+    const busNodeId = [...nodesToDB.entries()].filter(([key, val]) => val.uid === linkData.bus_id).map(([k, v]) => k)[0].split("-").pop();
+    const assetNodeId = [...nodesToDB.entries()].filter(([key, val]) => val.uid === linkData.asset_id).map(([k, v]) => k)[0].split("-").pop();
     (linkData.flow_direction === "B2A") ?
         editor.addConnection(busNodeId, assetNodeId, linkData.bus_connection_port, 'input_1')
         : editor.addConnection(assetNodeId, busNodeId, 'output_1', linkData.bus_connection_port);

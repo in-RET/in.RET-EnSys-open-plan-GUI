@@ -2,53 +2,54 @@
 <html lang="en">
 
 <head>
-  <title>{% block title %}Index{% endblock %} - FastAPI</title>
-  <link rel="stylesheet" href="{{ url_for('static', path='stylesheet.css') }}">
+    <title>{% block title %}Index{% endblock %} - FastAPI</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='stylesheet.css') }}">
 
-  <!-- Latest compiled and minified CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Latest compiled and minified CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet">
 
-  <!-- Latest compiled JavaScript -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Latest compiled JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 
 <body>
-  <div class="pagewrapper">
+<div class="pagewrapper">
     <div class="container">
-      <!-- header -->
-      <div class="row header">
-        <p class="center">
-          <img src="{{ url_for('static', path='ensys_logo_full.png') }}" alt="ensys logo" class="logo" width="200" />
-          Application Programming Interface
-        </p>
-      </div>
-
-      <!-- content -->
-      <div class="row">
-        <div>
-          <h1>Upload verschiedener Dateiformate</h1>
-          <form action="/uploadFile" enctype="multipart/form-data" method="post">
-            <h5>Daten des Energiesystems</h5>
-            <div class="mb-3">
-              <label for="datafile" class="form-label">Konfigurationsdatei</label>
-              <input class="form-control" name="datafiles" type="file" id="datafile" multiple="multiple"><br />
-              <button class="btn btn-outline-success form-control" type="submit">Run Simulation</button>
-            </div>
-          </form>
+        <!-- header -->
+        <div class="row header">
+            <p class="center">
+                <img src="{{ url_for('static', path='ensys_logo_full.png') }}" alt="ensys logo" class="logo"
+                     width="200"/>
+                Application Programming Interface
+            </p>
         </div>
-      </div>
-      <div class="row">
-        {% block content %}
 
-        {% endblock %}
-      </div>
-      <!-- footer -->
-      <div class="row footer">
-        <p class="hs-green">Copyright 2023 - Institut für regnerative Energietechnik</p>
-      </div>
+        <!-- content -->
+        <div class="row">
+            <div>
+                <h1>Upload verschiedener Dateiformate</h1>
+                <form action="/uploadFile" enctype="multipart/form-data" method="post">
+                    <h5>Daten des Energiesystems</h5>
+                    <div class="mb-3">
+                        <label for="datafile" class="form-label">Konfigurationsdatei</label>
+                        <input class="form-control" name="datafiles" type="file" id="datafile" multiple="multiple"><br/>
+                        <button class="btn btn-outline-success form-control" type="submit">Run Simulation</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            {% block content %}
+
+            {% endblock %}
+        </div>
+        <!-- footer -->
+        <div class="row footer">
+            <p class="hs-green">Copyright 2023 - Institut für regnerative Energietechnik</p>
+        </div>
 
     </div>
-  </div>
+</div>
 </body>
 
 </html>

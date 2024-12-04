@@ -18,7 +18,7 @@ colorama==0.4.6
 contourpy==1.2.1
 CoolProp==6.6.0
 crispy-bootstrap4
-cryptography==42.0.8
+cryptography==44.0.0
 cycler==0.12.1
 cydets==1.1
 dash==2.9.3

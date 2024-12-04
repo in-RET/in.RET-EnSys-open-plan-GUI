@@ -7,13 +7,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('projects', '0038_auto_20230515_1526'),
+        ("projects", "0038_auto_20230515_1526"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='scenario',
-            name='interest_rate',
-            field=models.FloatField(null=True, validators=[django.core.validators.MinValueValidator(0.0)]),
+            model_name="scenario",
+            name="interest_rate",
+            field=models.FloatField(
+                null=True, validators=[django.core.validators.MinValueValidator(0.0)]
+            ),
         ),
     ]

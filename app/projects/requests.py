@@ -4,6 +4,7 @@ from datetime import datetime
 
 import httpx as requests
 from dashboard.models import AssetsResults, KPICostsMatrixResults, KPIScalarResults
+
 # from requests.exceptions import HTTPError
 from app.settings import (
     INRETENSYS_CHECK_URL,
@@ -57,12 +58,12 @@ def fetch_mvs_simulation_results(simulation):
     if simulation.status == PENDING:
         response = mvs_simulation_check_status(token=simulation.mvs_token)
         print("Response:", response)
-        
+
         try:
             simulation.status = response["status"]
             simulation.errors = response["error"]
             exitcode = response["exitcode"]
-            
+
             logger.info(f"The simulation {simulation.id} is {simulation.status}.")
         except:
             simulation.status = ERROR
@@ -73,7 +74,7 @@ def fetch_mvs_simulation_results(simulation):
             datetime.now() if response["status"] in [ERROR, DONE] else None
         )
         simulation.save()
-    
+
     if simulation.status == ERROR:
         return "Error"
     elif simulation.status == PENDING:
@@ -90,9 +91,11 @@ def get_mvs_simulation_results(simulation):
         response = mvs_simulation_check_status(token=simulation.mvs_token)
         simulation.status = response["status"]
         simulation.errors = response["error"]
-        
+
         simulation.results = (
-            parse_mvs_results(simulation, response["results"]) if simulation.status == DONE else None
+            parse_mvs_results(simulation, response["results"])
+            if simulation.status == DONE
+            else None
         )
         logger.info(f"The simulation {simulation.id} is finished")
 
@@ -148,4 +151,3 @@ def parse_mvs_results(simulation, response_results):
             assets_list=json.dumps(data_subdict), simulation=simulation
         )
     return response_results
-

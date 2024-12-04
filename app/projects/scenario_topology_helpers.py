@@ -4,6 +4,7 @@ import uuid
 
 import numpy as np
 from django.core.exceptions import ValidationError
+
 # region sent db nodes to js
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
@@ -18,7 +19,7 @@ from projects.models import (
     Project,
     EconomicData,
     COPCalculator,
-    InputparameterSuggestion
+    InputparameterSuggestion,
 )
 
 logger = logging.getLogger(__name__)
@@ -164,11 +165,13 @@ def handle_asset_form_post(request, scen_id=0, asset_type_name="", asset_uuid=No
             # "inputs": json.loads(request.POST.get("inputs", "[]")),
             "outputs": json.loads(request.POST.get("outputs", "[]")),
         }
-    elif (asset_type_name == "myPredefinedSink" 
-          or asset_type_name == "myPredefinedSinkOEP"
-          or asset_type_name == "mySink"
-          or asset_type_name == "myExport"
-          or asset_type_name == "myExcess"):
+    elif (
+        asset_type_name == "myPredefinedSink"
+        or asset_type_name == "myPredefinedSinkOEP"
+        or asset_type_name == "mySink"
+        or asset_type_name == "myExport"
+        or asset_type_name == "myExcess"
+    ):
         input_output_mapping = {
             "inputs": json.loads(request.POST.get("inputs", "[]")),
             # "outputs": json.loads(request.POST.get("outputs", "[]")),
@@ -190,7 +193,7 @@ def handle_asset_form_post(request, scen_id=0, asset_type_name="", asset_uuid=No
         )
     else:
         input_timeseries = request.FILES.get("input_timeseries", None)
-        
+
         form = AssetCreateForm(
             request.POST,
             request.FILES,
@@ -207,12 +210,16 @@ def handle_asset_form_post(request, scen_id=0, asset_type_name="", asset_uuid=No
         asset.scenario = scenario
         asset.asset_type = asset_type
         # print(asset.input_timeseries)
-        if (asset.source_choice == "Wind"
-            or asset.source_choice == "Photovoltaic Free Field" 
+        if (
+            asset.source_choice == "Wind"
+            or asset.source_choice == "Photovoltaic Free Field"
             or asset.source_choice == "Roof Mounted Photovoltaic"
             or asset.source_choice == "Solar thermal system"
-            or asset.source_choice == "Run-of-river power plant"): # for wind pv (twice) solar water
-            queryset = InputparameterSuggestion.objects.filter(technology=asset.source_choice)
+            or asset.source_choice == "Run-of-river power plant"
+        ):  # for wind pv (twice) solar water
+            queryset = InputparameterSuggestion.objects.filter(
+                technology=asset.source_choice
+            )
             for item in queryset:
                 asset.input_timeseries = item.input_timeseries
         try:
@@ -265,9 +272,9 @@ def db_bus_nodes_to_list(scen_id):
                 "name": db_bus.name,
                 "bustype": db_bus.type,
                 "databaseId": db_bus.id,
-                "parent_asset_id": db_bus.parent_asset_id
-                if db_bus.parent_asset_id
-                else "",
+                "parent_asset_id": (
+                    db_bus.parent_asset_id if db_bus.parent_asset_id else ""
+                ),
             },
         }
         bus_nodes_list.append(db_bus_dict)
@@ -288,9 +295,9 @@ def db_asset_nodes_to_list(scen_id):
             "data": {
                 "name": db_asset.name,
                 "unique_id": db_asset.unique_id,
-                "parent_asset_id": db_asset.parent_asset_id
-                if db_asset.parent_asset_id
-                else "",
+                "parent_asset_id": (
+                    db_asset.parent_asset_id if db_asset.parent_asset_id else ""
+                ),
             },
         }
         asset_nodes_list.append(db_asset_dict)

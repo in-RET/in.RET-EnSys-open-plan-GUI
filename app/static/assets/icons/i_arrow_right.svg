@@ -22,19 +22,27 @@
         fill="#000000"
         width="100px"
         height="100px"><defs
-     id="defs16" /><metadata
-     id="metadata2"><ns:variableSets><ns:variableSet
+     id="defs16" />
+    <metadata
+            id="metadata2"><ns:variableSets><ns:variableSet
          locked="none"
-         varSetName="binding1"><ns:variables /><ns:sampleDataSets /></ns:variableSet></ns:variableSets><ns0:sfw><ns0:slices /><ns0:sliceSourceBounds
-         bottomLeftOrigin="true"
-         height="16"
-         width="10.5"
-         x="3"
-         y="0" /></ns0:sfw><?xpacket begin='&#65279;' id='W5M0MpCehiHzreSzNTczkc9d'?><x:xmpmeta
-       x:xmptk="XMP toolkit 3.0-29, framework 1.6" /><?xpacket end='w'?><rdf:RDF><cc:Work
+         varSetName="binding1"><ns:variables /><ns:sampleDataSets/></ns:variableSet></ns:variableSets>
+        <ns0:sfw><ns0:slices />
+            <ns0:sliceSourceBounds
+                    bottomLeftOrigin="true"
+                    height="16"
+                    width="10.5"
+                    x="3"
+                    y="0"/></ns0:sfw>
+        <?xpacket begin='&#65279;' id='W5M0MpCehiHzreSzNTczkc9d'?>
+        <x:xmpmeta
+                x:xmptk="XMP toolkit 3.0-29, framework 1.6"/>
+        <?xpacket end='w'?>
+        <rdf:RDF><cc:Work
          rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><g
-     id="g10"><g
+                rdf:resource="http://purl.org/dc/dcmitype/StillImage"/><dc:title></dc:title></cc:Work></rdf:RDF></metadata>
+    <g
+            id="g10"><g
        id="g8"
        i:extraneous="self"><g
          id="g6"

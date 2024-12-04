@@ -29,7 +29,7 @@ def createDashboard(simulation: Simulation):
         es = None
 
     if es is not None:
-        #investment_data = cost_calculation_from_energysystem(es)
+        # investment_data = cost_calculation_from_energysystem(es)
 
         busses = []
         bus_figures = []
@@ -45,7 +45,11 @@ def createDashboard(simulation: Simulation):
         flows = [x for x in results.keys() if x[1] is not None]
         nodes = [x for x in results.keys() if x[1] is None]
 
-        for flow in [x for x in flows if hasattr(results[x]["scalars"], "invest") and isinstance(x[1], solph.Bus)]:
+        for flow in [
+            x
+            for x in flows
+            if hasattr(results[x]["scalars"], "invest") and isinstance(x[1], solph.Bus)
+        ]:
             print(type(flow[0]))
             print(type(flow[1]))
 
@@ -58,16 +62,26 @@ def createDashboard(simulation: Simulation):
                 html.Tr(
                     style={"background": "white"},
                     children=[
+                        html.Td(style={"width": "75%"}, children=flow[0].label),
                         html.Td(
-                            style={"width": "75%"},
-                            children=flow[0].label
+                            style={"text-align": "right"},
+                            children=str(
+                                "{:.4f}".format(
+                                    round(results[flow]["scalars"]["invest"], 4)
+                                )
+                            )
+                            + " "
+                            + UNIT[0]
+                            + " ("
+                            + str(
+                                "{:.4f}".format(
+                                    round(results[flow]["scalars"]["invest"] * 1000, 4)
+                                )
+                            )
+                            + " "
+                            + UNIT[1]
+                            + ")",
                         ),
-                        html.Td(
-                            style={
-                                "text-align": "right"
-                            },
-                            children=str("{:.4f}".format(round(results[flow]["scalars"]["invest"], 4))) + " " + UNIT[0] + " (" + str("{:.4f}".format(round(results[flow]["scalars"]["invest"] * 1000, 4))) + " " + UNIT[1] + ")"
-                        )
                     ],
                 )
             )
@@ -271,7 +285,9 @@ def createDashboard(simulation: Simulation):
 
         for bus in busses:
             fig = go.Figure(layout=dict(title=f"{bus}"))
-            for t, g in solph.views.node(es.results["main"], node=bus)["sequences"].items():
+            for t, g in solph.views.node(es.results["main"], node=bus)[
+                "sequences"
+            ].items():
                 idx_asset = abs(t[0].index(bus) - 1)
 
                 fig.add_trace(
@@ -474,6 +490,6 @@ def createDashboard(simulation: Simulation):
                     children="Es ist ein Fehler passiert... Badum...",
                     style={"textAlign": "center"},
                 )
-            ]
+            ],
         )
         pass

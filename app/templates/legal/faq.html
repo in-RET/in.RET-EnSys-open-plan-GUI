@@ -15,26 +15,47 @@
 		</div>
 	</section>
 	<section class="standard-layout">
-		<div>
-			<div class="standard-layout__paragraph">
-				<h2>Placeholder</h2>
-                <p>Lorem Ipsum</p>
-			</div>
-			<div class="standard-layout__paragraph standard-layout__paragraph--foreground">
-				<h2>Hilfe! Nichts geht! der Programmierer ist schuld</h2>
-				<ul>
-                    <li>keine Ruhe bewahren</li>
-                    <li>bis 10e10 zählen</li>
-                    <li>in Panik verfallen</li>
-                    <li>Bildschirme ruckartig vom Tisch schieben</li>
-                    <li>schreiend im Kreis rennen</li>
-                </ul>
-			</div>
-			<div class="standard-layout__paragraph standard-layout__paragraph--small">
-				<h2>Small Placeholder</h2>
-				<p>Lorem Ipsum</p>
-			</div>
-		</div>
+        <div class="accordion" id="faq_accordion">
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="question-heading-1">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                My energysystem does not save.
+              </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+              <div class="accordion-body">
+                  If your energysystem does not safe check all connections between blocks and also the given parameters. 
+                  
+                  Individual names for the blocks are essential to save the energysystem.
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="question-heading-2">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                Question #2
+              </button>
+            </h2>
+            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+              <div class="accordion-body">
+                <strong>This is the second item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="question-heading-3">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                Question #3
+              </button>
+            </h2>
+            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+              <div class="accordion-body">
+                <strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+              </div>
+            </div>
+          </div>
+        </div>
+
 	</section>
 </main>
 {% endblock content %}

@@ -218,7 +218,7 @@ span.accordsubtitle {
     background: white;
 }
 
-.drawflow>.drawflow-delete {
+.drawflow > .drawflow-delete {
     border: 2px solid #43b993;
     background: white;
     color: #43b993;
@@ -274,11 +274,11 @@ span.accordsubtitle {
     background-color: #E5B142 !important;
 }
 
-.swal2-progress-steps .swal2-progress-step.swal2-active-progress-step~.swal2-progress-step-line {
+.swal2-progress-steps .swal2-progress-step.swal2-active-progress-step ~ .swal2-progress-step-line {
     background-color: #F4D9A4 !important;
 }
 
-.swal2-progress-steps .swal2-progress-step.swal2-active-progress-step~.swal2-progress-step {
+.swal2-progress-steps .swal2-progress-step.swal2-active-progress-step ~ .swal2-progress-step {
     background-color: #F4D9A4 !important;
 }
 

@@ -89,7 +89,7 @@ def is_economical_parameter(param):
         "invest_relation_output_capacity",
         "eco_params_flow_choice",
         "trafo_invest_bus_choice",
-        "trafo_variableCosts_bus_choice"
+        "trafo_variableCosts_bus_choice",
     ]
 
 

@@ -221,9 +221,9 @@ class AssetsResults(models.Model):
                                     MAP_EPA_MVS.get(sub_cat, sub_cat)
                                 )
                             if storage_subasset is not None:
-                                storage_subasset[
-                                    "category"
-                                ] = format_storage_subasset_name(category, sub_cat)
+                                storage_subasset["category"] = (
+                                    format_storage_subasset_name(category, sub_cat)
+                                )
                                 storage_subasset["type_oemof"] = asset["type_oemof"]
                                 storage_subasset["energy_vector"] = asset[
                                     "energy_vector"
@@ -284,10 +284,10 @@ class AssetsResults(models.Model):
                                 if storage_subasset is not None:
                                     if answer is None:
                                         answer = storage_subasset
-                                        answer[
-                                            "category"
-                                        ] = format_storage_subasset_name(
-                                            category, sub_cat
+                                        answer["category"] = (
+                                            format_storage_subasset_name(
+                                                category, sub_cat
+                                            )
                                         )
                                         answer["energy_vector"] = asset["energy_vector"]
                                         break
@@ -467,15 +467,19 @@ def graph_capacities(simulations, y_variables):
         # TODO link unit to unit in asset["installed_capacity"]["unit"] or asset["optimized_add_cap"]["unit"]
         installed_capacity_dict = {
             "capacity": [],
-            "name": _("Installed Capacity") + " (kW)"
-            if multi_scenario is False
-            else _("Inst. Cap.") + f"{simulation.scenario.name} (kW)",
+            "name": (
+                _("Installed Capacity") + " (kW)"
+                if multi_scenario is False
+                else _("Inst. Cap.") + f"{simulation.scenario.name} (kW)"
+            ),
         }
         optimized_capacity_dict = {
             "capacity": [],
-            "name": _("Optimized Capacity") + " (kW)"
-            if multi_scenario is False
-            else _("Opt. Cap.") + f"{simulation.scenario.name} (kW)",
+            "name": (
+                _("Optimized Capacity") + " (kW)"
+                if multi_scenario is False
+                else _("Opt. Cap.") + f"{simulation.scenario.name} (kW)"
+            ),
         }
         for y_var in y_variables:
 
@@ -684,6 +688,7 @@ REPORT_GRAPHS = {
     GRAPH_LOAD_DURATION: "Load duration curve",
     GRAPH_SANKEY: graph_sankey,
 }
+
 
 # # TODO change the form from this model to adapt the choices depending on single scenario/compare scenario or sensitivity
 class ReportItem(models.Model):

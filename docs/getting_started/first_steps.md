@@ -1,5 +1,5 @@
-!!! warning
-    This is a prototype. Under Construction!
+!!! info
+    If you find some bugs don't hesitate to mail at <a href="mailto:ensys@hs-nordhausen.de">Hochschule Nordhausen</a>
 
 ## Start
 After you visit the website the following page appears. This is our start.

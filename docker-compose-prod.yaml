@@ -3,15 +3,6 @@ services:
     build:
       context: .
       dockerfile: ./app/dockerfile
-    develop:
-      watch:
-        - action: sync
-          path: ./app
-          target: ./app
-        - action: rebuild
-          path: ./requirements/requirements.txt
-        - action: rebuild
-          path: .env
     command: python manage.py runserver 0.0.0.0:8000
     container_name: ensys-frontend
     env_file: .env
@@ -30,10 +21,6 @@ services:
     build:
       context: .
       dockerfile: ./api/dockerfile
-    develop:
-      watch:
-        - path: ./api/dockerfile
-          action: rebuild
     container_name: ensys-backend
     env_file: .env
     restart: always

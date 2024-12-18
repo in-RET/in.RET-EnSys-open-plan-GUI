@@ -16,24 +16,13 @@ def io_file() -> None:
 def simulate_docker(
     nameOfConfigFile, nameOfFolder, ftype, file, req_from_website=False
 ):
+    path_internal_workdir = os.path.join("/app", "data", "simulations")
+    path_api_container_workdir = os.path.join("/app", "data", "simulations", nameOfFolder)
+    path_host_datadir = os.path.join(LOCAL_DATA_DIR, nameOfFolder)
 
-    pathOfInternalWorkDir = os.path.join("/app", "data", "simulations")
-    pathOfDockerWorkDir = os.path.join("/app", os.getenv("LOCAL_WORKDIR"), nameOfFolder)
-    pathOfExternalWorkDir = os.path.join(
-        "/Users",
-        os.getenv("USER"),
-        "Documents",
-        "GitHub",
-        "python",
-        "ensys-gui",
-        os.getenv("LOCAL_WORKDIR"),
-        nameOfFolder,
-    )
+    os.makedirs(path_api_container_workdir, exist_ok=True)
 
-    os.makedirs(pathOfDockerWorkDir, exist_ok=True)
-
-    licensepath = LICENSE_PATH
-    pathOfConfigfile = os.path.join(pathOfDockerWorkDir, nameOfConfigFile)
+    api_configfile = os.path.join(path_api_container_workdir, nameOfConfigFile)
 
     if req_from_website and ftype == FTYPE_JSON:
         MODE = "wt"
@@ -42,7 +31,7 @@ def simulate_docker(
     else:
         raise Exception("Fileformat ist not valid!")
 
-    savefile = open(pathOfConfigfile, MODE)
+    savefile = open(api_configfile, MODE)
     savefile.write(file)
     savefile.close()
 
@@ -54,18 +43,18 @@ def simulate_docker(
     else:
         raise Exception("Fileformat is not valid!")
 
-    xf = open(pathOfConfigfile, MODE)
+    xf = open(api_configfile, MODE)
     model_dict = json.load(xf)
     model = InRetEnsysModel(**model_dict)
     xf.close()
 
     volumes_dict = {
-        pathOfExternalWorkDir: {"bind": pathOfInternalWorkDir, "mode": "rw"}
+        path_host_datadir: {"bind": path_internal_workdir, "mode": "rw"}
     }
 
     if model.solver == Solver.gurobi:
         IMAGE_TAG = "inretensys:0.2a7-gurobi"
-        volumes_dict[licensepath] = {
+        volumes_dict[LICENSE_PATH] = {
             "bind": os.path.join("/opt", "gurobi", "gurobi.lic"),
             "mode": "ro",
         }
@@ -74,7 +63,7 @@ def simulate_docker(
     else:
         raise Exception("Solver not implemented yet.")
 
-    internalConfigFile = os.path.join(pathOfInternalWorkDir, nameOfConfigFile)
+    container_configfile = os.path.join(path_internal_workdir, nameOfConfigFile)
 
     # Verbindung zum Docker-Clienten herstellen (Server/Desktop Version)
     docker_client = docker.from_env()
@@ -87,19 +76,11 @@ def simulate_docker(
     if image == []:
         raise HTTPException(status_code=404, detail="Docker image not found")
 
-    # print("Verzeichnisübersicht")
-    # print("Ext.:", pathOfExternalWorkDir)
-    # print("Int.:", pathOfInternalWorkDir)
-    # print("Docker:", pathOfDockerWorkDir)
-    # print("Config:", pathOfConfigfile)
-    # print("Int.Config:", internalConfigFile)
-    # print("Volumes_dict", volumes_dict)
-
     # Starten des docker-containers, im detach Mode, damit dieser das Python-Programm nicht blockiert
     container = docker_client.containers.run(
         IMAGE_TAG,
         entrypoint=["python", "main.py"],
-        command="-wdir " + pathOfInternalWorkDir + " " + internalConfigFile,
+        command="-wdir " + path_internal_workdir + " " + container_configfile,
         detach=True,
         tty=True,
         stdin_open=True,

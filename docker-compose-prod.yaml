@@ -9,7 +9,7 @@ services:
     restart: always
     volumes:
       - ./app:/app
-      - ./${LOCAL_WORKDIR}:/app/dumps
+      - ${LOCAL_DATADIR}:/app/dumps
       - static_volume:/app/cdn_static_root
     networks:
       - backend
@@ -26,7 +26,7 @@ services:
     restart: always
     volumes:
      - /var/run/docker.sock:/var/run/docker.sock
-     - ./${LOCAL_WORKDIR}:/app/${LOCAL_WORKDIR}
+     - ${LOCAL_DATADIR}:/app/data/simulations
     networks:
       - backend
 

@@ -198,10 +198,9 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 MAILER_EMAIL_BACKEND = EMAIL_BACKEND
 
-DEFAULT_FROM_EMAIL = "ensys@hs-nordhausen.de"
-EMAIL_HOST = os.getenv("EMAIL_HOST_IP", "127.0.0.1")
+DEFAULT_FROM_EMAIL = os.getenv("EMAIL_USER")
+EMAIL_HOST = os.getenv("EMAIL_HOST_IP")
 EMAIL_PORT = 25
-EMAIL_USE_TLS = False
 
 MESSAGE_TAGS = {
     messages.DEBUG: "alert-info",

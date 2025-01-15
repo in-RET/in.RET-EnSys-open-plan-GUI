@@ -59,7 +59,6 @@ from .services import (
     create_or_delete_simulation_scheduler,
     excuses_design_under_development,
     get_selected_scenarios_in_cache,
-    send_feedback_email,
 )
 
 from .models.usecases import UseCase

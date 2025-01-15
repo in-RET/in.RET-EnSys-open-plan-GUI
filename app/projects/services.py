@@ -1,35 +1,14 @@
 import logging
-import os
-import traceback
 from concurrent.futures import ThreadPoolExecutor
 
-from django_q.models import Schedule
 from django.contrib import messages
 from django.urls import reverse
 from django.utils.safestring import mark_safe
-from django.utils.translation import gettext_lazy as _
-from exchangelib import (
-    Account,
-    Credentials,
-    Mailbox,
-    Message,
-    EWSTimeZone,
-    Configuration,
-)
+from django_q.models import Schedule
+
 from projects.constants import PENDING
 from projects.models import Simulation
 from projects.requests import fetch_mvs_simulation_results
-
-from app.settings import (
-    EXCHANGE_ACCOUNT,
-    EXCHANGE_SERVER,
-    EXCHANGE_EMAIL,
-    RECIPIENTS,
-    EXCHANGE_PW,
-    EMAIL_SUBJECT_PREFIX,
-    TIME_ZONE,
-    USE_EXCHANGE_EMAIL_BACKEND,
-)
 
 logger = logging.getLogger(__name__)
 
@@ -96,116 +75,6 @@ def create_or_delete_simulation_scheduler(**kwargs):
             return False
 
 
-def send_feedback_email(subject, body):
-    tz = EWSTimeZone("Europe/Copenhagen")
-    try:
-        credentials = Credentials(EXCHANGE_ACCOUNT, EXCHANGE_PW)
-
-        config = Configuration(server=EXCHANGE_SERVER, credentials=credentials)
-
-        account = Account(
-            EXCHANGE_EMAIL,
-            credentials=credentials,
-            autodiscover=False,
-            default_timezone=tz,
-            config=config,
-        )
-        recipients = [Mailbox(email_address=recipient) for recipient in RECIPIENTS]
-        mail = Message(
-            account=account,
-            folder=account.sent,
-            subject=subject,
-            body=body,
-            to_recipients=recipients,
-        )
-        mail.send_and_save()
-    except Exception as ex:
-        logger.warning(
-            f"Couldn't send feedback email. Exception raised: {traceback.format_exc()}."
-        )
-        raise ex
-
-
-def send_email(*, to_email, subject, message):
-    """Send E-mail via MS Exchange Server using credentials from env vars
-    Parameters
-    ----------
-    to_email : :obj:`str`
-        Target mail address
-    subject : :obj:`str`
-        Subject of mail
-    message : :obj:`str`
-        Message body of mail
-    Returns
-    -------
-    :obj:`bool`
-        Success status (True: successful)
-    """
-    prefixed_subject = EMAIL_SUBJECT_PREFIX + subject
-
-    if USE_EXCHANGE_EMAIL_BACKEND is True:
-
-        tz = EWSTimeZone(TIME_ZONE)
-        credentials = Credentials(EXCHANGE_ACCOUNT, EXCHANGE_PW)
-        config = Configuration(server=EXCHANGE_SERVER, credentials=credentials)
-
-        try:
-            account = Account(
-                EXCHANGE_EMAIL,
-                credentials=credentials,
-                autodiscover=False,
-                default_timezone=tz,
-                config=config,
-            )
-        except ConnectionError as err:
-            err_msg = _("Form - connection error:") + f" {err}"
-            logger.error(err_msg)
-            return False
-        except Exception as err:  # pylint: disable=broad-except
-            err_msg = _("Form - other error:") + f" {err}"
-            logger.error(err_msg)
-            return False
-
-        recipients = [Mailbox(email_address=to_email)]
-
-        msg = Message(
-            account=account,
-            folder=account.sent,
-            subject=prefixed_subject,
-            body=message,
-            to_recipients=recipients,
-        )
-
-        try:
-            msg.send_and_save()
-            return True
-        except Exception as err:  # pylint: disable=broad-except
-            err_msg = _("Form - mail sending error:") + f" {err}"
-            logger.error(err_msg)
-            return False
-    elif USE_EXCHANGE_EMAIL_BACKEND is False:
-        print(
-            "\n",
-            "--- No email is send ---",
-            "\n\n",
-            "To:",
-            to_email,
-            "\n\n",
-            "Subject:",
-            prefixed_subject,
-            "\n\n",
-            "Message:",
-            message,
-            "\n",
-        )
-        return True
-    else:
-        raise ValueError(
-            "Email backend not configured.",
-            "USE_EXCHANGE_EMAIL_BACKEND must be boolean of either True or False.",
-        )
-
-
 def excuses_design_under_development(request, link=False):
     if link is False:
         msg = """This page is still under development. What you see is a design draft of how it should look like. If you have ideas or feedback about the design, you are welcome to submit it using the <a href='{url}'>feedback form</a>"""
@@ -213,7 +82,7 @@ def excuses_design_under_development(request, link=False):
         msg = """This website is still under development and not all buttons link to what they should yet. This is the case of the link or button you just clicked on. If you have ideas or feedback on how to improve the design, you are welcome to submit it using the <a href='{url}'>feedback form</a>"""
 
     url = reverse("user_feedback")
-    messages.warning(request, _(mark_safe(msg.format(url=url))))
+    messages.warning(request, mark_safe(msg.format(url=url)))
 
 
 def get_selected_scenarios_in_cache(request, proj_id):

@@ -20,16 +20,18 @@ from projects.constants import PENDING
 from projects.models import Simulation
 from projects.requests import fetch_mvs_simulation_results
 
+from app.settings import (
+    EXCHANGE_ACCOUNT,
+    EXCHANGE_SERVER,
+    EXCHANGE_EMAIL,
+    RECIPIENTS,
+    EXCHANGE_PW,
+    EMAIL_SUBJECT_PREFIX,
+    TIME_ZONE,
+    USE_EXCHANGE_EMAIL_BACKEND,
+)
+
 logger = logging.getLogger(__name__)
-
-# email account which will send the feedback emails
-EXCHANGE_ACCOUNT = os.getenv("EXCHANGE_ACCOUNT", "dummy@dummy.com")
-EXCHANGE_PW = os.getenv("EXCHANGE_PW", "dummypw")
-EXCHANGE_EMAIL = os.getenv("EXCHANGE_EMAIL", "dummy@dummy.com")
-EXCHANGE_SERVER = os.getenv("EXCHANGE_SERVER", "dummy.com")
-# email addresses to which the feedback emails will be sent
-RECIPIENTS = os.getenv("RECIPIENTS", "dummy@dummy.com,dummy2@dummy.com").split(",")
-
 
 r"""Functions meant to be powered by Django-Q.
 
@@ -122,6 +124,86 @@ def send_feedback_email(subject, body):
             f"Couldn't send feedback email. Exception raised: {traceback.format_exc()}."
         )
         raise ex
+
+
+def send_email(*, to_email, subject, message):
+    """Send E-mail via MS Exchange Server using credentials from env vars
+    Parameters
+    ----------
+    to_email : :obj:`str`
+        Target mail address
+    subject : :obj:`str`
+        Subject of mail
+    message : :obj:`str`
+        Message body of mail
+    Returns
+    -------
+    :obj:`bool`
+        Success status (True: successful)
+    """
+    prefixed_subject = EMAIL_SUBJECT_PREFIX + subject
+
+    if USE_EXCHANGE_EMAIL_BACKEND is True:
+
+        tz = EWSTimeZone(TIME_ZONE)
+        credentials = Credentials(EXCHANGE_ACCOUNT, EXCHANGE_PW)
+        config = Configuration(server=EXCHANGE_SERVER, credentials=credentials)
+
+        try:
+            account = Account(
+                EXCHANGE_EMAIL,
+                credentials=credentials,
+                autodiscover=False,
+                default_timezone=tz,
+                config=config,
+            )
+        except ConnectionError as err:
+            err_msg = _("Form - connection error:") + f" {err}"
+            logger.error(err_msg)
+            return False
+        except Exception as err:  # pylint: disable=broad-except
+            err_msg = _("Form - other error:") + f" {err}"
+            logger.error(err_msg)
+            return False
+
+        recipients = [Mailbox(email_address=to_email)]
+
+        msg = Message(
+            account=account,
+            folder=account.sent,
+            subject=prefixed_subject,
+            body=message,
+            to_recipients=recipients,
+        )
+
+        try:
+            msg.send_and_save()
+            return True
+        except Exception as err:  # pylint: disable=broad-except
+            err_msg = _("Form - mail sending error:") + f" {err}"
+            logger.error(err_msg)
+            return False
+    elif USE_EXCHANGE_EMAIL_BACKEND is False:
+        print(
+            "\n",
+            "--- No email is send ---",
+            "\n\n",
+            "To:",
+            to_email,
+            "\n\n",
+            "Subject:",
+            prefixed_subject,
+            "\n\n",
+            "Message:",
+            message,
+            "\n",
+        )
+        return True
+    else:
+        raise ValueError(
+            "Email backend not configured.",
+            "USE_EXCHANGE_EMAIL_BACKEND must be boolean of either True or False.",
+        )
 
 
 def excuses_design_under_development(request, link=False):

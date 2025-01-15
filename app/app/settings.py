@@ -142,7 +142,6 @@ DATABASES = {
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
-
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
@@ -159,17 +158,11 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
 LANGUAGE_CODE = "en"
-
 LOCALE_PATHS = (os.path.join(BASE_DIR, "locale"),)
-
 LANGUAGES = [("en", "English")]  # ("de", "German"),
-
 TIME_ZONE = "UTC"
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = False
 
 BOOTSTRAP_DATEPICKER_PLUS = {
@@ -195,12 +188,22 @@ LOGOUT_REDIRECT_URL = "home"
 
 CRISPY_TEMPLATE_PACK = "bootstrap4"
 
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-MAILER_EMAIL_BACKEND = EMAIL_BACKEND
+# Please note, we don't use Django's internal email system,
+# we implement our own, using exchangelib
+USE_EXCHANGE_EMAIL_BACKEND = ast.literal_eval(
+    os.getenv("USE_EXCHANGE_EMAIL_BACKEND", "True")
+)
 
-DEFAULT_FROM_EMAIL = os.getenv("EMAIL_USER")
-EMAIL_HOST = os.getenv("EMAIL_HOST_IP")
-EMAIL_PORT = 25
+if USE_EXCHANGE_EMAIL_BACKEND:
+    # The Exchange account which sends emails
+    EXCHANGE_ACCOUNT = os.getenv("EMAIL_HOST_USER")
+    EXCHANGE_PW = os.getenv("EMAIL_HOST")
+    EXCHANGE_EMAIL = os.getenv("EMAIL_SENDER")
+    EXCHANGE_SERVER = os.getenv("EMAIL_HOST_IP")
+
+# Email addresses to which feedback emails will be sent
+RECIPIENTS = os.getenv("RECIPIENTS", "ensys@hs-nordhausen.de,andreas.lubojanski@hs-nordhausen.de").split(",")
+EMAIL_SUBJECT_PREFIX = os.getenv("EMAIL_SUBJECT_PREFIX", "[EnSys] ")
 
 MESSAGE_TAGS = {
     messages.DEBUG: "alert-info",

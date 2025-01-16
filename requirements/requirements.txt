@@ -9,7 +9,7 @@ blinker==1.8.2
 branca==0.7.2
 build==1.2.1
 cached-property==1.5.2
-certifi==2024.2.2
+certifi==2024.7.4
 cffi==1.16.0
 channels
 charset-normalizer==3.3.2

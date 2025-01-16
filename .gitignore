@@ -20,4 +20,3 @@ site/
 
 production.env
 /data/
-.env

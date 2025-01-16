@@ -17,7 +17,9 @@ def simulate_docker(
     nameOfConfigFile, nameOfFolder, ftype, file, req_from_website=False
 ):
     path_internal_workdir = os.path.join("/app", "data", "simulations")
-    path_api_container_workdir = os.path.join("/app", "data", "simulations", nameOfFolder)
+    path_api_container_workdir = os.path.join(
+        "/app", "data", "simulations", nameOfFolder
+    )
     path_host_datadir = os.path.join(LOCAL_DATA_DIR, nameOfFolder)
 
     os.makedirs(path_api_container_workdir, exist_ok=True)
@@ -48,9 +50,7 @@ def simulate_docker(
     model = InRetEnsysModel(**model_dict)
     xf.close()
 
-    volumes_dict = {
-        path_host_datadir: {"bind": path_internal_workdir, "mode": "rw"}
-    }
+    volumes_dict = {path_host_datadir: {"bind": path_internal_workdir, "mode": "rw"}}
 
     if model.solver == Solver.gurobi:
         IMAGE_TAG = "inretensys:0.2a7-gurobi"

@@ -1,6 +1,13 @@
 from django.urls import path
 
-from .views import signup, change_password, user_info, activate, user_deletion_request, reset_password_request
+from .views import (
+    signup,
+    change_password,
+    user_info,
+    activate,
+    user_deletion_request,
+    reset_password_request,
+)
 
 urlpatterns = [
     path("signup/", signup, name="signup"),

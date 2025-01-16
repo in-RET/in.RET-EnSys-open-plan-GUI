@@ -18,7 +18,13 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.views.decorators.http import require_http_methods
 
-from app.settings import EMAIL_HOST_USER, EMAIL_HOST_PASSWORD, EMAIL_HOST, TIME_ZONE, DEFAULT_FROM_EMAIL
+from app.settings import (
+    EMAIL_HOST_USER,
+    EMAIL_HOST_PASSWORD,
+    EMAIL_HOST,
+    TIME_ZONE,
+    DEFAULT_FROM_EMAIL,
+)
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 
 UserModel = get_user_model()
@@ -59,7 +65,7 @@ def signup(request):
                 account=account,
                 subject=mail_subject,
                 body=email,
-                to_recipients=[form.cleaned_data.get("email")]
+                to_recipients=[form.cleaned_data.get("email")],
             )
 
             msg.send_and_save()
@@ -129,8 +135,9 @@ def reset_password_request(request):
     return render(
         request=request,
         template_name="registration/password_reset_form.html",
-        context={}
+        context={},
     )
+
 
 @login_required
 @require_http_methods(["POST"])

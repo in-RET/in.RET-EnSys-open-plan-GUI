@@ -189,7 +189,7 @@ LOGOUT_REDIRECT_URL = "home"
 CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 # Email Backend Service
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = os.getenv("EMAIL_HOST_IP")
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
@@ -200,7 +200,9 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 DEFAULT_FROM_EMAIL = os.getenv("EMAIL_SENDER")
 
 # Email addresses to which feedback emails will be sent
-RECIPIENTS = os.getenv("RECIPIENTS", "ensys@hs-nordhausen.de,andreas.lubojanski@hs-nordhausen.de").split(",")
+RECIPIENTS = os.getenv(
+    "RECIPIENTS", "ensys@hs-nordhausen.de,andreas.lubojanski@hs-nordhausen.de"
+).split(",")
 EMAIL_SUBJECT_PREFIX = os.getenv("EMAIL_SUBJECT_PREFIX", "[EnSys] ")
 
 MESSAGE_TAGS = {

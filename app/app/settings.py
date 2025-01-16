@@ -257,13 +257,13 @@ LOGGING = {
         "info_file": {
             "level": "INFO",
             "class": "logging.FileHandler",
-            "filename": "django_epa_info.log",
+            "filename": "django_ensys_info.log",
             "formatter": "dtlnm",
         },
         "warnings_file": {
             "level": "WARNING",
             "class": "logging.FileHandler",
-            "filename": "django_epa_warning.log",
+            "filename": "django_ensys_warning.log",
             "formatter": "dtlnm",
         },
         "console": {

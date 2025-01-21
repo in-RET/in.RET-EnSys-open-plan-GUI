@@ -4,12 +4,6 @@
 
 ### URL: "/"
 Generic root-path to render the mainpage.
-To get an overview of the rendered page see the picture below.
-
-<figure markdown>
-  ![Image title](../media/base-gui.PNG)
-  <figcaption>Example-GUI for the given API</figcaption>
-</figure>
 
 ### URL: "/uploadFile"
 This path is used by websites which provide a graphical user interface, like the root path of these API.

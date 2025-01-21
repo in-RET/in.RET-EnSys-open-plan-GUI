@@ -1,10 +1,10 @@
-site_name: inretensys-gui
-site_url: https://github.com/in-RET/in.RET-EnSys-open-plan-GUI
+site_name: ensys-gui
+site_url: https://github.com/in-RET/ensys-gui
 site_author: in.RET
 
 # Repository
-repo_name: in-RET/inretensys-gui
-repo_url: https://github.com/in-RET/in.RET-EnSys-open-plan-GUI
+repo_name: in-RET/ensys-gui
+repo_url: https://github.com/in-RET/ensys-gui
 
 markdown_extensions:
     - toc:

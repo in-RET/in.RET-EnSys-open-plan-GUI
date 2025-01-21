@@ -31,33 +31,31 @@ On the bottom menubar you can find various links to information about the develo
 
 === "Create Project"
 
-    !!! warning
-        Under Construction
-
     === "Create Project Menu"
+        In the dropdown menu please choose "Empty Project" if you don't have a json-file with an exported project.
+        Actually (Jan 2025) there are no use cases to choose from.
         <figure markdown>
             ![Image title](../assets/screenshots/create_project_button.png)
         </figure>
 
     === "Create Project Form"
+        Fill in the marked textfields, for your lattitude and longitude click on the map at the right. 
+        You can zoom and move the map to locate you position.
+        Afterwards select the three remaining points to create the project.
         <figure markdown>
             ![Image title](../assets/screenshots/project_create_filled.png)
         </figure>
 
 === "Create Scenario"
-
-    !!! warning
-        Under Construction
-
+    After you created a project there on the right three dots which you can click to create a project. 
+    After selecting "Create Scenario" you see the following screen and can fill out the given textfields to create a scenario.
+    
     <figure markdown>
       ![Image title](../assets/screenshots/scenario_step1_filled.png)
     </figure>
 
 
 === "Modelling the Energysystem"
-
-    !!! warning
-        Under Construction
 
     === "Before Modelling"
         <figure markdown>

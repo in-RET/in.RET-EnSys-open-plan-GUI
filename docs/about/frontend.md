@@ -1,4 +1,4 @@
 # About frontend
 
-!!! tip
-    for infos
+!!! note
+    To be done.

@@ -1,4 +1,4 @@
 # About EnSys
 
-!!! tip
-    for EnSys-infos
+!!! note
+    To be done.

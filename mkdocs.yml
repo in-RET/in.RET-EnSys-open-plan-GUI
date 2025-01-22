@@ -6,6 +6,8 @@ site_author: in.RET
 repo_name: in-RET/ensys-gui
 repo_url: https://github.com/in-RET/ensys-gui
 
+plugins:
+    - glightbox
 markdown_extensions:
     - toc:
         permalink: true
@@ -88,7 +90,7 @@ theme:
 extra:
     social:
         - icon: fontawesome/solid/envelope
-          link: mailto:andreas.lubojanski@hs-nordhausen.de
+          link: mailto:ensys@hs-nordhausen.de
     generator: true
-copyright: Copyright &copy; 2023 Institut für regnenrative Energietechnik
+copyright: Copyright &copy; 2024 Institut für regenerative Energietechnik
     

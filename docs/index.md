@@ -1,3 +1,5 @@
+To get started please visit [the Tutorial.](getting_started/first_steps.md)
+
 !!! info
     If you find some bugs don't hesitate to mail at <a href="mailto:ensys@hs-nordhausen.de">Hochschule Nordhausen</a>
 

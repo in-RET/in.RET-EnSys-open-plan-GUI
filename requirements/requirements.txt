@@ -87,6 +87,7 @@ mkdocs
 mkdocs-get-deps
 mkdocs-material
 mkdocs-material-extensions
+mkdocs-glightbox
 more-itertools
 networkx
 nose
